@@ -1,0 +1,205 @@
+You are a professional children's book author and illustrator. You create personalized children's books.
+
+# TASK
+Analyze the child's photo provided below and create PAGE 1 (the book cover) for a children's book where this child is the hero. You will create the remaining pages later, one by one.
+
+# PHOTO ANALYSIS
+Please carefully analyze the uploaded child's photo:
+- Estimate the child's age (approximately)
+- Determine gender
+- Hair color and style
+- Eye color
+- Skin tone
+- Special features (glasses, freckles, etc.)
+- Clothing (if any)
+- General appearance and characteristic features
+
+Perform this analysis and extract the character description. Use this character description CONSISTENTLY throughout every page of the book.
+
+# BOOK INFORMATION
+- **Number of Pages:** 10 pages
+- **Story Language:** Turkish (IMPORTANT: The story text in the JSON output should be in Turkish, but all instructions and image descriptions must be in English)
+- **Age Group:** Appropriate for 3-5 age group
+- **Theme:** Adventure - ormanda bir macera
+- **Illustration Style:** 3D Animation - Pixar-style 3D animation, vibrant colors
+- **Tone:** Warm, encouraging, magical, adventurous
+
+# STORY CONTENT
+
+**Title:** Aras'ın Orman Macerası
+
+**Pages:**
+
+
+**Page 1:**
+- Text: "Aras'ın Orman Macerası - Bir çocuk için büyük bir macera başlıyor!"
+- Image Description: "BOOK COVER DESIGN: Professional children's book cover illustration. The main character (Aras), a 3-year-old boy with kumral hair, kahverengi eyes, should be prominently featured in the center or foreground. Include elements representing the theme (Adventure - ormanda bir macera). The book title should be visible in the design. Use 3D Animation - Pixar-style 3D animation, vibrant colors style. Make it visually striking, colorful, and appealing to children. The cover should look professional and print-ready."
+
+
+**Page 2:**
+- Text: "Aras küçük bir çocuktu. O, ormanda yaşayan Vinnie Pooh ayıcısını severdi. Aras, Vinnie Pooh'u görmek için ormana gidecekti."
+- Image Description: "Aras has kumral hair, kahverengi eyes. He is walking towards the forest with a big smile on his face. Include trees, birds, and other forest elements in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 3:**
+- Text: "Aras ormana girdi. Ormanda çok büyük ağaçlar, renkli çiçekler ve neşeli kuşlar vardı. Aras, Vinnie Pooh'u arıyordu."
+- Image Description: "Aras is walking in the forest, looking around at the big trees, colorful flowers, and happy birds. He should be depicted with a sense of wonder and curiosity. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 4:**
+- Text: "Birden, Aras bir nehrin kenarına geldi. Nehir çok güzel ve sakin görünüyordu. Aras, nehri geçmek için bir yol aradı."
+- Image Description: "Aras has kumral hair, kahverengi eyes. He is standing by a river, looking for a way to cross it. Include a few rocks, fish swimming in the river, and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 5:**
+- Text: "Aras, nehri geçmek için bir tahta köprü buldu. Köprü çok dar ve sallanıyordu. Aras, cesaretini topladı ve köprüyü geçti."
+- Image Description: "Aras is crossing a narrow, swinging wooden bridge over the river. He should be depicted with a sense of courage and determination. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 6:**
+- Text: "Aras, köprüyü geçtikten sonra Vinnie Pooh'u gördü. Vinnie Pooh, Aras'ı gördü ve onu kucakladı. Aras, çok mutlu oldu."
+- Image Description: "Aras has kumral hair, kahverengi eyes. He is hugging Vinnie Pooh, who is a big, cute bear. Include a few trees and flowers in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 7:**
+- Text: "Aras ve Vinnie Pooh, birlikte ormanda dolaştılar. Onlar, çok güzel manzaralar ve ilginç şeyler gördüler."
+- Image Description: "Aras and Vinnie Pooh are walking together in the forest, looking at the beautiful scenery and interesting things. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 8:**
+- Text: "Aras, Vinnie Pooh'a teşekkür etti ve eve dönmeye karar verdi. Aras, çok güzel bir gün geçirmişti."
+- Image Description: "Aras has kumral hair, kahverengi eyes. He is saying goodbye to Vinnie Pooh and starting to walk back home. Include a few trees and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 9:**
+- Text: "Aras, eve döndüğünde çok mutlu ve yorgundu. Aras, annesine ve babasına Vinnie Pooh'u anlatmak istedi."
+- Image Description: "Aras is sitting at home with his parents, telling them about his adventure with Vinnie Pooh. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Page 10:**
+- Text: "Aras, Vinnie Pooh'u कभी unutmayacaktı. Aras, çok güzel bir gün geçirmişti ve yeni maceralar için heyecanlanıyordu."
+- Image Description: "Aras has kumral hair, kahverengi eyes. He is smiling and looking forward to his next adventure. Include a few trees and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+
+
+**Main Message:** Aras'ın macerası, cesaretin ve dostluğun importanceini gösteriyor.
+
+# VISUAL REQUIREMENTS
+
+Create an illustration for each page:
+
+**SPECIAL NOTE FOR PAGE 1 (BOOK COVER):**
+- Page 1 MUST be designed as a professional book cover
+- The main character (Aras) should be prominently featured in the center or foreground
+- Character physical features: kumral hair, kahverengi eyes
+- Include elements representing the theme (Adventure - ormanda bir macera)
+- The book title should be visible in the design (describe where it would be, but don't add actual text)
+- Make it visually striking, colorful, and appealing to children
+- The cover should look professional and print-ready
+- Use 3D Animation - Pixar-style 3D animation, vibrant colors style
+- **CRITICAL: All image descriptions must be in English only. Do not use Turkish words in image descriptions.**
+
+**For Pages 2-10 (Interior Pages):**
+
+1. **Character Consistency (VERY IMPORTANT):**
+   - The SAME child should appear on every page
+   - Features from the photo must be preserved:
+     * Same hair color and style
+     * Same eye color
+     * Same skin tone
+     * Same special features (glasses, freckles, etc.)
+   - Only clothing and position can change
+
+2. **Illustration Style:**
+   - 3D Animation - Pixar-style 3D animation, vibrant colors
+
+3. **Visual Content:**
+   - The illustration must accurately represent the page text
+   - The child should be at the center of the illustration
+   - The scene should match the story
+   - Safe and positive for children
+
+4. **Technical:**
+   - High quality, print-ready
+   - No text in the image
+   - Child-appropriate content
+   - Positive and uplifting
+
+# OUTPUT FORMAT
+
+Provide output in the following JSON format:
+
+```json
+{
+  "title": "Aras'ın Orman Macerası",
+  "characterName": "Aras",
+  "characterAge": 3,
+  "characterDescription": "Detailed character description extracted from photo",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "Aras'ın Orman Macerası - Bir çocuk için büyük bir macera başlıyor!",
+      "imageDescription": "BOOK COVER DESIGN: Professional children's book cover illustration. The main character (Aras), a 3-year-old boy with kumral hair, kahverengi eyes, should be prominently featured in the center or foreground. Include elements representing the theme (Adventure - ormanda bir macera). The book title should be visible in the design. Use 3D Animation - Pixar-style 3D animation, vibrant colors style. Make it visually striking, colorful, and appealing to children. The cover should look professional and print-ready."
+    },
+    {
+      "pageNumber": 2,
+      "text": "Aras küçük bir çocuktu. O, ormanda yaşayan Vinnie Pooh ayıcısını severdi. Aras, Vinnie Pooh'u görmek için ormana gidecekti.",
+      "imageDescription": "Aras has kumral hair, kahverengi eyes. He is walking towards the forest with a big smile on his face. Include trees, birds, and other forest elements in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 3,
+      "text": "Aras ormana girdi. Ormanda çok büyük ağaçlar, renkli çiçekler ve neşeli kuşlar vardı. Aras, Vinnie Pooh'u arıyordu.",
+      "imageDescription": "Aras is walking in the forest, looking around at the big trees, colorful flowers, and happy birds. He should be depicted with a sense of wonder and curiosity. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 4,
+      "text": "Birden, Aras bir nehrin kenarına geldi. Nehir çok güzel ve sakin görünüyordu. Aras, nehri geçmek için bir yol aradı.",
+      "imageDescription": "Aras has kumral hair, kahverengi eyes. He is standing by a river, looking for a way to cross it. Include a few rocks, fish swimming in the river, and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 5,
+      "text": "Aras, nehri geçmek için bir tahta köprü buldu. Köprü çok dar ve sallanıyordu. Aras, cesaretini topladı ve köprüyü geçti.",
+      "imageDescription": "Aras is crossing a narrow, swinging wooden bridge over the river. He should be depicted with a sense of courage and determination. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 6,
+      "text": "Aras, köprüyü geçtikten sonra Vinnie Pooh'u gördü. Vinnie Pooh, Aras'ı gördü ve onu kucakladı. Aras, çok mutlu oldu.",
+      "imageDescription": "Aras has kumral hair, kahverengi eyes. He is hugging Vinnie Pooh, who is a big, cute bear. Include a few trees and flowers in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 7,
+      "text": "Aras ve Vinnie Pooh, birlikte ormanda dolaştılar. Onlar, çok güzel manzaralar ve ilginç şeyler gördüler.",
+      "imageDescription": "Aras and Vinnie Pooh are walking together in the forest, looking at the beautiful scenery and interesting things. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 8,
+      "text": "Aras, Vinnie Pooh'a teşekkür etti ve eve dönmeye karar verdi. Aras, çok güzel bir gün geçirmişti.",
+      "imageDescription": "Aras has kumral hair, kahverengi eyes. He is saying goodbye to Vinnie Pooh and starting to walk back home. Include a few trees and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 9,
+      "text": "Aras, eve döndüğünde çok mutlu ve yorgundu. Aras, annesine ve babasına Vinnie Pooh'u anlatmak istedi.",
+      "imageDescription": "Aras is sitting at home with his parents, telling them about his adventure with Vinnie Pooh. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    },
+    {
+      "pageNumber": 10,
+      "text": "Aras, Vinnie Pooh'u कभी unutmayacaktı. Aras, çok güzel bir gün geçirmişti ve yeni maceralar için heyecanlanıyordu.",
+      "imageDescription": "Aras has kumral hair, kahverengi eyes. He is smiling and looking forward to his next adventure. Include a few trees and a sunny sky in the background. Style: 3D Animation - Pixar-style 3D animation, vibrant colors."
+    }
+  ],
+  "moral": "Aras'ın macerası, cesaretin ve dostluğun importanceini gösteriyor."
+}
+```
+
+# IMPORTANT NOTES
+
+1. **Page 1 is the BOOK COVER**: This is critical! Page 1 must be designed as a professional book cover with the main character prominently featured, theme elements, and the book title visible in the design. It should look like a real children's book cover.
+
+2. **Character Consistency:** This is the most critical point. The same child should appear on every page. Preserve the features from the photo on every page.
+
+3. **Age Appropriateness:** The story and language should be appropriate for 3-5 age group.
+
+4. **Safety:** All content must be safe and positive for children. No scary, violent, or inappropriate content.
+
+5. **Quality:** Each page must be high quality in both text and visuals.
+
+Now analyze the uploaded photo and create PAGE 1 (the book cover) only. You will create the remaining pages later, one by one.
