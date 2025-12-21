@@ -61,6 +61,5 @@ cd docs
 
 ## 📞 İletişim ve Notlar
 
-- Referans Site: https://magicalchildrensbook.com/
 - Hedef Kitle: Ebeveynler, anaokulları, kreşler
 - Diller: TR, EN (öncelik), + çok dilli destek
