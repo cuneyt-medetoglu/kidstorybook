@@ -118,16 +118,22 @@ MVP lansmanı: Çalışan bir ürün
 ---
 
 ## 🎨 FAZ 2: Frontend Geliştirme
-**Öncelik:** 🔴 Kritik
+**Öncelik:** 🔴 Kritik  
+**Durum:** 🔄 Başladı (4 Ocak 2026)
 
 ### 2.1 Layout ve Navigasyon
-- [ ] **2.1.1** Ana layout component (header, footer, nav)
-- [ ] **2.1.2** Responsive tasarım (mobile-first)
+- [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
+- [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut)
 - [ ] **2.1.3** Tema sistemi (renk paleti, typography)
+  - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
+  - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
+  - [ ] Renk paleti: çocuklara uygun, dark/light mode uyumlu
+  - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.)
 - [ ] **2.1.4** Loading states ve error boundaries
-- [ ] **2.1.5** Header'da ülke/para birimi seçici
-- [ ] **2.1.6** Header'da sepet ikonu (shopping bag)
-- [ ] **2.1.7** "Create a children's book" butonu header'da
+- [x] **2.1.5** Header'da ülke/para birimi seçici - ✅ DropdownMenu ile entegre edildi
+- [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
+- [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
+- [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
 
 ### 2.2 Ana Sayfa (Homepage)
 - [ ] **2.2.1** Hero section (başlık, CTA, görsel)
@@ -371,7 +377,7 @@ v0.app ile UI oluştururken kullanabileceğiniz prompt'lar:
 
 ### Ana Sayfa Hero Section
 ```
-Create a hero section for a children's personalized storybook website called "KidStoryBook". 
+Create an animated hero section for a children's personalized storybook website called "KidStoryBook" with playful animations similar to modern children's websites.
 
 Requirements:
 - Modern, playful design with soft gradients (purple to pink)
@@ -379,51 +385,71 @@ Requirements:
 - Subheading about AI-generated personalized books
 - Two CTA buttons: "Create Your Book" (primary) and "See Examples"
 - Hero image placeholder showing a cute illustrated children's book
-- Floating decorative elements (stars, hearts, book icons)
-- Responsive design
-- Use Tailwind CSS and shadcn/ui components
+- Floating decorative elements (stars, hearts, book icons) with gentle animations
+- Framer Motion animations:
+  - Fade in on scroll (text elements with stagger effect)
+  - Floating decorative elements with gentle bounce and rotate
+  - Parallax effect on hero image
+  - Button hover: scale(1.05) + color transition
+- Smooth transitions (0.3s - 0.6s, ease-in-out)
+- Responsive design (mobile-first)
+- Use Tailwind CSS, shadcn/ui components, and Framer Motion
 - Children-friendly aesthetic with rounded corners
 - Typography should be playful but readable (consider fonts like Fredoka, Quicksand)
+- Interactive elements that respond to user actions
 ```
 
 ### Kitap Oluşturma Wizard
 ```
-Create a multi-step wizard form for creating a personalized children's book.
+Create an animated multi-step wizard form for creating a personalized children's book with smooth transitions and playful animations.
 
 Steps:
-1. Character Info (name, age, gender)
-2. Photo Upload (drag & drop with preview)
-3. Theme Selection (adventure, fairy tale, etc. with icons)
+1. Character Info (name, age, gender, hair color, eye color, special features)
+2. Photo Upload (drag & drop with preview, AI analysis button)
+3. Theme Selection (adventure, fairy tale, etc. with icons and previews)
 4. Illustration Style (grid of style options with images)
 5. Custom Requests (textarea)
-6. Review & Create
+6. Review & Create (summary of all inputs)
 
 Requirements:
-- Progress indicator at top showing current step
-- Previous/Next navigation buttons
-- Form validation with error messages
-- Modern card-based design
-- Animations between steps
-- Mobile responsive
-- Use shadcn/ui Form, Input, Select, Button components
+- Progress indicator at top showing current step (animated progress bar)
+- Previous/Next navigation buttons with smooth transitions
+- Form validation with error messages (animated error states)
+- Modern card-based design with hover effects
+- Framer Motion animations:
+  - Slide transitions between steps (slide left/right)
+  - Fade in for form fields (stagger effect)
+  - Scale animation on step completion
+  - Smooth page transitions
+- Mobile responsive (stack on mobile, side-by-side on desktop)
+- Use shadcn/ui Form, Input, Select, Button, Card components
 - Tailwind CSS for styling
+- Loading states with animated spinners
+- Success animations on step completion
 ```
 
 ### E-book Viewer
 ```
-Create an e-book viewer component that looks like an open book.
+Create an animated e-book viewer component that looks like an open book with smooth page flip animations.
 
 Requirements:
 - Two-page spread view (left page: text, right page: illustration)
-- Page flip animation when navigating
-- Navigation controls (prev, next, page number)
-- Fullscreen toggle button
-- Thumbnail preview strip at bottom (optional)
-- Loading state for images
-- Mobile-friendly (single page view on mobile)
-- Download PDF button
-- Share button
-- Book-like shadow and styling
+- Page flip animation when navigating (using react-pageflip library)
+- Navigation controls (prev, next, page number) with smooth transitions
+- Fullscreen toggle button with fade animation
+- Thumbnail preview strip at bottom (optional, with scroll animation)
+- Loading state for images (animated skeleton loaders)
+- Mobile-friendly (single page view on mobile, swipe gestures)
+- Download PDF button with loading state
+- Share button with tooltip animation
+- Book-like shadow and styling with 3D effect
+- Framer Motion animations:
+  - Page turn animation (realistic book flip)
+  - Fade in for pages
+  - Smooth transitions between pages
+  - Hover effects on controls
+- Responsive design
+- Touch gestures for mobile (swipe left/right)
 ```
 
 ### Kullanıcı Kitaplığı
@@ -651,7 +677,7 @@ Response: {
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
 | Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🔵 Bekliyor | 0 | 60 | 0% |
+| Faz 2 | 🔄 Başladı | 0 | 61 | 0% |
 | Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |

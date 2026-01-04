@@ -26,6 +26,8 @@ docs/
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
 │   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
+│   ├── V0_APP_WORKFLOW.md      # v0.app çalışma akışı rehberi
+│   ├── COLOR_PALETTE.md        # Renk paleti rehberi
 │   └── ...
 │
 ├── reports/                    # Raporlar
@@ -51,6 +53,9 @@ docs/
 │   ├── PROMPT_STORY.md          # Hikaye prompt template
 │   ├── PROMPT_IMAGE.md          # Görsel prompt template
 │   ├── PROMPT_FINAL.md          # Final birleştirilmiş prompt
+│   ├── V0_HEADER_PROMPT.md      # v0.app Header component prompt
+│   ├── V0_MOBILE_MENU_PROMPT.md # v0.app Mobile Menu prompt
+│   ├── V0_COLOR_UPDATE_PROMPT.md # v0.app Renk güncelleme prompt
 │   └── ...
 │
 └── technical/                   # Teknik dokümanlar

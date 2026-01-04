@@ -227,6 +227,7 @@ kidstorybook/
 | **Ödeme** | Stripe + İyzico | TBD | Global + Türkiye |
 | **Hosting** | Vercel | TBD | Next.js için optimize |
 | **Container** | Docker | Gelecek | Local dev, CI/CD |
+| **Theme** | next-themes | Faz 2.1.3 | Dark/Light mode support |
 
 ---
 
@@ -354,6 +355,24 @@ kidstorybook/
 
 **Karar:**
 - Supabase seçildi çünkü: Auth + DB + Storage hepsi bir arada, kolay kurulum, ücretsiz tier yeterli
+
+### 4 Ocak 2026 - Dark/Light Mode Kararı ✅
+**Ne değişti:**
+- Dark mode ve Light mode desteği eklendi (Faz 2.1.3)
+- Renk paleti dark/light mode uyumlu olacak şekilde tasarlandı
+- next-themes kullanılacak (theme provider)
+
+**Neden:**
+- Kullanıcı tercihi (bazı kullanıcılar dark mode tercih eder)
+- Modern web standartı
+- Göz yormayan deneyim (özellikle akşam saatlerinde)
+
+**Alternatifler:**
+- Custom theme provider (daha fazla kontrol)
+- CSS variables only (daha basit ama daha az özellik)
+
+**Karar:**
+- next-themes seçildi çünkü: Next.js ile mükemmel entegrasyon, sistem tercihini otomatik algılar, kolay kullanım
 
 ### 4 Ocak 2026 - Faz 1.3 Tamamlandı ✅
 **Ne değişti:**

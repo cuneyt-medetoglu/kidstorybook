@@ -29,7 +29,6 @@ const nextConfig = {
   // Environment variables validation
   env: {
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001',
-    NODE_ENV: process.env.NODE_ENV || 'development',
   },
 
   // Production optimizations
