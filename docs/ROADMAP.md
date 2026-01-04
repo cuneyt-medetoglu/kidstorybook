@@ -127,23 +127,23 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **2.1.3** Tema sistemi (renk paleti, typography)
   - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
   - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
-  - [ ] Renk paleti: çocuklara uygun, dark/light mode uyumlu
-  - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.)
-- [ ] **2.1.4** Loading states ve error boundaries
+  - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor)
+  - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.) - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
+- [ ] **2.1.4** Loading states ve error boundaries - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
 - [x] **2.1.5** Header'da ülke/para birimi seçici - ✅ DropdownMenu ile entegre edildi
 - [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
 
 ### 2.2 Ana Sayfa (Homepage)
-- [ ] **2.2.1** Hero section (başlık, CTA, görsel)
-- [ ] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım)
-- [ ] **2.2.3** Örnek kitaplar carousel
-- [ ] **2.2.4** Özellikler özeti
-- [ ] **2.2.5** Fiyatlandırma özeti
-- [ ] **2.2.6** FAQ bölümü
-- [ ] **2.2.7** Kampanya banner'ları (free shipping, indirimler)
-- [ ] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk)
+- [x] **2.2.1** Hero section (başlık, CTA, görsel) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.5** Fiyatlandırma özeti - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.6** FAQ bölümü - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.7** Kampanya banner'ları (free shipping, indirimler) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk) - ✅ v0.app'den alındı ve entegre edildi
 
 ### 2.3 Auth Sayfaları
 - [ ] **2.3.1** Giriş sayfası (email/şifre)
@@ -530,6 +530,7 @@ Requirements:
 - [ ] **Kampanya Banner'ları** - "Free shipping when you buy 2+ books", "50% off 3rd book" gibi
 - [ ] **"View Example" Butonları** - Örnek kitapları görüntüleme butonları
 - [ ] **"Used Photos" Gösterimi** - Örneklerde hangi fotoğrafların kullanıldığını gösterme
+  - **Karar (4 Ocak 2026):** Örnek Kitaplar Carousel (2.2.3) içinde gösterilecek - Her kitap kartında kullanılan fotoğraf (solda) → Kitap kapağı (sağda) şeklinde before/after gösterimi
 - [ ] **Tema Kartları Görsel Gösterimi** - Her tema için görsel thumbnail
 - [ ] **"View All Examples" Linki** - Tüm örnekleri görüntüleme
 - [ ] **"View All Themes" Linki** - Tüm temaları görüntüleme
@@ -553,6 +554,9 @@ Requirements:
 - **Storage Geçiş Planı:** Supabase Storage → AWS S3 (gelecekte)
   - **Şu an:** Supabase Storage kullanılacak (MVP için yeterli)
   - **Geçiş Zamanı:** Database dolmaya yakın (500MB limitine yaklaşıldığında)
+- **Faz 2.1 Ertelenen İşler (4 Ocak 2026):**
+  - **Typography (Faz 2.1.3):** Çocuk dostu fontlar (Fredoka, Quicksand) eklenmesi ertelendi. Şu an Inter kullanılıyor, yeterli. Faz 2.2 sonrası tekrar ele alınacak.
+  - **Loading States ve Error Boundaries (Faz 2.1.4):** Global loading states ve error boundary component'leri ertelendi. Faz 2.2 (Ana Sayfa) tamamlandıktan sonra eklenmesi planlanıyor. Neden: Ana içerik geliştirmesi öncelikli, loading/error handling sonra optimize edilebilir.
   - **Geçiş Planı:**
     - [ ] AWS S3 bucket oluştur
     - [ ] IAM policy ayarla
@@ -677,11 +681,13 @@ Response: {
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
 | Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🔄 Başladı | 0 | 61 | 0% |
+| Faz 2 | 🟡 Devam Ediyor | 8 | 61 | 13% |
+| Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
+| Faz 2.2 | 🟡 Devam Ediyor | 1 | 8 | 12% |
 | Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
-| **TOPLAM** | **🟡** | **10** | **152** | **7%** |
+| **TOPLAM** | **🟡** | **18** | **152** | **12%** |
 
 ---
 
