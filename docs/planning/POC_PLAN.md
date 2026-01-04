@@ -1,128 +1,118 @@
 # 🧪 POC (Proof of Concept) Planı
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 3.0  
+**Doküman Versiyonu:** 1.0  
 **Tarih:** 21 Aralık 2025  
-**Durum:** Planlama - Final
+**Durum:** Planlama
 
 ---
 
 ## POC Hedefi
 
-**Amaç:** AI ile 10 sayfalık bir çocuk kitabı oluşturarak prompt'ların çalışabilirliğini kanıtlamak ve iteratif olarak iyileştirmek.
+**Amaç:** AI ile 10 sayfalık bir çocuk kitabı oluşturarak sistemin çalışabilirliğini kanıtlamak.
 
 **Kritik Test Noktaları:**
-1. ✅ Prompt'un fotoğraf analizi talimatları
+1. ✅ Çocuk fotoğrafından karakter oluşturma
 2. ✅ Karakter tutarlılığı (her sayfada aynı çocuk görünmeli)
 3. ✅ Hikaye metni üretimi (yaş grubuna uygun)
 4. ✅ Görsel üretimi (illustration style'a uygun)
-5. ✅ Prompt'un TR ve EN versiyonları
+5. ✅ Prompt template'lerinin çalışması
 
 ---
 
-## POC Akışı (Basitleştirilmiş)
+## POC Akışı
 
-### Adım 1: Prompt Hazırlama (Ben)
+### Adım 1: Kullanıcı Girişleri (Manuel veya Script ile)
 
-**Ben hazırlayacağım:**
-- Final prompt (TR versiyonu)
-- Final prompt (EN versiyonu)
-- Version sistemi (v1, v2, v3...)
-- Her versiyon için changelog
-
-**Prompt içeriği:**
-- Kitap içeriği talimatları
-- Fotoğraf analizi talimatları
-- Karakter tutarlılığı talimatları
-- Illustration style talimatları
-- Çıktı formatı talimatları
-
----
-
-### Adım 2: Prompt + Fotoğraf → AI (Sen)
-
-**Sen yapacaksın:**
-1. Benim hazırladığım prompt'u al (TR veya EN)
-2. Çocuk fotoğrafını hazırla
-3. Prompt + fotoğrafı AI'a gönder:
-   - ChatGPT (GPT-4 Vision) veya
-   - Gemini (Gemini Vision)
-4. AI'ın çıktısını al (10 sayfalık kitap)
-
-**Not:** Script yok, manuel olarak ChatGPT/Gemini'ye göndereceksin.
-
----
-
-### Adım 3: Değerlendirme ve İyileştirme (Birlikte)
-
-**Sen değerlendireceksin:**
-- Kitap kalitesi nasıl?
-- Karakter tutarlılığı var mı?
-- Hikaye yaş grubuna uygun mu?
-- Görseller doğru mu?
-- Eksik/yanlış ne var?
-
-**Birlikte iyileştireceğiz:**
-- Beğenmediğin noktaları söyle
-- Prompt'ta ne değişmeli tartışalım
-- Yeni versiyon hazırlayalım (v2, v3...)
-- Tekrar test edelim
-
-**İteratif süreç:**
 ```
-v1 → Test → Feedback → v2 → Test → Feedback → v3 → ...
+1. Çocuk fotoğrafı yükle
+2. Karakter bilgileri:
+   - İsim: "Elif"
+   - Yaş: 5
+   - Cinsiyet: Kız
+   - Saç rengi: Kahverengi
+   - Göz rengi: Yeşil
+   - Özellikler: Gözlüklü
+3. Tema seç: "Macera - Dinozorlar"
+4. Yaş grubu: 3-5 yaş
+5. Illustration Style: "Watercolor"
+6. Dil: Türkçe
+7. Özel istekler: "Parkta dinozor yumurtası bulsunlar"
 ```
 
----
+### Adım 2: Prompt Template'lerini Oluştur
 
-## Prompt Versiyonlama Sistemi
+**2.1 Görsel Prompt Template** → `prompts/PROMPT_IMAGE.md` dokümanından
+- Kullanıcı girişlerinden karakter bilgilerini al
+- Illustration style'a göre prompt oluştur
+- **Not:** Çocuk fotoğrafı analizi AI tarafından yapılacak (GPT-4 Vision veya Gemini Vision)
 
-### Versiyon Formatı
+**2.2 Kitap İçeriği Prompt Template** → `prompts/PROMPT_STORY.md` dokümanından
+- Karakter bilgileri
+- Tema ve yaş grubu
+- Özel istekler
+- 10 sayfalık hikaye prompt'u
 
-**Dosya adları:**
-- `PROMPT_FINAL_TR_v1.md` - Türkçe v1
-- `PROMPT_FINAL_EN_v1.md` - İngilizce v1
-- `PROMPT_FINAL_TR_v2.md` - Türkçe v2
-- `PROMPT_FINAL_EN_v2.md` - İngilizce v2
+### Adım 3: AI'a İki Ayrı Prompt Gönder
 
-**Changelog:**
-- Her versiyon için değişiklik notları
-- Ne değişti, neden değişti
-- Test sonuçları
+**3.1 Kitap İçeriği Prompt**
+- AI: GPT-4o (veya GPT-4 Turbo)
+- 10 sayfalık hikaye metni üret
+- Her sayfa için görsel açıklaması (image prompt) dahil
+- Çıktı: JSON formatında hikaye + her sayfa için image prompt
+
+**3.2 Görsel Prompt Oluşturma**
+- Hikaye çıktısından her sayfa için image prompt al
+- Illustration style bilgisi ekle
+- Karakter bilgileri ekle
+- → Her sayfa için hazır görsel prompt'u
+
+### Adım 4: İki Prompt'u Birleştir
+
+**Script ile:**
+- Kitap içeriği çıktısı (metin + image prompt'lar)
+- Görsel prompt'ları (style + karakter bilgileri ile zenginleştirilmiş)
+- → **Final Prompt** oluştur (`prompts/PROMPT_FINAL.md`)
+
+### Adım 5: Final Prompt + Çocuk Fotoğrafı → AI
+
+**Tek bir AI çağrısı ile:**
+- Final prompt + çocuk fotoğrafı (GPT-4 Vision veya Gemini Vision)
+- AI: Fotoğrafı analiz eder, karakteri tanır, tüm sayfaları oluşturur
+- Çıktı: 10 sayfalık kitap (metin + görsel)
+- **Not:** Görsel analizi AI yapacak, biz sadece fotoğrafı göndereceğiz
 
 ---
 
 ## POC Çıktıları
 
-### 1. Prompt Template'leri
-- [x] `prompts/PROMPT_FINAL_TR_v1.md` - Türkçe final prompt v1
-- [x] `prompts/PROMPT_FINAL_EN_v1.md` - İngilizce final prompt v1
-- [ ] `prompts/PROMPT_FINAL_TR_v2.md` - Türkçe final prompt v2 (feedback sonrası)
-- [ ] `prompts/PROMPT_FINAL_EN_v2.md` - İngilizce final prompt v2 (feedback sonrası)
+### 1. Prompt Template Dokümanları
+- [ ] `prompts/PROMPT_IMAGE.md` - Görsel üretimi için prompt template
+- [ ] `prompts/PROMPT_STORY.md` - Hikaye içeriği için prompt template
+- [ ] `prompts/PROMPT_FINAL.md` - Birleştirilmiş final prompt template
 
-### 2. Changelog
-- [ ] `prompts/CHANGELOG.md` - Tüm versiyon değişiklikleri
+### 2. Script
+- [ ] `poc-script.js` veya `poc-script.py`
+- Kullanıcı girişlerini alır
+- Prompt template'lerini doldurur
+- AI API'lerine gönderir
+- Sonuçları birleştirir
 
-### 3. Test Sonuçları
-- [ ] Test 1 sonuçları ve feedback
-- [ ] Test 2 sonuçları ve feedback
-- [ ] ...
-
-### 4. Örnek Kitap
-- [ ] v1 ile oluşturulmuş 10 sayfalık kitap
-- [ ] v2 ile oluşturulmuş 10 sayfalık kitap (varsa)
-- [ ] Karşılaştırma ve değerlendirme
+### 3. Örnek Kitap
+- [ ] 10 sayfa metin
+- [ ] 10 sayfa görsel (veya 5 çift sayfa)
+- [ ] Karakter tutarlılığı test sonucu
+- [ ] Kalite değerlendirmesi
 
 ---
 
 ## POC Başarı Kriterleri
 
 ### Minimum Başarı:
-- ✅ Prompt çalışıyor (AI kitap oluşturuyor)
 - ✅ 10 sayfalık kitap oluşturuldu
 - ✅ Her sayfada metin var
 - ✅ Her sayfada görsel var
-- ✅ AI fotoğrafı analiz edip karakteri tanıdı
+- ✅ Karakter ismi hikayede geçiyor
 
 ### İdeal Başarı:
 - ✅ Karakter her sayfada %70+ benzer görünüyor
@@ -130,67 +120,35 @@ v1 → Test → Feedback → v2 → Test → Feedback → v3 → ...
 - ✅ Illustration style tutarlı
 - ✅ Metin ve görsel uyumlu
 - ✅ Özel istekler hikayede var
-- ✅ Prompt TR ve EN versiyonları çalışıyor
 
 ---
 
-## Test Senaryoları
+## POC Sonrası Değerlendirme
 
-### Senaryo 1: Temel Test
-- **Dil:** Türkçe
-- **Yaş:** 5 yaş
-- **Tema:** Macera - Dinozorlar
-- **Style:** Watercolor
-- **Fotoğraf:** 1 çocuk fotoğrafı
+### Test Edilecekler:
+1. **Karakter Tutarlılığı:** Her sayfada aynı çocuk görünüyor mu?
+2. **Hikaye Kalitesi:** Yaş grubuna uygun mu? Akıcı mı?
+3. **Görsel Kalitesi:** Illustration style doğru mu? Çocuklar için uygun mu?
+4. **Prompt Etkinliği:** Prompt'lar yeterince detaylı mı?
+5. **Maliyet:** Her kitap için ne kadar maliyet?
 
-### Senaryo 2: İngilizce Test
-- **Dil:** İngilizce
-- **Yaş:** 5 yaş
-- **Tema:** Adventure - Space
-- **Style:** 3D Animation
-- **Fotoğraf:** 1 çocuk fotoğrafı
-
-### Senaryo 3: Farklı Yaş Grubu
-- **Dil:** Türkçe
-- **Yaş:** 3 yaş (daha basit)
-- **Tema:** Eğitici - Sayılar
-- **Style:** Cartoon
-- **Fotoğraf:** 1 çocuk fotoğrafı
-
----
-
-## Feedback Formatı
-
-**Test sonrası feedback için:**
-```
-Test Tarihi: [TARIH]
-Prompt Versiyonu: v1 (TR)
-Test Senaryosu: [SENARYO]
-
-Değerlendirme:
-- Karakter Tutarlılığı: [1-5] - [YORUM]
-- Hikaye Kalitesi: [1-5] - [YORUM]
-- Görsel Kalitesi: [1-5] - [YORUM]
-- Genel Memnuniyet: [1-5] - [YORUM]
-
-İyileştirme Önerileri:
-- [ÖNERİ 1]
-- [ÖNERİ 2]
-- [ÖNERİ 3]
-```
+### İyileştirme Noktaları:
+- Prompt template'lerde eksikler
+- Karakter tutarlılığı için ek teknikler
+- Hikaye kalitesi için prompt iyileştirmeleri
+- Maliyet optimizasyonu
 
 ---
 
 ## Sonraki Adımlar
 
-1. ✅ Prompt'ları hazırla (TR + EN v1)
-2. ⏳ Sen test et (ChatGPT/Gemini'ye gönder)
-3. ⏳ Feedback ver
-4. ⏳ Prompt'u iyileştir (v2)
-5. ⏳ Tekrar test et
-6. ⏳ İteratif olarak iyileştir
+POC tamamlandıktan sonra:
+1. Sonuçları dokümante et
+2. İyileştirmeleri belirle
+3. FAZ 2 planını güncelle
+4. MVP geliştirmeye başla
 
 ---
 
-**Son Güncelleme:** 21 Aralık 2025  
-**Not:** Script yok, manuel test. Prompt'ları ChatGPT/Gemini'ye kopyala-yapıştır yaparak test edeceksin.
+**Son Güncelleme:** 21 Aralık 2025
+

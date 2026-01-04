@@ -52,16 +52,16 @@ MVP lansmanı: Çalışan bir ürün
 ## 🏗️ FAZ 1: Temel Altyapı
 **Öncelik:** 🔴 Kritik
 
-### 1.1 Proje Kurulumu
-- [ ] **1.1.1** Next.js 14 projesi oluştur (App Router)
-- [ ] **1.1.2** Tailwind CSS kur ve yapılandır
-- [ ] **1.1.3** shadcn/ui kur ve tema ayarla
-- [ ] **1.1.4** ESLint + Prettier ayarla
-- [ ] **1.1.5** Git repo ve branch stratejisi belirle
+### 1.1 Proje Kurulumu ✅
+- [x] **1.1.1** Next.js 14 projesi oluştur (App Router)
+- [x] **1.1.2** Tailwind CSS kur ve yapılandır
+- [x] **1.1.3** shadcn/ui kur ve tema ayarla
+- [x] **1.1.4** ESLint + Prettier ayarla
+- [x] **1.1.5** Git repo ve branch stratejisi belirle
 
-### 1.2 Supabase Kurulumu
-- [ ] **1.2.1** Supabase projesi oluştur
-- [ ] **1.2.2** Veritabanı şeması tasarla ve oluştur
+### 1.2 Supabase Kurulumu ✅
+- [x] **1.2.1** Supabase projesi oluştur
+- [x] **1.2.2** Veritabanı şeması tasarla ve oluştur
   - users (kullanıcılar)
     - id (UUID, primary key)
     - email (string, unique)
@@ -105,9 +105,9 @@ MVP lansmanı: Çalışan bir ürün
   - books (kitaplar)
   - orders (siparişler)
   - payments (ödemeler)
-- [ ] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth)
-- [ ] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers)
-- [ ] **1.2.5** Row Level Security (RLS) kuralları
+- [x] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth) - Client setup tamamlandı
+- [x] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers)
+- [x] **1.2.5** Row Level Security (RLS) kuralları - Migration'da hazır
 
 ### 1.3 Environment ve Yapılandırma
 - [ ] **1.3.1** `.env.local` dosyası oluştur
@@ -520,6 +520,22 @@ Requirements:
 - POC'taki prompt template'leri production'a taşınacak
 - Karakter tutarlılığı için reference image + detaylı prompt yaklaşımı
 - İlk aşamada %50 otomatik, %50 manuel kontrol (kalite için)
+- **Docker:** Docker desteği gelecekte eklenecek (Faz 1.3 veya Faz 5)
+  - Dockerfile ve docker-compose.yml
+  - Local development için Supabase Docker setup
+  - Production deployment için Docker image
+- **Storage Geçiş Planı:** Supabase Storage → AWS S3 (gelecekte)
+  - **Şu an:** Supabase Storage kullanılacak (MVP için yeterli)
+  - **Geçiş Zamanı:** Database dolmaya yakın (500MB limitine yaklaşıldığında)
+  - **Geçiş Planı:**
+    - [ ] AWS S3 bucket oluştur
+    - [ ] IAM policy ayarla
+    - [ ] Upload utility'leri S3'e migrate et
+    - [ ] Mevcut dosyaları S3'e taşı
+    - [ ] Supabase Storage kodlarını S3'e çevir
+    - [ ] URL'ler Supabase DB'de kalır (S3 URL'leri)
+  - **Tahmini Süre:** 1-2 hafta (geçiş zamanı geldiğinde)
+  - **Not:** Hibrit yaklaşım - Supabase (DB) + AWS S3 (Storage)
 
 ### v0.app vs bolt.new Karşılaştırması
 
@@ -634,12 +650,12 @@ Response: {
 
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
-| Faz 1 | 🟡 Bekliyor | 0 | 14 | 0% |
-| Faz 2 | 🟡 Bekliyor | 0 | 60 | 0% |
-| Faz 3 | 🟡 Bekliyor | 0 | 38 | 0% |
-| Faz 4 | 🟡 Bekliyor | 0 | 18 | 0% |
-| Faz 5 | 🟡 Bekliyor | 0 | 22 | 0% |
-| **TOPLAM** | **🟡** | **0** | **152** | **0%** |
+| Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
+| Faz 2 | 🔵 Bekliyor | 0 | 60 | 0% |
+| Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
+| Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
+| Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
+| **TOPLAM** | **🟡** | **10** | **152** | **7%** |
 
 ---
 

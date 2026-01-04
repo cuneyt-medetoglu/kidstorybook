@@ -12,12 +12,33 @@ docs/
 ├── ROADMAP.md                   # Ana proje planı ve iş listesi
 ├── PRD.md                       # Ürün gereksinimleri
 ├── FEATURES.md                  # Özellik listesi ve önceliklendirme
-├── API_KEYS.md                  # API key'ler (gitignore'da olmalı)
+├── ARCHITECTURE.md              # Mimari kararlar ve yapı
+│
+├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
+│   ├── FAZ1_IMPLEMENTATION.md  # Faz 1 implementasyon takibi
+│   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi (gelecek)
+│   └── ...
+│
+├── checklists/                 # Kontrol listeleri
+│   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi
+│   └── ...
+│
+├── guides/                     # Rehberler ve talimatlar
+│   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
+│   └── ...
+│
+├── reports/                    # Raporlar
+│   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu
+│   └── ...
+│
+├── strategies/                 # Strateji dokümanları
+│   ├── GIT_STRATEGY.md         # Git branching stratejisi
+│   └── ...
 │
 ├── ai/                          # AI ile ilgili dokümanlar
 │   ├── AI_STRATEGY.md           # AI prompt stratejisi
 │   ├── AI_TOOLS_COMPARISON.md   # AI tool karşılaştırması (test sonuçları)
-│   └── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
+│   └── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı
 │
 ├── planning/                    # Planlama dokümanları
 │   ├── FEATURE_NOTES.md         # Özellik notları
@@ -37,6 +58,22 @@ docs/
     ├── DATABASE_COMPARISON.md   # Veritabanı karşılaştırması
     └── PLATFORM_EXPLANATION.md  # Platform açıklamaları
 ```
+
+### 📋 Ana Dosyalar (docs/ root)
+
+**Sadece şu 5 dosya docs/ root'unda olmalı:**
+1. **DOCUMENTATION.md** - Bu dosya (dokümantasyon indeksi)
+2. **ROADMAP.md** - Ana proje planı ve iş listesi
+3. **PRD.md** - Ürün gereksinimleri
+4. **FEATURES.md** - Özellik listesi ve önceliklendirme
+5. **ARCHITECTURE.md** - Mimari kararlar ve yapı
+
+**Diğer tüm dosyalar alt klasörlerde:**
+- `implementation/` - Faz bazlı implementasyon takibi
+- `checklists/` - Kontrol listeleri
+- `guides/` - Rehberler
+- `reports/` - Raporlar
+- `strategies/` - Strateji dokümanları
 
 ---
 
@@ -72,6 +109,13 @@ docs/
 
 Dokümantasyon sürekli güncellenir. Son güncellemeler:
 - **4 Ocak 2026:** 
+  - Dokümantasyon yapısı yeniden düzenlendi
+  - `implementation/` klasörü oluşturuldu (faz bazlı implementasyon takibi)
+  - `checklists/`, `guides/`, `reports/`, `strategies/` klasörleri oluşturuldu
+  - Geçici dosyalar uygun klasörlere taşındı
+  - IMPLEMENTATION.md → `docs/implementation/FAZ1_IMPLEMENTATION.md` olarak taşındı
+  - Faz 1.2: Supabase kurulumu dokümantasyonu eklendi
+  - ARCHITECTURE.md oluşturuldu (mimari kararlar)
   - AI dokümanları `ai/` klasörüne taşındı
   - Ücretsiz kapak hakkı eklendi
   - OAuth girişleri eklendi
