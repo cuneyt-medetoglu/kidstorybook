@@ -25,6 +25,7 @@ docs/
 │
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
+│   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
 │   └── ...
 │
 ├── reports/                    # Raporlar
@@ -109,6 +110,10 @@ docs/
 
 Dokümantasyon sürekli güncellenir. Son güncellemeler:
 - **4 Ocak 2026:** 
+  - Faz 1.3: Environment ve yapılandırma tamamlandı
+    - `lib/config.ts` oluşturuldu (environment-based configuration)
+    - `next.config.js` optimize edildi
+    - Environment setup rehberi eklendi (`docs/guides/ENVIRONMENT_SETUP.md`)
   - Dokümantasyon yapısı yeniden düzenlendi
   - `implementation/` klasörü oluşturuldu (faz bazlı implementasyon takibi)
   - `checklists/`, `guides/`, `reports/`, `strategies/` klasörleri oluşturuldu

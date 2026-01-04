@@ -102,34 +102,46 @@ Docker desteği şu an yok, ama planlanıyor:
 
 ## 🔐 Environment Variables
 
-### Durum: **Şimdi Oluşturulmalı**
+### Durum: **✅ Oluşturuldu (Faz 1.2)**
 
-`.env.local` dosyası şu an yok, ama **Faz 1.3'te oluşturulacak**.
+`.env.local` dosyası **Faz 1.2'de oluşturuldu** (Supabase kurulumu sırasında).
 
-#### Neden Şimdi Değil?
+#### Oluşturulma Zamanı
 
-- Supabase projesi henüz oluşturulmadı (Faz 1.2)
-- API key'ler henüz gerekli değil
-- Development server çalışıyor (API key olmadan)
+**Faz 1.2'de (Supabase kurulumu):**
+- ✅ Supabase URL ve key'ler eklendi
+- ✅ `.env.local` dosyası oluşturuldu
+- ✅ `.env.example` template hazır
+- ✅ `.gitignore`'da (güvenlik)
 
-#### Ne Zaman Oluşturulmalı?
+#### İçerik
 
-**Faz 1.2'den sonra (Supabase kurulumu tamamlandıktan sonra):**
-- Supabase URL ve key'ler hazır olacak
-- API key'ler eklenebilir
-- Environment variables yapılandırılabilir
+```bash
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
 
-#### Şimdilik Yapılacaklar
+# OpenAI (gelecekte)
+OPENAI_API_KEY=your_openai_api_key
 
-1. ✅ `.env.example` dosyası oluşturuldu (template)
-2. ⏳ Faz 1.2'de Supabase kurulumu
-3. ⏳ Faz 1.3'te `.env.local` oluşturulacak
+# Next.js
+NEXT_PUBLIC_APP_URL=http://localhost:3001
+NODE_ENV=development
+```
+
+#### Güvenlik
+
+- ✅ `.env.local` `.gitignore`'da
+- ✅ `.env.example` template olarak commit edilebilir
+- ✅ API key'ler asla commit edilmemeli
+- ✅ Production'da Vercel environment variables kullanılacak
 
 ---
 
 ## 📁 Proje Yapısı
 
-### Mevcut Yapı
+### Mevcut Yapı (Faz 1.2 Sonrası)
 
 ```
 kidstorybook/
@@ -137,19 +149,30 @@ kidstorybook/
 │   ├── layout.tsx          # Root layout
 │   ├── page.tsx            # Homepage
 │   ├── globals.css         # Global styles
+│   ├── test-supabase/     # Supabase test sayfası
 │   └── api/                # API Routes (Backend)
-│       ├── auth/           # Authentication endpoints
-│       ├── characters/     # Character endpoints
-│       ├── books/          # Book endpoints
-│       └── ai/              # AI endpoints
+│       └── test/           # Test endpoints
+│           └── storage/     # Storage test endpoint
 ├── components/             # React Components
-│   ├── ui/                 # shadcn/ui components
-│   └── ...                 # Custom components
+│   └── ui/                 # shadcn/ui components
+│       └── button.tsx      # Button component
 ├── lib/                    # Utility functions
-│   ├── utils.ts            # Helper functions
-│   ├── supabase.ts         # Supabase client
-│   └── ...                 # Other utilities
+│   ├── utils.ts            # Helper functions (cn)
+│   └── supabase/           # Supabase clients
+│       ├── client.ts       # Browser client
+│       ├── server.ts       # Server client
+│       └── middleware.ts   # Middleware client (auth refresh)
+├── supabase/               # Supabase configuration
+│   ├── migrations/         # Database migrations
+│   │   └── 00001_initial_schema.sql
+│   └── README.md           # Supabase setup guide
+├── middleware.ts           # Next.js middleware (Supabase auth)
 ├── docs/                   # Dokümantasyon
+│   ├── implementation/     # Faz bazlı implementasyon takibi
+│   ├── checklists/         # Kontrol listeleri
+│   ├── guides/             # Rehberler
+│   ├── reports/            # Raporlar
+│   └── strategies/         # Strateji dokümanları
 ├── poc/                    # Proof of Concept
 └── public/                 # Static files
 ```
@@ -189,16 +212,21 @@ kidstorybook/
 
 ## 📊 Teknoloji Stack Özeti
 
-| Katman | Teknoloji | Not |
-|--------|-----------|-----|
-| **Frontend** | Next.js 14 (App Router) | SSR, SEO, Performance |
-| **UI** | Tailwind CSS + shadcn/ui | Modern, hızlı geliştirme |
-| **Backend** | Next.js API Routes | Built-in, serverless |
-| **Database** | Supabase (PostgreSQL) | Auth, DB, Storage |
-| **AI** | OpenAI, Groq, Gemini | Multiple providers |
-| **Ödeme** | Stripe + İyzico | Global + Türkiye |
-| **Hosting** | Vercel | Next.js için optimize |
-| **Container** | Docker (gelecek) | Local dev, CI/CD |
+| Katman | Teknoloji | Versiyon | Not |
+|--------|-----------|----------|-----|
+| **Frontend** | Next.js 14 (App Router) | 14.2.35 | SSR, SEO, Performance |
+| **UI Framework** | Tailwind CSS | 3.4.19 | Utility-first CSS |
+| **UI Components** | shadcn/ui | Latest | Radix UI + Tailwind |
+| **Backend** | Next.js API Routes | Built-in | Serverless functions |
+| **Database** | Supabase (PostgreSQL) | Latest | Auth, DB, Storage |
+| **Supabase Client** | @supabase/ssr | 0.8.0 | SSR support |
+| **Supabase JS** | @supabase/supabase-js | 2.89.0 | Core client |
+| **TypeScript** | TypeScript | 5.9.3 | Type safety |
+| **React** | React | 18.3.1 | UI library |
+| **AI** | OpenAI, Groq, Gemini | TBD | Multiple providers |
+| **Ödeme** | Stripe + İyzico | TBD | Global + Türkiye |
+| **Hosting** | Vercel | TBD | Next.js için optimize |
+| **Container** | Docker | Gelecek | Local dev, CI/CD |
 
 ---
 
@@ -217,13 +245,138 @@ kidstorybook/
 2. ⏳ Ayrı repo'ya geçiş (eğer gerekiyorsa)
 3. ⏳ Microservices mimarisi (çok büyürse)
 
-### Şimdilik Yapılacaklar
+### Tamamlananlar (Faz 1.2)
 
-1. ✅ Monorepo yapısı ile devam et
-2. ✅ Next.js API Routes kullan (ayrı backend server'a gerek yok)
-3. ⏳ Faz 1.2: Supabase kurulumu
-4. ⏳ Faz 1.3: Environment variables
-5. ⏳ Gelecekte: Docker desteği
+1. ✅ Monorepo yapısı ile devam ediliyor
+2. ✅ Next.js API Routes kullanılıyor (ayrı backend server yok)
+3. ✅ Faz 1.2: Supabase kurulumu tamamlandı
+   - Database schema oluşturuldu
+   - Supabase client setup (browser, server, middleware)
+   - Storage buckets oluşturuldu
+   - RLS policies tanımlandı
+4. ✅ Environment variables oluşturuldu (`.env.local`)
+5. ✅ Test infrastructure oluşturuldu (`/test-supabase`)
+
+### Tamamlananlar (Faz 1.3)
+
+1. ✅ Faz 1.3: Environment ve yapılandırma tamamlandı
+   - `.env.local` kontrolü ve optimizasyonu
+   - `next.config.js` Supabase için optimize edildi
+   - `lib/config.ts` oluşturuldu (development/production ayrımı)
+   - Image domains eklendi ve optimize edildi
+   - Environment setup rehberi oluşturuldu
+
+### Sıradakiler
+
+1. ⏳ Faz 2: Frontend geliştirme
+2. ⏳ Gelecekte: Docker desteği
+3. ⏳ Gelecekte: AWS S3 storage geçişi (Supabase limitine yaklaşıldığında)
+
+---
+
+---
+
+## 💾 Storage Stratejisi
+
+### Mevcut Durum: **Supabase Storage**
+
+**Faz 1.2'de oluşturuldu:**
+- ✅ **photos** bucket (Private, 10MB, image/*) - Kullanıcı fotoğrafları
+- ✅ **books** bucket (Public, 50MB, image/*) - Kitap görselleri
+- ✅ **pdfs** bucket (Public, 50MB, application/pdf) - PDF dosyaları
+- ✅ **covers** bucket (Public, 10MB, image/*) - Kapak görselleri
+
+### Gelecek: **AWS S3 Geçiş Planı**
+
+**Neden Geçiş Gerekli?**
+- Supabase Storage limiti: 500MB (free tier)
+- Büyük görseller ve PDF'ler için yetersiz olabilir
+- Maliyet optimizasyonu
+
+**Geçiş Zamanı:**
+- Database dolmaya yakın (500MB limitine yaklaşıldığında)
+- Şu an Supabase Storage kullanılıyor
+
+**Hibrit Mimari (Geçiş Sonrası):**
+- **Supabase:** Database (metadata) + Auth
+- **AWS S3:** Storage (görseller, PDF'ler)
+- **URL'ler:** Supabase DB'de saklanır (S3 URL'leri)
+
+**Geçiş Planı:**
+1. AWS S3 bucket oluştur
+2. IAM policy ayarla
+3. S3 upload utility'leri yaz
+4. Mevcut kodları migrate et
+5. Mevcut dosyaları S3'e taşı
+6. Test et ve production'a al
+
+---
+
+## 🧪 Test Infrastructure
+
+### Mevcut Test Araçları
+
+**Faz 1.2'de oluşturuldu:**
+- ✅ `/test-supabase` - Supabase connection test sayfası
+  - Connection test
+  - Database schema test
+  - Storage buckets test
+  - Authentication test
+- ✅ `app/api/test/storage` - Storage API test endpoint
+
+**Kullanım:**
+- Development sırasında Supabase bağlantısını test etmek için
+- Storage bucket'larının doğru oluşturulduğunu kontrol etmek için
+- Database schema'nın doğru olduğunu doğrulamak için
+
+---
+
+## 📜 Mimari Değişiklik Geçmişi
+
+### 4 Ocak 2026 - Faz 1.2 Tamamlandı
+**Ne değişti:**
+- Supabase kurulumu tamamlandı
+- Database schema oluşturuldu (6 tablo)
+- Supabase client setup yapıldı (browser, server, middleware)
+- Storage buckets oluşturuldu (4 bucket)
+- Environment variables oluşturuldu (`.env.local`)
+- Test infrastructure eklendi
+
+**Neden:**
+- Backend altyapısının hazır olması gerekiyordu
+- Authentication ve database ihtiyacı vardı
+- Storage için Supabase kullanıldı (gelecekte S3'e geçilebilir)
+
+**Alternatifler:**
+- Ayrı PostgreSQL database (Supabase yerine)
+- AWS S3 (storage için, şimdilik Supabase yeterli)
+- Firebase (Supabase yerine)
+
+**Karar:**
+- Supabase seçildi çünkü: Auth + DB + Storage hepsi bir arada, kolay kurulum, ücretsiz tier yeterli
+
+### 4 Ocak 2026 - Faz 1.3 Tamamlandı ✅
+**Ne değişti:**
+- `lib/config.ts` oluşturuldu (environment-based configuration)
+- `next.config.js` optimize edildi (image domains, production optimizations)
+- Development/Production config ayrımı yapıldı
+- Environment setup rehberi oluşturuldu (`docs/guides/ENVIRONMENT_SETUP.md`)
+- Configuration validation eklendi
+
+**Neden:**
+- Environment variable'ların merkezi yönetimi gerekiyordu
+- Development ve production arasında farklı ayarlar olacak
+- Image optimization için Next.js config'i optimize edilmeliydi
+- Vercel deployment için hazırlık yapılmalıydı
+
+**Alternatifler:**
+- Her yerde `process.env` kullanmak (merkezi yönetim yok)
+- Config dosyası olmadan (validation yok)
+
+**Karar:**
+- `lib/config.ts` ile merkezi configuration yönetimi
+- Type-safe configuration
+- Otomatik validation (production'da hata verir)
 
 ---
 
