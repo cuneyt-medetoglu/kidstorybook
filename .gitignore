@@ -51,3 +51,7 @@ next-env.d.ts
 # Cursor
 .cursor/*
 !.cursor/rules/
+
+# API Keys (güvenlik)
+docs/API_KEYS.md
+poc/Untitled
