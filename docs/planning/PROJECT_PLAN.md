@@ -142,7 +142,7 @@ Bu platform temel alınarak benzer veya daha iyi özellikler geliştirilecek.
 - [PRD.md](./PRD.md) - Ürün gereksinimleri
 - [TECHNICAL_RESEARCH.md](./TECHNICAL_RESEARCH.md) - Teknik araştırma
 - [PLATFORM_EXPLANATION.md](./PLATFORM_EXPLANATION.md) - Platform seçimi basit açıklama
-- [AI_STRATEGY.md](./AI_STRATEGY.md) - AI stratejisi
+- [AI_STRATEGY.md](../ai/AI_STRATEGY.md) - AI stratejisi
 - [FEATURES.md](./FEATURES.md) - Özellik listesi
 - [QUESTIONS_AND_DECISIONS.md](./QUESTIONS_AND_DECISIONS.md) - Kararlar
 - [POC_PLAN.md](./POC_PLAN.md) - POC planı

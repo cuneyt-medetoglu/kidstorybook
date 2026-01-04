@@ -32,14 +32,33 @@
 interface StoryParams {
   // Karakter Bilgileri
   characters: {
-    name: string;              // "Elif"
-    age: number;               // 5
-    gender: "boy" | "girl";    // "girl"
+    name: string;              // "Elif" - Kullanıcı girdisi
+    age: number;               // 5 - Kullanıcı girdisi
+    gender: "boy" | "girl";    // "girl" - Kullanıcı girdisi
     role: "main" | "side";     // "main"
-    hairColor?: string;        // "kahverengi"
-    eyeColor?: string;         // "yeşil"
-    features?: string;         // "gözlüklü, örgülü saçlı"
-    photoUrl: string;          // Yüklenen fotoğraf
+    
+    // Kullanıcı Girdileri
+    hairColor: string;         // "Kahverengi" - Kullanıcı seçimi
+    eyeColor: string;          // "Yeşil" - Kullanıcı seçimi
+    features: string[];        // ["gözlüklü", "çilli"] - Kullanıcı seçimi
+    
+    // Referans Görsel
+    referencePhotoUrl: string; // Yüklenen çocuk fotoğrafı (referans)
+    
+    // AI Analiz Sonuçları (Fotoğraftan)
+    aiAnalysis: {
+      hairLength: "short" | "medium" | "long";  // AI analizi
+      hairStyle: "straight" | "wavy" | "curly" | "braided" | "ponytail";  // AI analizi
+      hairTexture: string;     // AI analizi
+      faceShape: string;       // AI analizi
+      eyeShape: string;        // AI analizi
+      skinTone: string;        // AI analizi
+      bodyProportions: string; // AI analizi
+      clothing?: string;       // AI analizi (varsa)
+    };
+    
+    // Birleştirilmiş Tanım (Prompt için)
+    fullDescription: string;   // Tüm bilgiler birleştirilmiş: "5-year-old girl with long brown curly hair, green eyes, wearing glasses..."
   }[];
   
   // Pet/Oyuncak (opsiyonel)

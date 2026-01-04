@@ -1,65 +1,114 @@
-# KidStoryBook - AI Destekli Kişiselleştirilmiş Çocuk Hikaye Kitapları
+# 📚 KidStoryBook
+
+AI destekli kişiselleştirilmiş çocuk hikaye kitapları oluşturma platformu.
 
 ## 📖 Proje Hakkında
 
 KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir web platformudur. Ebeveynler çocuklarının özel hikayelerini yaratabilir, önce dijital olarak inceleyebilir, sonra basılı kitap olarak sipariş verebilir.
 
-## 🎯 Proje Vizyonu
+## ✨ Özellikler
 
-Her çocuğun kendisinin kahramanı olduğu benzersiz bir hikaye kitabına sahip olması ve bu kitapların AI teknolojisi ile hızlı, kaliteli ve uygun fiyatlı bir şekilde üretilmesi.
-
-## 📋 Proje Fazları
-
-### ✅ FAZ 1: Planlama, Araştırma ve POC (Mevcut Faz)
-**Hedef:** Tüm kararları netleştirmek, teknik altyapıyı belirlemek, dokümantasyon oluşturmak, POC ile kanıtlamak
-
-**Çıktılar:**
-- ✅ Proje dokümantasyon yapısı
-- ✅ PRD (Product Requirements Document)
-- ✅ Teknik araştırma ve platform kararı
-- ✅ AI stratejisi ve prompt tasarımı
-- ✅ Feature listesi ve önceliklendirme
-- ✅ Teknoloji stack seçimi
-- ⏳ Prompt template'leri (Görsel + Hikaye + Final)
-- ⏳ POC Script
-- ⏳ 10 sayfalık örnek kitap (POC çıktısı)
-
-### FAZ 2: [Faz 1 Sonunda Belirlenecek]
-### FAZ 3: [Faz 1 Sonunda Belirlenecek]
-
-## 📁 Dokümantasyon Yapısı
-
-```
-/docs
-├── planning/                # Planlama dokümanları
-│   ├── PROJECT_PLAN.md      # Genel proje planı
-│   ├── POC_PLAN.md          # POC planı ve akışı
-│   └── QUESTIONS_AND_DECISIONS.md  # Karar verilmesi gereken konular
-├── technical/               # Teknik dokümanlar
-│   ├── TECHNICAL_RESEARCH.md    # Platform ve teknoloji araştırması
-│   ├── PLATFORM_EXPLANATION.md  # Platform seçimi basit açıklama
-│   └── DATABASE_COMPARISON.md    # PostgreSQL vs MongoDB
-├── prompts/                 # Prompt template'leri
-│   ├── PROMPT_IMAGE.md      # Görsel üretimi prompt template
-│   ├── PROMPT_STORY.md      # Hikaye içeriği prompt template
-│   ├── PROMPT_FINAL_TR_v1.md  # Türkçe final prompt v1 (POC için)
-│   ├── PROMPT_FINAL_EN_v1.md  # İngilizce final prompt v1 (POC için)
-│   └── CHANGELOG.md         # Prompt versiyon geçmişi
-├── PRD.md                   # Ürün gereksinimleri detayları
-├── FEATURES.md              # Özellik listesi ve detayları
-└── AI_STRATEGY.md          # AI prompt tasarımı ve stratejisi
-```
+- 🎨 **AI Destekli Hikaye Oluşturma** - GPT-4o ile özgün hikayeler
+- 🖼️ **Kişiselleştirilmiş Görseller** - DALL-E 3 ile çocuğun fotoğrafından karakter oluşturma
+- 📖 **Dijital Kitap Görüntüleme** - Flipbook tarzı interaktif kitap deneyimi
+- 📦 **Basılı Kitap Siparişi** - Fiziksel kitap siparişi ve teslimat
+- 🌍 **Çok Dilli Destek** - Türkçe ve İngilizce (daha fazla dil eklenecek)
+- 💳 **Güvenli Ödeme** - Stripe ve İyzico entegrasyonu
 
 ## 🚀 Hızlı Başlangıç
 
-Şu anda **FAZ 1: Planlama ve Araştırma** aşamasındayız. 
+### Gereksinimler
 
-Dokümantasyonu incelemek için:
+- Node.js 18+ 
+- npm veya yarn
+- API Keys (OpenAI, Groq, vb.)
+
+### Kurulum
+
 ```bash
-cd docs
+# Repository'yi klonla
+git clone https://github.com/yourusername/kidstorybook.git
+cd kidstorybook
+
+# Bağımlılıkları yükle
+npm install
+
+# Environment variables oluştur
+cp .env.example .env
+# .env dosyasını düzenle ve API key'lerini ekle
+
+# Development server'ı başlat
+npm run dev
 ```
 
-## 📞 İletişim ve Notlar
+Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
 
-- Hedef Kitle: Ebeveynler, anaokulları, kreşler
-- Diller: TR, EN (öncelik), + çok dilli destek
+## 🛠️ Teknoloji Stack
+
+| Katman | Teknoloji |
+|--------|-----------|
+| **Frontend** | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
+| **Backend** | Next.js API Routes, Supabase |
+| **Database** | PostgreSQL (Supabase) |
+| **AI - Metin** | OpenAI GPT-4o, Gemini Pro, Groq, Claude |
+| **AI - Görsel** | DALL-E 3, Gemini Imagen 3, Stable Diffusion, Grok |
+| **Ödeme** | Stripe, İyzico |
+| **Hosting** | Vercel |
+| **Storage** | Supabase Storage |
+
+## 📁 Proje Yapısı
+
+```
+kidstorybook/
+├── docs/              # Dokümantasyon
+│   ├── DOCUMENTATION.md  # Dokümantasyon indeksi
+│   ├── ROADMAP.md       # Proje yol haritası
+│   ├── PRD.md          # Ürün gereksinimleri
+│   └── ...
+├── poc/               # Proof of Concept (çalışan demo)
+├── src/               # Kaynak kod (oluşturulacak)
+└── .cursor/           # Cursor AI kuralları
+```
+
+## 📚 Dokümantasyon
+
+Detaylı dokümantasyon için [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) dosyasına bakın.
+
+- [Proje Yol Haritası](docs/ROADMAP.md)
+- [Ürün Gereksinimleri](docs/PRD.md)
+- [Özellik Listesi](docs/FEATURES.md)
+- [AI Stratejisi](docs/ai/AI_STRATEGY.md)
+- [Teknik Dokümantasyon](docs/technical/)
+
+## 🧪 POC (Proof of Concept)
+
+Proje şu anda POC aşamasında. Çalışan demo için:
+
+```bash
+cd poc
+npm install
+npm start
+```
+
+POC hakkında daha fazla bilgi için [`poc/README.md`](poc/README.md) dosyasına bakın.
+
+## 🤝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Commit yapın (`git commit -m 'feat: Yeni özellik eklendi'`)
+4. Push yapın (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+## 📝 Lisans
+
+Bu proje özel bir projedir. Tüm hakları saklıdır.
+
+## 📞 İletişim
+
+- **Hedef Kitle:** Ebeveynler, anaokulları, kreşler
+- **Diller:** Türkçe, İngilizce (daha fazla dil eklenecek)
+
+---
+
+**Not:** Bu proje aktif geliştirme aşamasındadır. MVP lansmanı için çalışmalar devam etmektedir.

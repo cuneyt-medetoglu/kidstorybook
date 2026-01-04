@@ -1,0 +1,60 @@
+# KidStoryBook - Cursor AI Kuralları
+
+## Proje Hakkında
+Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir SaaS platformudur.
+
+## Dil
+- Her zaman Türkçe yanıt ver
+- Kod yorumları İngilizce olabilir
+
+## Teknoloji Stack
+- **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui
+- **UI Builder:** v0.app
+- **Backend:** Next.js API Routes, Supabase
+- **Database:** PostgreSQL (Supabase)
+- **AI:** OpenAI GPT-4o, DALL-E 3, Groq
+- **Ödeme:** Stripe, İyzico
+- **Hosting:** Vercel
+
+## Proje Yapısı
+```
+kidstorybook/
+├── docs/           # Dokümantasyon
+│   ├── ROADMAP.md  # Ana proje planı ve iş listesi
+│   ├── PRD.md      # Ürün gereksinimleri
+│   ├── FEATURES.md # Özellik listesi
+│   └── ...
+├── poc/            # Proof of Concept (çalışan demo)
+├── src/            # Kaynak kod (oluşturulacak)
+└── .cursor/        # Cursor AI kuralları
+    └── rules/
+        └── project-manager.mdc  # Proje yönetici agent
+```
+
+## Agent Kullanımı
+Proje yönetimi için `@project-manager` agent'ını etiketleyebilirsin:
+- İş takibi ve güncelleme
+- Sonraki adım önerileri
+- v0.app UI prompt'ları
+- İlerleme raporları
+
+## Önemli Dosyalar
+- `docs/ROADMAP.md` - Tüm işlerin listesi, buradan takip et
+- `docs/DOCUMENTATION.md` - Dokümantasyon indeksi
+- `docs/ai/AI_STRATEGY.md` - AI prompt stratejisi
+- `poc/server.js` - Çalışan prompt sistemi
+
+## Kodlama Kuralları
+1. TypeScript kullan
+2. Tailwind CSS kullan, custom CSS yazma
+3. shadcn/ui componentlerini kullan
+4. Server Components tercih et (Next.js)
+5. Zod ile validasyon yap
+6. Error handling ekle
+
+## Commit Mesajları
+Türkçe, açıklayıcı commit mesajları kullan:
+- `feat: Ana sayfa hero section eklendi`
+- `fix: Form validasyon hatası düzeltildi`
+- `docs: ROADMAP güncellendi`
+
