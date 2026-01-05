@@ -61,6 +61,31 @@ export default function RegisterPage() {
     // Handle registration logic here (Faz 3'te Supabase Auth entegrasyonu yapılacak)
   }
 
+  // OAuth handlers (placeholder - Faz 3'te Supabase Auth entegrasyonu yapılacak)
+  const handleGoogleOAuth = async () => {
+    console.log("[OAuth] Google OAuth clicked - Faz 3'te entegrasyon yapılacak")
+    // TODO: Faz 3'te Supabase Auth signInWithOAuth('google') entegrasyonu
+    // const supabase = createClient()
+    // await supabase.auth.signInWithOAuth({
+    //   provider: 'google',
+    //   options: {
+    //     redirectTo: `${window.location.origin}/auth/callback`,
+    //   },
+    // })
+  }
+
+  const handleFacebookOAuth = async () => {
+    console.log("[OAuth] Facebook OAuth clicked - Faz 3'te entegrasyon yapılacak")
+    // TODO: Faz 3'te Supabase Auth signInWithOAuth('facebook') entegrasyonu
+    // const supabase = createClient()
+    // await supabase.auth.signInWithOAuth({
+    //   provider: 'facebook',
+    //   options: {
+    //     redirectTo: `${window.location.origin}/auth/callback`,
+    //   },
+    // })
+  }
+
   // Floating animations for decorative elements
   const floatingVariants = {
     animate: (i: number) => ({
@@ -455,6 +480,7 @@ export default function RegisterPage() {
                   <Button
                     type="button"
                     variant="outline"
+                    onClick={handleGoogleOAuth}
                     className="w-full border-gray-300 bg-white py-6 text-gray-700 transition-all hover:bg-gray-50 hover:shadow-md dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   >
                     <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -483,6 +509,7 @@ export default function RegisterPage() {
                   <Button
                     type="button"
                     variant="outline"
+                    onClick={handleFacebookOAuth}
                     className="w-full border-blue-500 bg-blue-600 py-6 text-white transition-all hover:bg-blue-700 hover:shadow-md dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                   >
                     <svg className="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

@@ -149,11 +149,11 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.3.1** Giriş sayfası (email/şifre) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.3.2** Kayıt sayfası - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.3.3** Şifre sıfırlama - ✅ v0.app'den alındı ve entegre edildi
-- [ ] **2.3.4** Google OAuth butonu ve entegrasyonu
-- [ ] **2.3.5** Facebook OAuth butonu ve entegrasyonu
-- [ ] **2.3.6** Instagram OAuth butonu ve entegrasyonu (opsiyonel)
-- [ ] **2.3.7** Email doğrulama sayfası
-- [ ] **2.3.8** OAuth callback sayfaları
+- [x] **2.3.4** Google OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [x] **2.3.5** Facebook OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [ ] **2.3.6** Instagram OAuth butonu ve entegrasyonu (opsiyonel) - ⏳ İleride eklenecek
+- [x] **2.3.7** Email doğrulama sayfası - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [x] **2.3.8** OAuth callback sayfaları - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
 
 ### 2.4 Kitap Oluşturma Wizard
 - [ ] **2.4.1** Step 1: Karakter bilgileri formu
