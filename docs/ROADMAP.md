@@ -146,9 +146,9 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk) - ✅ v0.app'den alındı ve entegre edildi
 
 ### 2.3 Auth Sayfaları
-- [ ] **2.3.1** Giriş sayfası (email/şifre)
-- [ ] **2.3.2** Kayıt sayfası
-- [ ] **2.3.3** Şifre sıfırlama
+- [x] **2.3.1** Giriş sayfası (email/şifre) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.3.2** Kayıt sayfası - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.3.3** Şifre sıfırlama - ✅ v0.app'den alındı ve entegre edildi
 - [ ] **2.3.4** Google OAuth butonu ve entegrasyonu
 - [ ] **2.3.5** Facebook OAuth butonu ve entegrasyonu
 - [ ] **2.3.6** Instagram OAuth butonu ve entegrasyonu (opsiyonel)
