@@ -7,7 +7,7 @@
 
 ## 📍 Mevcut Durum
 
-**Aktif Bölüm:** Faz 2.3 - Auth Sayfaları  
+**Aktif Bölüm:** Faz 2.4 - Kitap Oluşturma Wizard  
 **Son Güncelleme:** 4 Ocak 2026
 
 ---
@@ -65,12 +65,12 @@
 | Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
 | Faz 2.2 | ✅ Tamamlandı | 8 | 8 | 100% |
 | Faz 2.3 | 🟡 Devam Ediyor | 6 | 8 | 75% |
-| Faz 2.4 | 🔵 Bekliyor | 0 | 10 | 0% |
+| Faz 2.4 | 🟡 Devam Ediyor | 5 | 10 | 50% |
 | Faz 2.5 | 🔵 Bekliyor | 0 | 6 | 0% |
 | Faz 2.6 | 🔵 Bekliyor | 0 | 6 | 0% |
 | Faz 2.7 | 🔵 Bekliyor | 0 | 12 | 0% |
 | Faz 2.8 | 🔵 Bekliyor | 0 | 4 | 0% |
-| **Faz 2 Toplam** | **🟡** | **22** | **61** | **36%** |
+| **Faz 2 Toplam** | **🟡** | **27** | **61** | **44%** |
 
 ---
 
@@ -841,6 +841,363 @@
 - Callback sayfası şimdilik simulated processing yapıyor (Faz 3'te gerçek entegrasyon)
 - Email verification sayfası şimdilik simulated processing yapıyor (Faz 3'te gerçek entegrasyon)
 - Instagram OAuth (2.3.6) şimdilik atlandı, ileride eklenecek
+
+---
+
+### 4 Ocak 2026 - Faz 2.4 Başladı: Kitap Oluşturma Wizard 🔄
+
+**Plan:**
+- 10 alt görev (2.4.1 - 2.4.10)
+- v0.app ile adım adım oluşturulacak
+- Multi-step wizard (6 adım)
+- Progress indicator ve navigation
+- Form validasyonu (Zod + React Hook Form)
+
+**Step 1 - Karakter Bilgileri Formu:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP1_PROMPT.md`
+- ✅ v0.app'den Step 1 component kodu alındı
+- ✅ `app/create/step1/page.tsx` oluşturuldu
+- ✅ Lint kontrolü: Hata yok
+
+**Step 1 Özellikleri:**
+- ✅ Progress indicator (Step 1 of 6, 16.67% progress bar)
+- ✅ Form title: "Character Information" / "Karakter Bilgileri"
+- ✅ **Form Fields:**
+  - Name input (User icon, validation: min 2 chars)
+  - Age input (Heart icon, validation: 0-12)
+  - Gender radio buttons (Boy/Erkek, Girl/Kız, custom styling)
+  - Hair color dropdown (6 options, TR/EN labels)
+  - Eye color dropdown (5 options, TR/EN labels)
+  - Special features checkboxes (6 options, optional, grid layout)
+- ✅ "Next" button (gradient, disabled when invalid, ArrowRight icon)
+- ✅ Form validation (React Hook Form + Zod)
+- ✅ Real-time validation (onChange mode)
+- ✅ Error messages below each field
+- ✅ Framer Motion animasyonları (fade-in, slide-in, stagger)
+- ✅ Responsive tasarım (mobile: single column, desktop: 2-column checkboxes)
+- ✅ Dark mode desteği
+- ✅ Decorative floating elements (desktop only)
+- ✅ Help text ("Contact Support" link)
+
+**Teknik Detaylar:**
+- Component: `app/create/step1/page.tsx`
+- Dependencies: `react-hook-form`, `@hookform/resolvers`, `zod`, `framer-motion`, `lucide-react`, `@/components/ui/*`
+- Form handling: React Hook Form with Zod resolver
+- Validation: Zod schema (characterSchema)
+- State management: `useState` for selectedFeatures, React Hook Form for form state
+- Icons: `User`, `Heart`, `Eye`, `Scissors`, `ArrowRight`, `Sparkles`, `Star`, `BookOpen`
+- Layout: Centered form, max-width 2xl
+- Animations: Framer Motion (fade-in, slide-in, stagger, floating)
+- Accessibility: aria-labels, aria-invalid, aria-describedby
+
+**Notlar:**
+- Form submit şimdilik console.log yapıyor (Faz 3'te Step 2'ye navigate edilecek)
+- Form data localStorage'a kaydedilebilir (Faz 3'te backend'e kaydedilecek)
+- Progress indicator: 1/6 (16.67%) - Faz 3'te diğer step'ler eklendiğinde güncellenecek
+- **Localization:** Şu an tüm UI sadece EN (İngilizce). TR/EN karışık ifadeler kaldırıldı. Localization sistemi Faz 5 veya Post-MVP'de eklenecek (ROADMAP'te not edildi).
+
+**Step 2 - Referans Görsel Yükleme:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP2_PROMPT.md`
+- ✅ v0.app'den Step 2 component kodu alındı ve entegre edildi
+
+**Step 3 - Tema ve Yaş Grubu Seçimi:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP3_PROMPT.md`
+- ✅ v0.app'den Step 3 component kodu alındı
+
+**Step 4 - Illustration Style Seçimi:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP4_PROMPT.md`
+- ✅ v0.app'den Step 4 component kodu alındı
+
+**Step 5 - Özel İstekler:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP5_PROMPT.md`
+- ✅ v0.app'den Step 5 component kodu alındı
+
+**Step 6 - Önizleme ve Onay:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_BOOK_WIZARD_STEP6_PROMPT.md`
+- ✅ v0.app'den Step 6 component kodu alındı ve entegre edildi
+- ✅ Component: `app/create/step6/page.tsx`
+- ✅ Özellikler:
+  - Progress indicator: "Step 6 of 6" (100% progress bar)
+  - Character Information Summary: Step 1'den tüm karakter bilgileri (name, age, gender, hair color, eye color, special features)
+  - Reference Photo Preview: Step 2'den fotoğraf önizleme + AI analiz sonuçları (badges formatında)
+  - Theme & Age Group Summary: Step 3'ten seçilen tema ve yaş grubu
+  - Illustration Style Summary: Step 4'ten seçilen illustration style
+  - Custom Requests Summary: Step 5'ten özel istekler (varsa)
+  - Edit links: Her bölüm için "Edit" linki (Step'e geri dönüş)
+  - Navigation: "Back" button (to Step 5), "Create Book" button (placeholder alert)
+  - Framer Motion animations: fade-in, slide-up, stagger, hover effects
+  - Responsive design: Mobile, tablet, desktop
+  - Dark mode support
+  - Decorative floating elements: CheckCircle, Sparkles, BookOpen, Star icons (desktop only)
+- Dependencies: `framer-motion`, `lucide-react`, `next/image`, `@/components/ui/button`
+- State management: Mock data (Faz 3'te proper state management ile gerçek data kullanılacak)
+- Icons: `User`, `ImageIcon`, `Sparkles`, `Palette`, `Lightbulb`, `ArrowLeft`, `Rocket`, `CheckCircle`, `Star`, `BookOpen`, `Pencil`
+- Layout: Centered form, max-width 4xl
+- Animations: Framer Motion (fade-in, slide-up, stagger, hover scale, floating)
+- Accessibility: ARIA labels, keyboard navigation
+
+**Notlar:**
+- Mock data kullanılıyor (Faz 3'te context/localStorage/URL params veya proper state management ile gerçek data kullanılacak)
+- "Create Book" butonu şimdilik placeholder alert gösteriyor (Faz 3'te backend API entegrasyonu yapılacak)
+- Photo preview: `next/image` component kullanılıyor, placeholder image için `https://via.placeholder.com/256`
+- AI Analysis results: Mock data ile gösteriliyor (Faz 3'te gerçek AI analizi sonuçları gösterilecek)
+- Edit links: Her summary section için Step'e geri dönüş linki (hover'da görünür)
+
+**2.4.9 - Ücretsiz Kapak Hakkı Kontrolü ve Gösterimi:**
+- ✅ Free cover badge eklendi (Step 6 header'da)
+- ✅ Badge: Gradient green badge (from-green-500 to-emerald-500) with Gift icon
+- ✅ Mock data: `userData.freeCoverAvailable = true` (Faz 3'te `users.free_cover_used` kontrolü yapılacak)
+- ✅ Badge animasyonu: fade-in + scale animation
+- ✅ Responsive: Mobile ve desktop'ta düzgün görünüyor
+
+**2.4.10 - "Ücretsiz Kapak Oluştur" Butonu:**
+- ✅ "Create Free Cover" butonu eklendi (Step 6'da, "Create Book" butonunun üstünde)
+- ✅ Buton: Gradient green button (from-green-500 to-emerald-500) with Gift icon
+- ✅ Helper text: "Use your free cover credit to create just the cover (Page 1)"
+- ✅ Conditional rendering: Sadece `freeCoverAvailable === true` ise gösteriliyor
+- ✅ Placeholder onClick: Alert gösteriyor (Faz 3'te `/api/ai/generate-cover` API çağrısı yapılacak)
+- ✅ Layout: Full width button, "Create Book" butonunun üstünde
+- ✅ Animations: Framer Motion fade-in + slide-up
+
+**2.4.7 - Progress Indicator:**
+- ✅ Tüm step'lerde (1-6) progress indicator mevcut
+- ✅ Her step'te "Step X of 6" metni ve progress bar gösteriliyor
+- ✅ Progress bar: Gradient (from-purple-500 to-pink-500)
+- ✅ Progress yüzdeleri: Step 1: 16.67%, Step 2: 33.33%, Step 3: 50%, Step 4: 66.67%, Step 5: 83.33%, Step 6: 100%
+- ✅ Animations: Framer Motion width animation (0 → target width, duration: 0.8s, ease-out)
+- ✅ Responsive: Mobile ve desktop'ta düzgün görünüyor
+- ✅ Dark mode desteği
+
+**2.4.8 - Form Validasyonu (Zod + React Hook Form):**
+- ✅ Step 1: Zod schema + React Hook Form + zodResolver
+  - Schema: `characterSchema` (name, age, gender, hairColor, eyeColor, specialFeatures)
+  - Validation: min/max length, enum, array validation
+- ✅ Step 2: Custom file validation (`validateFile` function)
+  - File type validation: JPG, PNG only
+  - File size validation: max 5MB
+  - Error messages: User-friendly error messages
+- ✅ Step 3: Zod schema + React Hook Form + zodResolver
+  - Schema: `formSchema` (theme, ageGroup)
+  - Validation: enum validation for theme and ageGroup
+- ✅ Step 4: Zod schema + React Hook Form + zodResolver
+  - Schema: `formSchema` (illustrationStyle)
+  - Validation: enum validation for illustrationStyle
+- ✅ Step 5: Zod schema + React Hook Form + zodResolver
+  - Schema: `formSchema` (customRequests)
+  - Validation: max 500 characters, optional
+- ✅ Step 6: Preview sayfası (form yok, sadece önizleme ve onay)
+- ✅ Error handling: Tüm step'lerde error messages gösteriliyor
+- ✅ Form state: `formState.errors` ile error handling
+- ✅ Validation mode: `onChange` (Step 1), `onBlur` (diğer step'ler)
+- ✅ `app/create/step5/page.tsx` oluşturuldu
+- ✅ Link'ler düzeltildi (`/create-book/step-4` → `/create/step4`, `/create-book/step-6` → `/create/step6`)
+- ✅ Lint kontrolü: Hata yok
+
+**Step 5 Özellikleri:**
+- ✅ Progress indicator (Step 5 of 6, 83.33% progress bar)
+- ✅ Form title: "Custom Requests"
+- ✅ Subtitle: "Optional - Add any special requests for your story"
+- ✅ **Custom Requests Textarea:**
+  - Optional field (not required)
+  - Multi-line text input
+  - Placeholder: Example text with suggestions
+  - Minimum height: 200px (mobile), 250px (desktop)
+  - Resizable (vertical resize only)
+  - Maximum 500 characters
+  - Real-time character counter (bottom-right of textarea)
+  - Character counter warning: Red color when < 50 characters remaining
+  - Helper text: "Tell us about any specific elements, characters, or scenarios you'd like to include in the story"
+  - Focus state: Purple-500 ring
+  - Error message: Display below textarea if validation fails
+- ✅ **Form Validation:**
+  - React Hook Form + Zod validation
+  - Custom Requests: Optional, maximum 500 characters
+  - Error messages below textarea
+  - Real-time character count
+- ✅ **Navigation:**
+  - "Back" button (outline, ArrowLeft icon, to Step 4)
+  - "Next" button (gradient, ArrowRight icon, always enabled - optional field, to Step 6)
+- ✅ Framer Motion animasyonları (fade-in, slide-up, floating)
+- ✅ Responsive tasarım (mobile: single column, desktop: centered)
+- ✅ Dark mode desteği
+- ✅ Decorative floating elements (desktop only: Lightbulb, Sparkles, BookOpen, PenTool)
+
+**Teknik Detaylar:**
+- Component: `app/create/step5/page.tsx`
+- Dependencies: `framer-motion`, `react-hook-form`, `@hookform/resolvers`, `zod`, `lucide-react`
+- State management: `useForm` for form handling, `watch` for real-time character count
+- Form validation: Zod schema (optional, max 500 characters)
+- Character counter: Real-time calculation (500 - current length), warning when < 50 remaining
+- Icons: `Lightbulb`, `Sparkles`, `BookOpen`, `PenTool`, `ArrowRight`, `ArrowLeft`
+- Layout: Centered form, max-width 2xl
+- Animations: Framer Motion (fade-in, slide-up, floating)
+- Accessibility: aria-labels, aria-describedby, aria-live for character counter, keyboard navigation, focus states
+- ✅ `app/create/step4/page.tsx` oluşturuldu
+- ✅ Link'ler düzeltildi (`/create-book/step-3` → `/create/step3`, `/create-book/step-5` → `/create/step5`)
+- ✅ Lint kontrolü: Hata yok
+
+**Step 4 Özellikleri:**
+- ✅ Progress indicator (Step 4 of 6, 66.67% progress bar)
+- ✅ Form title: "Choose Illustration Style"
+- ✅ **Illustration Style Selection Section:**
+  - 12 illustration style cards (grid layout: 3 columns desktop, 2 tablet/mobile)
+  - Styles: 3D Animation, Geometric, Watercolor, Gouache, Picture-Book, Block World, Soft Anime, Collage, Clay Animation, Kawaii, Comic Book, Sticker Art
+  - Each style has unique gradient color and icon
+  - Card design:
+    - Preview image area (aspect-video, gradient placeholder with style-specific color)
+    - Icon badge (top-right corner, semi-transparent background)
+    - Selected checkmark badge (top-left corner, white circle with check icon)
+    - Title and description (line-clamp-3 for consistent height)
+    - Hover overlay (gradient overlay on image)
+  - Selected state: Gradient border (3px, style-specific color), shadow-2xl, checkmark badge
+  - Unselected state: Gray border (2px), white/slate-800 background
+  - Hover: scale(1.05), shadow increase
+  - Tap: scale(0.98)
+  - Stagger animation (delay: index * 0.05s - faster due to 12 items)
+- ✅ **Form Validation:**
+  - React Hook Form + Zod validation
+  - Illustration Style: Required, enum validation (12 options: 3d_animation, geometric, watercolor, gouache, picture_book, block_world, soft_anime, collage, clay_animation, kawaii, comic_book, sticker_art)
+  - Error messages below section
+  - Real-time validation on selection
+- ✅ **Navigation:**
+  - "Back" button (outline, ArrowLeft icon, to Step 3)
+  - "Next" button (gradient, ArrowRight icon, disabled when style not selected, to Step 5)
+- ✅ Framer Motion animasyonları (fade-in, slide-in, scale, stagger, floating, checkmark scale)
+- ✅ Responsive tasarım (mobile: 2 columns, tablet: 2 columns, desktop: 3 columns)
+- ✅ Dark mode desteği
+- ✅ Decorative floating elements (desktop only: Palette, Brush, Sparkles, BookOpen)
+
+**Teknik Detaylar:**
+- Component: `app/create/step4/page.tsx`
+- Dependencies: `framer-motion`, `react-hook-form`, `@hookform/resolvers`, `zod`, `lucide-react`
+- State management: `useState` for selectedStyle, `useForm` for form handling
+- Form validation: Zod schema with enum types (12 styles)
+- Illustration style options: 12 styles with unique gradients, icons, and descriptions
+- Preview images: Placeholder gradients (MVP için, Faz 3'te gerçek görseller eklenebilir)
+- Icons: `Box`, `Hexagon`, `Palette`, `Paintbrush`, `BookOpen`, `Grid3x3`, `Sparkles`, `Layers`, `Circle`, `Heart`, `Zap`, `StickyNote`, `ArrowRight`, `ArrowLeft`, `Brush`
+- Layout: Centered form, max-width 6xl
+- Animations: Framer Motion (fade-in, slide-in, scale, stagger, floating, checkmark scale)
+- Accessibility: Keyboard navigation, focus states, image alt text (placeholder için)
+- ✅ `app/create/step3/page.tsx` oluşturuldu
+- ✅ Link'ler düzeltildi (`/create-book/step-2` → `/create/step2`, `/create-book/step-4` → `/create/step4`)
+- ✅ Lint kontrolü: Hata yok
+
+**Step 3 Özellikleri:**
+- ✅ Progress indicator (Step 3 of 6, 50% progress bar)
+- ✅ Form title: "Choose Theme & Age Group"
+- ✅ **Theme Selection Section:**
+  - 6 theme cards (grid layout: 3 columns desktop, 2 tablet, 1 mobile)
+  - Themes: Adventure, Fairy Tale, Educational, Nature & Animals, Space & Science, Sports & Activities
+  - Each theme has unique gradient color (Orange/Amber, Purple/Pink, Blue/Cyan, Green/Emerald, Indigo/Violet, Red/Rose)
+  - Card design: Icon (h-12 w-12), title, description
+  - Selected state: Gradient background, white text, checkmark indicator (top-right)
+  - Unselected state: White/Slate-800 background, gray border, gradient icon background
+  - Hover: scale(1.05), shadow increase
+  - Tap: scale(0.98)
+  - Stagger animation (delay: index * 0.1s)
+- ✅ **Age Group Selection Section:**
+  - 3 age group cards (grid layout: 3 columns desktop, 1 mobile)
+  - Age groups: 0-2 Years, 3-5 Years, 6-9 Years
+  - Each age group has unique gradient color (Pink/Rose, Yellow/Amber, Blue/Cyan)
+  - Card design: Icon (h-10 w-10), title, description, features (italic, small text)
+  - Selected state: Gradient background, white text, checkmark indicator
+  - Unselected state: White/Slate-800 background, gray border, gradient icon background
+  - Hover: scale(1.05), shadow increase
+  - Tap: scale(0.98)
+  - Stagger animation (delay: 0.3s + index * 0.1s)
+- ✅ **Form Validation:**
+  - React Hook Form + Zod validation
+  - Theme: Required, enum validation (6 options)
+  - Age Group: Required, enum validation (3 options)
+  - Error messages below each section
+  - Real-time validation on selection
+- ✅ **Navigation:**
+  - "Back" button (outline, ArrowLeft icon, to Step 2)
+  - "Next" button (gradient, ArrowRight icon, disabled when theme or age group not selected, to Step 4)
+- ✅ Framer Motion animasyonları (fade-in, slide-in, scale, stagger, floating, checkmark scale)
+- ✅ Responsive tasarım (mobile: single column, tablet: 2 columns, desktop: 3 columns)
+- ✅ Dark mode desteği
+- ✅ Decorative floating elements (desktop only)
+
+**Teknik Detaylar:**
+- Component: `app/create/step3/page.tsx`
+- Dependencies: `framer-motion`, `react-hook-form`, `@hookform/resolvers`, `zod`, `lucide-react`
+- State management: `useState` for selectedTheme, selectedAgeGroup, `useForm` for form handling
+- Form validation: Zod schema with enum types
+- Theme options: 6 themes with unique gradients and icons
+- Age group options: 3 age groups with unique gradients and icons
+- Icons: `Mountain`, `Sparkles`, `BookOpen`, `Trees`, `Rocket`, `Trophy`, `Baby`, `Smile`, `GraduationCap`, `ArrowRight`, `ArrowLeft`, `Star`, `Heart`
+- Layout: Centered form, max-width 4xl
+- Animations: Framer Motion (fade-in, slide-in, scale, stagger, floating, checkmark scale)
+- Accessibility: Keyboard navigation, focus states
+- ✅ v0.app'den Step 2 component kodu alındı
+- ✅ `app/create/step2/page.tsx` oluşturuldu
+- ✅ Link'ler düzeltildi (`/create-book/step-1` → `/create/step1`, `/create-book/step-3` → `/create/step3`)
+- ✅ TR/EN karışık ifadeler kaldırıldı (sadece EN)
+- ✅ Lint kontrolü: Hata yok
+
+**Step 2 Özellikleri:**
+- ✅ Progress indicator (Step 2 of 6, 33.33% progress bar)
+- ✅ Form title: "Upload Your Child's Photo"
+- ✅ **Upload Section:**
+  - Drag & drop zone (large, min-height 300px desktop, 250px mobile)
+  - Dashed border (purple-300, dark: purple-700)
+  - Hover/active states (border color change, background change)
+  - Upload icon (Lucide) - center
+  - "Choose File" button (gradient)
+  - File requirements text: "JPG, PNG up to 5MB"
+  - File validation (format: JPG/PNG, size: max 5MB)
+  - Error messages for invalid files
+- ✅ **Photo Preview (After Upload):**
+  - Image preview (rounded-lg, shadow, centered, max-width 400px)
+  - "Remove" button (top-right corner, X icon, red background)
+  - File info: File name, size (formatted: "2.5 MB")
+  - Fade-in + scale animation
+- ✅ **AI Analysis Section:**
+  - Card with gradient border (purple-200 to pink-50)
+  - Brain icon (gradient circle background)
+  - Title: "Analyze Photo with AI"
+  - Description: "Get detailed character analysis"
+  - "Analyze Photo" button:
+    - Gradient background (purple to pink)
+    - Loading state (spinner, "Analyzing..." text)
+    - Success state (CheckCircle icon, "Analysis Complete" text)
+    - Disabled state (when analyzing or analysis complete)
+    - Sparkles icon (Lucide)
+  - Analysis Results (After Analysis):
+    - Success indicator: CheckCircle icon + "Analysis Complete" text
+    - Results display: Grid layout (2 columns)
+    - Badges for each feature: Hair Length, Hair Style, Hair Texture, Face Shape, Eye Shape, Skin Tone
+    - Stagger animation (delay per badge)
+    - "Re-analyze" button (optional)
+- ✅ **Navigation:**
+  - "Back" button (outline, ArrowLeft icon, to Step 1)
+  - "Next" button (gradient, ArrowRight icon, disabled when no photo, to Step 3)
+- ✅ Framer Motion animasyonları (fade-in, slide-in, scale, stagger, floating)
+- ✅ Responsive tasarım (mobile: single column, desktop: inline buttons)
+- ✅ Dark mode desteği
+- ✅ Decorative floating elements (desktop only)
+
+**Teknik Detaylar:**
+- Component: `app/create/step2/page.tsx`
+- Dependencies: `framer-motion`, `lucide-react`, `@/components/ui/*`
+- File handling: Native HTML5 File API
+- State management: `useState` for uploadedFile, previewUrl, isDragging, uploadError, isAnalyzing, analysisResult
+- File validation: `validateFile()` function (format: JPG/PNG, size: max 5MB)
+- Drag & drop: `handleDragEnter`, `handleDragLeave`, `handleDragOver`, `handleDrop` callbacks
+- Photo preview: `URL.createObjectURL()` for preview URL
+- AI analysis: Simulated (2.5 second delay, mock results) - Faz 3'te gerçek entegrasyon
+- Icons: `Upload`, `X`, `CheckCircle`, `Brain`, `Sparkles`, `Star`, `Heart`, `BookOpen`, `ArrowRight`, `ArrowLeft`
+- Layout: Centered form, max-width 2xl
+- Animations: Framer Motion (fade-in, slide-in, scale, stagger, floating, rotate)
+- Accessibility: aria-labels, keyboard navigation
+
+**Notlar:**
+- File upload şimdilik client-side preview (Faz 3'te Supabase Storage'a yüklenecek)
+- AI analysis şimdilik simulated (mock results, 2.5 second delay) - Faz 3'te gerçek AI entegrasyonu (GPT-4 Vision veya Gemini Vision)
+- Analysis results: Random mock data (Faz 3'te gerçek AI analizi sonuçları gösterilecek)
+- Crop feature: Opsiyonel, MVP'de basit tutuldu, Faz 3'te detaylı implement edilebilir
+- Navigation: Link'ler şimdilik placeholder (Faz 3'te router.push ile yapılacak)
 
 ---
 

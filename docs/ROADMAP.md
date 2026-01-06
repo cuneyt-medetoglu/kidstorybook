@@ -14,8 +14,9 @@
 4. [Faz 3: Backend ve AI Entegrasyonu](#faz-3-backend-ve-ai-entegrasyonu)
 5. [Faz 4: E-ticaret ve Ödeme](#faz-4-e-ticaret-ve-ödeme)
 6. [Faz 5: Polish ve Lansman](#faz-5-polish-ve-lansman)
-7. [v0.app Prompt Rehberi](#v0app-prompt-rehberi)
-8. [Notlar ve Fikirler](#notlar-ve-fikirler)
+7. [Faz 6: Mobil Uygulama (PWA)](#faz-6-mobil-uygulama-pwa)
+8. [v0.app Prompt Rehberi](#v0app-prompt-rehberi)
+9. [Notlar ve Fikirler](#notlar-ve-fikirler)
 
 ---
 
@@ -119,7 +120,8 @@ MVP lansmanı: Çalışan bir ürün
 
 ## 🎨 FAZ 2: Frontend Geliştirme
 **Öncelik:** 🔴 Kritik  
-**Durum:** 🔄 Başladı (4 Ocak 2026)
+**Durum:** 🟡 Devam Ediyor (4 Ocak 2026)  
+**İlerleme:** 32/61 iş tamamlandı (52%)
 
 ### 2.1 Layout ve Navigasyon
 - [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
@@ -156,31 +158,31 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.3.8** OAuth callback sayfaları - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
 
 ### 2.4 Kitap Oluşturma Wizard
-- [ ] **2.4.1** Step 1: Karakter bilgileri formu
-  - [ ] Çocuğun adı (text input)
-  - [ ] Yaş (number input, 0-12)
-  - [ ] Cinsiyet (radio: Erkek/Kız)
-  - [ ] Saç rengi (dropdown: Açık Kumral, Kumral, Koyu Kumral, Siyah, Kahverengi, Kızıl)
-  - [ ] Göz rengi (dropdown: Mavi, Yeşil, Kahverengi, Siyah, Ela)
-  - [ ] Özel özellikler (checkbox: gözlüklü, çilli, dimples, vb.)
-- [ ] **2.4.2** Step 2: Referans görsel yükleme (çocuk fotoğrafı)
-  - [ ] Drag & drop veya file picker
-  - [ ] Fotoğraf önizleme
-  - [ ] Fotoğraf kırpma/crop (opsiyonel)
-  - [ ] Maksimum dosya boyutu kontrolü (5MB)
-  - [ ] Format kontrolü (JPG, PNG)
-  - [ ] AI analiz butonu (fotoğrafı analiz et)
-  - [ ] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.)
-- [ ] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9, 10+)
-- [ ] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme)
-- [ ] **2.4.5** Step 5: Özel istekler
-- [ ] **2.4.6** Step 6: Önizleme ve onay
-  - [ ] Karakter tanımı özeti (kullanıcı girdileri + AI analizi)
-  - [ ] Referans görsel önizleme
-- [ ] **2.4.7** Progress indicator
-- [ ] **2.4.8** Form validasyonu (Zod + React Hook Form)
-- [ ] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi
-- [ ] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa)
+- [x] **2.4.1** Step 1: Karakter bilgileri formu - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Çocuğun adı (text input)
+  - [x] Yaş (number input, 0-12)
+  - [x] Cinsiyet (radio: Erkek/Kız)
+  - [x] Saç rengi (dropdown: Açık Kumral, Kumral, Koyu Kumral, Siyah, Kahverengi, Kızıl)
+  - [x] Göz rengi (dropdown: Mavi, Yeşil, Kahverengi, Siyah, Ela)
+  - [x] Özel özellikler (checkbox: gözlüklü, çilli, dimples, vb.)
+- [x] **2.4.2** Step 2: Referans görsel yükleme (çocuk fotoğrafı) - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Drag & drop veya file picker
+  - [x] Fotoğraf önizleme
+  - [ ] Fotoğraf kırpma/crop (opsiyonel) - ⏸️ MVP'de basit tutuldu, Faz 3'te detaylı implement edilebilir
+  - [x] Maksimum dosya boyutu kontrolü (5MB)
+  - [x] Format kontrolü (JPG, PNG)
+  - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+  - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
+- [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Karakter tanımı özeti (kullanıcı girdileri + AI analizi) - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek data)
+  - [x] Referans görsel önizleme - ✅ UI tamamlandı
+- [x] **2.4.7** Progress indicator - ✅ Tüm step'lerde (1-6) mevcut, her step'te "Step X of 6" ve progress bar gösteriliyor
+- [x] **2.4.8** Form validasyonu (Zod + React Hook Form) - ✅ Tüm step'lerde mevcut (Step 1,3,4,5: Zod + RHF, Step 2: Custom file validation, Step 6: Preview sayfası)
+- [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)
+- [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)
 
 ### 2.5 E-book Viewer
 - [ ] **2.5.1** react-pageflip entegrasyonu
@@ -212,11 +214,20 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış)
 - [ ] **2.7.12** "View All Examples" ve "View All Themes" linkleri
 
-### 2.8 Çok Dilli Destek (i18n)
-- [ ] **2.8.1** next-intl kurulumu
-- [ ] **2.8.2** TR çevirileri
-- [ ] **2.8.3** EN çevirileri
-- [ ] **2.8.4** Dil değiştirici component
+### 2.8 Çok Dilli Destek (i18n) - ⏸️ Ertelendi
+**Durum:** 🔵 Post-MVP / Faz 5  
+**Karar (4 Ocak 2026):** Şu an tüm UI sadece İngilizce (EN) olarak geliştiriliyor. Localization sistemi Faz 5 veya Post-MVP'de eklenecek.
+
+- [ ] **2.8.1** i18n library seçimi (next-intl, react-i18next, vb.)
+- [ ] **2.8.2** Dil seçici component (header'da)
+- [ ] **2.8.3** Tüm UI metinlerinin çeviri dosyalarına taşınması
+- [ ] **2.8.4** Dinamik dil değiştirme
+- [ ] **2.8.5** URL-based dil routing (/tr/, /en/, vb.)
+- [ ] **2.8.6** Cookie/localStorage ile dil tercihi saklama
+- [ ] **2.8.7** TR çevirileri
+- [ ] **2.8.8** Gelecekte 25+ dil desteği
+
+**Not:** Detaylı plan için "Notlar ve Fikirler" → "Localization (i18n) Planı" bölümüne bakın.
 
 ---
 
@@ -371,6 +382,66 @@ MVP lansmanı: Çalışan bir ürün
 
 ---
 
+## 📱 FAZ 6: Mobil Uygulama (PWA)
+**Öncelik:** 🟢 Düşük (Post-MVP)  
+**Durum:** 🔵 Bekliyor (Web tamamlandıktan sonra)  
+**Not:** Şu an odağımız web uygulamasını tamamlamak. Mobil uygulama web tamamlandıktan sonra geliştirilecek.
+
+### 6.1 PWA Temel Kurulumu
+- [ ] **6.1.1** next-pwa paketi kurulumu
+- [ ] **6.1.2** Manifest.json oluşturma (app name, icons, theme color)
+- [ ] **6.1.3** Service Worker yapılandırması
+- [ ] **6.1.4** App icon'ları oluştur (192x192, 512x512, iOS icon'ları)
+- [ ] **6.1.5** Splash screen yapılandırması
+- [ ] **6.1.6** Offline desteği (cache strategy)
+- [ ] **6.1.7** Install prompt (PWA yükleme butonu)
+
+### 6.2 Mobil Optimizasyon
+- [ ] **6.2.1** Touch gesture desteği (swipe, pinch)
+- [ ] **6.2.2** Mobil navigasyon iyileştirmeleri
+- [ ] **6.2.3** Fotoğraf yükleme optimizasyonu (mobil kamera entegrasyonu)
+- [ ] **6.2.4** Push notification desteği (opsiyonel)
+- [ ] **6.2.5** Share API entegrasyonu (kitap paylaşma)
+- [ ] **6.2.6** Responsive tasarım son kontrolleri
+
+### 6.3 Android (Play Store) - TWA Build
+- [ ] **6.3.1** PWA Builder veya Bubblewrap ile TWA projesi oluştur
+- [ ] **6.3.2** Android manifest yapılandırması
+- [ ] **6.3.3** APK/AAB build alma
+- [ ] **6.3.4** Google Play Console hesabı oluştur ($25 tek seferlik)
+- [ ] **6.3.5** Store listing hazırlama (açıklama, ekran görüntüleri, icon)
+- [ ] **6.3.6** Play Store'a yükleme ve yayınlama
+- [ ] **6.3.7** Test ve inceleme süreci
+
+### 6.4 iOS (App Store) - Capacitor Wrapper
+- [ ] **6.4.1** Capacitor kurulumu ve yapılandırması
+- [ ] **6.4.2** iOS platform ekleme
+- [ ] **6.4.3** iOS native wrapper oluşturma
+- [ ] **6.4.4** Xcode projesi yapılandırması
+- [ ] **6.4.5** Apple Developer hesabı oluştur ($99/yıl)
+- [ ] **6.4.6** App Store Connect'te uygulama oluşturma
+- [ ] **6.4.7** Store listing hazırlama (açıklama, ekran görüntüleri, icon)
+- [ ] **6.4.8** App Store'a yükleme ve yayınlama
+- [ ] **6.4.9** Test ve inceleme süreci
+
+### 6.5 Test ve Optimizasyon
+- [ ] **6.5.1** PWA test (Lighthouse PWA audit)
+- [ ] **6.5.2** Android cihazlarda test (farklı ekran boyutları)
+- [ ] **6.5.3** iOS cihazlarda test (iPhone, iPad)
+- [ ] **6.5.4** Performance optimizasyonu (bundle size, loading time)
+- [ ] **6.5.5** Offline functionality test
+- [ ] **6.5.6** Store'larda görünürlük ve kullanılabilirlik testi
+
+### 6.6 Güncelleme ve Bakım
+- [ ] **6.6.1** OTA (Over-The-Air) güncelleme stratejisi
+- [ ] **6.6.2** Store güncelleme süreci dokümantasyonu
+- [ ] **6.6.3** Kullanıcı geri bildirimi toplama sistemi
+- [ ] **6.6.4** Crash reporting (Sentry veya benzeri)
+
+**Not:** Bu faz web uygulaması tamamlandıktan ve production'da stabil çalıştıktan sonra başlatılacak. PWA yaklaşımı ile mevcut web kodunun %95'i kullanılabilir, sadece mobil optimizasyonlar ve store entegrasyonları eklenecek.
+
+---
+
 ## 🎨 v0.app Prompt Rehberi
 
 v0.app ile UI oluştururken kullanabileceğiniz prompt'lar:
@@ -515,7 +586,7 @@ Requirements:
 - [ ] Görsel yeniden oluşturma (revize)
 - [ ] Sesli kitap (text-to-speech)
 - [ ] Video hikayeler
-- [ ] Mobil uygulama
+- [x] Mobil uygulama - ✅ **Faz 6'ya taşındı** (PWA yaklaşımı ile)
 - [ ] Abonelik modeli
 - [ ] Referral programı
 - [ ] Blog sayfası
@@ -537,7 +608,13 @@ Requirements:
 - [ ] **"Show More Reviews" Butonu** - Reviews bölümünde daha fazla göster
 
 #### Post-MVP (Gelecekte)
-- [ ] **25 Dil Desteği** - Şu an sadece TR/EN, gelecekte 25 dil
+- [ ] **Localization (i18n) Sistemi** - Çoklu dil desteği (TR, EN ve gelecekte 25+ dil)
+  - [ ] Dil seçici component (header'da)
+  - [ ] Tüm UI metinlerinin çevirisi
+  - [ ] Dinamik dil değiştirme
+  - [ ] URL-based dil routing (/tr/, /en/, vb.)
+  - [ ] Cookie/localStorage ile dil tercihi saklama
+  - **Not:** Şu an tüm UI EN olarak geliştiriliyor, localization Faz 5 veya Post-MVP'de eklenecek
 - [ ] **Çoklu Para Birimi** - USD, EUR, GBP, TRY, vb. otomatik dönüşüm
 - [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı
 - [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb.
@@ -554,6 +631,15 @@ Requirements:
 - **Storage Geçiş Planı:** Supabase Storage → AWS S3 (gelecekte)
   - **Şu an:** Supabase Storage kullanılacak (MVP için yeterli)
   - **Geçiş Zamanı:** Database dolmaya yakın (500MB limitine yaklaşıldığında)
+- **Görsel Yönetimi ve Folder Yapısı (4 Ocak 2026):**
+  - **Sorun:** Şu an görseller `public/` klasöründe düz olarak tutuluyor (örn: `arya-photo.jpg`)
+  - **Gereksinim:** Görseller için standart bir isimlendirme ve folder yapısı oluşturulmalı
+  - **Çözüm:** 
+    - Görseller proje içinde değil, S3'te tutulmalı (Storage geçiş planı ile birlikte)
+    - S3'te folder yapısı: `{user_id}/{book_id}/{image_type}/{filename}`
+    - Örnek: `users/123/books/456/photos/arya-photo.jpg`, `users/123/books/456/covers/cover-1.jpg`
+    - İsimlendirme: `{character-name}-{type}-{timestamp}.{ext}` (örn: `arya-photo-20260104.jpg`)
+  - **Not:** Bu konu S3 geçişi ile birlikte ele alınacak, şimdilik `public/` klasöründe mock görseller kullanılabilir
 - **Faz 2.1 Ertelenen İşler (4 Ocak 2026):**
   - **Typography (Faz 2.1.3):** Çocuk dostu fontlar (Fredoka, Quicksand) eklenmesi ertelendi. Şu an Inter kullanılıyor, yeterli. Faz 2.2 sonrası tekrar ele alınacak.
   - **Loading States ve Error Boundaries (Faz 2.1.4):** Global loading states ve error boundary component'leri ertelendi. Faz 2.2 (Ana Sayfa) tamamlandıktan sonra eklenmesi planlanıyor. Neden: Ana içerik geliştirmesi öncelikli, loading/error handling sonra optimize edilebilir.
@@ -681,13 +767,16 @@ Response: {
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
 | Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🟡 Devam Ediyor | 8 | 61 | 13% |
+| Faz 2 | 🟡 Devam Ediyor | 32 | 61 | 52% |
 | Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
-| Faz 2.2 | 🟡 Devam Ediyor | 1 | 8 | 12% |
+| Faz 2.2 | ✅ Tamamlandı | 8 | 8 | 100% |
+| Faz 2.3 | 🟡 Devam Ediyor | 7 | 8 | 87% |
+| Faz 2.4 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
-| **TOPLAM** | **🟡** | **18** | **152** | **12%** |
+| Faz 6 | 🔵 Bekliyor | 0 | 24 | 0% |
+| **TOPLAM** | **🟡** | **42** | **176** | **24%** |
 
 ---
 

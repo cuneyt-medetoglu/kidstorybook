@@ -64,7 +64,7 @@ export function PricingSection() {
           transition={{ duration: 0.5 }}
           className="mb-12 text-center md:mb-16"
         >
-          <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-4xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400 md:text-5xl">
+          <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-4xl font-bold leading-normal pb-1 text-transparent dark:from-purple-400 dark:to-pink-400 md:text-5xl md:leading-normal">
             Pricing
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
