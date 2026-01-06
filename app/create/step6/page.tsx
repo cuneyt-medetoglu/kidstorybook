@@ -28,6 +28,31 @@ export default function Step6Page() {
   }
 
   const formData = {
+    // Multi-character (Step 2) mock - when available, this section is used
+    characters: [
+      {
+        type: "Child",
+        filename: "arya-photo.jpg",
+        size: "2.5 MB",
+        url: "/arya-photo.jpg",
+        analysis: {
+          hairLength: "Short",
+          hairStyle: "Curly",
+          hairTexture: "Fine",
+          faceShape: "Round",
+          eyeShape: "Round",
+          skinTone: "Fair",
+        },
+      },
+      // Example pet character
+      // {
+      //   type: "Dog",
+      //   filename: "buddy.jpg",
+      //   size: "1.8 MB",
+      //   url: "/arya-photo.jpg",
+      //   analysis: {},
+      // },
+    ],
     character: {
       name: "Arya",
       age: 2,
@@ -225,7 +250,7 @@ export default function Step6Page() {
                 </div>
               </motion.div>
 
-              {/* 2. Reference Photo Preview */}
+              {/* 2. Character Photos (supports multi-character) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -235,7 +260,7 @@ export default function Step6Page() {
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ImageIcon className="h-6 w-6 text-purple-500" />
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Reference Photo</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Character Photos</h2>
                     </div>
                     <Link
                       href="/create/step2"
@@ -246,9 +271,61 @@ export default function Step6Page() {
                     </Link>
                   </div>
 
-                  {formData.photo.uploaded ? (
+                  {Array.isArray(formData.characters) && formData.characters.length > 0 ? (
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      {formData.characters.map((ch, idx) => (
+                        <div key={idx} className="space-y-4">
+                          <div className="flex flex-col items-center">
+                            <div className="mb-2 text-sm font-semibold text-gray-700 dark:text-slate-300">
+                              Character {idx + 1} — {ch.type}
+                            </div>
+                            <div className="relative h-64 w-64 overflow-hidden rounded-lg shadow-lg">
+                              <Image
+                                src={ch.url || "/arya-photo.jpg"}
+                                alt={`${ch.type} reference photo`}
+                                fill
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                            <p className="mt-3 text-sm text-gray-600 dark:text-slate-400">
+                              {ch.filename} ({ch.size})
+                            </p>
+                          </div>
+
+                          {ch.analysis && (
+                            <div>
+                              <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-300">
+                                AI Analysis Results:
+                              </p>
+                              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                                {Object.entries(ch.analysis).map(([key, value], index) => (
+                                  <motion.div
+                                    key={key}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.3 + index * 0.05, duration: 0.25 }}
+                                    className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-2 text-center text-sm font-medium text-white shadow"
+                                  >
+                                    <div className="text-xs opacity-90">
+                                      {key
+                                        .replace(/([A-Z])/g, " $1")
+                                        .trim()
+                                        .split(" ")
+                                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                        .join(" ")}
+                                    </div>
+                                    <div className="font-bold">{value as string}</div>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : formData.photo.uploaded ? (
                     <div className="space-y-4">
-                      {/* Photo Preview */}
                       <div className="flex flex-col items-center">
                         <div className="relative h-64 w-64 overflow-hidden rounded-lg shadow-lg">
                           <Image
@@ -264,7 +341,6 @@ export default function Step6Page() {
                         </p>
                       </div>
 
-                      {/* AI Analysis Results */}
                       {formData.photo.analysis && (
                         <div>
                           <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-300">
@@ -287,7 +363,7 @@ export default function Step6Page() {
                                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                                     .join(" ")}
                                 </div>
-                                <div className="font-bold">{value}</div>
+                                <div className="font-bold">{value as string}</div>
                               </motion.div>
                             ))}
                           </div>

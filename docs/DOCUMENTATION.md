@@ -36,6 +36,7 @@ docs/
 │
 ├── strategies/                 # Strateji dokümanları
 │   ├── GIT_STRATEGY.md         # Git branching stratejisi
+│   ├── B2B_FEATURE_ANALYSIS.md # B2B (Business-to-Business) özellik analizi
 │   └── ...
 │
 ├── ai/                          # AI ile ilgili dokümanlar

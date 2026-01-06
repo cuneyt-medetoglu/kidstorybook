@@ -173,6 +173,14 @@ MVP lansmanı: Çalışan bir ürün
   - [x] Format kontrolü (JPG, PNG)
   - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
   - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
+  - [ ] **Multi-karakter desteği (3 karaktere kadar)** - 🆕 **MVP'ye eklendi (4 Ocak 2026)**
+    - [ ] "Add Character" butonu (maksimum 3 karakter)
+    - [ ] Her karakter için ayrı upload alanı
+    - [ ] Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
+    - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel)
+    - [ ] Her karakter için ayrı AI analiz
+    - [ ] Karakter silme butonu
+    - [ ] Ücretsiz özellik (MVP'de dahil)
 - [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
@@ -184,13 +192,66 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)
 - [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)
 
-### 2.5 E-book Viewer
-- [ ] **2.5.1** react-pageflip entegrasyonu
-- [ ] **2.5.2** Flipbook animasyonu
-- [ ] **2.5.3** Navigasyon (ileri, geri, sayfa atlama)
-- [ ] **2.5.4** Tam ekran modu
-- [ ] **2.5.5** Mobil swipe desteği
-- [ ] **2.5.6** Loading states
+### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM**
+**Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Çok iyi planlanmalı ve harika bir UX sunmalı.  
+**Strateji Dokümantasyonu:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`  
+**Durum:** ⏸️ Beklemede - Detaylı analiz ve planlama aşamasında
+
+#### 2.5.1 Temel Görüntüleme ve Navigasyon
+- [ ] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi
+- [ ] **2.5.1.2** Flipbook animasyonu (sayfa çevirme efekti)
+- [ ] **2.5.1.3** Sayfa navigasyonu (ileri, geri, sayfa atlama)
+- [ ] **2.5.1.4** Progress indicator (hangi sayfa/toplam sayfa)
+- [ ] **2.5.1.5** Page thumbnails / mini map (tüm sayfaları küçük gösterme)
+- [ ] **2.5.1.6** Tam ekran modu (fullscreen)
+- [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma)
+- [ ] **2.5.1.8** Loading states ve skeleton screens
+
+#### 2.5.2 Mobil ve Responsive Özellikler
+- [ ] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma)
+- [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.)
+- [ ] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey)
+- [ ] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı
+- [ ] **2.5.2.5** Screen orientation detection ve otomatik layout değişimi
+- [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.)
+
+#### 2.5.3 Sesli Okuma (Text-to-Speech)
+- [ ] **2.5.3.1** Text-to-Speech entegrasyonu (Web Speech API veya Elevenlabs)
+- [ ] **2.5.3.2** Farklı ses seçenekleri (3-5 farklı ses: erkek, kadın, çocuk sesleri)
+- [ ] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası)
+- [ ] **2.5.3.4** Volume kontrolü
+- [ ] **2.5.3.5** Play/Pause/Stop butonları
+- [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence)
+- [ ] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç)
+
+#### 2.5.4 Otomatik Oynatma (Autoplay)
+- [ ] **2.5.4.1** Autoplay butonu ve kontrolü
+- [ ] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye)
+- [ ] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme
+- [ ] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma)
+
+#### 2.5.5 Kullanıcı Deneyimi İyileştirmeleri
+- [ ] **2.5.5.1** Bookmark/favori sayfa işaretleme
+- [ ] **2.5.5.2** Reading progress save (nerede kaldı, otomatik kaydetme)
+- [ ] **2.5.5.3** Share butonu (kitabı/sayfayı paylaşma)
+- [ ] **2.5.5.4** Download as PDF butonu
+- [ ] **2.5.5.5** Print options
+- [ ] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.)
+- [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support)
+
+#### 2.5.6 Görsel ve Animasyonlar
+- [ ] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.)
+- [ ] **2.5.6.2** Animasyon hızı/stili seçenekleri
+- [ ] **2.5.6.3** Smooth transitions
+- [ ] **2.5.6.4** Page curl effect (sayfa kıvrılma efekti)
+- [ ] **2.5.6.5** Shadow ve depth effects (3D görünüm)
+
+#### 2.5.7 Gelecek Özellikler (Post-MVP)
+- [ ] **2.5.7.1** Notes/annotations (sayfaya not alma)
+- [ ] **2.5.7.2** Search in book (kitap içinde arama)
+- [ ] **2.5.7.3** Multi-language subtitle support (sesli okuma için altyazı)
+- [ ] **2.5.7.4** Background music (opsiyonel arka plan müziği)
+- [ ] **2.5.7.5** Reading statistics (ne kadar süre okudu, hangi sayfaları okudu)
 
 ### 2.6 Kullanıcı Dashboard
 - [ ] **2.6.1** Kitaplık sayfası (tüm kitaplar grid)
@@ -581,8 +642,17 @@ Requirements:
 - [x] **UI Builder:** v0.app seçildi ✅
 
 ### Gelecek Özellikler (Post-MVP)
-- [ ] Multi-karakter desteği (5 karaktere kadar)
-- [ ] Pet ve oyuncak karakterleri
+- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)**
+  - **Tarih:** 4 Ocak 2026
+  - **Kategori:** MVP / Faz 2.4.2
+  - **Özellikler:**
+    - 3 karaktere kadar destek (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi)
+    - Her karakter için ayrı fotoğraf yükleme
+    - Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
+    - Ücretsiz özellik (MVP'de dahil)
+  - **Detaylar:** Faz 2.4.2'ye bakın
+- [ ] Multi-karakter desteği genişletme (5 karaktere kadar) - Post-MVP
+- [ ] Pet ve oyuncak karakterleri (genişletilmiş liste)
 - [ ] Görsel yeniden oluşturma (revize)
 - [ ] Sesli kitap (text-to-speech)
 - [ ] Video hikayeler
@@ -590,10 +660,32 @@ Requirements:
 - [ ] Abonelik modeli
 - [ ] Referral programı
 - [ ] Blog sayfası
+- [ ] **B2B (Business-to-Business) Özelliği** - Kreşler, özel okullar gibi şirketler için toplu kitap oluşturma sistemi
+  - **Tarih:** 4 Ocak 2026
+  - **Kategori:** Post-MVP / Gelecek Özellikler
+  - **Detaylı Analiz:** `docs/strategies/B2B_FEATURE_ANALYSIS.md`
+  - **Özellikler:**
+    - Şirket/kurum kayıt sistemi (admin paneli)
+    - Toplu kitap oluşturma (10+ çocuk için)
+    - Ebeveynlerle link ile paylaşma
+    - Toplu baskı yapma
+    - Adetlere göre özel fiyatlandırma
+    - Şirket dashboard'u (oluşturulan kitapları görüntüleme)
 
 ### Referans Siteden (magicalchildrensbook.com) Eksik Özellikler
 
 #### MVP'ye Eklenmeli (Önemli)
+- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye eklendi (4 Ocak 2026)**
+  - **Tarih:** 4 Ocak 2026
+  - **Kategori:** MVP / Faz 2.4.2
+  - **Açıklama:** Hikaye oluştururken 3 karaktere kadar eklenebilmeli (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi)
+  - **Özellikler:**
+    - "Add Character" butonu (maksimum 3 karakter)
+    - Her karakter için ayrı upload alanı
+    - Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
+    - Ücretsiz özellik
+  - **UI Yaklaşımı:** v0.app ile yeni component çizdirmek önerilir (daha temiz UX)
+  - **Detaylar:** Faz 2.4.2'ye bakın
 - [ ] **Cookie Banner** - GDPR/KVKK uyumluluk için cookie onayı
 - [ ] **Ülke/Para Birimi Seçici** - Header'da ülke ve para birimi değiştirme
 - [ ] **Sepet İkonu** - Header'da sepet göstergesi (shopping bag)
@@ -619,6 +711,72 @@ Requirements:
 - [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı
 - [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb.
 - [ ] **Reviews/Testimonials Sayfası** - Detaylı kullanıcı yorumları sayfası
+
+### E-book Viewer Notları (4 Ocak 2026)
+**Kritik Önem:** E-book viewer kullanıcının en çok etkileşimde bulunacağı kısım. Mükemmel olmalı.
+
+**Detaylı Strateji:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`
+
+**Temel Gereksinimler:**
+1. **Responsive Layout:**
+   - Portrait (dikey): Tek sayfa gösterimi
+   - Landscape (yatay): Çift sayfa - bir taraf görsel, bir taraf yazı
+   - Orientation detection: Otomatik layout değişimi
+
+2. **Sayfa Geçiş Animasyonları:**
+   - Flip effect (varsayılan): Gerçek kitap gibi
+   - Slide, Fade, Curl: Alternatif animasyonlar
+   - Kullanıcı seçebilmeli
+
+3. **Sesli Okuma (TTS):**
+   - 3-5 farklı ses seçeneği (kadın, erkek, çocuk)
+   - Speed control (0.5x - 2x)
+   - Volume control
+   - Sayfa vurgulama (okunan kelime/cümle)
+   - Otomatik sayfa ilerleme (ses bitince)
+
+4. **Otomatik Oynatma (Autoplay):**
+   - Manuel, Timed, TTS Synced modları
+   - Kullanıcı ayarlayabilir hız (5s, 10s, 15s, 20s per page)
+   - Ekrana dokunarak duraklama
+   - Visual indicator (countdown, progress ring)
+
+5. **Ekstra Özellikler:**
+   - Zoom in/out (görselleri yakınlaştırma)
+   - Fullscreen mode
+   - Page thumbnails / mini map
+   - Bookmark system
+   - Reading progress tracking (nerede kaldı)
+   - Share functionality
+   - Download as PDF
+   - Keyboard shortcuts (desktop)
+   - Touch gestures (mobile)
+
+6. **Accessibility:**
+   - WCAG 2.1 AA uyumluluk
+   - High contrast mode
+   - Font size control
+   - Dyslexia-friendly font
+   - Reduced motion option
+   - Screen reader support
+
+**Implementation Plan:**
+- Faz 1: Temel görüntüleme ve navigasyon (2-3 gün)
+- Faz 2: Gelişmiş özellikler (2-3 gün)
+- Faz 3: Sesli okuma (2-3 gün)
+- Faz 4: Autoplay ve UX (1-2 gün)
+- Faz 5: Polish ve optimizasyon (1-2 gün)
+- **Toplam:** 8-13 gün (1.5-2.5 hafta)
+
+**Başlamadan Önce:**
+1. Technical research (react-pageflip vs alternatives)
+2. Design mockups (v0.app ile birkaç versiyon)
+3. User testing plan
+4. Beta kullanıcı feedback
+
+**Not:** v0.app'de birkaç versiyon denemek gerekebilir. İlk seferde mükemmel olmayabilir, iterasyon şart.
+
+---
 
 ### Teknik Notlar
 - POC'taki prompt template'leri production'a taşınacak
