@@ -341,13 +341,13 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
 - [ ] **3.4.7** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
 
-### 3.6 Kitap API'leri
+### 3.6 Kitap API'leri ✅
 - [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites)
-- [ ] **3.6.2** `POST /api/books` - Yeni kitap başlat - ⏳ Story generation API ile entegre
-- [ ] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ⏳ Sonraki adım
-- [ ] **3.6.4** `GET /api/books/:id` - Kitap detay - ⏳ Sonraki adım
-- [ ] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ⏳ Sonraki adım
-- [ ] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ⏳ Sonraki adım
+- [x] **3.6.2** `POST /api/books` - Yeni kitap başlat - ✅ Story generation API ile entegre (10 Ocak 2026)
+- [x] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ✅ Pagination, filtering support (10 Ocak 2026)
+- [x] **3.6.4** `GET /api/books/:id` - Kitap detay - ✅ View count increment, ownership check (10 Ocak 2026)
+- [x] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ✅ Favorite, status, images update (10 Ocak 2026)
+- [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026)
 
 ### 3.5 AI Entegrasyonu ✅
 - [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)

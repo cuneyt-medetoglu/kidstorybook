@@ -289,12 +289,194 @@ All API endpoints require authentication via Supabase.
 
 ## 📚 Books API
 
-### Coming Soon
-- `GET /api/books` - List user's books
-- `GET /api/books/:id` - Get book details
-- `PATCH /api/books/:id` - Update book
-- `DELETE /api/books/:id` - Delete book
-- `POST /api/books/:id/favorite` - Toggle favorite
+### 1. Create Book (Generate Story)
+
+**Endpoint:** `POST /api/books`
+
+**Description:** Creates a new book and generates the story using AI. This endpoint combines story generation and book creation.
+
+**Request Body:**
+```json
+{
+  "characterId": "uuid",
+  "theme": "adventure",
+  "illustrationStyle": "watercolor",
+  "customRequests": "Make it exciting",
+  "language": "en"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "title": "Arya's Magical Adventure",
+    "status": "draft",
+    "totalPages": 10,
+    "theme": "adventure",
+    "illustrationStyle": "watercolor",
+    "character": {
+      "id": "uuid",
+      "name": "Arya"
+    },
+    "generationTime": 12345,
+    "tokensUsed": 2500
+  },
+  "message": "Book created and story generated successfully"
+}
+```
+
+**Generation Time:** ~5-15s  
+**Cost:** ~$0.01-0.03 (GPT-4o)
+
+---
+
+### 2. Get User's Books
+
+**Endpoint:** `GET /api/books`
+
+**Description:** Returns all books for the authenticated user with optional filtering and pagination.
+
+**Query Parameters:**
+- `status` (optional): Filter by status (`draft`, `generating`, `completed`, `failed`, `archived`)
+- `limit` (optional): Number of books per page (default: unlimited)
+- `offset` (optional): Offset for pagination (default: 0)
+
+**Example:** `GET /api/books?status=completed&limit=10&offset=0`
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "title": "Arya's Magical Adventure",
+      "theme": "adventure",
+      "illustration_style": "watercolor",
+      "status": "completed",
+      "total_pages": 10,
+      "cover_image_url": "https://...",
+      "is_favorite": false,
+      "view_count": 5,
+      "created_at": "2026-01-10T12:00:00Z",
+      "last_viewed_at": "2026-01-10T15:00:00Z"
+    }
+  ],
+  "message": "Books fetched successfully"
+}
+```
+
+---
+
+### 3. Get Book Details
+
+**Endpoint:** `GET /api/books/:id`
+
+**Description:** Returns detailed information about a specific book. Automatically increments view count.
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "user_id": "uuid",
+    "character_id": "uuid",
+    "title": "Arya's Magical Adventure",
+    "theme": "adventure",
+    "illustration_style": "watercolor",
+    "language": "en",
+    "age_group": "preschool",
+    "story_data": {
+      "title": "Arya's Magical Adventure",
+      "pages": [...]
+    },
+    "total_pages": 10,
+    "images_data": [...],
+    "cover_image_url": "https://...",
+    "status": "completed",
+    "view_count": 6,
+    "is_favorite": false,
+    "created_at": "2026-01-10T12:00:00Z",
+    "updated_at": "2026-01-10T12:05:00Z",
+    "completed_at": "2026-01-10T12:05:00Z"
+  },
+  "message": "Book fetched successfully"
+}
+```
+
+**Note:** View count is incremented automatically (non-blocking).
+
+---
+
+### 4. Update Book
+
+**Endpoint:** `PATCH /api/books/:id`
+
+**Description:** Updates book properties like title, status, favorite status, images, etc.
+
+**Request Body (all fields optional):**
+```json
+{
+  "title": "New Title",
+  "status": "completed",
+  "is_favorite": true,
+  "images_data": [...],
+  "cover_image_url": "https://...",
+  "cover_image_path": "path/to/cover.jpg",
+  "generation_metadata": {...}
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "title": "New Title",
+    "is_favorite": true,
+    "status": "completed",
+    ...
+  },
+  "message": "Book updated successfully"
+}
+```
+
+**Common Use Cases:**
+- Toggle favorite: `{ "is_favorite": true }`
+- Update status: `{ "status": "completed" }`
+- Add images: `{ "images_data": [...] }`
+- Update cover: `{ "cover_image_url": "..." }`
+
+---
+
+### 5. Delete Book
+
+**Endpoint:** `DELETE /api/books/:id`
+
+**Description:** Deletes a book permanently. Cascade deletes related images (via trigger).
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid"
+  },
+  "message": "Book deleted successfully"
+}
+```
+
+**Note:** 
+- Requires ownership verification
+- Cascade deletes images from storage (via database trigger)
+- Removes book from character's `used_in_books` array (via trigger)
+
+---
 
 ---
 

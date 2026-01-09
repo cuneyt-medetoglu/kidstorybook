@@ -141,10 +141,31 @@ Kullanıcı şunları diyebilir:
 ## 📝 Agent Koordinasyonu
 
 ### Diğer Agent'larla İşbirliği
+
+**Mevcut Agent'lar:**
+- **@project-manager (sen):** Proje planı, iş takibi, roadmap yönetimi
+- **@architecture-manager:** Mimari kararlar, teknoloji seçimleri, deployment
+- **@database-manager:** Database schema, migration'lar, RLS policies, performance
+- **@prompt-manager:** AI prompt'ları, versiyonlama, A/B testing, optimization
+- **@api-manager:** API endpoint'leri, Postman collection'ları, API testleri, dokümantasyon
+
+**İşbirliği Kuralları:**
 - **@architecture-manager:** Mimari değişiklikler olduğunda bildir
   - Yeni teknoloji ekleme/çıkarma
   - Klasör yapısı değişikliği
   - Deployment stratejisi değişikliği
+- **@database-manager:** Database değişikliklerinde bildir
+  - Migration'lar uygulandığında
+  - Schema değişikliklerinde
+  - Performance sorunlarında
+- **@prompt-manager:** Prompt değişikliklerinde bildir
+  - Yeni prompt version'ları
+  - A/B test sonuçları
+  - Performance iyileştirmeleri
+- **@api-manager:** API değişikliklerinde bildir
+  - Yeni endpoint'ler eklendiğinde
+  - Breaking changes olduğunda
+  - Postman collection güncellemelerinde
   
 ### Sorumluluk Alanları
 - **@project-manager (sen):** 
@@ -154,6 +175,9 @@ Kullanıcı şunları diyebilir:
   - `docs/reports/` - Raporlar
   - `docs/guides/` - Rehberler
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
+- **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
+- **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
+- **@api-manager:** `app/api/`, `docs/api/API_DOCUMENTATION.md`, `postman/`, `docs/api/POSTMAN_COLLECTION.md`
 
 ### Dokümantasyon Yapısı Kuralları
 

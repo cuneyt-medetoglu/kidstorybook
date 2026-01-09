@@ -47,7 +47,8 @@ docs/
 │   └── SCHEMA.md               # Database schema dokümantasyonu
 │
 ├── api/                        # API dokümantasyonu
-│   └── API_DOCUMENTATION.md    # API endpoints ve kullanım rehberi
+│   ├── API_DOCUMENTATION.md    # API endpoints ve kullanım rehberi
+│   └── POSTMAN_COLLECTION.md   # Postman collection kullanım rehberi
 │
 ├── ai/                          # AI ile ilgili dokümanlar
 │   ├── AI_STRATEGY.md           # AI prompt stratejisi
@@ -133,6 +134,15 @@ docs/
    - Storage buckets
 
 **Database Agent:** `@database-manager` - Database ile ilgili tüm işlerden sorumlu agent
+
+### API
+1. **api/API_DOCUMENTATION.md** - Tüm API endpoint'leri ve kullanım örnekleri
+2. **api/POSTMAN_COLLECTION.md** - Postman collection kullanım rehberi
+3. **postman/KidStoryBook_API.postman_collection.json** - Postman collection (tüm endpoint'ler)
+4. **postman/KidStoryBook_Environment.postman_environment.json** - Postman environment (local dev)
+5. **tests/api/README.md** - API test senaryoları ve rehberi
+
+**API Agent:** `@api-manager` - API endpoint'leri, Postman collection'ları ve testlerden sorumlu agent
 
 ---
 

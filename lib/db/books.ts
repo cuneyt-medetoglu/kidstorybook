@@ -45,8 +45,9 @@ export interface CreateBookInput {
   story_data: any
   total_pages: number
   custom_requests?: string
-  status?: 'draft' | 'generating' | 'completed'
+  images_data?: any[]
   generation_metadata?: any
+  status?: 'draft' | 'generating' | 'completed'
 }
 
 export interface UpdateBookInput {
