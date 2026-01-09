@@ -7,7 +7,7 @@
 
 ## 📍 Mevcut Durum
 
-**Aktif Bölüm:** Faz 2.4 - Kitap Oluşturma Wizard  
+**Aktif Bölüm:** Faz 2.5 - E-book Viewer ⭐ KRİTİK  
 **Son Güncelleme:** 4 Ocak 2026
 
 ---
@@ -1222,4 +1222,144 @@
 
 ---
 
-**Son Güncelleme:** 4 Ocak 2026
+## 🎨 Faz 2.5: E-book Viewer ⭐ KRİTİK
+
+**Başlangıç Tarihi:** 4 Ocak 2026  
+**Durum:** 🟡 Başladı  
+**Önem Derecesi:** ⭐⭐⭐⭐⭐ (En Yüksek)
+
+**Strateji Dokümantasyonu:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`  
+**v0.app Prompt:** `docs/prompts/V0_EBOOK_VIEWER_PROMPT.md`
+
+**Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Mükemmel olmalı.
+
+**2.5.1 - Temel Görüntüleme ve Navigasyon:**
+- ✅ v0.app prompt hazırlandı: `docs/prompts/V0_EBOOK_VIEWER_PROMPT.md`
+- ✅ v0.app'den E-book Viewer component'leri alındı ve entegre edildi
+- ✅ Component: `components/book-viewer/book-viewer.tsx`
+- ✅ Sub-components:
+  - `components/book-viewer/book-page.tsx` - Sayfa gösterimi (portrait/landscape)
+  - `components/book-viewer/page-thumbnails.tsx` - Thumbnail grid modal
+- ✅ Hook: `hooks/use-swipe-gesture.ts` - Touch swipe gesture desteği
+- ✅ Page: `app/books/[id]/view/page.tsx` - Viewer sayfası
+- ✅ Test Page: `app/books/test/page.tsx` - Test için viewer sayfası
+
+**Özellikler:**
+- ✅ Header: Progress indicator ("Page X of Y" + progress bar), fullscreen button, settings dropdown, close button
+- ✅ Page Content: 
+  - Portrait mode: Tek sayfa gösterimi (image + text stacked)
+  - Landscape mode: Çift sayfa gösterimi (sol: görsel, sağ: yazı)
+  - Auto orientation detection: window.innerWidth/innerHeight ile otomatik layout değişimi
+- ✅ Controls (Bottom Bar):
+  - Previous button (ArrowLeft, disabled on first page)
+  - Play/Pause button (gradient, TTS placeholder - autoplay simulation)
+  - Next button (ArrowRight, disabled on last page)
+  - Page thumbnails button (Grid icon, opens modal)
+  - Bookmark button (Bookmark/BookmarkCheck icon, toggle state)
+  - Share button (Share2 icon, Web Share API)
+- ✅ Animations: 
+  - Flip (default): 3D page flip effect (rotateY, perspective)
+  - Slide: Horizontal slide transition
+  - Fade: Simple fade in/out
+  - User selectable: Settings dropdown'dan seçilebilir
+- ✅ Navigation Methods:
+  - Button clicks (Previous/Next)
+  - Keyboard shortcuts (Arrow keys, Space, Backspace, F for fullscreen, Esc)
+  - Touch swipe gestures (useSwipeGesture hook)
+  - Mouse click on page edges (desktop, hover'da görünür)
+  - Page thumbnails (jump to any page)
+- ✅ Fullscreen Mode:
+  - Toggle button (Maximize/Minimize icon)
+  - Keyboard shortcut (F)
+  - Fullscreen API entegrasyonu
+- ✅ Responsive Design:
+  - Mobile (< 768px): Single page, touch gestures, bottom controls
+  - Tablet (768px - 1024px): Portrait single, landscape double page
+  - Desktop (> 1024px): Portrait centered, landscape double page
+- ✅ Dark mode support: Tüm component'ler dark mode uyumlu
+- ✅ Accessibility: ARIA labels, keyboard navigation, focus indicators
+
+**Teknik Detaylar:**
+- Dependencies: `framer-motion`, `lucide-react`, `next/image`, `@/components/ui/*`
+- State management: `useState` for currentPage, isPlaying, isBookmarked, isFullscreen, animationType, showThumbnails, isLandscape, direction
+- Custom hook: `useSwipeGesture` for touch gestures
+- Mock data: 10 sayfalık "Arya's Adventure" kitabı (Faz 3'te API'den gelecek)
+- Image optimization: `next/image` with `unoptimized` flag (local images için)
+- Animations: Framer Motion `AnimatePresence` with `mode="wait"` for smooth transitions
+- Icons: `ArrowLeft`, `ArrowRight`, `Play`, `Pause`, `Grid3X3`, `Bookmark`, `BookmarkCheck`, `Share2`, `Maximize`, `Minimize`, `Settings`, `X`, `ChevronLeft`
+
+**Notlar:**
+- Mock data kullanılıyor (Faz 3'te API entegrasyonu yapılacak)
+- TTS (Text-to-Speech) şimdilik placeholder (autoplay simulation - 5 saniye timer)
+- Görseller: `zpublicTest` klasöründen `public/` klasörüne taşındı (10 görsel)
+- Test sayfası: `/books/test` route'u oluşturuldu
+- `use-swipe-gesture.ts` root'tan silindi, `hooks/` klasörüne taşındı
+- `zpublicTest` klasörü silindi
+
+**2.5.2 - Mobil ve Responsive Özellikler:**
+- ✅ Mobil swipe desteği: `useSwipeGesture` hook ile entegre edildi
+- ✅ Portrait mode: Tek sayfa gösterimi (dikey) - ✅ Tamamlandı
+- ✅ Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı - ✅ Tamamlandı
+- ✅ Screen orientation detection: window.innerWidth/innerHeight ile otomatik layout değişimi - ✅ Tamamlandı
+- ⏳ Touch gestures (pinch to zoom, double tap): Sonraki adım (zoom ile birlikte)
+- ⏳ PWA optimizasyonu: Faz 6'da yapılacak
+
+**2.5.3 - Sesli Okuma (Text-to-Speech):**
+- ✅ Backend API endpoint: `app/api/tts/generate/route.ts` oluşturuldu
+- ✅ Google Cloud Text-to-Speech entegrasyonu
+- ✅ Frontend hook: `hooks/useTTS.ts` oluşturuldu
+- ✅ Book Viewer'a TTS entegrasyonu yapıldı
+- ✅ Play/Pause butonu TTS ile çalışıyor
+- ✅ Settings dropdown'a Voice ve Speed seçenekleri eklendi
+- ✅ Sayfa değiştiğinde TTS otomatik duruyor
+- ✅ TTS bittiğinde otomatik sayfa ilerleme
+- ✅ Loading state gösterimi (spinner animasyonu)
+- ⚠️ Google Cloud TTS credentials kurulumu gerekiyor
+- ⏳ Word highlighting: Basit implementasyon, gelişmiş versiyon için Web Speech API word timing gerekli
+- ⏳ Volume kontrolü: UI'da henüz yok, hook'ta mevcut
+
+**Teknik Detaylar:**
+- Package: `@google-cloud/text-to-speech` kuruldu
+- API Route: `/api/tts/generate`
+- Audio Format: MP3 (base64 encoded data URL)
+- Ses Seçenekleri: 8 farklı hikaye anlatıcı sesi (Female/Male, Standard/Wavenet)
+- Hız Kontrolü: 0.25x - 4.0x arası (UI'da 0.75x, 1.0x, 1.25x)
+- Environment Variables: `GOOGLE_CLOUD_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_SERVICE_ACCOUNT_JSON`
+
+**Notlar:**
+- ElevenLabs alternatif olarak roadmap'e not edildi (Post-MVP değerlendirilecek)
+- İlk 4 milyon karakter/ay ücretsiz, sonrası $4/1M karakter
+- Environment setup guide'a Google Cloud TTS kurulum bilgileri eklendi
+
+**2.5.4 - Otomatik Oynatma (Autoplay):**
+- ✅ Autoplay state management: `autoplayMode`, `autoplaySpeed`, `autoplayCountdown`
+- ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + sonraki sayfayı otomatik okuma
+- ✅ Timed mode: Her X saniyede bir otomatik sayfa geçişi (5s, 10s, 15s, 20s)
+- ✅ Autoplay toggle butonu (Footer'da)
+- ✅ Visual indicator: Header'da autoplay durumu gösterimi (badge + countdown)
+- ✅ Settings dropdown: Autoplay mode ve speed seçenekleri
+- ✅ Tap to pause/resume: Ekrana dokunarak TTS pause/resume (TTS Synced modunda)
+- ✅ Otomatik durdurma: Kitabın sonuna ulaşınca autoplay otomatik kapatılıyor
+- ✅ TTS auto-advance bug fix: İlk yükleme ve sayfa değişiminde yanlışlıkla tetiklenen auto-advance sorunu çözüldü
+
+**Teknik Detaylar:**
+- **Autoplay Modes:**
+  - `off`: Manuel kontrol (varsayılan)
+  - `tts`: TTS ile senkronize (ses bitince sayfa geç + otomatik oku)
+  - `timed`: Zamanlayıcı ile otomatik sayfa geçişi
+- **State Management:** `useRef` ile `wasPlayingRef` - TTS durumu takibi için
+- **Timer Logic:** `setInterval` ile countdown, `setTimeout` ile sayfa geçişi
+- **UI Components:**
+  - PlayCircle/PauseCircle icons (Autoplay butonu)
+  - Badge indicator (Header'da "Auto-reading" veya "Auto (Xs)")
+  - Settings'te 3 ayrı dropdown section: Autoplay Mode, Speed, Animation
+
+**Kullanıcı Deneyimi:**
+1. **TTS Synced Autoplay:** Kullanıcı "Autoplay" butonuna basıyor → Mevcut sayfa okunuyor → Ses bitince otomatik sayfa geçişi → Sonraki sayfa otomatik okunuyor → Sürekli devam ediyor
+2. **Timed Autoplay:** Kullanıcı Settings'ten "Timed" seçiyor → Her X saniyede bir sayfa otomatik geçiyor → Header'da countdown gösteriliyor (örn: "Auto (7s)")
+3. **Pause/Resume:** Ekrana dokunarak TTS pause/resume (TTS Synced modunda)
+4. **Stop Autoplay:** Autoplay butonuna tekrar basarak kapatma
+
+---
+
+**Son Güncelleme:** 10 Ocak 2026

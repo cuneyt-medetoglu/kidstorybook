@@ -36,6 +36,8 @@ docs/
 │
 ├── strategies/                 # Strateji dokümanları
 │   ├── GIT_STRATEGY.md         # Git branching stratejisi
+│   ├── EBOOK_VIEWER_STRATEGY.md # E-book Viewer stratejisi
+│   ├── TTS_STRATEGY.md         # Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
 │   ├── B2B_FEATURE_ANALYSIS.md # B2B (Business-to-Business) özellik analizi
 │   └── ...
 │
@@ -100,6 +102,13 @@ docs/
 2. **ai/AI_TOOLS_COMPARISON.md** - AI tool karşılaştırması ve test planı
 3. **ai/CHARACTER_CREATION_FLOW.md** - Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
 4. **prompts/** - Tüm prompt template'leri
+
+### Strateji Dokümanları
+1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
+   - Mevcut özellikler (MVP)
+   - Planlanan özellikler (yaş grubuna göre, modlar, çok dilli destek)
+   - Teknik detaylar
+   - Maliyet analizi
 
 ---
 

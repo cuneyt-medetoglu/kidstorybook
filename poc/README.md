@@ -21,10 +21,10 @@ npm start
 
 4. **Tarayıcıda aç:**
 ```
-http://localhost:3001
+http://localhost:3005
 ```
 
-**Not:** Eğer port 3001 de kullanılıyorsa, `.env` dosyasına `PORT=3002` ekleyebilirsin.
+**Not:** Portu değiştirmek istersen, `.env` dosyasına `PORT=3005` (veya istediğin port numarası) ekleyebilirsin.
 
 ## Kullanım
 

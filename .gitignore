@@ -55,3 +55,14 @@ next-env.d.ts
 # API Keys (güvenlik)
 docs/API_KEYS.md
 poc/Untitled
+
+# Google Cloud Service Account Keys
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!next.config.js
+!tailwind.config.ts
+!postcss.config.js
+!eslintrc.json
+!.prettierrc

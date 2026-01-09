@@ -195,40 +195,42 @@ MVP lansmanı: Çalışan bir ürün
 ### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM**
 **Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Çok iyi planlanmalı ve harika bir UX sunmalı.  
 **Strateji Dokümantasyonu:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`  
-**Durum:** ⏸️ Beklemede - Detaylı analiz ve planlama aşamasında
+**v0.app Prompt:** `docs/prompts/V0_EBOOK_VIEWER_PROMPT.md`  
+**Durum:** 🟡 Başladı (4 Ocak 2026)
 
 #### 2.5.1 Temel Görüntüleme ve Navigasyon
-- [ ] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi
-- [ ] **2.5.1.2** Flipbook animasyonu (sayfa çevirme efekti)
-- [ ] **2.5.1.3** Sayfa navigasyonu (ileri, geri, sayfa atlama)
-- [ ] **2.5.1.4** Progress indicator (hangi sayfa/toplam sayfa)
-- [ ] **2.5.1.5** Page thumbnails / mini map (tüm sayfaları küçük gösterme)
-- [ ] **2.5.1.6** Tam ekran modu (fullscreen)
-- [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma)
-- [ ] **2.5.1.8** Loading states ve skeleton screens
+- [x] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi - ✅ Framer Motion ile custom implementation seçildi
+- [x] **2.5.1.2** Flipbook animasyonu (sayfa çevirme efekti) - ✅ v0.app'den alındı ve entegre edildi (Flip, Slide, Fade animasyonları)
+- [x] **2.5.1.3** Sayfa navigasyonu (ileri, geri, sayfa atlama) - ✅ Buttons, keyboard, swipe, mouse click desteği
+- [x] **2.5.1.4** Progress indicator (hangi sayfa/toplam sayfa) - ✅ Header'da progress bar ve sayfa numarası
+- [x] **2.5.1.5** Page thumbnails / mini map (tüm sayfaları küçük gösterme) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.1.6** Tam ekran modu (fullscreen) - ✅ Fullscreen toggle button ve keyboard shortcut (F)
+- [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma) - ⏳ Sonraki adım
+- [ ] **2.5.1.8** Loading states ve skeleton screens - ⏳ Sonraki adım
 
 #### 2.5.2 Mobil ve Responsive Özellikler
-- [ ] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma)
-- [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.)
-- [ ] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey)
-- [ ] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı
-- [ ] **2.5.2.5** Screen orientation detection ve otomatik layout değişimi
-- [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.)
+- [x] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma) - ✅ useSwipeGesture hook ile entegre edildi
+- [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.) - ⏳ Sonraki adım (zoom ile birlikte)
+- [x] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.2.5** Screen orientation detection ve otomatik layout değişimi - ✅ window.innerWidth/innerHeight ile otomatik detection
+- [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.) - ⏳ Faz 6'da yapılacak
 
 #### 2.5.3 Sesli Okuma (Text-to-Speech)
-- [ ] **2.5.3.1** Text-to-Speech entegrasyonu (Web Speech API veya Elevenlabs)
-- [ ] **2.5.3.2** Farklı ses seçenekleri (3-5 farklı ses: erkek, kadın, çocuk sesleri)
-- [ ] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası)
-- [ ] **2.5.3.4** Volume kontrolü
-- [ ] **2.5.3.5** Play/Pause/Stop butonları
-- [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence)
-- [ ] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç)
+- [x] **2.5.3.1** Text-to-Speech entegrasyonu (Google Cloud TTS - MVP, ElevenLabs alternatif olarak değerlendirilecek) - ✅ Backend API ve frontend hook oluşturuldu
+- [x] **2.5.3.2** Farklı ses seçenekleri (3-5 farklı ses: erkek, kadın, çocuk sesleri) - ✅ 8 ses seçeneği (Settings dropdown'da 3 ana seçenek)
+- [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x)
+- [ ] **2.5.3.4** Volume kontrolü - ⏳ Hook'ta mevcut, UI'da henüz yok
+- [x] **2.5.3.5** Play/Pause/Stop butonları - ✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok
+- [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence) - ⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli
+- [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme
+- [ ] **2.5.3.8** TTS Cache mekanizması - ⏳ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz)
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
-- [ ] **2.5.4.1** Autoplay butonu ve kontrolü
-- [ ] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye)
-- [ ] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme
-- [ ] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma)
+- [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu, visual indicator ve Settings'te mod seçimi
+- [x] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye) - ✅ 5s, 10s, 15s, 20s seçenekleri Settings'te
+- [x] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme - ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam
+- [x] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma) - ✅ Ekrana dokunarak TTS pause/resume, Timed mode countdown ile sayfa geçişi
 
 #### 2.5.5 Kullanıcı Deneyimi İyileştirmeleri
 - [ ] **2.5.5.1** Bookmark/favori sayfa işaretleme
@@ -238,6 +240,7 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **2.5.5.5** Print options
 - [ ] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.)
 - [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support)
+- [ ] **2.5.5.8** Settings UI iyileştirmesi - ⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım)
 
 #### 2.5.6 Görsel ve Animasyonlar
 - [ ] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.)
@@ -717,6 +720,16 @@ Requirements:
 
 **Detaylı Strateji:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`
 
+**Settings UI İyileştirmesi (6 Ocak 2026):**
+- **Mevcut Durum:** Sağ üstte Settings dropdown mevcut (debug için)
+- **Sorun:** Çok fazla seçenek var, karmaşık görünüyor, kullanıcı dostu değil
+- **Planlanan İyileştirmeler:**
+  - Settings dropdown'ı daha güzel bir yere taşınacak (örn: bottom bar'da ayrı bir buton, veya slide-in panel)
+  - Daha sade ve anlaşılır hale getirilecek
+  - Kullanıcı dostu tasarım (daha az teknik terim, daha çok görsel ipuçları)
+  - Gerekli ayarlar öne çıkarılacak, gelişmiş ayarlar gizlenecek veya ayrı bir bölüme alınacak
+- **Zamanlama:** Faz 2.5.5 (UX İyileştirmeleri) veya Faz 3 (Polish) sırasında
+
 **Temel Gereksinimler:**
 1. **Responsive Layout:**
    - Portrait (dikey): Tek sayfa gösterimi
@@ -810,6 +823,37 @@ Requirements:
     - [ ] URL'ler Supabase DB'de kalır (S3 URL'leri)
   - **Tahmini Süre:** 1-2 hafta (geçiş zamanı geldiğinde)
   - **Not:** Hibrit yaklaşım - Supabase (DB) + AWS S3 (Storage)
+- **Text-to-Speech (TTS) Stratejisi (6 Ocak 2026):**
+  - **MVP:** Google Cloud Text-to-Speech kullanılacak
+    - WaveNet sesleri: İlk 1 milyon karakter/ay ücretsiz, sonrası $16/1M karakter
+    - Standart sesler: İlk 4 milyon karakter/ay ücretsiz, sonrası $4/1M karakter
+    - Yüksek kalite, makul fiyat
+  - **TTS Cache Mekanizması (6 Ocak 2026):**
+    - **Sorun:** Aynı metin tekrar okutulduğunda her seferinde API ücreti alınıyor
+    - **Çözüm:** Ses dosyalarını Supabase Storage'da cache'leyelim
+    - **Implementasyon:**
+      - Text'i SHA-256 hash'le (unique identifier)
+      - İlk okuma: API'den al, Supabase Storage'a kaydet (`/tts-cache/{hash}.mp3`)
+      - Sonraki okumalar: Storage'dan çek (ücretsiz, API çağrısı yok)
+      - Storage maliyeti: Supabase Storage (500MB ücretsiz, sonrası $0.021/GB/ay)
+    - **Faydalar:**
+      - Aynı metin tekrar okutulduğunda ücretsiz
+      - Daha hızlı yükleme (API çağrısı yok)
+      - API kullanımını azaltır (maliyet tasarrufu)
+    - **Not:** Faz 2.5.3.8'de implement edilecek
+  - **TTS Gelişmiş Özellikler (6 Ocak 2026):**
+    - **Çok Dilli Destek (TR/EN):** ✅ TR-TR sesleri eklendi. Şu an manuel seçim yapılabiliyor.
+    - **Otomatik Dil Algılama (Localization ile):** Localization altyapısı (i18n) yapılınca, hikayenin diline göre otomatik ses seçilecek. Örnek: Türkçe hikaye → `tr-TR-Standard-A`, İngilizce hikaye → `en-US-Standard-E`. Bu özellik Faz 5 (Localization) ile birlikte implement edilecek.
+    - **Yaş Grubuna Göre Özelleştirme:** 3-5 yaş (yavaş, yüksek pitch), 6-8 yaş (normal), 9-12 yaş (biraz hızlı) - Planlanıyor
+    - **Modlar:** Uyku modu (yavaş, düşük pitch), Neşeli mod (enerjik), Samimi mod (sıcak) - Planlanıyor
+    - **Achernar Ses:** Gemini Pro TTS modelinde mevcut, ancak ücretli. Şu an WaveNet kullanıyoruz (ücretsiz tier mevcut). Achernar'ı default yapmak için Gemini Pro TTS entegrasyonu gerekli (Post-MVP)
+    - **Strateji Dokümanı:** `docs/strategies/TTS_STRATEGY.md` - Detaylı TTS stratejisi ve gereksinimler
+  - **Alternatif (Post-MVP):** ElevenLabs API değerlendirilecek
+    - Daha doğal, hikaye anlatıcı tonu
+    - Daha pahalı: Starter $5/ay (30K karakter), Creator $22/ay (100K karakter)
+    - Ses kalitesi çok yüksek, emotion ve tone kontrolü mevcut
+    - **Geçiş Kriteri:** Google Cloud TTS kalitesi yetersiz kalırsa veya kullanıcı geri bildirimleri olumsuz olursa
+    - **Not:** Her iki API de backend'de entegre edilebilir, kullanıcı tercihine göre seçilebilir
 
 ### v0.app vs bolt.new Karşılaştırması
 

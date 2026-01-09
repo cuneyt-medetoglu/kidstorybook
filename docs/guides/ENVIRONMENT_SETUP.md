@@ -123,6 +123,32 @@ GOOGLE_AI_API_KEY=...
 **Nereden Alınır:**
 - [Google AI Studio](https://makersuite.google.com/app/apikey)
 
+#### Google Cloud Text-to-Speech
+
+```bash
+# Google Cloud Project ID
+GOOGLE_CLOUD_PROJECT_ID=your-project-id
+
+# Service Account Key File Path (local development)
+GOOGLE_APPLICATION_CREDENTIALS=./path/to/service-account-key.json
+
+# OR: Service Account JSON as Environment Variable (production)
+# Set the entire JSON content as a base64 encoded string or use Vercel secrets
+```
+
+**Kullanım:**
+- Text-to-Speech: Sesli okuma (E-book Viewer)
+
+**Kurulum:**
+1. [Google Cloud Console](https://console.cloud.google.com/) → Create Project
+2. **APIs & Services** → **Library** → Enable "Cloud Text-to-Speech API"
+3. **IAM & Admin** → **Service Accounts** → Create Service Account
+4. **Keys** → **Add Key** → **JSON** → Download key file
+5. Local development için: `GOOGLE_APPLICATION_CREDENTIALS=./path/to/key.json`
+6. Production (Vercel) için: Service Account JSON'u environment variable olarak ekle
+
+**Not:** İlk 4 milyon karakter/ay ücretsiz, sonrası $4/1M karakter
+
 ### Payment Providers
 
 #### Stripe

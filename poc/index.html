@@ -365,7 +365,7 @@
             try {
                 console.log('📤 Gönderilen veri:', data);
                 
-                const response = await fetch('http://localhost:3001/api/create-prompt', {
+                const response = await fetch('http://localhost:3005/api/create-prompt', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -456,7 +456,7 @@
             resultSection.style.display = 'none';
             
             try {
-                const response = await fetch('http://localhost:3001/api/prepare-prompt', {
+                const response = await fetch('http://localhost:3005/api/prepare-prompt', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -525,7 +525,7 @@
             error.style.display = 'none';
             
             try {
-                const response = await fetch('http://localhost:3001/api/create-final-from-json', {
+                const response = await fetch('http://localhost:3005/api/create-final-from-json', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

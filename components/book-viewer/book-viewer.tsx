@@ -1,0 +1,807 @@
+"use client"
+
+import { useState, useEffect, useCallback, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  ArrowLeft,
+  ArrowRight,
+  Play,
+  Pause,
+  Grid3X3,
+  Bookmark,
+  BookmarkCheck,
+  Share2,
+  Maximize,
+  Minimize,
+  Settings,
+  X,
+  ChevronLeft,
+  RotateCcw,
+  Square,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
+import { BookPage } from "./book-page"
+import { PageThumbnails } from "./page-thumbnails"
+import { useSwipeGesture } from "@/hooks/use-swipe-gesture"
+import { useTTS } from "@/hooks/useTTS"
+
+// Mock data - Faz 3'te API'den gelecek
+const mockBook = {
+  id: "book-123",
+  title: "Arya's Adventure",
+  pages: [
+    {
+      pageNumber: 1,
+      imageUrl: "/magical-forest-entrance-with-glowing-pathway-child.jpg",
+      text: "Once upon a time, there was a little girl named Arya who lived at the edge of a magical forest. Every night, she would look out her window and wonder what secrets lay hidden among the trees.",
+    },
+    {
+      pageNumber: 2,
+      imageUrl: "/little-girl-with-backpack-exploring-enchanted-fore.jpg",
+      text: "One sunny morning, Arya decided to explore the forest. She packed her favorite snacks, put on her adventure boots, and stepped onto the winding path that led into the woods.",
+    },
+    {
+      pageNumber: 3,
+      imageUrl: "/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg",
+      text: "Deep in the forest, she met a friendly rabbit named Oliver. He wore a tiny vest and spoke in riddles. 'To find the treasure you seek, follow the butterflies to the creek!'",
+    },
+    {
+      pageNumber: 4,
+      imageUrl: "/colorful-butterflies-leading-path-through-magical-.jpg",
+      text: "Arya followed the butterflies through meadows of wildflowers. They shimmered in shades of purple, pink, and gold, leaving trails of sparkles in the air.",
+    },
+    {
+      pageNumber: 5,
+      imageUrl: "/sparkling-creek-with-stepping-stones-and-fireflies.jpg",
+      text: "At last, she reached the crystal creek. Stepping stones led across the water, and fireflies danced above the surface like tiny floating lanterns.",
+    },
+    {
+      pageNumber: 6,
+      imageUrl: "/ancient-tree-with-door-carved-into-trunk-magical-f.jpg",
+      text: "On the other side, Arya discovered an ancient tree with a door carved into its trunk. It was covered in glowing runes and seemed to hum with magic.",
+    },
+    {
+      pageNumber: 7,
+      imageUrl: "/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg",
+      text: "Inside the tree was a cozy room filled with books, soft cushions, and a warm fireplace. This was the forest library, where all the woodland creatures came to share stories.",
+    },
+    {
+      pageNumber: 8,
+      imageUrl: "/wise-owl-with-glasses-reading-book-to-forest-anima.jpg",
+      text: "A wise owl named Professor Hoot welcomed her. 'Every adventurer finds this place when they need it most,' he said, adjusting his tiny spectacles.",
+    },
+    {
+      pageNumber: 9,
+      imageUrl: "/little-girl-reading-glowing-book-surrounded-by-for.jpg",
+      text: "Professor Hoot gave Arya a special book that glowed with her name on the cover. 'This book will fill with your own adventures,' he explained with a knowing smile.",
+    },
+    {
+      pageNumber: 10,
+      imageUrl: "/little-girl-walking-home-at-sunset-with-magical-bo.jpg",
+      text: "As the sun began to set, Arya made her way home with her magical book. She knew this was just the beginning of many wonderful adventures to come. The End.",
+    },
+  ],
+  totalPages: 10,
+}
+
+type AnimationType = "flip" | "slide" | "fade"
+
+interface BookViewerProps {
+  bookId?: string
+  onClose?: () => void
+}
+
+export function BookViewer({ onClose }: BookViewerProps) {
+  const [currentPage, setCurrentPage] = useState(0)
+  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [animationType, setAnimationType] = useState<AnimationType>("flip")
+  const [showThumbnails, setShowThumbnails] = useState(false)
+  const [isLandscape, setIsLandscape] = useState(false)
+  const [direction, setDirection] = useState(0)
+  const [selectedVoice, setSelectedVoice] = useState("en-US-Standard-E")
+  const [ttsSpeed, setTtsSpeed] = useState(1.0)
+  
+  // Autoplay states
+  const [autoplayMode, setAutoplayMode] = useState<"off" | "tts" | "timed">("off")
+  const [autoplaySpeed, setAutoplaySpeed] = useState(10) // seconds per page
+  const [autoplayCountdown, setAutoplayCountdown] = useState(0)
+  
+  const containerRef = useRef<HTMLDivElement>(null)
+  const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // TTS hook
+  const { isPlaying, isPaused, isLoading, play, pause, resume, stop, onEnded } = useTTS()
+
+  const book = mockBook
+  const totalPages = book.pages.length
+
+  // Detect orientation
+  useEffect(() => {
+    const checkOrientation = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight && window.innerWidth >= 768)
+    }
+    checkOrientation()
+    window.addEventListener("resize", checkOrientation)
+    return () => window.removeEventListener("resize", checkOrientation)
+  }, [])
+
+  // Fullscreen handling
+  const toggleFullscreen = useCallback(async () => {
+    if (!document.fullscreenElement) {
+      await containerRef.current?.requestFullscreen()
+      setIsFullscreen(true)
+    } else {
+      await document.exitFullscreen()
+      setIsFullscreen(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange)
+  }, [])
+
+  // Navigation functions
+  const goToNextPage = useCallback(() => {
+    if (currentPage < totalPages - 1) {
+      setDirection(1)
+      setCurrentPage((prev) => prev + 1)
+    }
+  }, [currentPage, totalPages])
+
+  const goToPrevPage = useCallback(() => {
+    if (currentPage > 0) {
+      setDirection(-1)
+      setCurrentPage((prev) => prev - 1)
+    }
+  }, [currentPage])
+
+  // Keyboard navigation (moved after function definitions)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (showThumbnails) return
+      switch (e.key) {
+        case "ArrowRight":
+        case " ":
+          e.preventDefault()
+          goToNextPage()
+          break
+        case "ArrowLeft":
+        case "Backspace":
+          e.preventDefault()
+          goToPrevPage()
+          break
+        case "Escape":
+          if (isFullscreen) toggleFullscreen()
+          else if (showThumbnails) setShowThumbnails(false)
+          break
+        case "f":
+          toggleFullscreen()
+          break
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [currentPage, isFullscreen, showThumbnails, goToNextPage, goToPrevPage, toggleFullscreen])
+
+  const goToPage = useCallback(
+    (page: number) => {
+      setDirection(page > currentPage ? 1 : -1)
+      setCurrentPage(page)
+      setShowThumbnails(false)
+    },
+    [currentPage],
+  )
+
+  // Swipe gesture
+  const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGesture({
+    onSwipeLeft: goToNextPage,
+    onSwipeRight: goToPrevPage,
+  })
+
+  // Auto-advance page when TTS finishes (only if autoplay TTS mode is active)
+  const handleTTSEnded = useCallback(() => {
+    if (autoplayMode === "tts") {
+      // TTS just finished, wait a bit then advance to next page
+      setTimeout(() => {
+        setCurrentPage((prevPage) => {
+          const nextPage = prevPage + 1
+          if (nextPage < totalPages) {
+            // Update direction for animation
+            setDirection(1)
+            // Auto-play next page after a short delay
+            setTimeout(() => {
+              const nextPageText = book.pages[nextPage]?.text
+              if (nextPageText) {
+                play(nextPageText, {
+                  voiceId: selectedVoice,
+                  speed: ttsSpeed,
+                })
+              }
+            }, 500)
+            return nextPage
+          } else {
+            // Reached end of book, stop autoplay
+            setAutoplayMode("off")
+            return prevPage
+          }
+        })
+      }, 1000) // 1 second delay between pages
+    }
+  }, [autoplayMode, totalPages, book.pages, play, selectedVoice, ttsSpeed])
+
+  // Set up TTS ended callback
+  useEffect(() => {
+    if (autoplayMode === "tts") {
+      onEnded(handleTTSEnded)
+    }
+  }, [autoplayMode, onEnded, handleTTSEnded])
+
+  // Timed autoplay
+  useEffect(() => {
+    if (autoplayMode === "timed") {
+      setAutoplayCountdown(autoplaySpeed)
+      
+      // Countdown timer
+      const countdownInterval = setInterval(() => {
+        setAutoplayCountdown((prev) => {
+          if (prev <= 1) {
+            // Time's up, go to next page
+            if (currentPage < totalPages - 1) {
+              goToNextPage()
+              return autoplaySpeed
+            } else {
+              // Reached end, stop autoplay
+              setAutoplayMode("off")
+              return 0
+            }
+          }
+          return prev - 1
+        })
+      }, 1000)
+
+      return () => clearInterval(countdownInterval)
+    } else {
+      setAutoplayCountdown(0)
+    }
+  }, [autoplayMode, autoplaySpeed, currentPage, totalPages, goToNextPage])
+
+  // Stop TTS when page changes manually (but continue autoplay if active)
+  useEffect(() => {
+    stop()
+    // If autoplay is active and in TTS mode, start playing the new page
+    if (autoplayMode === "tts") {
+      const timer = setTimeout(() => {
+        const currentPageText = book.pages[currentPage]?.text
+        if (currentPageText) {
+          play(currentPageText, {
+            voiceId: selectedVoice,
+            speed: ttsSpeed,
+          })
+        }
+      }, 500) // Small delay after page change
+      return () => clearTimeout(timer)
+    }
+  }, [currentPage, stop, autoplayMode, book.pages, play, selectedVoice, ttsSpeed])
+
+  // Play TTS for current page when play button is clicked
+  const handlePlayPause = useCallback(async () => {
+    if (isPlaying) {
+      pause()
+    } else if (isPaused) {
+      resume()
+    } else {
+      // Start playing current page
+      const currentPageText = book.pages[currentPage]?.text
+      if (currentPageText) {
+        await play(currentPageText, {
+          voiceId: selectedVoice,
+          speed: ttsSpeed,
+        })
+      }
+    }
+  }, [isPlaying, isPaused, currentPage, book.pages, play, pause, resume, selectedVoice, ttsSpeed])
+
+  // Toggle autoplay mode
+  const handleAutoplayToggle = useCallback(() => {
+    if (autoplayMode === "off") {
+      // Start TTS autoplay
+      setAutoplayMode("tts")
+      // Start playing current page immediately
+      const currentPageText = book.pages[currentPage]?.text
+      if (currentPageText) {
+        stop() // Stop any current playback first
+        setTimeout(() => {
+          play(currentPageText, {
+            voiceId: selectedVoice,
+            speed: ttsSpeed,
+          })
+        }, 100)
+      }
+    } else {
+      // Stop autoplay
+      setAutoplayMode("off")
+      stop()
+    }
+  }, [autoplayMode, currentPage, book.pages, play, stop, selectedVoice, ttsSpeed])
+
+  // Pause/resume autoplay on tap
+  const handleContentTap = useCallback(() => {
+    if (autoplayMode !== "off") {
+      if (autoplayMode === "tts") {
+        if (isPlaying) {
+          pause()
+        } else if (isPaused) {
+          resume()
+        }
+      }
+      // For timed mode, just toggle the mode
+    }
+  }, [autoplayMode, isPlaying, isPaused, pause, resume])
+
+  // Share function
+  const handleShare = async () => {
+    try {
+      await navigator.share({
+        title: book.title,
+        text: `Check out this amazing story: ${book.title}`,
+        url: window.location.href,
+      })
+    } catch {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(window.location.href)
+    }
+  }
+
+  // Animation variants
+  const getPageVariants = () => {
+    switch (animationType) {
+      case "flip":
+        return {
+          enter: (dir: number) => ({
+            rotateY: dir > 0 ? 90 : -90,
+            opacity: 0,
+            scale: 0.9,
+          }),
+          center: {
+            rotateY: 0,
+            opacity: 1,
+            scale: 1,
+          },
+          exit: (dir: number) => ({
+            rotateY: dir > 0 ? -90 : 90,
+            opacity: 0,
+            scale: 0.9,
+          }),
+        }
+      case "slide":
+        return {
+          enter: (dir: number) => ({
+            x: dir > 0 ? "100%" : "-100%",
+            opacity: 0,
+          }),
+          center: {
+            x: 0,
+            opacity: 1,
+          },
+          exit: (dir: number) => ({
+            x: dir > 0 ? "-100%" : "100%",
+            opacity: 0,
+          }),
+        }
+      case "fade":
+      default:
+        return {
+          enter: { opacity: 0, scale: 0.95 },
+          center: { opacity: 1, scale: 1 },
+          exit: { opacity: 0, scale: 0.95 },
+        }
+    }
+  }
+
+  const pageVariants = getPageVariants()
+
+  return (
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-50 flex flex-col bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Header */}
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border/50 bg-white/80 px-4 shadow-sm backdrop-blur-sm md:h-[60px] md:px-6 dark:bg-slate-800/80">
+        {/* Left: Progress */}
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">
+                Page {currentPage + 1} of {totalPages}
+              </span>
+              {autoplayMode !== "off" && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 text-[10px] font-semibold text-white"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  {autoplayMode === "tts" ? "Auto-reading" : `Auto (${autoplayCountdown}s)`}
+                </motion.div>
+              )}
+            </div>
+            <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-secondary md:w-32">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                initial={{ width: 0 }}
+                animate={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Center: Title */}
+        <h1 className="hidden text-center font-semibold text-foreground md:block">{book.title}</h1>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-1 md:gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleFullscreen}
+            className="h-9 w-9"
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+          >
+            {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="Settings">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>Autoplay Mode</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAutoplayMode("off")}>
+                <span className={cn(autoplayMode === "off" && "font-semibold")}>Off</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAutoplayMode("tts")}>
+                <span className={cn(autoplayMode === "tts" && "font-semibold")}>TTS Synced (Auto-read)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAutoplayMode("timed")}>
+                <span className={cn(autoplayMode === "timed" && "font-semibold")}>Timed (Auto-turn pages)</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Autoplay Speed (Timed)</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAutoplaySpeed(5)}>
+                <span className={cn(autoplaySpeed === 5 && "font-semibold")}>Fast (5s per page)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAutoplaySpeed(10)}>
+                <span className={cn(autoplaySpeed === 10 && "font-semibold")}>Normal (10s per page)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAutoplaySpeed(15)}>
+                <span className={cn(autoplaySpeed === 15 && "font-semibold")}>Slow (15s per page)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAutoplaySpeed(20)}>
+                <span className={cn(autoplaySpeed === 20 && "font-semibold")}>Very Slow (20s per page)</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Page Animation</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAnimationType("flip")}>
+                <span className={cn(animationType === "flip" && "font-semibold")}>Flip (3D)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationType("slide")}>
+                <span className={cn(animationType === "slide" && "font-semibold")}>Slide</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationType("fade")}>
+                <span className={cn(animationType === "fade" && "font-semibold")}>Fade</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Voice (English)</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-E")}>
+                <span className={cn(selectedVoice === "en-US-Standard-E" && "font-semibold")}>
+                  Child-Friendly (Default)
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-C")}>
+                <span className={cn(selectedVoice === "en-US-Standard-C" && "font-semibold")}>
+                  Warm & Friendly
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-F")}>
+                <span className={cn(selectedVoice === "en-US-Standard-F" && "font-semibold")}>
+                  Warm & Gentle
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-D")}>
+                <span className={cn(selectedVoice === "en-US-Standard-D" && "font-semibold")}>
+                  Male Voice
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Voice (Turkish)</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-A")}>
+                <span className={cn(selectedVoice === "tr-TR-Standard-A" && "font-semibold")}>
+                  Female (TR) - Recommended
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-C")}>
+                <span className={cn(selectedVoice === "tr-TR-Standard-C" && "font-semibold")}>
+                  Female (TR) - Alternative
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-E")}>
+                <span className={cn(selectedVoice === "tr-TR-Standard-E" && "font-semibold")}>
+                  Female (TR) - Alternative 2
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-B")}>
+                <span className={cn(selectedVoice === "tr-TR-Standard-B" && "font-semibold")}>
+                  Male (TR)
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-D")}>
+                <span className={cn(selectedVoice === "tr-TR-Standard-D" && "font-semibold")}>
+                  Male (TR) - Alternative
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Premium Voices (WaveNet)</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-C")}>
+                <span className={cn(selectedVoice === "en-US-Wavenet-C" && "font-semibold")}>
+                  Female Storyteller (EN)
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-D")}>
+                <span className={cn(selectedVoice === "en-US-Wavenet-D" && "font-semibold")}>
+                  Male Storyteller (EN)
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-E")}>
+                <span className={cn(selectedVoice === "en-US-Wavenet-E" && "font-semibold")}>
+                  Child-Friendly (EN)
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-A")}>
+                <span className={cn(selectedVoice === "tr-TR-Wavenet-A" && "font-semibold")}>
+                  Female (TR) - Premium
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-C")}>
+                <span className={cn(selectedVoice === "tr-TR-Wavenet-C" && "font-semibold")}>
+                  Female (TR) - Premium Alt
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-E")}>
+                <span className={cn(selectedVoice === "tr-TR-Wavenet-E" && "font-semibold")}>
+                  Female (TR) - Premium Alt 2
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-B")}>
+                <span className={cn(selectedVoice === "tr-TR-Wavenet-B" && "font-semibold")}>
+                  Male (TR) - Premium
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-D")}>
+                <span className={cn(selectedVoice === "tr-TR-Wavenet-D" && "font-semibold")}>
+                  Male (TR) - Premium Alt
+                </span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Speed</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setTtsSpeed(0.75)}>
+                <span className={cn(ttsSpeed === 0.75 && "font-semibold")}>Slow (0.75x)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTtsSpeed(1.0)}>
+                <span className={cn(ttsSpeed === 1.0 && "font-semibold")}>Normal (1x)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTtsSpeed(1.25)}>
+                <span className={cn(ttsSpeed === 1.25 && "font-semibold")}>Fast (1.25x)</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9" aria-label="Close book">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main 
+        className="relative flex flex-1 items-center justify-center overflow-hidden px-4 py-6 md:px-8 md:py-8"
+        onClick={handleContentTap}
+      >
+        {/* Click zones for desktop navigation */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            goToPrevPage()
+          }}
+          disabled={currentPage === 0}
+          className="absolute left-0 top-0 z-10 hidden h-full w-20 cursor-pointer items-center justify-start pl-4 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-default disabled:opacity-0 md:flex"
+          aria-label="Previous page"
+        >
+          <div className="rounded-full bg-black/10 p-2 dark:bg-white/10">
+            <ChevronLeft className="h-6 w-6 text-foreground" />
+          </div>
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            goToNextPage()
+          }}
+          disabled={currentPage === totalPages - 1}
+          className="absolute right-0 top-0 z-10 hidden h-full w-20 cursor-pointer items-center justify-end pr-4 opacity-0 transition-opacity hover:opacity-100 disabled:cursor-default disabled:opacity-0 md:flex"
+          aria-label="Next page"
+        >
+          <div className="rounded-full bg-black/10 p-2 dark:bg-white/10">
+            <ArrowRight className="h-6 w-6 text-foreground" />
+          </div>
+        </button>
+
+        {/* Page Content */}
+        <div
+          className={cn(
+            "relative flex h-full w-full items-center justify-center",
+            isLandscape ? "max-w-6xl" : "max-w-3xl",
+          )}
+          style={{ perspective: "1500px" }}
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentPage}
+              custom={direction}
+              variants={pageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                duration: animationType === "flip" ? 0.5 : animationType === "slide" ? 0.4 : 0.3,
+                ease: "easeInOut",
+              }}
+              className={cn("flex h-full w-full", isLandscape ? "flex-row gap-6" : "flex-col")}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              <BookPage page={book.pages[currentPage]} isLandscape={isLandscape} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Thumbnails Modal */}
+        <AnimatePresence>
+          {showThumbnails && (
+            <PageThumbnails
+              pages={book.pages}
+              currentPage={currentPage}
+              onSelectPage={goToPage}
+              onClose={() => setShowThumbnails(false)}
+            />
+          )}
+        </AnimatePresence>
+      </main>
+
+      {/* Footer Controls */}
+      <footer className="sticky bottom-0 z-40 flex h-[72px] items-center justify-center gap-2 border-t border-border/50 bg-white/80 px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm md:h-20 md:gap-4 md:px-6 dark:bg-slate-800/80">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={goToPrevPage}
+          disabled={currentPage === 0}
+          className="h-10 w-10 bg-transparent md:h-12 md:w-12"
+          aria-label="Previous page"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+
+        {/* Autoplay Button */}
+        <Button
+          onClick={handleAutoplayToggle}
+          className={cn(
+            "h-10 w-10 text-white md:h-12 md:w-12",
+            autoplayMode !== "off"
+              ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              : "bg-slate-400 hover:bg-slate-500"
+          )}
+          size="icon"
+          aria-label={autoplayMode !== "off" ? "Stop autoplay" : "Start autoplay"}
+        >
+          {autoplayMode !== "off" ? (
+            <Square className="h-5 w-5" />
+          ) : (
+            <RotateCcw className="h-5 w-5" />
+          )}
+        </Button>
+
+        {/* TTS Play/Pause Button (only when autoplay is off) */}
+        {autoplayMode === "off" && (
+          <Button
+            onClick={handlePlayPause}
+            disabled={isLoading}
+            className="h-10 w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 md:h-12 md:w-12 disabled:opacity-50"
+            size="icon"
+            aria-label={isLoading ? "Loading..." : isPlaying ? "Pause reading" : "Play reading"}
+          >
+            {isLoading ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
+              />
+            ) : isPlaying ? (
+              <Pause className="h-5 w-5" />
+            ) : (
+              <Play className="h-5 w-5" />
+            )}
+          </Button>
+        )}
+
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={goToNextPage}
+          disabled={currentPage === totalPages - 1}
+          className="h-10 w-10 bg-transparent md:h-12 md:w-12"
+          aria-label="Next page"
+        >
+          <ArrowRight className="h-5 w-5" />
+        </Button>
+
+        <div className="mx-2 h-8 w-px bg-border md:mx-4" />
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setShowThumbnails(true)}
+          className="h-10 w-10 md:h-12 md:w-12"
+          aria-label="View all pages"
+        >
+          <Grid3X3 className="h-5 w-5" />
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsBookmarked(!isBookmarked)}
+          className={cn("h-10 w-10 md:h-12 md:w-12", isBookmarked && "text-pink-500")}
+          aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+        >
+          {isBookmarked ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleShare}
+          className="h-10 w-10 md:h-12 md:w-12"
+          aria-label="Share book"
+        >
+          <Share2 className="h-5 w-5" />
+        </Button>
+      </footer>
+    </div>
+  )
+}
+

@@ -5,7 +5,7 @@ const Groq = require('groq-sdk');
 require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3005;
 
 // Middleware
 app.use(cors());
