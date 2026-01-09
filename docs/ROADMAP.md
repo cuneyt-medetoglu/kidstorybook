@@ -272,12 +272,12 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **2.5.7.5** Reading statistics (ne kadar süre okudu, hangi sayfaları okudu)
 
 ### 2.6 Kullanıcı Dashboard
-- [ ] **2.6.1** Kitaplık sayfası (tüm kitaplar grid)
-- [ ] **2.6.2** Kitap kartı component
-- [ ] **2.6.3** Filtreleme ve sıralama
-- [ ] **2.6.4** Sipariş geçmişi
-- [ ] **2.6.5** Profil ayarları
-- [ ] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı)
+- [x] **2.6.1** Kitaplık sayfası (tüm kitaplar grid) - ✅ Dashboard sayfası oluşturuldu, grid/list view toggle
+- [x] **2.6.2** Kitap kartı component - ✅ Book card component (cover, title, character, status, actions)
+- [x] **2.6.3** Filtreleme ve sıralama - ✅ Filter tabs (All, Completed, In Progress, Drafts), Sort dropdown (Date, Title), Search bar
+- [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons)
+- [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing)
+- [x] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı) - ✅ Free Cover Status section (status badge, used date, info box)
 
 ### 2.7 Statik Sayfalar
 - [ ] **2.7.1** Özellikler (Features) sayfası
@@ -761,6 +761,24 @@ Requirements:
   - Gerekli ayarlar öne çıkarılacak, gelişmiş ayarlar gizlenecek veya ayrı bir bölüme alınacak
 - **Zamanlama:** Faz 2.5.5 (UX İyileştirmeleri) veya Faz 3 (Polish) sırasında
 
+**Görsel Kırpılma Sorunu (10 Ocak 2026):**
+- **Sorun:** E-book viewer'da ekran boyutuna göre metin altta (portrait) veya yanda (landscape) olabiliyor, ancak görsel kırpılıyor (`object-cover` kullanılıyor)
+- **Mevcut Durum:** 
+  - Portrait mode: Görsel üstte, metin altta (stacked layout)
+  - Landscape mode: Görsel solda, metin sağda (side-by-side)
+  - Görsel `object-cover` ile gösteriliyor, bu da görselin kırpılmasına neden oluyor
+- **Çözüm Önerileri:**
+  - `object-contain` kullanarak görselin tamamını göstermek (kenarlarda boşluk olabilir)
+  - Görsel için dinamik aspect ratio hesaplama
+  - Zoom özelliği ekleyerek kullanıcının görseli yakınlaştırmasına izin vermek
+  - Görsel için `object-position` ile önemli kısmın ortalanması
+  - Responsive görsel boyutlandırma (farklı ekran boyutları için farklı aspect ratio'lar)
+- **İlgili Dosyalar:**
+  - `components/book-viewer/book-page.tsx` - Görsel gösterimi burada yapılıyor
+  - `components/book-viewer/book-viewer.tsx` - Ana viewer component
+- **Zamanlama:** Faz 2.5.1.7 (Zoom in/out) veya Faz 2.5.5 (UX İyileştirmeleri) sırasında ele alınacak
+- **Kategori:** UI/UX İyileştirmesi / Responsive Design
+
 **Temel Gereksinimler:**
 1. **Responsive Layout:**
    - Portrait (dikey): Tek sayfa gösterimi
@@ -1000,22 +1018,25 @@ Response: {
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
 | Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🟡 Devam Ediyor | 42 | 61 | 69% |
+| Faz 2 | 🟡 Devam Ediyor | 48 | 61 | 79% |
 | Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
 | Faz 2.2 | ✅ Tamamlandı | 8 | 8 | 100% |
 | Faz 2.3 | 🟡 Devam Ediyor | 7 | 8 | 87% |
 | Faz 2.4 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 2.5 | ✅ Tamamlandı | 10 | 10 | 100% |
+| Faz 2.6 | ✅ Tamamlandı | 6 | 6 | 100% |
 | Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
 | Faz 6 | 🔵 Bekliyor | 0 | 24 | 0% |
-| **TOPLAM** | **🟡** | **52** | **176** | **30%** |
+| **TOPLAM** | **🟡** | **58** | **176** | **33%** |
 
 ---
 
 **Son Güncelleme:** 10 Ocak 2026  
 **Güncelleyen:** @project-manager agent
+
+**Not:** Faz 2.6 tamamlandı ve test edildi ✅ (10 Ocak 2026). Dashboard ve Profile Settings sayfaları çalışıyor. Sırada Faz 2.7 (Statik Sayfalar) veya Faz 3 (Backend ve AI Entegrasyonu - KRİTİK) var.
 
 > 💡 **İpucu:** Bu dosyayı güncel tutun! Her iş tamamlandığında `[ ]` işaretini `[x]` olarak değiştirin ve ilerleme tablosunu güncelleyin.
 
