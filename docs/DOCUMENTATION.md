@@ -26,6 +26,7 @@ docs/
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
 │   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
+│   ├── SUPABASE_MIGRATION_GUIDE.md # Supabase migration uygulama rehberi
 │   ├── V0_APP_WORKFLOW.md      # v0.app çalışma akışı rehberi
 │   ├── COLOR_PALETTE.md        # Renk paleti rehberi
 │   └── ...
@@ -38,8 +39,15 @@ docs/
 │   ├── GIT_STRATEGY.md         # Git branching stratejisi
 │   ├── EBOOK_VIEWER_STRATEGY.md # E-book Viewer stratejisi
 │   ├── TTS_STRATEGY.md         # Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
+│   ├── CHARACTER_CONSISTENCY_STRATEGY.md # Master character multi-book tutarlılığı
 │   ├── B2B_FEATURE_ANALYSIS.md # B2B (Business-to-Business) özellik analizi
 │   └── ...
+│
+├── database/                   # Database schemas ve migration'lar
+│   └── SCHEMA.md               # Database schema dokümantasyonu
+│
+├── api/                        # API dokümantasyonu
+│   └── API_DOCUMENTATION.md    # API endpoints ve kullanım rehberi
 │
 ├── ai/                          # AI ile ilgili dokümanlar
 │   ├── AI_STRATEGY.md           # AI prompt stratejisi
@@ -109,6 +117,22 @@ docs/
    - Planlanan özellikler (yaş grubuna göre, modlar, çok dilli destek)
    - Teknik detaylar
    - Maliyet analizi
+2. **strategies/CHARACTER_CONSISTENCY_STRATEGY.md** - Master Character çoklu kitap tutarlılığı
+   - Master Character konsepti
+   - Çoklu kitap stratejisi
+   - Database schema
+   - Kullanıcı akışları
+
+### Database
+1. **database/SCHEMA.md** - Database schema dokümantasyonu
+   - Characters table
+   - Books table
+   - RLS policies
+   - Triggers ve functions
+   - Index strategies
+   - Storage buckets
+
+**Database Agent:** `@database-manager` - Database ile ilgili tüm işlerden sorumlu agent
 
 ---
 
@@ -144,5 +168,21 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
 
 ---
 
-**Son Güncelleme:** 4 Ocak 2026
+- **10 Ocak 2026:**
+  - Faz 3: Backend ve AI Integration başladı
+  - Prompt Management System kuruldu
+    - Prompt versiyonlama sistemi (`lib/prompts/`)
+    - Story generation prompts v1.0.0
+    - Image generation prompts v1.0.0 (character, scene, negative)
+    - Prompt Manager Agent oluşturuldu (`.cursor/rules/prompt-manager.mdc`)
+  - Character Consistency System
+    - Master Character konsepti tasarlandı
+    - Multi-book consistency stratejisi oluşturuldu
+    - Database migrations oluşturuldu (`supabase/migrations/`)
+    - Characters table ve triggers eklendi
+    - Database helper functions (`lib/db/characters.ts`)
+    - `docs/database/SCHEMA.md` oluşturuldu
+    - `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md` oluşturuldu
+
+**Son Güncelleme:** 10 Ocak 2026
 

@@ -328,47 +328,48 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **3.2.7** `GET /api/auth/facebook` - Facebook OAuth callback
 - [ ] **3.2.8** `GET /api/auth/instagram` - Instagram OAuth callback (opsiyonel)
 
-### 3.3 Karakter API'leri
-- [ ] **3.3.1** `POST /api/characters` - Karakter oluştur (kullanıcı girdileri + referans görsel)
-- [ ] **3.3.2** `POST /api/characters/upload-photo` - Referans görsel yükle (çocuk fotoğrafı)
-- [ ] **3.3.3** `POST /api/characters/analyze-photo` - Fotoğraf analiz et (AI ile detaylı analiz)
-  - [ ] Kullanıcı girdilerini doğrula
-  - [ ] Saç uzunluğu, stili, dokusu analiz et
-  - [ ] Yüz şekli, göz şekli analiz et
-  - [ ] Ten rengi, vücut oranları analiz et
-  - [ ] Birleştirilmiş karakter tanımı oluştur
-- [ ] **3.3.4** `GET /api/characters` - Kullanıcının karakterleri
+### 3.4 Karakter API'leri ✅
+- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu
+  - [x] Kullanıcı girdilerini doğrula
+  - [x] Fotoğraf analizi (GPT-4o Vision)
+  - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.)
+  - [x] Master Character olarak database'e kaydet
+- [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API
+- [x] **3.4.3** `GET /api/characters/:id` - Karakter detayları - ✅ Single character API
+- [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API
+- [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
+- [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
+- [ ] **3.4.7** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
 
-### 3.4 Kitap API'leri
-- [ ] **3.4.1** `POST /api/books` - Yeni kitap başlat
-- [ ] **3.4.2** `GET /api/books` - Kullanıcının kitapları
-- [ ] **3.4.3** `GET /api/books/:id` - Kitap detay
-- [ ] **3.4.4** `PATCH /api/books/:id` - Kitap güncelle
-- [ ] **3.4.5** `DELETE /api/books/:id` - Kitap sil
+### 3.6 Kitap API'leri
+- [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites)
+- [ ] **3.6.2** `POST /api/books` - Yeni kitap başlat - ⏳ Story generation API ile entegre
+- [ ] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ⏳ Sonraki adım
+- [ ] **3.6.4** `GET /api/books/:id` - Kitap detay - ⏳ Sonraki adım
+- [ ] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ⏳ Sonraki adım
+- [ ] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ⏳ Sonraki adım
 
-### 3.5 AI Entegrasyonu (Henüz Karar Verilmedi - Tüm Seçenekler Hazır Olacak)
-- [ ] **3.5.1** AI Provider abstraction layer (tüm provider'ları destekle)
-- [ ] **3.5.2** `POST /api/ai/generate-story` - Hikaye üret
-  - [ ] OpenAI GPT-4o entegrasyonu
-  - [ ] Google Gemini Pro entegrasyonu
-  - [ ] Groq (Llama) entegrasyonu
-  - [ ] Claude entegrasyonu (opsiyonel)
-- [ ] **3.5.3** `POST /api/ai/generate-image` - Görsel üret (kapak için)
-  - [ ] DALL-E 3 entegrasyonu (OpenAI)
-  - [ ] Gemini Banana (Imagen 3) entegrasyonu (Google)
-  - [ ] Stable Diffusion entegrasyonu (Replicate)
-  - [ ] Referans görsel + karakter tanımı kullanarak tutarlı görsel üret
-- [ ] **3.5.4** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et)
-- [ ] **3.5.5** `POST /api/ai/analyze-photo` - Fotoğraf analiz (referans görsel + kullanıcı girdileri)
-  - [ ] GPT-4 Vision entegrasyonu (OpenAI)
-  - [ ] Gemini Vision entegrasyonu (Google)
-  - [ ] Kullanıcı girdilerini doğrula (saç rengi, göz rengi, vb.)
-  - [ ] Detaylı analiz: saç uzunluğu, stili, dokusu, yüz şekli, göz şekli, ten rengi
-  - [ ] Birleştirilmiş karakter tanımı oluştur (kullanıcı girdileri + AI analizi)
-- [ ] **3.5.6** POC'tan prompt template'leri taşı
-- [ ] **3.5.7** Queue sistemi (uzun işlemler için)
-- [ ] **3.5.8** Retry ve hata yönetimi
-- [ ] **3.5.9** AI provider seçimi için config sistemi
+### 3.5 AI Entegrasyonu ✅
+- [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
+- [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
+- [x] **3.5.3** Image Generation Prompts v1.0.0 - ✅ Character consistency, scene generation, negative prompts
+- [x] **3.5.4** Character Consistency System - ✅ Master Character concept, multi-book tutarlılığı
+- [x] **3.5.5** `POST /api/ai/generate-story` - Hikaye üret - ✅ GPT-4o entegrasyonu, Master Character kullanımı
+  - [x] OpenAI GPT-4o entegrasyonu
+  - [ ] Google Gemini Pro entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Groq (Llama) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Claude entegrasyonu (opsiyonel) - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ DALL-E 3 entegrasyonu
+  - [x] DALL-E 3 entegrasyonu (OpenAI)
+  - [x] Master Character description kullanarak tutarlı görsel üret
+  - [x] Supabase Storage'a otomatik upload
+  - [ ] Gemini Banana (Imagen 3) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Stable Diffusion entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ⏳ Sonraki adım
+- [x] **3.5.8** Prompt template'leri - ✅ POC'tan taşındı ve geliştirildi (`lib/prompts/`)
+- [ ] **3.5.9** Queue sistemi (uzun işlemler için) - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.10** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.11** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing)
 
 ### 3.6 PDF Generation
 - [ ] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur
@@ -1036,7 +1037,15 @@ Response: {
 **Son Güncelleme:** 10 Ocak 2026  
 **Güncelleyen:** @project-manager agent
 
-**Not:** Faz 2.6 tamamlandı ve test edildi ✅ (10 Ocak 2026). Dashboard ve Profile Settings sayfaları çalışıyor. Sırada Faz 2.7 (Statik Sayfalar) veya Faz 3 (Backend ve AI Entegrasyonu - KRİTİK) var.
+**Not:** Faz 2.6 tamamlandı ve test edildi ✅ (10 Ocak 2026). Dashboard ve Profile Settings sayfaları çalışıyor. 
+
+**KARAR (10 Ocak 2026):** Faz 3 - Backend ve AI Entegrasyonuna geçiyoruz. Atladığımız/ertelenen işler:
+- ⏸️ **Faz 2.1:** Email verification, OAuth callback pages (1 iş)
+- ⏸️ **Faz 2.3:** OAuth entegrasyonları (1 iş)
+- ⏸️ **Faz 2.7:** Tüm statik sayfalar (12 iş) - Backend sonrası yapılacak
+- ⏸️ **Faz 2.8:** Localization/i18n - Post-MVP
+
+**Neden Faz 3?** Backend ve AI entegrasyonu kritik. Gerçek veri akışı olmadan demo sınırlı kalır. Statik sayfalar backend sonrası hızlıca eklenebilir.
 
 > 💡 **İpucu:** Bu dosyayı güncel tutun! Her iş tamamlandığında `[ ]` işaretini `[x]` olarak değiştirin ve ilerleme tablosunu güncelleyin.
 
