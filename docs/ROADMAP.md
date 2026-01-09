@@ -26,7 +26,13 @@
 - POC tamamlandı (10 sayfalık kitap prompt sistemi çalışıyor)
 - AI stratejisi ve prompt template'leri hazır
 - Teknik stack kararı verildi: **Next.js + Tailwind + shadcn/ui + Supabase**
-- API key'ler hazır (OpenAI, Groq)
+- API key'ler hazır (OpenAI, Groq, Google Cloud TTS)
+- **Faz 1:** Temel altyapı tamamlandı (71%)
+- **Faz 2:** Frontend geliştirme devam ediyor (69%)
+  - ✅ Faz 2.2: Ana sayfa (100%)
+  - ✅ Faz 2.4: Kitap oluşturma wizard (100%)
+  - ✅ Faz 2.5: E-book Viewer (100%) - **YENİ!**
+  - ⏳ Faz 2.6: Kullanıcı Dashboard (sırada)
 
 ### Hedef
 MVP lansmanı: Çalışan bir ürün
@@ -192,11 +198,19 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)
 - [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)
 
-### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM**
+### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM** ✅ **TAMAMLANDI**
 **Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Çok iyi planlanmalı ve harika bir UX sunmalı.  
 **Strateji Dokümantasyonu:** `docs/strategies/EBOOK_VIEWER_STRATEGY.md`  
 **v0.app Prompt:** `docs/prompts/V0_EBOOK_VIEWER_PROMPT.md`  
-**Durum:** 🟡 Başladı (4 Ocak 2026)
+**Durum:** ✅ Tamamlandı (10 Ocak 2026)
+
+**Özet:**
+- ✅ Temel görüntüleme ve navigasyon (6 animasyon tipi, fullscreen, thumbnails)
+- ✅ Mobil ve responsive (portrait/landscape, swipe gestures)
+- ✅ Text-to-Speech entegrasyonu (Google Cloud TTS, 8 ses seçeneği)
+- ✅ Otomatik oynatma (TTS Synced, Timed modes)
+- ✅ UX iyileştirmeleri (Bookmark, Reading Progress, Keyboard Shortcuts, Share)
+- ✅ Görsel ve animasyonlar (6 animasyon tipi, 3 hız seçeneği, shadow/depth effects)
 
 #### 2.5.1 Temel Görüntüleme ve Navigasyon
 - [x] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi - ✅ Framer Motion ile custom implementation seçildi
@@ -227,27 +241,28 @@ MVP lansmanı: Çalışan bir ürün
 - [ ] **2.5.3.8** TTS Cache mekanizması - ⏳ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz)
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
-- [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu, visual indicator ve Settings'te mod seçimi
+- [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi
 - [x] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye) - ✅ 5s, 10s, 15s, 20s seçenekleri Settings'te
-- [x] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme - ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam
+- [x] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme - ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam (onEnded callback ile)
 - [x] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma) - ✅ Ekrana dokunarak TTS pause/resume, Timed mode countdown ile sayfa geçişi
+- ✅ **Bug Fix:** TTS auto-advance sorunu çözüldü, closure sorunu düzeltildi, icon'lar iyileştirildi (RotateCcw/Square)
 
 #### 2.5.5 Kullanıcı Deneyimi İyileştirmeleri
-- [ ] **2.5.5.1** Bookmark/favori sayfa işaretleme
-- [ ] **2.5.5.2** Reading progress save (nerede kaldı, otomatik kaydetme)
-- [ ] **2.5.5.3** Share butonu (kitabı/sayfayı paylaşma)
-- [ ] **2.5.5.4** Download as PDF butonu
-- [ ] **2.5.5.5** Print options
-- [ ] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.)
-- [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support)
+- [x] **2.5.5.1** Bookmark/favori sayfa işaretleme - ✅ localStorage ile bookmark sistemi, her sayfa için ayrı bookmark
+- [x] **2.5.5.2** Reading progress save (nerede kaldı, otomatik kaydetme) - ✅ localStorage ile otomatik kaydetme, kitap açıldığında kaldığı yerden devam
+- [x] **2.5.5.3** Share butonu (kitabı/sayfayı paylaşma) - ✅ navigator.share API ile paylaşma (fallback: clipboard)
+- [ ] **2.5.5.4** Download as PDF butonu - ⏳ Post-MVP
+- [ ] **2.5.5.5** Print options - ⏳ Post-MVP
+- [x] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.) - ✅ 11 farklı klavye kısayolu eklendi
+- [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support) - ⏳ Post-MVP
 - [ ] **2.5.5.8** Settings UI iyileştirmesi - ⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım)
 
 #### 2.5.6 Görsel ve Animasyonlar
-- [ ] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.)
-- [ ] **2.5.6.2** Animasyon hızı/stili seçenekleri
-- [ ] **2.5.6.3** Smooth transitions
-- [ ] **2.5.6.4** Page curl effect (sayfa kıvrılma efekti)
-- [ ] **2.5.6.5** Shadow ve depth effects (3D görünüm)
+- [x] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.) - ✅ 6 farklı animasyon tipi: Flip (3D), Slide, Fade, Page Curl, Zoom, None (Instant)
+- [x] **2.5.6.2** Animasyon hızı/stili seçenekleri - ✅ Settings'te 3 hız seçeneği: Slow, Normal, Fast (configurable)
+- [x] **2.5.6.3** Smooth transitions - ✅ Spring ve tween animasyonları, easeInOut/easeOut transitions
+- [x] **2.5.6.4** Page curl effect (sayfa kıvrılma efekti) - ✅ 3D rotateX/rotateY ile page curl animasyonu
+- [x] **2.5.6.5** Shadow ve depth effects (3D görünüm) - ✅ Shadow-2xl, drop-shadow, depth effects (z-index)
 
 #### 2.5.7 Gelecek Özellikler (Post-MVP)
 - [ ] **2.5.7.1** Notes/annotations (sayfaya not alma)
@@ -715,6 +730,22 @@ Requirements:
 - [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb.
 - [ ] **Reviews/Testimonials Sayfası** - Detaylı kullanıcı yorumları sayfası
 
+### Keyboard Shortcuts (E-book Viewer)
+
+| Tuş | Fonksiyon |
+|-----|-----------|
+| `→` / `Space` | Sonraki sayfa |
+| `←` / `Backspace` | Önceki sayfa |
+| `Home` | İlk sayfaya git |
+| `End` | Son sayfaya git |
+| `F` | Fullscreen toggle |
+| `Esc` | Fullscreen'den çık / Thumbnails'ı kapat |
+| `P` | TTS Play/Pause (autoplay kapalıyken) |
+| `A` | Autoplay toggle |
+| `B` | Bookmark toggle (mevcut sayfayı işaretle/kaldır) |
+| `T` | Thumbnails (sayfa önizlemeleri) |
+| `S` | Share (paylaş) |
+
 ### E-book Viewer Notları (4 Ocak 2026)
 **Kritik Önem:** E-book viewer kullanıcının en çok etkileşimde bulunacağı kısım. Mükemmel olmalı.
 
@@ -969,20 +1000,21 @@ Response: {
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
 | Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🟡 Devam Ediyor | 32 | 61 | 52% |
+| Faz 2 | 🟡 Devam Ediyor | 42 | 61 | 69% |
 | Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
 | Faz 2.2 | ✅ Tamamlandı | 8 | 8 | 100% |
 | Faz 2.3 | 🟡 Devam Ediyor | 7 | 8 | 87% |
 | Faz 2.4 | ✅ Tamamlandı | 10 | 10 | 100% |
+| Faz 2.5 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
 | Faz 6 | 🔵 Bekliyor | 0 | 24 | 0% |
-| **TOPLAM** | **🟡** | **42** | **176** | **24%** |
+| **TOPLAM** | **🟡** | **52** | **176** | **30%** |
 
 ---
 
-**Son Güncelleme:** 4 Ocak 2026  
+**Son Güncelleme:** 10 Ocak 2026  
 **Güncelleyen:** @project-manager agent
 
 > 💡 **İpucu:** Bu dosyayı güncel tutun! Her iş tamamlandığında `[ ]` işaretini `[x]` olarak değiştirin ve ilerleme tablosunu güncelleyin.

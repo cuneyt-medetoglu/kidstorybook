@@ -93,7 +93,8 @@ const mockBook = {
   totalPages: 10,
 }
 
-type AnimationType = "flip" | "slide" | "fade"
+type AnimationType = "flip" | "slide" | "fade" | "curl" | "zoom" | "none"
+type AnimationSpeed = "slow" | "normal" | "fast"
 
 interface BookViewerProps {
   bookId?: string
@@ -101,10 +102,42 @@ interface BookViewerProps {
 }
 
 export function BookViewer({ onClose }: BookViewerProps) {
+  const book = mockBook
+  const totalPages = book.pages.length
+  
+  // Initialize currentPage - always start with 0 for SSR, then load from localStorage on client
   const [currentPage, setCurrentPage] = useState(0)
-  const [isBookmarked, setIsBookmarked] = useState(false)
+  
+  // Initialize bookmark state - always start with empty Set for SSR, then load from localStorage on client
+  const [bookmarkedPages, setBookmarkedPages] = useState<Set<number>>(new Set())
+  
+  // Load reading progress from localStorage on client mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedProgress = localStorage.getItem(`book-progress-${book.id}`)
+      if (savedProgress) {
+        const page = parseInt(savedProgress, 10)
+        if (page >= 0 && page < totalPages) {
+          setCurrentPage(page)
+        }
+      }
+      
+      // Load bookmarks from localStorage
+      const savedBookmarks = localStorage.getItem(`book-bookmarks-${book.id}`)
+      if (savedBookmarks) {
+        try {
+          const bookmarks = JSON.parse(savedBookmarks)
+          setBookmarkedPages(new Set(bookmarks))
+        } catch {
+          // Invalid JSON, ignore
+        }
+      }
+    }
+  }, [book.id, totalPages])
+  
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [animationType, setAnimationType] = useState<AnimationType>("flip")
+  const [animationSpeed, setAnimationSpeed] = useState<AnimationSpeed>("normal")
   const [showThumbnails, setShowThumbnails] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const [direction, setDirection] = useState(0)
@@ -121,9 +154,23 @@ export function BookViewer({ onClose }: BookViewerProps) {
 
   // TTS hook
   const { isPlaying, isPaused, isLoading, play, pause, resume, stop, onEnded } = useTTS()
+  
+  // Check if current page is bookmarked
+  const isBookmarked = bookmarkedPages.has(currentPage)
 
-  const book = mockBook
-  const totalPages = book.pages.length
+  // Save reading progress to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`book-progress-${book.id}`, currentPage.toString())
+    }
+  }, [currentPage, book.id])
+
+  // Save bookmarks to localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`book-bookmarks-${book.id}`, JSON.stringify(Array.from(bookmarkedPages)))
+    }
+  }, [bookmarkedPages, book.id])
 
   // Detect orientation
   useEffect(() => {
@@ -168,34 +215,6 @@ export function BookViewer({ onClose }: BookViewerProps) {
       setCurrentPage((prev) => prev - 1)
     }
   }, [currentPage])
-
-  // Keyboard navigation (moved after function definitions)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (showThumbnails) return
-      switch (e.key) {
-        case "ArrowRight":
-        case " ":
-          e.preventDefault()
-          goToNextPage()
-          break
-        case "ArrowLeft":
-        case "Backspace":
-          e.preventDefault()
-          goToPrevPage()
-          break
-        case "Escape":
-          if (isFullscreen) toggleFullscreen()
-          else if (showThumbnails) setShowThumbnails(false)
-          break
-        case "f":
-          toggleFullscreen()
-          break
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [currentPage, isFullscreen, showThumbnails, goToNextPage, goToPrevPage, toggleFullscreen])
 
   const goToPage = useCallback(
     (page: number) => {
@@ -279,24 +298,6 @@ export function BookViewer({ onClose }: BookViewerProps) {
     }
   }, [autoplayMode, autoplaySpeed, currentPage, totalPages, goToNextPage])
 
-  // Stop TTS when page changes manually (but continue autoplay if active)
-  useEffect(() => {
-    stop()
-    // If autoplay is active and in TTS mode, start playing the new page
-    if (autoplayMode === "tts") {
-      const timer = setTimeout(() => {
-        const currentPageText = book.pages[currentPage]?.text
-        if (currentPageText) {
-          play(currentPageText, {
-            voiceId: selectedVoice,
-            speed: ttsSpeed,
-          })
-        }
-      }, 500) // Small delay after page change
-      return () => clearTimeout(timer)
-    }
-  }, [currentPage, stop, autoplayMode, book.pages, play, selectedVoice, ttsSpeed])
-
   // Play TTS for current page when play button is clicked
   const handlePlayPause = useCallback(async () => {
     if (isPlaying) {
@@ -338,6 +339,33 @@ export function BookViewer({ onClose }: BookViewerProps) {
     }
   }, [autoplayMode, currentPage, book.pages, play, stop, selectedVoice, ttsSpeed])
 
+  // Toggle bookmark for current page
+  const toggleBookmark = useCallback(() => {
+    setBookmarkedPages((prev) => {
+      const newBookmarks = new Set(prev)
+      if (newBookmarks.has(currentPage)) {
+        newBookmarks.delete(currentPage)
+      } else {
+        newBookmarks.add(currentPage)
+      }
+      return newBookmarks
+    })
+  }, [currentPage])
+
+  // Share function
+  const handleShare = useCallback(async () => {
+    try {
+      await navigator.share({
+        title: book.title,
+        text: `Check out this amazing story: ${book.title}`,
+        url: window.location.href,
+      })
+    } catch {
+      // Fallback: copy to clipboard
+      await navigator.clipboard.writeText(window.location.href)
+    }
+  }, [book.title])
+
   // Pause/resume autoplay on tap
   const handleContentTap = useCallback(() => {
     if (autoplayMode !== "off") {
@@ -352,22 +380,129 @@ export function BookViewer({ onClose }: BookViewerProps) {
     }
   }, [autoplayMode, isPlaying, isPaused, pause, resume])
 
-  // Share function
-  const handleShare = async () => {
-    try {
-      await navigator.share({
-        title: book.title,
-        text: `Check out this amazing story: ${book.title}`,
-        url: window.location.href,
-      })
-    } catch {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(window.location.href)
+  // Keyboard navigation (moved after function definitions)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Close thumbnails on any key
+      if (showThumbnails && e.key === "Escape") {
+        setShowThumbnails(false)
+        return
+      }
+      
+      // Ignore keyboard shortcuts when thumbnails are open
+      if (showThumbnails) return
+      
+      switch (e.key) {
+        case "ArrowRight":
+        case " ":
+          e.preventDefault()
+          goToNextPage()
+          break
+        case "ArrowLeft":
+        case "Backspace":
+          e.preventDefault()
+          goToPrevPage()
+          break
+        case "Home":
+          e.preventDefault()
+          setDirection(-1)
+          setCurrentPage(0)
+          break
+        case "End":
+          e.preventDefault()
+          setDirection(1)
+          setCurrentPage(totalPages - 1)
+          break
+        case "Escape":
+          e.preventDefault()
+          if (isFullscreen) toggleFullscreen()
+          break
+        case "f":
+        case "F":
+          e.preventDefault()
+          toggleFullscreen()
+          break
+        case "p":
+        case "P":
+          e.preventDefault()
+          if (autoplayMode === "off") {
+            handlePlayPause()
+          }
+          break
+        case "a":
+        case "A":
+          e.preventDefault()
+          handleAutoplayToggle()
+          break
+        case "b":
+        case "B":
+          e.preventDefault()
+          toggleBookmark()
+          break
+        case "t":
+        case "T":
+          e.preventDefault()
+          setShowThumbnails(true)
+          break
+        case "s":
+        case "S":
+          e.preventDefault()
+          handleShare()
+          break
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [
+    currentPage,
+    totalPages,
+    isFullscreen,
+    showThumbnails,
+    autoplayMode,
+    goToNextPage,
+    goToPrevPage,
+    toggleFullscreen,
+    handlePlayPause,
+    handleAutoplayToggle,
+    toggleBookmark,
+    handleShare,
+  ])
+
+  // Stop TTS when page changes manually (but continue autoplay if active)
+  useEffect(() => {
+    stop()
+    // If autoplay is active and in TTS mode, start playing the new page
+    if (autoplayMode === "tts") {
+      const timer = setTimeout(() => {
+        const currentPageText = book.pages[currentPage]?.text
+        if (currentPageText) {
+          play(currentPageText, {
+            voiceId: selectedVoice,
+            speed: ttsSpeed,
+          })
+        }
+      }, 500) // Small delay after page change
+      return () => clearTimeout(timer)
+    }
+  }, [currentPage, stop, autoplayMode, book.pages, play, selectedVoice, ttsSpeed])
+
+  // Get animation duration based on speed
+  const getAnimationDuration = () => {
+    switch (animationSpeed) {
+      case "slow":
+        return 0.8
+      case "fast":
+        return 0.2
+      case "normal":
+      default:
+        return 0.5
     }
   }
 
   // Animation variants
   const getPageVariants = () => {
+    const baseDuration = getAnimationDuration()
+    
     switch (animationType) {
       case "flip":
         return {
@@ -375,16 +510,19 @@ export function BookViewer({ onClose }: BookViewerProps) {
             rotateY: dir > 0 ? 90 : -90,
             opacity: 0,
             scale: 0.9,
+            z: -50,
           }),
           center: {
             rotateY: 0,
             opacity: 1,
             scale: 1,
+            z: 0,
           },
           exit: (dir: number) => ({
             rotateY: dir > 0 ? -90 : 90,
             opacity: 0,
             scale: 0.9,
+            z: -50,
           }),
         }
       case "slide":
@@ -403,16 +541,65 @@ export function BookViewer({ onClose }: BookViewerProps) {
           }),
         }
       case "fade":
-      default:
         return {
           enter: { opacity: 0, scale: 0.95 },
           center: { opacity: 1, scale: 1 },
           exit: { opacity: 0, scale: 0.95 },
         }
+      case "curl":
+        return {
+          enter: (dir: number) => ({
+            rotateY: dir > 0 ? 45 : -45,
+            rotateX: 10,
+            opacity: 0,
+            scale: 0.95,
+            z: -100,
+          }),
+          center: {
+            rotateY: 0,
+            rotateX: 0,
+            opacity: 1,
+            scale: 1,
+            z: 0,
+          },
+          exit: (dir: number) => ({
+            rotateY: dir > 0 ? -45 : 45,
+            rotateX: -10,
+            opacity: 0,
+            scale: 0.95,
+            z: -100,
+          }),
+        }
+      case "zoom":
+        return {
+          enter: (dir: number) => ({
+            scale: dir > 0 ? 1.1 : 0.9,
+            opacity: 0,
+            z: -50,
+          }),
+          center: {
+            scale: 1,
+            opacity: 1,
+            z: 0,
+          },
+          exit: (dir: number) => ({
+            scale: dir > 0 ? 0.9 : 1.1,
+            opacity: 0,
+            z: -50,
+          }),
+        }
+      case "none":
+      default:
+        return {
+          enter: { opacity: 1 },
+          center: { opacity: 1 },
+          exit: { opacity: 1 },
+        }
     }
   }
 
   const pageVariants = getPageVariants()
+  const animationDuration = getAnimationDuration()
 
   return (
     <div
@@ -512,6 +699,27 @@ export function BookViewer({ onClose }: BookViewerProps) {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setAnimationType("fade")}>
                 <span className={cn(animationType === "fade" && "font-semibold")}>Fade</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationType("curl")}>
+                <span className={cn(animationType === "curl" && "font-semibold")}>Page Curl</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationType("zoom")}>
+                <span className={cn(animationType === "zoom" && "font-semibold")}>Zoom</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationType("none")}>
+                <span className={cn(animationType === "none" && "font-semibold")}>None (Instant)</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Animation Speed</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setAnimationSpeed("slow")}>
+                <span className={cn(animationSpeed === "slow" && "font-semibold")}>Slow</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationSpeed("normal")}>
+                <span className={cn(animationSpeed === "normal" && "font-semibold")}>Normal</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAnimationSpeed("fast")}>
+                <span className={cn(animationSpeed === "fast" && "font-semibold")}>Fast</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Voice (English)</DropdownMenuLabel>
@@ -679,11 +887,22 @@ export function BookViewer({ onClose }: BookViewerProps) {
               animate="center"
               exit="exit"
               transition={{
-                duration: animationType === "flip" ? 0.5 : animationType === "slide" ? 0.4 : 0.3,
-                ease: "easeInOut",
+                duration: animationDuration,
+                ease: animationType === "flip" || animationType === "curl" ? "easeInOut" : "easeOut",
+                type: animationType === "flip" || animationType === "curl" ? "spring" : "tween",
+                stiffness: animationType === "flip" || animationType === "curl" ? 100 : undefined,
+                damping: animationType === "flip" || animationType === "curl" ? 15 : undefined,
               }}
-              className={cn("flex h-full w-full", isLandscape ? "flex-row gap-6" : "flex-col")}
-              style={{ transformStyle: "preserve-3d" }}
+              className={cn(
+                "flex h-full w-full",
+                isLandscape ? "flex-row gap-6" : "flex-col",
+                animationType !== "none" && "shadow-2xl",
+                animationType === "flip" || animationType === "curl" ? "shadow-[0_20px_60px_rgba(0,0,0,0.3)]" : "",
+              )}
+              style={{
+                transformStyle: "preserve-3d",
+                filter: animationType === "curl" ? "drop-shadow(0 10px 30px rgba(0,0,0,0.2))" : undefined,
+              }}
             >
               <BookPage page={book.pages[currentPage]} isLandscape={isLandscape} />
             </motion.div>
@@ -784,11 +1003,11 @@ export function BookViewer({ onClose }: BookViewerProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsBookmarked(!isBookmarked)}
+          onClick={toggleBookmark}
           className={cn("h-10 w-10 md:h-12 md:w-12", isBookmarked && "text-pink-500")}
           aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
         >
-          {isBookmarked ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
+          {isBookmarked ? <BookmarkCheck className="h-5 w-5 fill-pink-500" /> : <Bookmark className="h-5 w-5" />}
         </Button>
 
         <Button
