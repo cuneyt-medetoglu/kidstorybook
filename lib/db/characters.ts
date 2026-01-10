@@ -4,7 +4,7 @@
  * Handles CRUD operations for master character descriptions
  */
 
-import { createClient } from '@/lib/supabase/client'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CharacterDescription } from '@/lib/prompts/types'
 
 // ============================================================================
@@ -36,9 +36,14 @@ export interface CreateCharacterInput {
   name: string
   age: number
   gender: 'boy' | 'girl' | 'other'
-  description: CharacterDescription
+  hair_color: string
+  eye_color: string
+  features?: string[]
   reference_photo_url?: string
   reference_photo_path?: string
+  ai_analysis?: any
+  full_description?: string
+  description: CharacterDescription
   analysis_raw?: any
   analysis_confidence?: number
   is_default?: boolean
@@ -56,12 +61,11 @@ export interface UpdateCharacterInput {
 // ============================================================================
 
 export async function createCharacter(
+  supabase: SupabaseClient,
   userId: string,
   input: CreateCharacterInput
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('characters')
       .insert({
@@ -69,9 +73,14 @@ export async function createCharacter(
         name: input.name,
         age: input.age,
         gender: input.gender,
-        description: input.description,
+        hair_color: input.hair_color,
+        eye_color: input.eye_color,
+        features: input.features || [],
         reference_photo_url: input.reference_photo_url,
         reference_photo_path: input.reference_photo_path,
+        ai_analysis: input.ai_analysis,
+        full_description: input.full_description,
+        description: input.description,
         analysis_raw: input.analysis_raw,
         analysis_confidence: input.analysis_confidence,
         is_default: input.is_default ?? true, // First character is default
@@ -93,11 +102,10 @@ export async function createCharacter(
 // ============================================================================
 
 export async function getCharacterById(
+  supabase: SupabaseClient,
   characterId: string
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('characters')
       .select('*')
@@ -114,11 +122,10 @@ export async function getCharacterById(
 }
 
 export async function getUserCharacters(
+  supabase: SupabaseClient,
   userId: string
 ): Promise<{ data: Character[] | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('characters')
       .select('*')

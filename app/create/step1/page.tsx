@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { User, Heart, Eye, Scissors, ArrowRight, Sparkles, Star, BookOpen } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,7 +54,9 @@ const specialFeaturesOptions = [
 ]
 
 export default function Step1Page() {
+  const router = useRouter()
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
@@ -74,10 +77,29 @@ export default function Step1Page() {
   const selectedEyeColor = watch("eyeColor")
 
   const onSubmit = async (data: CharacterFormData) => {
-    console.log("[v0] Step 1 form submitted:", data)
-    // TODO: Faz 3'te Step 2'ye navigate edilecek
-    // router.push('/create/step2')
-    // Form data localStorage'a kaydedilebilir (Faz 3'te backend'e kaydedilecek)
+    setIsSubmitting(true)
+    try {
+      console.log("[v0] Step 1 form submitted:", data)
+      
+      // Save form data to localStorage for wizard flow
+      const wizardData = {
+        step1: {
+          name: data.name,
+          age: data.age,
+          gender: data.gender,
+          hairColor: data.hairColor,
+          eyeColor: data.eyeColor,
+          specialFeatures: data.specialFeatures || [],
+        },
+      }
+      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+      
+      // Navigate to Step 2
+      router.push("/create/step2")
+    } catch (error) {
+      console.error("Error saving step 1 data:", error)
+      setIsSubmitting(false)
+    }
   }
 
   const toggleFeature = (feature: string) => {
@@ -438,11 +460,11 @@ export default function Step1Page() {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                   <Button
                     type="submit"
-                    disabled={!isValid}
+                    disabled={!isValid || isSubmitting}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400 sm:w-auto"
                   >
-                    <span>Next</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
+                    <span>{isSubmitting ? "Saving..." : "Next"}</span>
+                    {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
                   </Button>
                 </motion.div>
               </motion.div>

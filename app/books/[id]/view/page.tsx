@@ -7,7 +7,9 @@ export default function BookViewPage({ params }: { params: { id: string } }) {
   const router = useRouter()
 
   const handleClose = () => {
-    router.push("/books")
+    // TODO: After /books route is added, redirect to /books
+    // For now, redirect to dashboard
+    router.push("/dashboard")
   }
 
   return <BookViewer bookId={params.id} onClose={handleClose} />

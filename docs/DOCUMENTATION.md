@@ -29,6 +29,8 @@ docs/
 │   ├── SUPABASE_MIGRATION_GUIDE.md # Supabase migration uygulama rehberi
 │   ├── V0_APP_WORKFLOW.md      # v0.app çalışma akışı rehberi
 │   ├── COLOR_PALETTE.md        # Renk paleti rehberi
+│   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
+│   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
 │   └── ...
 │
 ├── reports/                    # Raporlar
@@ -193,6 +195,24 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - Database helper functions (`lib/db/characters.ts`)
     - `docs/database/SCHEMA.md` oluşturuldu
     - `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md` oluşturuldu
+  - Authentication Issues & Workarounds
+    - Register sonrası email verification durumu çözüldü (geçici çözüm)
+    - Login sayfasında email verification kontrolü eklendi
+    - Dashboard auth protection eklendi (client-side)
+    - Header auth state eklendi (User Menu, Logout)
+    - Migration 005 hazır (henüz uygulanmadı - trigger yok)
+    - `docs/guides/AUTHENTICATION_ISSUES.md` oluşturuldu (bypass'lar ve geçici çözümler)
+    - `docs/ROADMAP.md` güncellendi (bypass notları eklendi)
+  - Create Book Akışı Düzeltmeleri
+    - Create book hatası düzeltildi (`buildCharacterDescription` null check'leri)
+    - Step 6 görsel sorunu düzeltildi (localStorage'dan gerçek görsel gösterimi)
+    - Step 2'de yüklenen görselin data URL'i localStorage'a kaydediliyor
+    - Character API response'una `reference_photo_url` eklendi
+    - Character API GET endpoint'inde Bearer token desteği eklendi
+  - Odaklanma ve Netleştirme
+    - Roadmap netleştirildi (çok fazla şeye aynı anda bakıyoruz uyarısı eklendi)
+    - Odaklanma kuralları belirlendi (bir iş bitmeden diğerine geçme)
+    - `docs/implementation/FAZ3_IMPLEMENTATION.md` güncellendi (tüm yapılanlar not edildi)
 
 **Son Güncelleme:** 10 Ocak 2026
 

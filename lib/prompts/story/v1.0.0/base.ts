@@ -33,8 +33,12 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     theme,
     illustrationStyle,
     customRequests,
-    referencePhotoAnalysis,
+    referencePhotoAnalysis, // Optional: kept for backward compatibility, but not required
     language = 'en',
+    // New: Direct character features from Step 1 (optional)
+    hairColor,
+    eyeColor,
+    specialFeatures,
   } = input
 
   // Get age-appropriate rules
@@ -42,12 +46,13 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
   const safetyRules = getSafetyRules(ageGroup)
   const themeConfig = getThemeConfig(theme)
 
-  // Build character description
+  // Build character description (use Step 1 data if available, otherwise use analysis)
   const characterDesc = buildCharacterDescription(
     characterName,
     characterAge,
     characterGender,
-    referencePhotoAnalysis
+    referencePhotoAnalysis, // Optional: for backward compatibility
+    { hairColor, eyeColor, specialFeatures } // Step 1 data
   )
 
   // Main prompt
@@ -148,14 +153,18 @@ function getAgeGroup(age: number): string {
 }
 
 function getPageCount(ageGroup: string): number {
-  const counts: Record<string, number> = {
-    toddler: 6,
-    preschool: 8,
-    'early-elementary': 10,
-    elementary: 12,
-    'pre-teen': 14,
-  }
-  return counts[ageGroup] || 10
+  // Fixed to 10 pages for all age groups (user request: 10 Ocak 2026)
+  return 10
+  
+  // Previous logic (commented out for reference):
+  // const counts: Record<string, number> = {
+  //   toddler: 6,
+  //   preschool: 8,
+  //   'early-elementary': 10,
+  //   elementary: 12,
+  //   'pre-teen': 14,
+  // }
+  // return counts[ageGroup] || 10
 }
 
 function getVocabularyLevel(ageGroup: string): string {
@@ -307,27 +316,110 @@ function buildCharacterDescription(
   name: string,
   age: number,
   gender: string,
-  analysis?: any
+  analysis?: any, // Optional: kept for backward compatibility
+  step1Data?: { hairColor?: string; eyeColor?: string; specialFeatures?: string[] } // Step 1 data (preferred)
 ): string {
   let desc = `Name: ${name}\nAge: ${age} years old\nGender: ${gender}`
   
-  if (analysis?.finalDescription) {
-    const char = analysis.finalDescription
+  // Prefer Step 1 data if available (simpler, no AI Analysis needed)
+  if (step1Data && (step1Data.hairColor || step1Data.eyeColor || step1Data.specialFeatures?.length)) {
     desc += `\n\nPHYSICAL APPEARANCE (use in every image):`
-    desc += `\n- Skin tone: ${char.skinTone}`
-    desc += `\n- Hair: ${char.hairColor} ${char.hairStyle} ${char.hairLength} hair`
-    desc += `\n- Eyes: ${char.eyeColor} ${char.eyeShape} eyes`
-    desc += `\n- Face: ${char.faceShape} face shape`
-    desc += `\n- Build: ${char.height}, ${char.build}`
-    desc += `\n- Clothing style: ${char.clothingStyle} in ${char.clothingColors.join(' and ')}`
     
-    if (char.uniqueFeatures?.length > 0) {
-      desc += `\n- Unique features: ${char.uniqueFeatures.join(', ')}`
+    // Default reasonable values for missing data
+    const skinTone = 'fair' // Default, can be adjusted by user later if needed
+    const hairStyle = 'natural' // Default
+    const hairLength = age <= 3 ? 'short' : age <= 7 ? 'medium' : 'long' // Age-based default
+    const eyeShape = 'round' // Default for children
+    const faceShape = 'round' // Default for children
+    
+    desc += `\n- Skin tone: ${skinTone}`
+    
+    if (step1Data.hairColor) {
+      desc += `\n- Hair: ${step1Data.hairColor} ${hairStyle} ${hairLength} hair`
+    } else {
+      desc += `\n- Hair: natural ${hairStyle} ${hairLength} hair`
+    }
+    
+    if (step1Data.eyeColor) {
+      desc += `\n- Eyes: ${step1Data.eyeColor} ${eyeShape} eyes`
+    } else {
+      desc += `\n- Eyes: brown ${eyeShape} eyes` // Default
+    }
+    
+    desc += `\n- Face: ${faceShape} face shape`
+    desc += `\n- Build: average height, normal build for age`
+    desc += `\n- Clothing style: casual in various colors`
+    
+    if (step1Data.specialFeatures && step1Data.specialFeatures.length > 0) {
+      desc += `\n- Unique features: ${step1Data.specialFeatures.join(', ')}`
     }
     
     desc += `\n\nPERSONALITY:`
-    desc += `\n- Expression: ${char.typicalExpression}`
-    desc += `\n- Traits: ${char.personalityTraits.join(', ')}`
+    desc += `\n- Expression: happy, cheerful`
+    desc += `\n- Traits: curious, friendly, adventurous`
+    
+    return desc
+  }
+  
+  // Fallback: Use analysis data if available (backward compatibility)
+  if (analysis?.finalDescription) {
+    const char = analysis.finalDescription
+    desc += `\n\nPHYSICAL APPEARANCE (use in every image):`
+    
+    if (char.skinTone) desc += `\n- Skin tone: ${char.skinTone}`
+    if (char.hairColor && char.hairStyle && char.hairLength) {
+      desc += `\n- Hair: ${char.hairColor} ${char.hairStyle} ${char.hairLength} hair`
+    } else if (char.hairColor) {
+      desc += `\n- Hair: ${char.hairColor}`
+    }
+    if (char.eyeColor && char.eyeShape) {
+      desc += `\n- Eyes: ${char.eyeColor} ${char.eyeShape} eyes`
+    } else if (char.eyeColor) {
+      desc += `\n- Eyes: ${char.eyeColor}`
+    }
+    if (char.faceShape) desc += `\n- Face: ${char.faceShape} face shape`
+    if (char.height && char.build) {
+      desc += `\n- Build: ${char.height}, ${char.build}`
+    }
+    
+    if (char.clothingStyle) {
+      const colors = Array.isArray(char.clothingColors) && char.clothingColors.length > 0
+        ? char.clothingColors.join(' and ')
+        : 'various colors'
+      desc += `\n- Clothing style: ${char.clothingStyle} in ${colors}`
+    }
+    
+    if (char.uniqueFeatures && Array.isArray(char.uniqueFeatures) && char.uniqueFeatures.length > 0) {
+      desc += `\n- Unique features: ${char.uniqueFeatures.join(', ')}`
+    }
+    
+    if (char.typicalExpression || (char.personalityTraits && Array.isArray(char.personalityTraits))) {
+      desc += `\n\nPERSONALITY:`
+      if (char.typicalExpression) desc += `\n- Expression: ${char.typicalExpression}`
+      if (char.personalityTraits && Array.isArray(char.personalityTraits) && char.personalityTraits.length > 0) {
+        desc += `\n- Traits: ${char.personalityTraits.join(', ')}`
+      }
+    }
+  } else if (analysis?.detectedFeatures) {
+    // Fallback: Use detectedFeatures if finalDescription is not available
+    const features = analysis.detectedFeatures
+    desc += `\n\nPHYSICAL APPEARANCE (from photo analysis):`
+    if (features.hairColor) desc += `\n- Hair: ${features.hairColor}`
+    if (features.eyeColor) desc += `\n- Eyes: ${features.eyeColor}`
+    if (features.faceShape) desc += `\n- Face: ${features.faceShape}`
+    if (features.skinTone) desc += `\n- Skin tone: ${features.skinTone}`
+  } else {
+    // Default description if no data available
+    desc += `\n\nPHYSICAL APPEARANCE (use in every image):`
+    desc += `\n- Skin tone: fair`
+    desc += `\n- Hair: natural hair`
+    desc += `\n- Eyes: brown round eyes`
+    desc += `\n- Face: round face shape`
+    desc += `\n- Build: average height, normal build for age`
+    desc += `\n- Clothing style: casual in various colors`
+    desc += `\n\nPERSONALITY:`
+    desc += `\n- Expression: happy, cheerful`
+    desc += `\n- Traits: curious, friendly, adventurous`
   }
   
   return desc

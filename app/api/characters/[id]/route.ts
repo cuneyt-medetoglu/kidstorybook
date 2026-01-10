@@ -30,8 +30,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get character
+    // Get character (pass supabase client for Bearer token support)
     const { data: character, error: dbError } = await getCharacterById(
+      supabase,
       params.id
     )
 

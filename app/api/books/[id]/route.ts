@@ -26,8 +26,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication
-    const supabase = createClient()
+    // Authentication (supports both Bearer token and session cookies)
+    const supabase = await createClient(request)
     const {
       data: { user },
       error: authError,
@@ -44,7 +44,7 @@ export async function GET(
     }
 
     // Get Book
-    const { data: book, error: dbError } = await getBookById(bookId)
+    const { data: book, error: dbError } = await getBookById(supabase, bookId)
 
     if (dbError || !book) {
       return CommonErrors.notFound('Book')
@@ -56,7 +56,7 @@ export async function GET(
     }
 
     // Increment view count (non-blocking)
-    incrementBookViews(bookId).catch((error) => {
+    incrementBookViews(supabase, bookId).catch((error) => {
       console.error('Failed to increment view count:', error)
     })
 
@@ -76,8 +76,8 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication
-    const supabase = createClient()
+    // Authentication (supports both Bearer token and session cookies)
+    const supabase = await createClient(request)
     const {
       data: { user },
       error: authError,
@@ -94,7 +94,7 @@ export async function PATCH(
     }
 
     // Get Book (to verify ownership)
-    const { data: existingBook, error: getError } = await getBookById(bookId)
+    const { data: existingBook, error: getError } = await getBookById(supabase, bookId)
 
     if (getError || !existingBook) {
       return CommonErrors.notFound('Book')
@@ -139,6 +139,7 @@ export async function PATCH(
 
     // Update Book
     const { data: updatedBook, error: updateError } = await updateBook(
+      supabase,
       bookId,
       updateInput
     )
@@ -164,8 +165,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication
-    const supabase = createClient()
+    // Authentication (supports both Bearer token and session cookies)
+    const supabase = await createClient(request)
     const {
       data: { user },
       error: authError,
@@ -182,7 +183,7 @@ export async function DELETE(
     }
 
     // Get Book (to verify ownership)
-    const { data: existingBook, error: getError } = await getBookById(bookId)
+    const { data: existingBook, error: getError } = await getBookById(supabase, bookId)
 
     if (getError || !existingBook) {
       return CommonErrors.notFound('Book')
@@ -194,7 +195,7 @@ export async function DELETE(
     }
 
     // Delete Book
-    const { error: deleteError } = await deleteBook(bookId)
+    const { error: deleteError } = await deleteBook(supabase, bookId)
 
     if (deleteError) {
       console.error('Delete error:', deleteError)

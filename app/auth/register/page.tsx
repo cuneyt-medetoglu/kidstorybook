@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Sparkles, Heart, BookOpen, Star, Mail, Lock, Eye, EyeOff, User } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
@@ -34,6 +35,7 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -41,12 +43,17 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isValid },
     watch,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    mode: "onChange",
+    mode: "onChange", // Validate on every change for real-time feedback
     defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
       agreeToTerms: false,
       agreeToPrivacy: false,
     },
@@ -54,11 +61,78 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    console.log("[v0] Register form submitted:", data)
-    setIsLoading(false)
-    // Handle registration logic here (Faz 3'te Supabase Auth entegrasyonu yapılacak)
+    try {
+      console.log("[Register] Attempting registration for:", data.email)
+      
+      // Use Supabase client-side auth
+      const { createClient } = await import("@/lib/supabase/client")
+      const supabase = createClient()
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+          },
+        },
+      })
+
+      if (authError) {
+        throw new Error(authError.message)
+      }
+
+      if (authData.user) {
+        console.log("[Register] Success:", authData.user.email)
+        
+        // Check if email verification is required
+        // Supabase signUp returns session only if email verification is disabled
+        if (authData.session) {
+          // Session exists (email verification disabled or auto-confirmed)
+          // User is automatically logged in
+          console.log("[Register] Session exists, user is logged in")
+          
+          // Update public.users with name if provided (trigger creates record automatically)
+          // Note: Trigger will create public.users record, but name might be null
+          // We'll update it here if provided
+          if (data.name) {
+            try {
+              // Wait a bit for trigger to complete (trigger is async)
+              await new Promise(resolve => setTimeout(resolve, 500))
+              
+              const { error: updateError } = await supabase
+                .from('users')
+                .update({ name: data.name })
+                .eq('id', authData.user.id)
+              
+              if (updateError) {
+                console.warn("[Register] Failed to update user name:", updateError)
+                // Non-critical error, continue with redirect
+                // Trigger might not have created record yet, or RLS might be blocking
+              }
+            } catch (updateErr) {
+              console.warn("[Register] Error updating user name:", updateErr)
+              // Non-critical error, continue with redirect
+            }
+          }
+          
+          // Redirect to dashboard (session exists, user is logged in)
+          router.push("/dashboard")
+          router.refresh()
+        } else {
+          // No session - email verification required
+          // Redirect to verify-email page with email parameter
+          console.log("[Register] No session, email verification required")
+          router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`)
+        }
+      }
+    } catch (err) {
+      console.error("Register error:", err)
+      const errorMessage = err instanceof Error ? err.message : "Registration failed. Please try again."
+      alert(errorMessage) // TODO: Replace with toast notification
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // OAuth handlers (placeholder - Faz 3'te Supabase Auth entegrasyonu yapılacak)
@@ -377,7 +451,18 @@ export default function RegisterPage() {
                 className="space-y-3"
               >
                 <div className="flex items-start space-x-2">
-                  <Checkbox id="agreeToTerms" {...register("agreeToTerms")} className="mt-1" />
+                  <Controller
+                    name="agreeToTerms"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="agreeToTerms"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1"
+                      />
+                    )}
+                  />
                   <Label
                     htmlFor="agreeToTerms"
                     className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer leading-relaxed"
@@ -403,7 +488,18 @@ export default function RegisterPage() {
 
                 {/* Privacy Policy Checkbox */}
                 <div className="flex items-start space-x-2">
-                  <Checkbox id="agreeToPrivacy" {...register("agreeToPrivacy")} className="mt-1" />
+                  <Controller
+                    name="agreeToPrivacy"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="agreeToPrivacy"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1"
+                      />
+                    )}
+                  />
                   <Label
                     htmlFor="agreeToPrivacy"
                     className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer leading-relaxed"
@@ -437,7 +533,7 @@ export default function RegisterPage() {
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                   <Button
                     type="submit"
-                    disabled={!isValid || isLoading}
+                    disabled={isLoading || !isValid}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
                   >
                     {isLoading ? (

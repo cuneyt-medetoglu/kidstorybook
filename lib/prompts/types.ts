@@ -26,8 +26,12 @@ export interface StoryGenerationInput {
   theme: string
   illustrationStyle: string
   customRequests?: string
-  referencePhotoAnalysis?: CharacterAnalysis
+  referencePhotoAnalysis?: CharacterAnalysis // Optional: kept for backward compatibility, but not required
   language?: 'en' | 'tr'
+  // Step 1 data (preferred, no AI Analysis needed)
+  hairColor?: string
+  eyeColor?: string
+  specialFeatures?: string[]
 }
 
 export interface StoryGenerationOutput {

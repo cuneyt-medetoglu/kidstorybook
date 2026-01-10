@@ -22,8 +22,17 @@
 3. **Import** butonuna tıkla
 
 ### Adım 4: Environment'ı Aktif Et
-1. Sağ üst köşede **Environments** dropdown'ını aç
+1. Sağ üst köşede **Environments** dropdown'ını aç (veya sağ üstte environment ikonuna tıkla)
 2. **KidStoryBook - Local Development** seçeneğini seç
+
+### Adım 5: Environment Variables Ayarla
+
+**Güncellemen Gereken Değişkenler:**
+- `test_email` → Supabase'de oluşturduğun test kullanıcı email
+- `test_password` → Supabase'de oluşturduğun test kullanıcı şifre
+
+**Zaten Doğru Olan Değişkenler:**
+- `base_url` → `http://localhost:3001/api` ✅ (Değiştirme!)
 
 ---
 
@@ -53,20 +62,40 @@ Collection'daki test script'leri otomatik olarak şu değişkenleri doldurur:
 
 ## 🧪 Test Senaryoları
 
-### 1. Full Book Creation Flow
+### 1. Books API Full Test (✅ Tam Hazır)
 
 **Sıralama:**
-1. **Authentication → Get Auth Token** (Login)
-2. **Characters → Analyze Character Photo** (Character oluştur)
-3. **Books → Create Book (Generate Story)** (Story oluştur)
-4. **AI Generation → Generate Images** (Görseller oluştur)
-5. **Books → Get Book by ID** (Sonucu kontrol et)
+1. ✅ **Authentication → Get Auth Token (Test Login)** (Login)
+2. ✅ **Books → Create Book (Generate Story)** (Story oluştur - Character ID gerekli, manuel ekle)
+3. ✅ **Books → Get All Books** (Kitapları listele)
+4. ✅ **Books → Get Book by ID** (Detayları görüntüle)
+5. ✅ **Books → Update Book** (Favorite, status güncelle)
+6. ✅ **Books → Delete Book** (Sil)
 
 **Beklenen Sonuç:**
-- Character oluşturuldu
-- Story generate edildi
-- Images generate edildi
-- Book tamamlandı
+- ✅ Token alındı
+- ✅ Story generate edildi
+- ✅ Book oluşturuldu
+- ✅ Books listelendi
+- ✅ Book detayları görüntülendi
+- ✅ Book güncellendi
+- ✅ Book silindi
+
+### 2. Full Book Creation Flow (⚠️ Kısmen Hazır)
+
+**Sıralama:**
+1. ✅ **Authentication → Get Auth Token** (Login)
+2. ⚠️ **Characters → Analyze Character Photo** (Browser'dan - henüz Bearer token yok)
+3. ✅ **Books → Create Book (Generate Story)** (Story oluştur)
+4. ⚠️ **AI Generation → Generate Images** (Browser'dan - henüz Bearer token yok)
+5. ✅ **Books → Get Book by ID** (Sonucu kontrol et)
+
+**Beklenen Sonuç:**
+- ✅ Token alındı
+- ⚠️ Character oluşturuldu (browser'dan)
+- ✅ Story generate edildi
+- ⚠️ Images generate edildi (browser'dan)
+- ✅ Book tamamlandı
 
 ### 2. Character Reuse Flow
 

@@ -8,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -22,8 +23,13 @@ import {
   X,
   Sun,
   Moon,
+  User,
+  LogOut,
+  Settings,
 } from "lucide-react"
 import Link from "next/link"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 const countries = [
   { code: "US", flag: "🇺🇸", currency: "USD" },
@@ -41,12 +47,43 @@ const navLinks = [
 
 export function Header() {
   const { theme, setTheme } = useTheme()
+  const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(countries[0])
   const [cartCount, setCartCount] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [prevCartCount, setPrevCartCount] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Check auth state
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setIsLoading(false)
+    }
+    
+    checkAuth()
+
+    // Listen for auth state changes
+    const supabase = createClient()
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    setUser(null)
+    router.push("/")
+    router.refresh()
+  }
 
   // Avoid hydration mismatch
   useEffect(() => {
@@ -196,16 +233,78 @@ export function Header() {
             </motion.div>
           )}
 
-          {/* CTA Button - Desktop */}
-          <motion.div
-            className="hidden md:block"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
-              Create a children's book
-            </Button>
-          </motion.div>
+          {/* Auth Buttons / User Menu - Desktop */}
+          <div className="hidden items-center gap-3 md:flex">
+            {isLoading ? (
+              <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-slate-700" />
+            ) : user ? (
+              <>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/create/step1">
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                      Create a children's book
+                    </Button>
+                  </Link>
+                </motion.div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2 font-medium">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                        {user.user_metadata?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                      </div>
+                      <span className="hidden lg:inline">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard" className="flex items-center">
+                        <User className="mr-2 h-4 w-4" />
+                        My Library
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center">
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-purple-500 dark:text-slate-100 dark:hover:text-purple-400">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-purple-500 dark:text-slate-100 dark:hover:text-purple-400">
+                    Sign Up
+                  </Button>
+                </Link>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href="/create/step1">
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                      Create a children's book
+                    </Button>
+                  </Link>
+                </motion.div>
+              </>
+            )}
+          </div>
 
           {/* Mobile Menu */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -344,15 +443,76 @@ export function Header() {
                     </motion.div>
                   )}
 
-                  {/* CTA Button */}
+                  {/* Auth Buttons / User Menu - Mobile */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
+                    className="space-y-3"
                   >
-                    <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
-                      Create a children's book
-                    </Button>
+                    {isLoading ? (
+                      <div className="h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-slate-700" />
+                    ) : user ? (
+                      <>
+                        <div className="mb-4 flex items-center gap-3 rounded-lg bg-white/60 p-3 backdrop-blur-sm dark:bg-slate-800/60">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                            {user.user_metadata?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900 dark:text-slate-100">
+                              {user.user_metadata?.name || "User"}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-slate-400">{user.email}</p>
+                          </div>
+                        </div>
+                        <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
+                            <User className="mr-2 h-4 w-4" />
+                            <span className="font-medium">My Library</span>
+                          </Button>
+                        </Link>
+                        <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span className="font-medium">Settings</span>
+                          </Button>
+                        </Link>
+                        <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                            Create a children's book
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start border-red-200 bg-white/60 text-red-600 backdrop-blur-sm hover:bg-red-50 dark:border-red-800 dark:bg-slate-800/60 dark:text-red-400 dark:hover:bg-red-950"
+                          onClick={() => {
+                            handleLogout()
+                            setIsMobileMenuOpen(false)
+                          }}
+                        >
+                          <LogOut className="mr-2 h-4 w-4" />
+                          <span className="font-medium">Logout</span>
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
+                            <span className="font-medium">Sign In</span>
+                          </Button>
+                        </Link>
+                        <Link href="/auth/register" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
+                            <span className="font-medium">Sign Up</span>
+                          </Button>
+                        </Link>
+                        <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                            Create a children's book
+                          </Button>
+                        </Link>
+                      </>
+                    )}
                   </motion.div>
                 </div>
               </motion.div>

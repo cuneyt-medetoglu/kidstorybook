@@ -4,7 +4,7 @@
  * Handles CRUD operations for user-generated books
  */
 
-import { createClient } from '@/lib/supabase/client'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 // ============================================================================
 // Types
@@ -65,12 +65,11 @@ export interface UpdateBookInput {
 // ============================================================================
 
 export async function createBook(
+  supabase: SupabaseClient,
   userId: string,
   input: CreateBookInput
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('books')
       .insert({
@@ -94,11 +93,10 @@ export async function createBook(
 // ============================================================================
 
 export async function getBookById(
+  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('books')
       .select('*')
@@ -115,6 +113,7 @@ export async function getBookById(
 }
 
 export async function getUserBooks(
+  supabase: SupabaseClient,
   userId: string,
   options?: {
     status?: string
@@ -123,8 +122,6 @@ export async function getUserBooks(
   }
 ): Promise<{ data: Book[] | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     let query = supabase
       .from('books')
       .select('*')
@@ -155,11 +152,10 @@ export async function getUserBooks(
 }
 
 export async function getUserFavoriteBooks(
+  supabase: SupabaseClient,
   userId: string
 ): Promise<{ data: Book[] | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('books')
       .select('*')
@@ -181,12 +177,11 @@ export async function getUserFavoriteBooks(
 // ============================================================================
 
 export async function updateBook(
+  supabase: SupabaseClient,
   bookId: string,
   input: UpdateBookInput
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase
       .from('books')
       .update(input)
@@ -204,18 +199,18 @@ export async function updateBook(
 }
 
 export async function toggleFavorite(
+  supabase: SupabaseClient,
   bookId: string,
   isFavorite: boolean
 ): Promise<{ data: Book | null; error: Error | null }> {
-  return updateBook(bookId, { is_favorite: isFavorite })
+  return updateBook(supabase, bookId, { is_favorite: isFavorite })
 }
 
 export async function incrementBookViews(
+  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { error } = await supabase.rpc('increment_book_views', {
       p_book_id: bookId,
     })
@@ -234,11 +229,10 @@ export async function incrementBookViews(
 // ============================================================================
 
 export async function deleteBook(
+  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = createClient()
-
     const { error } = await supabase.from('books').delete().eq('id', bookId)
 
     if (error) throw error
@@ -254,7 +248,10 @@ export async function deleteBook(
 // Statistics
 // ============================================================================
 
-export async function getUserBookStats(userId: string): Promise<{
+export async function getUserBookStats(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<{
   data: {
     total_books: number
     completed_books: number
@@ -266,8 +263,6 @@ export async function getUserBookStats(userId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase.rpc('get_user_book_stats', {
       p_user_id: userId,
     })
@@ -281,7 +276,10 @@ export async function getUserBookStats(userId: string): Promise<{
   }
 }
 
-export async function getBookWithCharacter(bookId: string): Promise<{
+export async function getBookWithCharacter(
+  supabase: SupabaseClient,
+  bookId: string
+): Promise<{
   data: {
     book_id: string
     title: string
@@ -294,8 +292,6 @@ export async function getBookWithCharacter(bookId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = createClient()
-
     const { data, error } = await supabase.rpc('get_book_with_character', {
       p_book_id: bookId,
     })
@@ -308,4 +304,3 @@ export async function getBookWithCharacter(bookId: string): Promise<{
     return { data: null, error: error as Error }
   }
 }
-

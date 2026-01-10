@@ -8,28 +8,19 @@ import {
   Upload,
   X,
   CheckCircle,
-  Brain,
-  Sparkles,
   Star,
   Heart,
   BookOpen,
   ArrowRight,
   ArrowLeft,
   Plus,
+  Sparkles,
 } from "lucide-react"
 import Link from "next/link"
-import { useState, useCallback } from "react"
+import { useRouter } from "next/navigation"
+import { useState, useCallback, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-
-type AnalysisResult = {
-  hairLength: string
-  hairStyle: string
-  hairTexture: string
-  faceShape: string
-  eyeShape: string
-  skinTone: string
-}
+import { useToast } from "@/hooks/use-toast"
 
 type CharacterType = "Child" | "Dog" | "Cat" | "Rabbit" | "Teddy Bear" | "Other"
 
@@ -39,12 +30,13 @@ type Character = {
   uploadedFile: File | null
   previewUrl: string | null
   uploadError: string | null
-  isAnalyzing: boolean
-  analysisResult: AnalysisResult | null
   isDragging: boolean
 }
 
 export default function Step2Page() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const [step1Data, setStep1Data] = useState<any>(null)
   const [characters, setCharacters] = useState<Character[]>([
     {
       id: "1",
@@ -52,11 +44,22 @@ export default function Step2Page() {
       uploadedFile: null,
       previewUrl: null,
       uploadError: null,
-      isAnalyzing: false,
-      analysisResult: null,
       isDragging: false,
     },
   ])
+
+  // Load Step 1 data from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("kidstorybook_wizard")
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        setStep1Data(data.step1)
+      } catch (error) {
+        console.error("Error parsing wizard data:", error)
+      }
+    }
+  }, [])
 
   const validateFile = (file: File): string | null => {
     const validTypes = ["image/jpeg", "image/jpg", "image/png"]
@@ -73,68 +76,148 @@ export default function Step2Page() {
     return null
   }
 
-  const handleFileUpload = (characterId: string, file: File) => {
+  const handleFileUpload = async (characterId: string, file: File) => {
     const error = validateFile(file)
 
+    if (error) {
+      setCharacters((prev) =>
+        prev.map((char) => (char.id === characterId ? { ...char, uploadError: error } : char)),
+      )
+      toast({
+        title: "Upload Error",
+        description: error,
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Update character state with uploaded file
     setCharacters((prev) =>
       prev.map((char) => {
         if (char.id === characterId) {
-          if (error) {
-            return { ...char, uploadError: error }
-          }
-
-          const url = URL.createObjectURL(file)
           return {
             ...char,
             uploadedFile: file,
-            previewUrl: url,
+            previewUrl: URL.createObjectURL(file),
             uploadError: null,
-            analysisResult: null,
           }
         }
         return char
       }),
     )
+
+    // Save photo to localStorage and create character (no AI Analysis needed)
+    try {
+      // Convert file to base64 for localStorage
+      const reader = new FileReader()
+      reader.onload = async () => {
+        const dataUrl = reader.result as string
+        const photoBase64 = dataUrl.split(",")[1] // Extract base64 part
+
+        // Save to localStorage
+        const saved = localStorage.getItem("kidstorybook_wizard")
+        const wizardData = saved ? JSON.parse(saved) : {}
+        
+        wizardData.step2 = {
+          ...wizardData.step2,
+          characterPhoto: {
+            url: dataUrl,
+            filename: file.name,
+            size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          },
+        }
+        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+        console.log("[Step 2] Saved photo to localStorage:", { characterPhoto: wizardData.step2.characterPhoto })
+
+        // Create character in database (simple, no AI Analysis)
+        if (step1Data) {
+          try {
+            const createCharResponse = await fetch("/api/characters", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: step1Data.name,
+                age: step1Data.age?.toString() || "5",
+                gender: step1Data.gender?.toLowerCase() || "girl",
+                hairColor: step1Data.hairColor || "brown",
+                eyeColor: step1Data.eyeColor || "brown",
+                specialFeatures: step1Data.specialFeatures || [],
+                photoBase64: photoBase64, // Photo as base64 (without data URL prefix)
+              }),
+            })
+
+            const createCharResult = await createCharResponse.json()
+
+            if (!createCharResponse.ok || !createCharResult.success) {
+              throw new Error(createCharResult.error || "Failed to create character")
+            }
+
+            // Save character ID to localStorage
+            const createdCharacterId = createCharResult.character?.id
+            if (createdCharacterId) {
+              localStorage.setItem("kidstorybook_character_id", createdCharacterId)
+              console.log("[Step 2] Character created with ID:", createdCharacterId)
+              toast({
+                title: "Character Created!",
+                description: `Character "${step1Data.name}" has been created successfully.`,
+              })
+            }
+          } catch (error) {
+            console.error("[Step 2] Error creating character:", error)
+            toast({
+              title: "Warning",
+              description: "Photo saved but character creation failed. You can continue and try again later.",
+              variant: "destructive",
+            })
+          }
+        } else {
+          toast({
+            title: "Warning",
+            description: "Photo saved but Step 1 data not found. Please go back to Step 1 first.",
+            variant: "destructive",
+          })
+        }
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error("Error processing file:", error)
+      toast({
+        title: "Error",
+        description: "Failed to process photo. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
-  const handleFileInputChange = (characterId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileDrop = useCallback(
+    (characterId: string, e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      setCharacters((prev) =>
+        prev.map((char) => (char.id === characterId ? { ...char, isDragging: false } : char)),
+      )
+
+      const file = e.dataTransfer.files[0]
+      if (file) {
+        handleFileUpload(characterId, file)
+      }
+    },
+    [step1Data], // Add step1Data as dependency
+  )
+
+  const handleFileInput = (characterId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       handleFileUpload(characterId, file)
     }
   }
 
-  const handleDragEnter = useCallback((characterId: string, e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setCharacters((prev) => prev.map((char) => (char.id === characterId ? { ...char, isDragging: true } : char)))
-  }, [])
-
-  const handleDragLeave = useCallback((characterId: string, e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setCharacters((prev) => prev.map((char) => (char.id === characterId ? { ...char, isDragging: false } : char)))
-  }, [])
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }, [])
-
-  const handleDrop = useCallback((characterId: string, e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setCharacters((prev) => prev.map((char) => (char.id === characterId ? { ...char, isDragging: false } : char)))
-
-    const file = e.dataTransfer.files?.[0]
-    if (file) {
-      handleFileUpload(characterId, file)
-    }
-  }, [])
-
   const handleRemoveFile = (characterId: string) => {
-    setCharacters((prev) =>
-      prev.map((char) => {
+    setCharacters((prev) => {
+      const updated = prev.map((char) => {
         if (char.id === characterId) {
           if (char.previewUrl) {
             URL.revokeObjectURL(char.previewUrl)
@@ -144,33 +227,24 @@ export default function Step2Page() {
             uploadedFile: null,
             previewUrl: null,
             uploadError: null,
-            analysisResult: null,
           }
         }
         return char
-      }),
-    )
-  }
+      })
+      return updated
+    })
 
-  const handleAnalyze = async (characterId: string) => {
-    setCharacters((prev) => prev.map((char) => (char.id === characterId ? { ...char, isAnalyzing: true } : char)))
-
-    await new Promise((resolve) => setTimeout(resolve, 2500))
-
-    const mockResults: AnalysisResult = {
-      hairLength: ["Long", "Medium", "Short"][Math.floor(Math.random() * 3)],
-      hairStyle: ["Curly", "Straight", "Wavy", "Braided"][Math.floor(Math.random() * 4)],
-      hairTexture: ["Fine", "Thick"][Math.floor(Math.random() * 2)],
-      faceShape: ["Round", "Oval", "Square"][Math.floor(Math.random() * 3)],
-      eyeShape: ["Almond", "Round", "Hooded"][Math.floor(Math.random() * 3)],
-      skinTone: ["Light", "Medium", "Dark"][Math.floor(Math.random() * 3)],
+    // Remove from localStorage
+    const saved = localStorage.getItem("kidstorybook_wizard")
+    if (saved) {
+      try {
+        const wizardData = JSON.parse(saved)
+        delete wizardData.step2?.characterPhoto
+        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+      } catch (error) {
+        console.error("Error updating localStorage:", error)
+      }
     }
-
-    setCharacters((prev) =>
-      prev.map((char) =>
-        char.id === characterId ? { ...char, isAnalyzing: false, analysisResult: mockResults } : char,
-      ),
-    )
   }
 
   const handleAddCharacter = () => {
@@ -182,8 +256,6 @@ export default function Step2Page() {
       uploadedFile: null,
       previewUrl: null,
       uploadError: null,
-      isAnalyzing: false,
-      analysisResult: null,
       isDragging: false,
     }
 
@@ -325,22 +397,20 @@ export default function Step2Page() {
                 {characters.map((character, index) => (
                   <motion.div
                     key={character.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                    transition={{ duration: 0.3 }}
-                    className="rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-50/50 to-pink-50/50 p-4 dark:border-purple-700 dark:from-purple-900/10 dark:to-pink-900/10 md:p-6"
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className="rounded-xl border-2 border-purple-200 bg-gradient-to-br from-white to-purple-50/50 p-6 shadow-lg dark:border-purple-700 dark:from-slate-800 dark:to-purple-900/20"
                   >
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                    <div className="mb-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                        <span className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-bold text-white">
                           Character {index + 1}
-                        </Badge>
-                        <Select
-                          value={character.type}
-                          onValueChange={(value) => handleCharacterTypeChange(character.id, value as CharacterType)}
-                        >
-                          <SelectTrigger className="w-[160px]">
+                        </span>
+                        <Select value={character.type} onValueChange={(value) => handleCharacterTypeChange(character.id, value as CharacterType)}>
+                          <SelectTrigger className="w-[140px] border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -358,7 +428,7 @@ export default function Step2Page() {
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           onClick={() => handleRemoveCharacter(character.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition-all hover:bg-red-600"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-all hover:bg-red-600"
                           aria-label="Remove character"
                         >
                           <X className="h-4 w-4" />
@@ -366,60 +436,58 @@ export default function Step2Page() {
                       )}
                     </div>
 
-                    {!character.uploadedFile ? (
-                      <div>
-                        <div
-                          onDragEnter={(e) => handleDragEnter(character.id, e)}
-                          onDragLeave={(e) => handleDragLeave(character.id, e)}
-                          onDragOver={handleDragOver}
-                          onDrop={(e) => handleDrop(character.id, e)}
-                          className={`relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all md:min-h-[220px] ${
-                            character.isDragging
-                              ? "border-purple-500 bg-purple-100 dark:border-purple-400 dark:bg-purple-900/30"
-                              : "border-purple-300 bg-purple-50 hover:border-purple-400 hover:bg-purple-100 dark:border-purple-700 dark:bg-purple-900/20 dark:hover:border-purple-600 dark:hover:bg-purple-900/30"
-                          }`}
+                    {!character.previewUrl ? (
+                      <motion.div
+                        onDragOver={(e) => {
+                          e.preventDefault()
+                          setCharacters((prev) =>
+                            prev.map((char) => (char.id === character.id ? { ...char, isDragging: true } : char)),
+                          )
+                        }}
+                        onDragLeave={(e) => {
+                          e.preventDefault()
+                          setCharacters((prev) =>
+                            prev.map((char) => (char.id === character.id ? { ...char, isDragging: false } : char)),
+                          )
+                        }}
+                        onDrop={(e) => handleFileDrop(character.id, e)}
+                        className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-all ${
+                          character.isDragging
+                            ? "border-purple-500 bg-purple-100 dark:bg-purple-900/30"
+                            : "border-purple-300 bg-white/50 hover:border-purple-400 hover:bg-purple-50/50 dark:border-purple-600 dark:bg-slate-700/50 dark:hover:border-purple-500"
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          id={`file-input-${character.id}`}
+                          accept="image/jpeg,image/jpg,image/png"
+                          className="hidden"
+                          onChange={(e) => handleFileInput(character.id, e)}
+                        />
+                        <label
+                          htmlFor={`file-input-${character.id}`}
+                          className="flex cursor-pointer flex-col items-center justify-center"
                         >
-                          <input
-                            type="file"
-                            accept="image/jpeg,image/jpg,image/png"
-                            onChange={(e) => handleFileInputChange(character.id, e)}
-                            className="absolute inset-0 cursor-pointer opacity-0"
-                            aria-label={`Upload photo for character ${index + 1}`}
-                          />
-
-                          <Upload className="mb-3 h-12 w-12 text-purple-400 dark:text-purple-300" />
-
-                          <h3 className="mb-2 text-lg font-bold text-gray-900 dark:text-slate-50">
-                            {character.isDragging ? "Drop your photo here" : getUploadLabel(character.type)}
-                          </h3>
-
-                          <p className="mb-3 text-sm text-gray-600 dark:text-slate-400">or click to browse</p>
-
-                          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                            <Button
-                              type="button"
-                              size="sm"
-                              className="pointer-events-none bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg dark:from-purple-400 dark:to-pink-400"
-                            >
-                              Choose File
-                            </Button>
-                          </motion.div>
-
-                          <p className="mt-3 text-xs text-gray-500 dark:text-slate-500">JPG, PNG up to 5MB</p>
-                        </div>
-
-                        {character.uploadError && (
                           <motion.div
-                            initial={{ opacity: 0, y: -10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-3 rounded-lg bg-red-50 p-3 dark:bg-red-900/20"
+                            whileHover={{ scale: 1.1, rotate: 5 }}
+                            whileTap={{ scale: 0.9 }}
+                            className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
                           >
-                            <p className="text-sm text-red-600 dark:text-red-400">{character.uploadError}</p>
+                            <Upload className="h-8 w-8" />
                           </motion.div>
-                        )}
-                      </div>
+                          <p className="mb-1 text-sm font-semibold text-gray-700 dark:text-slate-300">
+                            {getUploadLabel(character.type)}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-slate-400">
+                            Drag and drop or click to browse
+                          </p>
+                          <p className="mt-2 text-xs text-gray-400 dark:text-slate-500">
+                            JPG or PNG, max 5MB
+                          </p>
+                        </label>
+                      </motion.div>
                     ) : (
-                      <div className="space-y-4">
+                      <div>
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -445,84 +513,21 @@ export default function Step2Page() {
                           </div>
 
                           <div className="mt-2 text-center text-sm text-gray-600 dark:text-slate-400">
-                            <p className="font-medium">{character.uploadedFile.name}</p>
-                            <p>{formatFileSize(character.uploadedFile.size)}</p>
+                            <p className="font-medium">{character.uploadedFile?.name}</p>
+                            <p>{character.uploadedFile && formatFileSize(character.uploadedFile.size)}</p>
+                            {character.uploadedFile && (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="mt-2 flex items-center justify-center gap-2 text-green-600 dark:text-green-400"
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                                <span className="text-xs font-semibold">Photo Ready</span>
+                              </motion.div>
+                            )}
                           </div>
                         </motion.div>
-
-                        <div className="rounded-xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 p-4 dark:border-purple-700 dark:from-purple-900/20 dark:to-pink-900/20">
-                          <div className="mb-3 flex items-center gap-2">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500">
-                              <Brain className="h-5 w-5 text-white" />
-                            </div>
-                            <div>
-                              <h4 className="text-sm font-bold text-gray-900 dark:text-slate-50">AI Analysis</h4>
-                              <p className="text-xs text-gray-600 dark:text-slate-400">Detect character features</p>
-                            </div>
-                          </div>
-
-                          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                            <Button
-                              type="button"
-                              size="sm"
-                              onClick={() => handleAnalyze(character.id)}
-                              disabled={character.isAnalyzing || !!character.analysisResult}
-                              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 dark:from-purple-400 dark:to-pink-400"
-                            >
-                              {character.isAnalyzing ? (
-                                <>
-                                  <motion.div
-                                    animate={{ rotate: 360 }}
-                                    transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                                    className="mr-2 h-4 w-4 rounded-full border-2 border-white border-t-transparent"
-                                  />
-                                  <span>Analyzing...</span>
-                                </>
-                              ) : character.analysisResult ? (
-                                <>
-                                  <CheckCircle className="mr-2 h-4 w-4" />
-                                  <span>Complete</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Sparkles className="mr-2 h-4 w-4" />
-                                  <span>Analyze Photo</span>
-                                </>
-                              )}
-                            </Button>
-                          </motion.div>
-
-                          {character.analysisResult && (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.2 }}
-                              className="mt-3 space-y-2"
-                            >
-                              <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                                <CheckCircle className="h-4 w-4" />
-                                <span className="text-xs font-semibold">Analysis Complete</span>
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2">
-                                {Object.entries(character.analysisResult).map(([key, value], idx) => (
-                                  <motion.div
-                                    key={key}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 + idx * 0.05 }}
-                                    className="rounded-lg bg-white px-2 py-1.5 shadow-sm dark:bg-slate-800"
-                                  >
-                                    <p className="text-xs font-medium text-gray-500 dark:text-slate-400">
-                                      {key.replace(/([A-Z])/g, " $1").trim()}
-                                    </p>
-                                    <p className="mt-0.5 text-sm font-bold text-gray-900 dark:text-slate-50">{value}</p>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </div>
                       </div>
                     )}
                   </motion.div>
@@ -551,52 +556,39 @@ export default function Step2Page() {
               className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between"
             >
               <Link href="/create/step1" className="w-full sm:w-auto">
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full border-2 border-gray-300 px-6 py-6 text-base font-semibold transition-all hover:border-purple-500 hover:bg-purple-50 dark:border-slate-600 dark:hover:border-purple-400 dark:hover:bg-purple-900/20 sm:w-auto bg-transparent"
-                  >
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                    <span>Back</span>
-                  </Button>
-                </motion.div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20 sm:w-auto"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  <span>Back</span>
+                </Button>
               </Link>
 
-              <Link href="/create/step3" className="w-full sm:w-auto">
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
-                  <Button
-                    type="button"
-                    disabled={!hasUploadedPhotos}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 dark:from-purple-400 dark:to-pink-400 sm:w-auto"
-                  >
-                    <span>Next</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </motion.div>
-              </Link>
+              <Button
+                type="button"
+                onClick={() => {
+                  if (!hasUploadedPhotos) {
+                    toast({
+                      title: "Photo Required",
+                      description: "Please upload at least one character photo before proceeding.",
+                      variant: "destructive",
+                    })
+                    return
+                  }
+                  router.push("/create/step3")
+                }}
+                disabled={!hasUploadedPhotos}
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 sm:w-auto"
+              >
+                <span>Next</span>
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </motion.div>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.4 }}
-            className="mt-6 text-center"
-          >
-            <p className="text-sm text-gray-600 dark:text-slate-400">
-              Need help?{" "}
-              <Link
-                href="/help"
-                className="font-semibold text-purple-600 underline underline-offset-2 transition-colors hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
-              >
-                Contact Support
-              </Link>
-            </p>
-          </motion.div>
         </motion.div>
       </div>
     </div>
   )
 }
-

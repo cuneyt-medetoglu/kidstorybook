@@ -1,14 +1,18 @@
+/**
+ * Supabase Server Client with Bearer Token Support
+ * 
+ * Helper function to create Supabase client that supports both:
+ * - Session cookies (browser requests)
+ * - Bearer tokens (Postman, API clients)
+ */
+
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest } from 'next/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
 /**
- * Create Supabase client with Bearer token support for Postman testing
- * 
- * Supports both:
- * - Session cookies (browser requests)
- * - Bearer tokens (Postman, API clients)
+ * Create Supabase client with Bearer token support
  * 
  * @param request - Next.js request object (optional, for Bearer token)
  * @returns Supabase client configured for server-side use
@@ -65,5 +69,19 @@ export async function createClient(request?: NextRequest) {
       },
     }
   )
+}
+
+/**
+ * Get authenticated user from request
+ * Supports both Bearer token and session cookies
+ */
+export async function getAuthenticatedUser(request: NextRequest) {
+  const supabase = await createClient(request)
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  return { user, error: authError }
 }
 

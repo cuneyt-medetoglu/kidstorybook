@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Sparkles, Heart, BookOpen, Star, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { createClient } from "@/lib/supabase/client"
 
 // Form validation schema
 const loginSchema = z.object({
@@ -22,8 +24,10 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -32,15 +36,53 @@ export default function LoginPage() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false,
+    },
   })
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    console.log("[v0] Login form submitted:", data)
-    setIsLoading(false)
-    // Handle login logic here (Faz 3'te Supabase Auth entegrasyonu yapılacak)
+    setError(null)
+    try {
+      console.log("[Login] Attempting login for:", data.email)
+      
+      // Use Supabase client-side auth
+      const supabase = createClient()
+      
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+
+      if (authError) {
+        // Check if it's an email verification error
+        if (authError.message.includes("email not confirmed") || authError.message.includes("Email not confirmed")) {
+          throw new Error("Please verify your email address before logging in. Check your inbox for the verification link.")
+        }
+        throw new Error(authError.message || "Invalid email or password")
+      }
+
+      if (!authData.user) {
+        throw new Error("User not found. Please register first.")
+      }
+
+      if (!authData.session) {
+        throw new Error("Session not created. Please verify your email address first.")
+      }
+
+      // Success - redirect to dashboard
+      console.log("[Login] Success:", authData.user.email)
+      router.push("/dashboard")
+      router.refresh()
+    } catch (err) {
+      console.error("Login error:", err)
+      const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again."
+      setError(errorMessage)
+      setIsLoading(false)
+    }
   }
 
   // OAuth handlers (placeholder - Faz 3'te Supabase Auth entegrasyonu yapılacak)
@@ -278,6 +320,17 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </motion.div>
+
+              {/* Error Message */}
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-lg bg-red-50 p-3 dark:bg-red-900/20"
+                >
+                  <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                </motion.div>
+              )}
 
               {/* Sign In Button */}
               <motion.div

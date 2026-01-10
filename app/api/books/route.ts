@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+// Note: createClient now supports Bearer token from Authorization header
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getUserBooks } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
@@ -48,8 +49,8 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
   try {
-    // Authentication
-    const supabase = createClient()
+    // Authentication (supports both Bearer token and session cookies)
+    const supabase = await createClient(request)
     const {
       data: { user },
       error: authError,
@@ -75,8 +76,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get Character
-    const { data: character, error: charError } = await getCharacterById(characterId)
+    // Get Character (using authenticated supabase client)
+    const { data: character, error: charError } = await getCharacterById(supabase, characterId)
 
     if (charError || !character) {
       return CommonErrors.notFound('Character')
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create Book in Database
-    const { data: book, error: bookError } = await createBook(user.id, {
+    const { data: book, error: bookError } = await createBook(supabase, user.id, {
       character_id: characterId,
       title: storyData.title,
       theme,
@@ -184,6 +185,7 @@ export async function POST(request: NextRequest) {
       },
       generationTime,
       tokensUsed,
+      story_data: storyData, // Include story content in response for debug/preview
     }
 
     return successResponse(
@@ -202,8 +204,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Authentication
-    const supabase = createClient()
+    // Authentication (supports both Bearer token and session cookies)
+    const supabase = await createClient(request)
     const {
       data: { user },
       error: authError,
@@ -220,7 +222,7 @@ export async function GET(request: NextRequest) {
     const offset = searchParams.get('offset')
 
     // Get User's Books
-    const { data: books, error: dbError } = await getUserBooks(user.id, {
+    const { data: books, error: dbError } = await getUserBooks(supabase, user.id, {
       status: status || undefined,
       limit: limit ? parseInt(limit) : undefined,
       offset: offset ? parseInt(offset) : undefined,

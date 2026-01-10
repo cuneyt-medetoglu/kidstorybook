@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,9 +63,37 @@ export default function LibraryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<string>("date-newest")
   const [searchQuery, setSearchQuery] = useState("")
-  const [isLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  // Filter and search
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user }, error } = await supabase.auth.getUser()
+        
+        if (error || !user) {
+          // Not authenticated, redirect to login
+          console.log("[Dashboard] Not authenticated, redirecting to login")
+          router.push("/auth/login")
+          return
+        }
+        
+        // Authenticated, allow access
+        console.log("[Dashboard] Authenticated user:", user.email)
+        setIsAuthenticated(true)
+        setIsLoading(false)
+      } catch (err) {
+        console.error("[Dashboard] Auth check error:", err)
+        router.push("/auth/login")
+      }
+    }
+    
+    checkAuth()
+  }, [router])
+
+  // Filter and search (moved before early return to fix hooks order)
   const filteredBooks = useMemo(() => {
     let result = books.filter((book) => {
       const matchesFilter =
@@ -94,6 +123,18 @@ export default function LibraryPage() {
 
     return result
   }, [books, filter, searchQuery, sortBy])
+
+  // Show loading state while checking auth (moved after hooks to fix hooks order)
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-purple-500 border-t-transparent mx-auto" />
+          <p className="text-gray-600 dark:text-slate-400">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   const handleCreateBook = () => {
     router.push("/create/step1")

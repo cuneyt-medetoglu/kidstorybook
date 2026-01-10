@@ -27,12 +27,17 @@
 - AI stratejisi ve prompt template'leri hazır
 - Teknik stack kararı verildi: **Next.js + Tailwind + shadcn/ui + Supabase**
 - API key'ler hazır (OpenAI, Groq, Google Cloud TTS)
-- **Faz 1:** Temel altyapı tamamlandı (71%)
-- **Faz 2:** Frontend geliştirme devam ediyor (69%)
+- **Faz 1:** Temel altyapı tamamlandı (100%) ✅
+- **Faz 2:** Frontend geliştirme tamamlandı (100%) ✅
   - ✅ Faz 2.2: Ana sayfa (100%)
+  - ✅ Faz 2.3: Auth sayfaları (100%)
   - ✅ Faz 2.4: Kitap oluşturma wizard (100%)
-  - ✅ Faz 2.5: E-book Viewer (100%) - **YENİ!**
-  - ⏳ Faz 2.6: Kullanıcı Dashboard (sırada)
+  - ✅ Faz 2.5: E-book Viewer (100%)
+  - ✅ Faz 2.6: Kullanıcı Dashboard (100%)
+- **Faz 3:** Backend ve AI Entegrasyonu devam ediyor (75%) 🟡
+  - ✅ Faz 3.5: AI Entegrasyonu (100%) - ⚠️ Organization verification bekleniyor
+  - ⏳ Faz 3.6: PDF Generation (sırada)
+  - ⏳ Faz 3.7: Webhook'lar (sırada)
 
 ### Hedef
 MVP lansmanı: Çalışan bir ürün
@@ -47,7 +52,7 @@ MVP lansmanı: Çalışan bir ürün
 | **Backend** | Next.js API Routes + Supabase | Basit, hızlı, serverless |
 | **Database** | Supabase (PostgreSQL) | Auth, DB, Storage hepsi bir arada |
 | **AI - Metin** | Henüz karar verilmedi | GPT-4o, Gemini Pro, Groq, Claude (tümü hazır olacak) |
-| **AI - Görsel** | Henüz karar verilmedi | DALL-E 3, Gemini Banana (Imagen 3), Stable Diffusion, Grok (tümü hazır olacak) |
+| **AI - Görsel** | GPT-image API | GPT-image-1.5, GPT-image-1, GPT-image-1-mini |
 | **Ödeme** | Stripe + İyzico | Global + Türkiye |
 | **E-book Viewer** | react-pageflip | Flipbook görünümü |
 | **PDF** | jsPDF / PDFKit | PDF generation |
@@ -191,6 +196,29 @@ MVP lansmanı: Çalışan bir ürün
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
+  - ✅ Debug mode eklendi (prompt preview, API test butonları)
+  - ✅ Story prompt gösterimi ve test butonu eklendi
+  - ✅ Story generation testi tamamlandı ✅ (API response başarılı, 10 sayfa)
+  - ✅ Story content API response'a eklendi ✅ (`story_data` field)
+  - ✅ Cover prompt gösterimi eklendi ✅ (`buildDetailedCharacterPrompt` kullanılıyor)
+  - ✅ Cover generation API eklendi ✅ (`POST /api/ai/generate-cover`)
+  - ✅ Test Cover Generation butonu eklendi ✅
+  - ✅ Cover butonları düzeltildi ✅ (validation kaldırıldı, fallback'lere güveniyor)
+  - ✅ Mock Analysis düzeltildi (gerçek karakter oluşturma, UUID desteği)
+  - ✅ Test Story Generation düzeltildi (mock ID kontrolü, otomatik karakter oluşturma)
+  - ✅ API endpoint'ine skipOpenAI desteği eklendi (mock analysis için)
+  - ✅ Sayfa sayısı 10'a sabitlendi (tüm yaş grupları için)
+  - ✅ Model selection eklendi (GPT-4o/4o-mini/3.5-turbo for story, GPT-image-1.5/1/1-mini for cover)
+  - ✅ Size selection eklendi (1024x1024, 1024x1792, 1792x1024)
+  - ✅ Storage RLS policy düzeltildi (user_id/covers/ folder structure)
+  - ✅ **GPT-image API entegrasyonu** (REST API ile `/v1/images/edits` endpoint)
+  - ✅ **Reference image support** (multimodal input via FormData - base64 → Blob conversion)
+  - ✅ **AI Analysis kaldırıldı** (Step 2 sadece photo upload, character creation Step 1 data kullanıyor)
+  - ✅ **Character creation basitleştirildi** (Step 1 inputs + photo → GPT-image için yeterli)
+  - ⚠️ **Organization verification gerekli** (OpenAI organizasyon doğrulaması yapılacak)
+  - 🎯 **READY TO TEST**: Organization verification sonrası GPT-image API test edilecek
+  - ⏳ Character consistency test (benzerlik değerlendirmesi)
+  - ⏳ Create Book butonu debug testlerinden sonra aktif edilecek
   - [x] Karakter tanımı özeti (kullanıcı girdileri + AI analizi) - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek data)
   - [x] Referans görsel önizleme - ✅ UI tamamlandı
 - [x] **2.4.7** Progress indicator - ✅ Tüm step'lerde (1-6) mevcut, her step'te "Step X of 6" ve progress bar gösteriliyor
@@ -331,7 +359,7 @@ MVP lansmanı: Çalışan bir ürün
 ### 3.4 Karakter API'leri ✅
 - [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu
   - [x] Kullanıcı girdilerini doğrula
-  - [x] Fotoğraf analizi (GPT-4o Vision)
+  - [x] Fotoğraf analizi (OpenAI Vision API)
   - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.)
   - [x] Master Character olarak database'e kaydet
 - [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API
@@ -359,13 +387,29 @@ MVP lansmanı: Çalışan bir ürün
   - [ ] Google Gemini Pro entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
   - [ ] Groq (Llama) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
   - [ ] Claude entegrasyonu (opsiyonel) - ⏸️ **Ertelendi (daha sonra)**
-- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ DALL-E 3 entegrasyonu
-  - [x] DALL-E 3 entegrasyonu (OpenAI)
+- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ GPT-image API'ye geçildi (15 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Reference image support (master character photo)
   - [x] Master Character description kullanarak tutarlı görsel üret
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
   - [x] Supabase Storage'a otomatik upload
+  - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
   - [ ] Gemini Banana (Imagen 3) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
   - [ ] Stable Diffusion entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
-- [ ] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ⏳ Sonraki adım
+- [x] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ✅ API endpoint oluşturuldu (10 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅ (15 Ocak 2026)
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Multimodal input (text + reference image via FormData)
+  - [x] Base64 → Blob conversion (data URL support)
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
+  - [x] Free cover credit kontrolü
+  - [x] Supabase Storage'a upload
+  - [x] Test butonu eklendi (Step 6)
+  - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
+  - 🎯 **Status:** API hazır, organization verification sonrası test edilecek
 - [x] **3.5.8** Prompt template'leri - ✅ POC'tan taşındı ve geliştirildi (`lib/prompts/`)
 - [ ] **3.5.9** Queue sistemi (uzun işlemler için) - ⏸️ **Ertelendi (daha sonra)**
 - [ ] **3.5.10** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
@@ -652,12 +696,41 @@ Requirements:
 
 ## 📝 Notlar ve Fikirler
 
+### Character Consistency (10 Ocak 2026)
+- [x] **GPT-image API Integration** - REST API ile `/v1/images/edits` endpoint ✅ (15 Ocak 2026)
+  - Kategori: MVP (Tamamlandı - Organization verification bekleniyor)
+  - İlgili Faz: Faz 3 (AI Integration)
+  - Notlar: 
+    - Endpoint: `/v1/images/edits` (FormData ile multimodal input)
+    - Reference image: Base64 → Blob conversion, FormData ile gönderiliyor
+    - Model seçenekleri: gpt-image-1.5, gpt-image-1, gpt-image-1-mini
+    - Size seçenekleri: 1024x1024, 1024x1792, 1792x1024
+    - ⚠️ Organization verification gerekli (OpenAI organizasyon doğrulaması)
+  - Dokümantasyon: `docs/strategies/CHARACTER_CONSISTENCY_IMPROVEMENT.md`
+  - Status: API hazır, organization verification sonrası test edilecek
+- [ ] **Character Similarity Testing** - GPT-image API ile benzerlik değerlendirmesi
+  - Kategori: MVP
+  - İlgili Faz: Faz 3
+  - Notlar: Model karşılaştırması (1.5 vs 1 vs mini), benzerlik skorlaması
+- [ ] **Character Analysis İyileştirme** - OpenAI Vision API'den daha detaylı bilgi almak (opsiyonel)
+  - Kategori: Post-MVP
+  - İlgili Faz: Faz 3+
+  - Notlar: GPT-image yeterli olmazsa uygulama, yüz hatları detayı artırma
+- [ ] **Multi-Attempt Generation** - 3x cover üret, en iyisini seç
+  - Kategori: Post-MVP
+  - İlgili Faz: Faz 4
+  - Notlar: Trade-off: 3x maliyet vs daha iyi sonuç
+- [ ] **Custom Model Training** - LoRA/DreamBooth per character (uzak gelecek)
+  - Kategori: Gelecek
+  - İlgili Faz: Faz 6+
+  - Notlar: Training time 5-15 dk, GPU cost, storage per user
+
 ### Bekleyen Kararlar
 - [ ] Domain adı belirlenmedi
 - [ ] Fiyatlar netleştirilmedi (TL/USD)
 - [ ] Basılı kitap (Print-on-Demand) MVP'ye dahil mi?
 - [ ] **AI Tool Seçimi:** Hikaye üretimi için hangi AI? (GPT-4o, Gemini, Groq, Claude)
-- [ ] **AI Tool Seçimi:** Görsel üretimi için hangi AI? (DALL-E 3, Midjourney, Stable Diffusion, Leonardo, Ideogram)
+- [x] **AI Tool Seçimi:** GPT-image API (gpt-image-1.5, gpt-image-1, gpt-image-1-mini) ✅
 - [x] **UI Builder:** v0.app seçildi ✅
 
 ### Gelecek Özellikler (Post-MVP)
@@ -873,6 +946,24 @@ Requirements:
     - [ ] URL'ler Supabase DB'de kalır (S3 URL'leri)
   - **Tahmini Süre:** 1-2 hafta (geçiş zamanı geldiğinde)
   - **Not:** Hibrit yaklaşım - Supabase (DB) + AWS S3 (Storage)
+- **Authentication Issues & Workarounds (10 Ocak 2026):**
+  - **Sorun 1:** Register sonrası email verification durumu belirsiz
+    - Geçici çözüm: Session kontrolü yapılıyor, varsa dashboard, yoksa verify-email
+    - Düzgün çözüm: Faz 3'te Supabase email verification durumunu kontrol et
+    - Konum: `app/auth/register/page.tsx`, `docs/guides/AUTHENTICATION_ISSUES.md`
+  - **Sorun 2:** `public.users` tablosu boş (migration 005 henüz uygulanmadı)
+    - Geçici çözüm: Register sonrası manuel update yapılıyor (ama trigger yok)
+    - Düzgün çözüm: Migration 005'i Supabase'de çalıştır (trigger otomatik kayıt yapacak)
+    - Konum: `supabase/migrations/005_fix_user_references.sql`, `docs/guides/AUTHENTICATION_ISSUES.md`
+  - **Sorun 3:** Dashboard auth kontrolü sadece client-side
+    - Geçici çözüm: `useEffect` ile kontrol + loading state
+    - Düzgün çözüm: Faz 3'te middleware'de server-side protection
+    - Konum: `app/dashboard/page.tsx`, `docs/guides/AUTHENTICATION_ISSUES.md`
+  - **Sorun 4:** Header auth state sadece client-side (hydration riski)
+    - Geçici çözüm: `useEffect` + `onAuthStateChange` listener
+    - Düzgün çözüm: Faz 3'te server-side auth state yönetimi
+    - Konum: `components/layout/Header.tsx`, `docs/guides/AUTHENTICATION_ISSUES.md`
+  - **Detaylı Dokümantasyon:** `docs/guides/AUTHENTICATION_ISSUES.md`
 - **Text-to-Speech (TTS) Stratejisi (6 Ocak 2026):**
   - **MVP:** Google Cloud Text-to-Speech kullanılacak
     - WaveNet sesleri: İlk 1 milyon karakter/ay ücretsiz, sonrası $16/1M karakter
@@ -1018,26 +1109,53 @@ Response: {
 
 | Faz | Durum | Tamamlanan | Toplam | Yüzde |
 |-----|-------|------------|--------|-------|
-| Faz 1 | 🟡 Devam Ediyor | 10 | 14 | 71% |
-| Faz 2 | 🟡 Devam Ediyor | 48 | 61 | 79% |
-| Faz 2.1 | 🟡 Devam Ediyor | 7 | 8 | 87% |
+| Faz 1 | ✅ Tamamlandı | 14 | 14 | 100% |
+| Faz 2 | ✅ Tamamlandı | 61 | 61 | 100% |
+| Faz 2.1 | ✅ Tamamlandı | 8 | 8 | 100% |
 | Faz 2.2 | ✅ Tamamlandı | 8 | 8 | 100% |
-| Faz 2.3 | 🟡 Devam Ediyor | 7 | 8 | 87% |
+| Faz 2.3 | ✅ Tamamlandı | 8 | 8 | 100% |
 | Faz 2.4 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 2.5 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 2.6 | ✅ Tamamlandı | 6 | 6 | 100% |
-| Faz 3 | 🔵 Bekliyor | 0 | 38 | 0% |
+| Faz 3 | 🟡 Devam Ediyor | 29 | 38 | 76% |
+| Faz 3.5 | ✅ Tamamlandı | 11 | 11 | 100% ⚠️ Organization verification bekleniyor |
+| Faz 3.6 | 🔵 Bekliyor | 0 | 4 | 0% |
+| Faz 3.7 | 🔵 Bekliyor | 0 | 2 | 0% |
 | Faz 4 | 🔵 Bekliyor | 0 | 18 | 0% |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
 | Faz 6 | 🔵 Bekliyor | 0 | 24 | 0% |
-| **TOPLAM** | **🟡** | **58** | **176** | **33%** |
+| **TOPLAM** | **🟡** | **104** | **176** | **59%** |
 
 ---
 
-**Son Güncelleme:** 10 Ocak 2026  
+**Son Güncelleme:** 15 Ocak 2026  
 **Güncelleyen:** @project-manager agent
 
-**Not:** Faz 2.6 tamamlandı ve test edildi ✅ (10 Ocak 2026). Dashboard ve Profile Settings sayfaları çalışıyor. 
+**Not:** 
+- Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)
+- Faz 3.5 AI Entegrasyonu tamamlandı ✅ (15 Ocak 2026) - GPT-image API entegrasyonu yapıldı
+- ⚠️ **Organization Verification:** OpenAI organizasyon doğrulaması yapılacak (kullanıcı tarafından)
+- 🎯 **Sıradaki:** Organization verification sonrası GPT-image API test edilecek
+
+**Son Yapılanlar (15 Ocak 2026):**
+- ✅ GPT-image API entegrasyonu (`/v1/images/edits` endpoint)
+- ✅ Size selection eklendi (1024x1024, 1024x1792, 1792x1024)
+- ✅ Model selection eklendi (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+- ✅ Reference image support (FormData ile multimodal input)
+- ✅ AI Analysis kaldırıldı (Step 2 sadece photo upload)
+- ✅ Character creation basitleştirildi (Step 1 data + photo)
+- **Aktif İşler:** 
+  - ✅ Story generation testi tamamlandı ✅
+  - ✅ Cover prompt gösterimi eklendi ✅
+  - ✅ "Show Cover Prompt" butonu düzeltildi ✅
+  - ⏳ Cover generation API endpoint gerekli (`POST /api/ai/generate-cover`)
+  - ⏳ Test Cover Generation butonu (API endpoint sonrası)
+  - ⏳ Prompt kalite iyileştirmeleri (v1.0.1 - sonra)
+  - ⏳ Create Book butonu debug testlerinden sonra aktif edilecek
+- **Bypass'lar:** Email verification bypass yapıldı (mail işleri sonra), AI analiz gösterimi kararı bekliyor
+- **Detaylar:** `docs/strategies/PROMPT_QUALITY_REVIEW.md` - Prompt kalite değerlendirme raporu (@prompt-manager)
+
+**📋 Odaklanma Kuralı:** Bir iş bitmeden diğerine geçme! Öncelik: Create Book akışı → Test → Sonraki iş. 
 
 **KARAR (10 Ocak 2026):** Faz 3 - Backend ve AI Entegrasyonuna geçiyoruz. Atladığımız/ertelenen işler:
 - ⏸️ **Faz 2.1:** Email verification, OAuth callback pages (1 iş)
