@@ -45,10 +45,13 @@ const TEXT_FONT_SIZE = 12
 
 /**
  * Convert ArrayBuffer to base64
+ * Uses Node.js Buffer for efficient conversion (works in Next.js API routes)
  */
 function convertArrayBufferToBase64(arrayBuffer: ArrayBuffer, contentType: string = 'image/png'): string {
-  const uint8Array = new Uint8Array(arrayBuffer)
-  const base64 = btoa(String.fromCharCode(...uint8Array))
+  // Use Buffer for efficient conversion (Node.js environment)
+  // This avoids "Maximum call stack size exceeded" error with large images
+  const buffer = Buffer.from(arrayBuffer)
+  const base64 = buffer.toString('base64')
   return `data:${contentType};base64,${base64}`
 }
 

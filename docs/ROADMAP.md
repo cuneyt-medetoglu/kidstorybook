@@ -447,7 +447,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 
 ### 3.6 PDF Generation ✅
 - [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
-- [x] **3.6.2** PDF template tasarımı ✅ (10 Ocak 2026)
+- [x] **3.6.2** PDF template tasarımı ✅ (10 Ocak 2026) - **Not:** Temel tasarım tamamlandı, profesyonel tasarım iyileştirmesi Faz 5'te yapılacak
 - [x] **3.6.3** Supabase Storage'a kaydet ✅ (10 Ocak 2026)
 - [x] **3.6.4** İndirme linki oluştur ✅ (10 Ocak 2026)
   - ✅ jsPDF kütüphanesi kuruldu
@@ -457,6 +457,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ✅ Cover page + iç sayfalar (image + text)
   - ✅ Supabase Storage upload
   - ✅ Database update
+  - ⏳ **PDF Tasarım İyileştirmesi:** Faz 5.7'de profesyonel PDF tasarımı yapılacak (11 Ocak 2026)
   - ⏳ Testing - Test book ile PDF oluştur (sırada)
 
 ### 3.7 Webhook'lar
@@ -544,6 +545,20 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.5.3** SSL sertifikası
 - [ ] **5.5.4** Monitoring kurulumu
 - [ ] **5.5.5** Error tracking (Sentry)
+
+### 5.7 PDF Tasarım İyileştirmesi
+- [ ] **5.7.1** Profesyonel PDF template tasarımı
+  - [ ] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
+  - [ ] Sayfa layout iyileştirmesi (görsel + metin düzeni)
+  - [ ] Font seçimi (çocuk dostu, okunabilir)
+  - [ ] Renk şeması ve tema uyumu
+  - [ ] Sayfa numaraları ve footer tasarımı
+  - [ ] Görsel kalitesi optimizasyonu
+- [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme)
+- [ ] **5.7.3** PDF customization seçenekleri (opsiyonel)
+  - [ ] Farklı sayfa boyutları (A4, Letter, Square)
+  - [ ] Farklı layout seçenekleri
+- **Not:** Temel PDF generation çalışıyor, tasarım iyileştirmesi sonraki fazda yapılacak (11 Ocak 2026)
 
 ### 5.6 Lansman Hazırlıkları
 - [ ] **5.6.1** Örnek kitaplar oluştur (demo)
@@ -742,6 +757,18 @@ Requirements:
 ---
 
 ## 📝 Notlar ve Fikirler
+
+### PDF Tasarım İyileştirmesi (11 Ocak 2026)
+- **Kategori:** Faz 5.7 - Polish ve Lansman
+- **Durum:** ⏳ Planlandı
+- **Öncelik:** 🟡 Önemli
+- **Açıklama:** Mevcut PDF generation çalışıyor ancak tasarım profesyonel değil. Çocuk kitabına uygun, çekici bir PDF tasarımı yapılmalı.
+- **İlgili Faz:** Faz 5.7
+- **Notlar:** 
+  - Cover page tasarımı iyileştirilmeli
+  - Sayfa layout'u daha profesyonel olmalı
+  - Font ve renk seçimi çocuk kitabına uygun olmalı
+  - Görsel kalitesi optimize edilmeli
 
 ### Character Consistency (10 Ocak 2026)
 - [x] **GPT-image API Integration** - REST API ile `/v1/images/edits` endpoint ✅ (15 Ocak 2026)
