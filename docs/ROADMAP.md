@@ -193,6 +193,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [ ] Her karakter için ayrı AI analiz
     - [ ] Karakter silme butonu
     - [ ] Ücretsiz özellik (MVP'de dahil)
+  - [ ] **Mevcut karakter seçimi (Character Library entegrasyonu)** - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+    - [ ] Step 2'de kullanıcının karakterleri varsa karakter seçimi bölümü göster
+    - [ ] "Select Character" section (karakter listesi grid/cards)
+    - [ ] "Upload New Photo" butonu (yeni karakter için)
+    - [ ] Karakter seçildiğinde Step 1 verilerini otomatik doldur (name, age, gender)
+    - [ ] Kullanıcı isterse Step 1 verilerini edit edebilir (karakter de güncellenir)
+    - [ ] Seçilen karakter bilgisi localStorage'a kaydet
+    - [ ] Empty state (karakter yoksa mevcut flow devam eder)
 - [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
@@ -308,6 +316,16 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons)
 - [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing)
 - [x] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı) - ✅ Free Cover Status section (status badge, used date, info box)
+- [ ] **2.6.7** Characters tab (karakter yönetimi) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+  - [ ] Tab navigation (Books, Characters)
+  - [ ] Characters grid layout (karakter kartları)
+  - [ ] Character card component (thumbnail, name, age, book count, actions)
+  - [ ] "Create New Character" butonu
+  - [ ] "Set as Default" butonu
+  - [ ] "Edit Character" modal/page
+  - [ ] "Delete Character" (confirmation modal)
+  - [ ] Empty state (karakter yoksa)
+  - [ ] Loading states ve error handling
 
 ### 2.7 Statik Sayfalar
 - [ ] **2.7.1** Özellikler (Features) sayfası
@@ -373,6 +391,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
 - [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
 - [ ] **3.4.7** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
+- [ ] **3.4.8** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+  - [ ] `GET /api/characters` response'a `total_books` ekle (her karakter için)
+  - [ ] `GET /api/characters` response'a `last_used_at` ekle
+  - [ ] Book oluşturulduğunda `last_used_at` güncelleme (trigger)
+  - [ ] Character selection için optimize edilmiş response (thumbnail, summary)
 
 ### 3.6 Kitap API'leri ✅
 - [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites)
@@ -815,6 +838,68 @@ Requirements:
     - Detaylı analiz: `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md`
   - **Aksiyon:** Test edildi, çalışıyor
 
+### Karakter Yönetimi Sistemi (Character Library) (15 Ocak 2026)
+- [ ] **Karakter Yönetimi Sistemi** - Kullanıcıların birden fazla çocuğu için karakter profilleri oluşturması ve yönetmesi
+  - **Tarih:** 15 Ocak 2026
+  - **Kategori:** MVP
+  - **Öncelik:** 🟡 Önemli
+  - **İlgili Fazlar:** Faz 2.6 (Dashboard), Faz 2.4.2 (Step 2), Faz 3.4 (API)
+  - **Açıklama:** 
+    - Kullanıcılar birden fazla çocuğu için ayrı karakter profilleri oluşturabilecek
+    - MyLibrary'de "Characters" tab'ı eklenecek
+    - Story create'te (Step 2) mevcut karakterler seçilebilecek veya yeni karakter oluşturulabilecek
+    - İlk karakter otomatik default olur, kullanıcı değiştirebilir
+    - Karakter seçildiğinde Step 1 verileri otomatik doldurulur (kullanıcı isterse edit edebilir)
+    - Edit yapılırsa karakter de güncellenir
+  - **Özellikler:**
+    - **Dashboard Characters Tab:**
+      - Grid layout (karakter kartları)
+      - Her kart: thumbnail, isim, yaş, kitap sayısı
+      - "Set as Default" butonu
+      - "Edit" butonu
+      - "Delete" butonu
+      - "Create New Character" butonu
+    - **Step 2 Karakter Seçimi:**
+      - Eğer kullanıcının karakterleri varsa:
+        - "Select Character" bölümü gösterilir
+        - Karakter listesi (grid/cards)
+        - "Upload New Photo" butonu (yeni karakter için)
+      - Eğer karakteri yoksa:
+        - Mevcut flow (sadece fotoğraf yükleme)
+    - **Karakter Kartı Component:**
+      - Thumbnail image
+      - Name, Age
+      - Book count badge
+      - "Select" button
+      - "Edit" button (opsiyonel)
+    - **Workflow:**
+      - Step 1 → Step 2:
+        - Karakterleri varsa: "Select Character" veya "Upload New Photo"
+        - Karakteri yoksa: Mevcut flow (upload)
+      - Karakter seçildiğinde:
+        - Step 1 verileri otomatik doldurulur (name, age, gender)
+        - Kullanıcı isterse edit edebilir
+        - Edit yapılırsa karakter güncellenir (PATCH /api/characters/:id)
+      - Create Book:
+        - Seçilen karakter: character_id ile book oluştur
+        - Yeni karakter: Önce character oluştur, sonra book oluştur
+  - **Database:**
+    - ✅ Zaten hazır (characters tablosu kullanıcıya özel, is_default mekanizması var)
+    - ✅ RLS policies hazır
+    - ✅ books tablosunda character_id var
+  - **API:**
+    - ✅ GET /api/characters (kullanıcının tüm karakterleri) - var
+    - ✅ GET /api/characters/:id (karakter detayı) - var
+    - ✅ PATCH /api/characters/:id (karakter güncelle) - var
+    - ✅ DELETE /api/characters/:id (karakter sil) - var
+    - ⏳ API iyileştirmeleri: total_books, last_used_at bilgileri eklenmeli
+  - **Frontend:**
+    - ⏳ Dashboard Characters tab (Faz 2.6)
+    - ⏳ Step 2 karakter seçimi UI (Faz 2.4.2)
+    - ⏳ Character card component
+    - ⏳ Character selection modal/section
+  - **Detaylı Plan:** `docs/strategies/CHARACTER_LIBRARY_STRATEGY.md` (oluşturulacak)
+
 ### Gelecek Özellikler (Post-MVP)
 - [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)**
   - **Tarih:** 4 Ocak 2026
@@ -1210,7 +1295,8 @@ Response: {
 ---
 
 **Son Güncelleme:** 15 Ocak 2026  
-**Güncelleyen:** @project-manager agent
+**Güncelleyen:** @project-manager agent  
+**Son Eklenen:** Karakter Yönetimi Sistemi (Character Library) - 15 Ocak 2026
 
 **Not:** 
 - Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)

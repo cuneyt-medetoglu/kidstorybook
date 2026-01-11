@@ -298,9 +298,30 @@ interface ABTestConfig {
 - Integration patterns
 - Performance optimization
 
+### @database-manager
+- Character library entegrasyonu
+- Character update workflow (prompt'lara etkisi)
+- Character selection optimizasyonu
+
 ---
 
-**Son Güncelleme:** 10 Ocak 2026  
+## 🔗 İlgili Sistemler
+
+### Character Library Sistemi (15 Ocak 2026)
+- **Durum:** Planlanıyor
+- **Açıklama:** Kullanıcıların birden fazla karakter profili oluşturması ve yönetmesi
+- **Prompt'a Etkisi:**
+  - Mevcut karakterlerin prompt'larda kullanılması
+  - Karakter güncellendiğinde prompt'ların yenilenmesi
+  - Default karakter mekanizması
+- **Geliştirme Notları:**
+  - Character selection olduğunda mevcut karakter bilgilerini prompt'lara entegre et
+  - Character update olduğunda ilgili kitapların prompt'larını güncelle (gelecek özellik)
+  - Character library'nin prompt performansına etkisini izle
+
+---
+
+**Son Güncelleme:** 15 Ocak 2026  
 **Oluşturan:** @project-manager agent
 
 **Not:** Bu agent'ı kullanmak için: `@prompt-manager [sorun veya istediğin]`
