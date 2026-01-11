@@ -116,11 +116,11 @@ export function Header() {
           : "bg-white dark:bg-slate-900"
       }`}
     >
-      <nav className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
+      <nav className="container mx-auto flex h-20 items-center justify-between gap-2 px-4 md:px-6 max-w-full overflow-hidden">
         {/* Logo */}
-        <Link href="/">
+        <Link href="/" className="shrink-0">
           <motion.div
-            className="text-2xl font-bold md:text-3xl"
+            className="text-xl font-bold sm:text-2xl md:text-3xl"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
@@ -131,7 +131,7 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-4 lg:gap-8 md:flex shrink-0">
           {navLinks.map((link, index) => (
             <motion.div
               key={link.href}
@@ -153,18 +153,18 @@ export function Header() {
         </div>
 
         {/* Right Side Actions */}
-        <div className="flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
           {/* Country/Currency Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="sm"
-                className="hidden gap-1 text-sm md:flex"
+                className="hidden gap-1 text-xs sm:text-sm lg:flex"
               >
                 <span>{selectedCountry.flag}</span>
-                <span className="font-medium">{selectedCountry.currency}</span>
-                <ChevronDown className="h-4 w-4" />
+                <span className="font-medium hidden xl:inline">{selectedCountry.currency}</span>
+                <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
@@ -234,18 +234,20 @@ export function Header() {
           )}
 
           {/* Auth Buttons / User Menu - Desktop */}
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-2 lg:gap-3 md:flex shrink-0">
             {isLoading ? (
-              <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-slate-700" />
+              <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-slate-700 shrink-0" />
             ) : user ? (
               <>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="shrink-0"
                 >
                   <Link href="/create/step1">
-                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
-                      Create a children's book
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
+                      <span className="hidden lg:inline">Create a children's book</span>
+                      <span className="lg:hidden">Create</span>
                     </Button>
                   </Link>
                 </motion.div>
@@ -295,10 +297,12 @@ export function Header() {
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="shrink-0"
                 >
                   <Link href="/create/step1">
-                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
-                      Create a children's book
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
+                      <span className="hidden lg:inline">Create a children's book</span>
+                      <span className="lg:hidden">Create</span>
                     </Button>
                   </Link>
                 </motion.div>

@@ -311,60 +311,61 @@ export default function LibraryPage() {
           {/* Filters and Controls */}
           <div className="space-y-4">
             {/* Top Row: Tabs and Create Button */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <Tabs value={filter} onValueChange={setFilter} className="w-full sm:w-auto">
-                <TabsList>
-                  <TabsTrigger value="all">All Books</TabsTrigger>
-                  <TabsTrigger value="completed">Completed</TabsTrigger>
-                  <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                  <TabsTrigger value="drafts">Drafts</TabsTrigger>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 overflow-x-auto">
+              <Tabs value={filter} onValueChange={setFilter} className="w-full sm:w-auto min-w-0">
+                <TabsList className="flex-wrap sm:flex-nowrap">
+                  <TabsTrigger value="all" className="text-xs sm:text-sm">All Books</TabsTrigger>
+                  <TabsTrigger value="completed" className="text-xs sm:text-sm">Completed</TabsTrigger>
+                  <TabsTrigger value="in-progress" className="text-xs sm:text-sm">In Progress</TabsTrigger>
+                  <TabsTrigger value="drafts" className="text-xs sm:text-sm">Drafts</TabsTrigger>
                 </TabsList>
               </Tabs>
 
               <Button
                 size="lg"
                 onClick={handleCreateBook}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full sm:w-auto text-white"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full sm:w-auto shrink-0 text-white text-sm sm:text-base"
               >
-                <Plus className="mr-2 h-5 w-5" />
-                Create New Book
+                <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="hidden sm:inline">Create New Book</span>
+                <span className="sm:hidden">Create Book</span>
               </Button>
             </div>
 
             {/* Bottom Row: Search, View Toggle, Sort */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
-              <div className="relative flex-1">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 overflow-x-auto">
+              <div className="relative flex-1 min-w-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search your books..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 w-full"
                 />
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                 <div className="flex items-center border rounded-lg p-1">
                   <Button
                     variant={viewMode === "grid" ? "secondary" : "ghost"}
                     size="sm"
                     onClick={() => setViewMode("grid")}
-                    className="px-3"
+                    className="px-2 sm:px-3"
                   >
-                    <Grid3x3 className="h-4 w-4" />
+                    <Grid3x3 className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                   <Button
                     variant={viewMode === "list" ? "secondary" : "ghost"}
                     size="sm"
                     onClick={() => setViewMode("list")}
-                    className="px-3"
+                    className="px-2 sm:px-3"
                   >
-                    <List className="h-4 w-4" />
+                    <List className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[140px] sm:w-[180px]">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
