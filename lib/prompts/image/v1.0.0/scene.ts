@@ -83,12 +83,24 @@ export function generateScenePrompt(
 // ============================================================================
 
 function getEnvironmentDescription(theme: string, sceneDesc: string): string {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
   const environments: Record<string, string[]> = {
     adventure: [
       'lush forest with tall trees and dappled sunlight',
       'mountain path with colorful wildflowers',
       'beach with gentle waves and smooth sand',
       'meadow with butterflies and blooming flowers',
+    ],
+    sports: [
+      'sunny playground with colorful equipment and soft grass',
+      'sports field with friendly kids and bright cones',
+      'indoor gym with soft mats and fun activity stations',
+      'park path with a playful obstacle course',
     ],
     fantasy: [
       'magical garden with glowing flowers',
@@ -122,7 +134,7 @@ function getEnvironmentDescription(theme: string, sceneDesc: string): string {
     ],
   }
 
-  const themeEnvs = environments[theme] || environments['adventure']
+  const normalizedThemeEnvs = environments[normalizedTheme] || environments['adventure']
   
   // Try to match scene description to appropriate environment
   // Or use the scene description directly if detailed
@@ -131,7 +143,7 @@ function getEnvironmentDescription(theme: string, sceneDesc: string): string {
   }
   
   // Otherwise pick appropriate environment
-  return themeEnvs[0]
+  return normalizedThemeEnvs[0]
 }
 
 // ============================================================================

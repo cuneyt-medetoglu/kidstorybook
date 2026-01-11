@@ -75,7 +75,19 @@ export async function POST(request: NextRequest) {
           : photoBase64
         
         const buffer = Buffer.from(base64Data, 'base64')
-        const fileName = `character_${Date.now()}_${name.replace(/\s+/g, '_')}.png`
+
+        // Supabase Storage keys are strict; sanitize name to avoid invalid characters (e.g., "Venüs")
+        const safeName = name
+          .toString()
+          .trim()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+          .replace(/[^a-zA-Z0-9_-]+/g, '_') // keep only safe chars
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '')
+          .slice(0, 40) || 'child'
+
+        const fileName = `character_${Date.now()}_${safeName}.png`
         const filePath = `${user.id}/characters/${fileName}`
 
         console.log('[Character Creation] Uploading photo to Supabase Storage:', filePath)

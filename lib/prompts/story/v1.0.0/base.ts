@@ -252,12 +252,24 @@ function getSafetyRules(ageGroup: string) {
 }
 
 function getThemeConfig(theme: string) {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
   const configs: Record<string, any> = {
     adventure: {
       name: 'Adventure',
       mood: 'exciting',
       setting: 'outdoor exploration (forest, mountain, beach)',
       commonElements: ['discovery', 'nature', 'exploration', 'teamwork'],
+    },
+    sports: {
+      name: 'Sports & Activities',
+      mood: 'exciting',
+      setting: 'playground, sports field, or indoor activity space',
+      commonElements: ['movement', 'teamwork', 'practice', 'friendly competition', 'having fun'],
     },
     fantasy: {
       name: 'Fantasy',
@@ -291,10 +303,16 @@ function getThemeConfig(theme: string) {
     },
   }
   
-  return configs[theme] || configs['adventure']
+  return configs[normalizedTheme] || configs['adventure']
 }
 
 function getEducationalFocus(ageGroup: string, theme: string): string {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
   const focuses: Record<string, string[]> = {
     toddler: ['colors', 'shapes', 'counting', 'emotions'],
     preschool: ['sharing', 'kindness', 'curiosity', 'basic concepts'],
@@ -305,6 +323,7 @@ function getEducationalFocus(ageGroup: string, theme: string): string {
   
   const themeFocuses: Record<string, string> = {
     adventure: 'courage and exploration',
+    sports: 'movement, teamwork, and healthy habits',
     fantasy: 'imagination and creativity',
     animals: 'empathy and care for animals',
     'daily-life': 'social-emotional skills',
@@ -313,7 +332,7 @@ function getEducationalFocus(ageGroup: string, theme: string): string {
   }
   
   const ageFocus = focuses[ageGroup] || focuses['elementary']
-  const themeFocus = themeFocuses[theme] || 'general growth'
+  const themeFocus = themeFocuses[normalizedTheme] || 'general growth'
   
   return `${themeFocus}, ${ageFocus.join(', ')}`
 }

@@ -12,13 +12,20 @@ import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
-import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { buildCharacterPrompt, buildDetailedCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
 import { generateFullPagePrompt } from '@/lib/prompts/image/v1.0.0/scene'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+function normalizeThemeKey(theme: string): string {
+  const t = (theme || '').toString().trim().toLowerCase()
+  if (!t) return t
+  if (t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities') return 'sports'
+  return t
+}
 
 export interface CreateBookRequest {
   characterId: string
@@ -80,7 +87,9 @@ export async function POST(request: NextRequest) {
       imageSize = '1024x1024', // Default: 1024x1024 (Square)
     } = body
 
-    if (!characterId || !theme || !illustrationStyle) {
+    const themeKey = normalizeThemeKey(theme)
+
+    if (!characterId || !themeKey || !illustrationStyle) {
       return CommonErrors.badRequest(
         'characterId, theme, and illustrationStyle are required'
       )
@@ -104,6 +113,7 @@ export async function POST(request: NextRequest) {
     const isCoverOnlyMode = !pageCount || pageCount === 0
     
     console.log(`[Create Book] 📋 Mode: ${isCoverOnlyMode ? 'Cover Only' : 'Full Book'} (pageCount: ${pageCount || 'undefined'})`)
+    console.log(`[Create Book] 🎯 Theme: ${theme} → ${themeKey}`)
 
     let storyData: any = null
     let completion: any = null
@@ -117,12 +127,12 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] 📝 Creating book with minimal data...')
 
       // Create book with minimal data (no story, just metadata)
-      const bookTitle = `${character.name}'s ${theme.charAt(0).toUpperCase() + theme.slice(1)} Adventure`
+      const bookTitle = `${character.name}'s ${themeKey.charAt(0).toUpperCase() + themeKey.slice(1)} Adventure`
       
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
         character_id: characterId,
         title: bookTitle,
-        theme,
+        theme: themeKey,
         illustration_style: illustrationStyle,
         language,
         age_group: 'preschool', // Default for cover only
@@ -161,7 +171,7 @@ export async function POST(request: NextRequest) {
         characterName: character.name,
         characterAge: character.age,
         characterGender: character.gender,
-        theme,
+        theme: themeKey,
         illustrationStyle,
         customRequests,
         pageCount: pageCount, // Debug: Optional page count override
@@ -279,7 +289,7 @@ export async function POST(request: NextRequest) {
       console.log(`[Create Book] Status updated to 'generating'`)
 
       // Build cover generation request
-      const coverScene = `A magical book cover for a children's story titled "${book.title}" in a ${theme} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+      const coverScene = `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
 
       const characterDescription = character.description
       const textPrompt = buildDetailedCharacterPrompt(
@@ -702,7 +712,7 @@ export async function POST(request: NextRequest) {
         const pages = storyData.pages
         const totalPages = pages.length
         const referenceImageUrl = character.reference_photo_url || null
-        const characterDescription = character.description
+        const characterPrompt = buildCharacterPrompt(character.description)
         const generatedImages: any[] = []
 
       for (let i = 0; i < totalPages; i++) {
@@ -712,7 +722,7 @@ export async function POST(request: NextRequest) {
         console.log(`[Create Book] 🖼️  Generating image for page ${pageNumber}/${totalPages}...`)
 
         // Build prompt for this page
-        const sceneDescription = page.imagePrompt || page.text
+        const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
         const ageGroup = storyData.metadata?.ageGroup || 'preschool'
         
         // Extract character action from page text (what character is doing)
@@ -725,16 +735,17 @@ export async function POST(request: NextRequest) {
           'balanced'
         
         // Determine mood from theme or use default
-        const mood = theme === 'adventure' ? 'exciting' :
-                     theme === 'fantasy' ? 'mysterious' :
-                     theme === 'space' ? 'inspiring' :
+        const mood = themeKey === 'adventure' ? 'exciting' :
+                     themeKey === 'fantasy' ? 'mysterious' :
+                     themeKey === 'space' ? 'inspiring' :
+                     themeKey === 'sports' ? 'exciting' :
                      'happy'
         
         // Create SceneInput object for generateFullPagePrompt
         const sceneInput = {
           pageNumber,
           sceneDescription,
-          theme,
+          theme: themeKey,
           mood,
           characterAction,
           focusPoint,
@@ -753,7 +764,7 @@ export async function POST(request: NextRequest) {
 
         // Generate full page prompt with correct parameters
         const fullPrompt = generateFullPagePrompt(
-          characterDescription,
+          characterPrompt,
           sceneInput,
           illustrationStyle,
           ageGroup
@@ -916,6 +927,63 @@ export async function POST(request: NextRequest) {
               console.log(`[Create Book] 🧩 Page ${pageNumber} - Image b64 received (length:`, pageImageB64.length, 'chars)')
             }
           }
+        } else {
+          // No reference image available: MUST call generations directly
+          console.log(`[Create Book] 🔄 Page ${pageNumber} - No reference image, calling /v1/images/generations directly`)
+          console.log(`[Create Book] 📋 Page ${pageNumber} - Model:`, imageModel)
+          console.log(`[Create Book] 📏 Page ${pageNumber} - Size:`, imageSize)
+          console.log(`[Create Book] 📝 Page ${pageNumber} - Prompt length:`, fullPrompt.length, 'characters')
+
+          const generationsApiStartTime = Date.now()
+          console.log(`[Create Book] 🚀 Page ${pageNumber} - Calling /v1/images/generations API...`)
+          console.log(`[Create Book] ⏱️  Page ${pageNumber} - API call started at:`, new Date().toISOString())
+
+          const genResponse = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              model: imageModel,
+              prompt: fullPrompt,
+              n: 1,
+              size: imageSize,
+            }),
+          })
+
+          const generationsApiTime = Date.now() - generationsApiStartTime
+          console.log(`[Create Book] ⏱️  Page ${pageNumber} - Generations API call completed in:`, generationsApiTime, 'ms')
+          console.log(`[Create Book] 📊 Page ${pageNumber} - Response status:`, genResponse.status, genResponse.statusText)
+
+          if (!genResponse.ok) {
+            const errorText = await genResponse.text()
+            console.error(`[Create Book] ❌ Page ${pageNumber} - Generations API error:`)
+            console.error(`[Create Book]   Status:`, genResponse.status)
+            console.error(`[Create Book]   Status Text:`, genResponse.statusText)
+            console.error(`[Create Book]   Error Response:`, errorText)
+            continue
+          }
+
+          console.log(`[Create Book] ✅ Page ${pageNumber} - Generations API call successful, parsing response...`)
+          const genResult = await genResponse.json()
+          console.log(`[Create Book] 📦 Page ${pageNumber} - Response structure:`, {
+            hasData: !!genResult.data,
+            dataLength: genResult.data?.length || 0,
+            dataType: Array.isArray(genResult.data) ? 'array' : typeof genResult.data,
+          })
+
+          pageImageUrl = genResult.data?.[0]?.url || null
+          pageImageB64 = genResult.data?.[0]?.b64_json || null
+          pageImageOutputFormat = genResult.output_format || null
+
+          console.log(`[Create Book] ✅ Page ${pageNumber} - Generations response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
+          if (pageImageUrl) {
+            console.log(`[Create Book] 🖼️  Page ${pageNumber} - Image URL received (length:`, pageImageUrl.length, 'chars)')
+          }
+          if (pageImageB64) {
+            console.log(`[Create Book] 🧩 Page ${pageNumber} - Image b64 received (length:`, pageImageB64.length, 'chars)')
+          }
         }
 
         if (!pageImageUrl && !pageImageB64) {
@@ -1010,6 +1078,8 @@ export async function POST(request: NextRequest) {
       // Update book with page images
       console.log(`[Create Book] 💾 Updating book in database with page images...`)
       const dbUpdateStart = Date.now()
+
+      const allImagesGenerated = generatedImages.length === totalPages
       
       await updateBook(supabase, book.id, {
         story_data: {
@@ -1017,12 +1087,16 @@ export async function POST(request: NextRequest) {
           pages: pages,
         },
         images_data: generatedImages,
-        status: 'completed', // All images generated
+        status: allImagesGenerated ? 'completed' : 'failed',
       })
       
       const dbUpdateMs = Date.now() - dbUpdateStart
       console.log(`[Create Book] ⏱️  Database update time:`, dbUpdateMs, 'ms')
-      console.log(`[Create Book] ✅ Book completed! All images generated and uploaded`)
+      if (allImagesGenerated) {
+        console.log(`[Create Book] ✅ Book completed! All images generated and uploaded`)
+      } else {
+        console.warn(`[Create Book] ⚠️  Book NOT completed - missing page images (${generatedImages.length}/${totalPages}). Status set to 'failed'.`)
+      }
       console.log(`[Create Book] 📊 Final stats:`)
       console.log(`[Create Book]   - Total pages:`, totalPages)
       console.log(`[Create Book]   - Images generated:`, generatedImages.length)
