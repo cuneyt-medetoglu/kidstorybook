@@ -35,7 +35,7 @@
   - ✅ Faz 2.5: E-book Viewer (100%)
   - ✅ Faz 2.6: Kullanıcı Dashboard (100%)
 - **Faz 3:** Backend ve AI Entegrasyonu tamamlandı (100%) ✅
-  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026)
+  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026), ✅ Bug fix'ler: Reference image handling, theme sports mapping, storage sanitization (16 Ocak 2026)
   - ✅ Faz 3.6: PDF Generation (100%) ✅
   - ✅ Faz 3.7: Webhook'lar → Faz 4'e taşındı ✅ (15 Ocak 2026)
 - **🎉 MVP Durumu:** Kitap oluşturma, görüntüleme ve PDF indirme tamamen çalışıyor! (11 Ocak 2026)

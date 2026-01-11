@@ -1,6 +1,7 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
+**Son Güncelleme:** 16 Ocak 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
@@ -70,7 +71,12 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 #### 3.4.1-3.4.6 - Karakter API'leri ✅
 - **Tarih:** 10 Ocak 2026
+- **Son Güncelleme:** 16 Ocak 2026
 - **Durum:** Tüm karakter CRUD operasyonları hazır
+- **Yeni Özellikler (16 Ocak 2026):**
+  - ✅ Storage key sanitization: Türkçe karakterler ve özel karakterler temizleniyor (ör: "Venüs" → "Venus")
+  - ✅ Supabase Storage "Invalid key" hatası düzeltildi
+  - ✅ Dosya adları güvenli karakter setine normalize ediliyor
 
 ### Opsiyonel İşler
 
@@ -91,13 +97,20 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 #### 3.5.2 - Story Generation Prompts v1.0.0 ✅
 - **Tarih:** 10 Ocak 2026
+- **Son Güncelleme:** 16 Ocak 2026
 - **Dosyalar:** `lib/prompts/story/v1.0.0/`
 - **Durum:** Yaş gruplarına özel, safety rules, educational content
+- **Yeni Özellikler (16 Ocak 2026):**
+  - ✅ Theme "sports" desteği eklendi: `getThemeConfig()` fonksiyonuna "sports" tema konfigürasyonu eklendi
+  - ✅ Theme normalizasyonu: "sports&activities" alias'ı "sports" olarak normalize ediliyor
 
 #### 3.5.3 - Image Generation Prompts v1.0.0 ✅
 - **Tarih:** 10 Ocak 2026
+- **Son Güncelleme:** 16 Ocak 2026
 - **Dosyalar:** `lib/prompts/image/v1.0.0/`
 - **Durum:** Character consistency, scene generation, negative prompts
+- **Yeni Özellikler (16 Ocak 2026):**
+  - ✅ Theme "sports" environment mapping eklendi: `getThemeEnvironment()` fonksiyonuna sports sahne çevreleri eklendi (stadium, field, court vb.)
 
 #### 3.5.4 - Character Consistency System ✅
 - **Tarih:** 10 Ocak 2026
@@ -138,7 +151,7 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 #### 3.5.10 - Create Book'da Page Images Generation Entegrasyonu ✅
 - **Tarih:** 15 Ocak 2026
-- **Son Güncelleme:** 11 Ocak 2026
+- **Son Güncelleme:** 16 Ocak 2026
 - **Dosya:** `app/api/books/route.ts`
 - **Durum:** Page images generation cover generation'dan sonra otomatik çağrılıyor ✅ **ÇALIŞIYOR**
 - **Özellikler:**
@@ -157,6 +170,11 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
     - ✅ Sayfa sayısı enforcement (kullanıcı 3 sayfa istediğinde AI 5 sayfa üretse bile 3 sayfa kullanılıyor)
     - ✅ Detaylı log'lar (API call timing, response structure, image upload timing)
     - ✅ Cover-only mode desteği (pageCount = 0 veya undefined)
+  - **Bug Fix'ler (16 Ocak 2026):**
+    - ✅ **Reference image yoksa `/v1/images/generations` çağrısı yapılmaması hatası düzeltildi**: Reference image olmadığında doğrudan `/v1/images/generations` API'si çağrılıyor (önceden hiç çağrılmıyordu)
+    - ✅ **Theme "sports" mapping eklendi**: Story prompt ve image scene environment'larında "sports" teması için doğru mapping'ler eklendi (fallback "adventure" sorunu çözüldü)
+    - ✅ **Character prompt fix**: `generateFullPagePrompt`'a artık string karakter prompt gönderiliyor (önceden object gönderiliyordu, `[object Object]` hatası)
+    - ✅ **Status management iyileştirildi**: Eksik görseller varsa (0/5 gibi) status `completed` yapılmıyor, `failed` olarak işaretleniyor
 
 #### 3.5.11 - Book Status Management ✅
 - **Tarih:** 15 Ocak 2026
@@ -243,9 +261,9 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 - ✅ Story Generation (GPT-4o)
 - ✅ Cover Generation (GPT-image) - **ÇALIŞIYOR** (11 Ocak 2026)
-- ✅ Page Images Generation (GPT-image) - **ÇALIŞIYOR** (11 Ocak 2026)
+- ✅ Page Images Generation (GPT-image) - **ÇALIŞIYOR** (11 Ocak 2026, bug fix'ler: 16 Ocak 2026)
 - ✅ PDF Generation
-- ✅ Create Book API (story + cover + page images otomatik) - **ÇALIŞIYOR** (11 Ocak 2026)
+- ✅ Create Book API (story + cover + page images otomatik) - **ÇALIŞIYOR** (11 Ocak 2026, bug fix'ler: 16 Ocak 2026)
 - ✅ Book Status Management (draft → generating → completed) - **ÇALIŞIYOR** (11 Ocak 2026)
 - ✅ Character Consistency (reference image support)
 - ✅ Supabase Storage Integration
