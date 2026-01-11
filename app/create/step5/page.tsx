@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Lightbulb, Sparkles, BookOpen, PenTool, ArrowRight, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -11,11 +12,13 @@ import { z } from "zod"
 // Validation schema
 const formSchema = z.object({
   customRequests: z.string().max(500, "Custom requests must not exceed 500 characters").optional().or(z.literal("")),
+  pageCount: z.number().min(0).max(20).optional(), // Debug: Page count override (0 = cover only, undefined = cover only)
 })
 
 type FormData = z.infer<typeof formSchema>
 
 export default function Step5Page() {
+  const router = useRouter()
   const {
     register,
     watch,
@@ -24,11 +27,32 @@ export default function Step5Page() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       customRequests: "",
+      pageCount: undefined,
     },
   })
 
   const customRequests = watch("customRequests") || ""
+  const pageCount = watch("pageCount")
   const remainingChars = 500 - customRequests.length
+
+  const handleNext = () => {
+    // Save custom requests and page count to localStorage
+    try {
+      const saved = localStorage.getItem("kidstorybook_wizard")
+      const wizardData = saved ? JSON.parse(saved) : {}
+      
+      wizardData.step5 = {
+        customRequests: customRequests || undefined,
+        pageCount: pageCount || undefined, // Debug: Optional page count override
+      }
+      
+      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+    } catch (error) {
+      console.error("Error saving step 5 data:", error)
+    }
+    
+    router.push("/create/step6")
+  }
 
   // Floating animations for decorative elements
   const floatingVariants = {
@@ -190,6 +214,42 @@ export default function Step5Page() {
               </motion.p>
             </motion.div>
 
+            {/* Debug: Page Count Override */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.4 }}
+              className="mb-8 rounded-lg border-2 border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+            >
+              <label
+                htmlFor="pageCount"
+                className="mb-2 block text-sm font-semibold text-amber-900 dark:text-amber-200"
+              >
+                🐛 Debug: Page Count (Optional)
+              </label>
+              <input
+                id="pageCount"
+                type="number"
+                min="0"
+                max="20"
+                {...register("pageCount", { valueAsNumber: true })}
+                placeholder="Leave empty for cover only (no pages)"
+                className="w-full rounded-lg border-2 border-amber-300 bg-white p-3 text-gray-900 transition-all placeholder:text-gray-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-amber-700 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus:border-amber-500"
+              />
+              <p className="mt-2 text-xs text-amber-700 dark:text-amber-300">
+                For testing: Override default page count (2-20 pages). Leave empty to use default (10 pages).
+              </p>
+              {errors.pageCount && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 text-sm text-red-600 dark:text-red-400"
+                >
+                  {errors.pageCount.message}
+                </motion.p>
+              )}
+            </motion.div>
+
             {/* Navigation Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -210,17 +270,16 @@ export default function Step5Page() {
                 </motion.div>
               </Link>
 
-              <Link href="/create/step6" className="w-full sm:w-auto">
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
-                  <Button
-                    type="button"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 sm:w-auto"
-                  >
-                    <span>Next</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </motion.div>
-              </Link>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 sm:w-auto"
+                >
+                  <span>Next</span>
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
             </motion.div>
           </div>
 

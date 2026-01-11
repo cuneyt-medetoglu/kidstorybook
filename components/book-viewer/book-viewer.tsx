@@ -18,6 +18,7 @@ import {
   ChevronLeft,
   RotateCcw,
   Square,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -101,40 +102,13 @@ interface BookViewerProps {
   onClose?: () => void
 }
 
-export function BookViewer({ onClose }: BookViewerProps) {
-  const book = mockBook
-  const totalPages = book.pages.length
-  
-  // Initialize currentPage - always start with 0 for SSR, then load from localStorage on client
+export function BookViewer({ bookId, onClose }: BookViewerProps) {
+  const [book, setBook] = useState<any>(null)
+  const [isLoadingBook, setIsLoadingBook] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  // All hooks must be declared unconditionally (React Rules of Hooks)
   const [currentPage, setCurrentPage] = useState(0)
-  
-  // Initialize bookmark state - always start with empty Set for SSR, then load from localStorage on client
   const [bookmarkedPages, setBookmarkedPages] = useState<Set<number>>(new Set())
-  
-  // Load reading progress from localStorage on client mount
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedProgress = localStorage.getItem(`book-progress-${book.id}`)
-      if (savedProgress) {
-        const page = parseInt(savedProgress, 10)
-        if (page >= 0 && page < totalPages) {
-          setCurrentPage(page)
-        }
-      }
-      
-      // Load bookmarks from localStorage
-      const savedBookmarks = localStorage.getItem(`book-bookmarks-${book.id}`)
-      if (savedBookmarks) {
-        try {
-          const bookmarks = JSON.parse(savedBookmarks)
-          setBookmarkedPages(new Set(bookmarks))
-        } catch {
-          // Invalid JSON, ignore
-        }
-      }
-    }
-  }, [book.id, totalPages])
-  
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [animationType, setAnimationType] = useState<AnimationType>("flip")
   const [animationSpeed, setAnimationSpeed] = useState<AnimationSpeed>("normal")
@@ -143,34 +117,159 @@ export function BookViewer({ onClose }: BookViewerProps) {
   const [direction, setDirection] = useState(0)
   const [selectedVoice, setSelectedVoice] = useState("en-US-Standard-E")
   const [ttsSpeed, setTtsSpeed] = useState(1.0)
-  
-  // Autoplay states
   const [autoplayMode, setAutoplayMode] = useState<"off" | "tts" | "timed">("off")
   const [autoplaySpeed, setAutoplaySpeed] = useState(10) // seconds per page
   const [autoplayCountdown, setAutoplayCountdown] = useState(0)
-  
+
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // TTS hook
+  // TTS hook (must be called unconditionally)
   const { isPlaying, isPaused, isLoading, play, pause, resume, stop, onEnded } = useTTS()
-  
-  // Check if current page is bookmarked
-  const isBookmarked = bookmarkedPages.has(currentPage)
 
+  const totalPages = book?.pages?.length ?? 0
+  const isBookmarked = bookmarkedPages.has(currentPage)
+  
+  // Fetch book data from API
+  useEffect(() => {
+    if (!bookId) {
+      setError('Book ID is required')
+      setIsLoadingBook(false)
+      return
+    }
+
+    const fetchBook = async () => {
+      try {
+        setIsLoadingBook(true)
+        const response = await fetch(`/api/books/${bookId}`)
+        const result = await response.json()
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || result.error || 'Failed to fetch book')
+        }
+
+        const bookData = result.data
+        
+        // DEBUG: Log API response
+        console.log('[BookViewer] 📦 API Response received:')
+        console.log('[BookViewer]   - Book ID:', bookData.id)
+        console.log('[BookViewer]   - Title:', bookData.title)
+        console.log('[BookViewer]   - Has story_data:', !!bookData.story_data)
+        console.log('[BookViewer]   - Has images_data:', !!bookData.images_data)
+        console.log('[BookViewer]   - images_data length:', bookData.images_data?.length || 0)
+        
+        if (bookData.story_data?.pages) {
+          console.log('[BookViewer]   - story_data.pages length:', bookData.story_data.pages.length)
+          console.log('[BookViewer]   - First page imageUrl:', bookData.story_data.pages[0]?.imageUrl || 'MISSING')
+          console.log('[BookViewer]   - All page imageUrls:', bookData.story_data.pages.map((p: any, i: number) => ({
+            page: i + 1,
+            imageUrl: p.imageUrl || 'MISSING',
+            hasImageUrl: !!p.imageUrl,
+          })))
+        }
+        
+        if (bookData.images_data && Array.isArray(bookData.images_data)) {
+          console.log('[BookViewer]   - images_data sample:', bookData.images_data.slice(0, 2).map((img: any) => ({
+            pageNumber: img.pageNumber,
+            imageUrl: img.imageUrl || 'MISSING',
+            hasImageUrl: !!img.imageUrl,
+          })))
+        }
+        
+        // Transform API response to BookViewer format
+        const hasStoryData = bookData.story_data && Array.isArray(bookData.story_data.pages) && bookData.story_data.pages.length > 0
+        
+        // Merge images_data into story_data.pages if imageUrl is missing
+        let mergedPages: any[] = []
+        if (hasStoryData) {
+          const pages = [...bookData.story_data.pages]
+          const imagesMap = new Map()
+          
+          // Build map from images_data
+          if (bookData.images_data && Array.isArray(bookData.images_data)) {
+            bookData.images_data.forEach((img: any) => {
+              if (img.pageNumber) {
+                imagesMap.set(img.pageNumber, img.imageUrl || null)
+              }
+            })
+          }
+          
+          mergedPages = pages.map((page: any, index: number) => {
+            const pageNum = page.pageNumber || index + 1
+            // Use imageUrl from page, or fallback to images_data
+            const imageUrl = page.imageUrl || imagesMap.get(pageNum) || null
+            
+            return {
+              pageNumber: pageNum,
+              text: page.text || '',
+              imageUrl: imageUrl,
+            }
+          })
+        }
+        
+        const transformedBook = {
+          id: bookData.id,
+          title: bookData.title || bookData.story_data?.title || 'Untitled',
+          pages: mergedPages,
+        }
+        
+        console.log('[BookViewer] ✅ Transformed book:')
+        console.log('[BookViewer]   - Total pages:', transformedBook.pages.length)
+        console.log('[BookViewer]   - Pages with imageUrl:', transformedBook.pages.filter((p: any) => p.imageUrl).length)
+        console.log('[BookViewer]   - Pages without imageUrl:', transformedBook.pages.filter((p: any) => !p.imageUrl).length)
+        console.log('[BookViewer]   - First page imageUrl:', transformedBook.pages[0]?.imageUrl || 'MISSING')
+
+        setBook(transformedBook)
+        setError(null)
+      } catch (err) {
+        console.error('[BookViewer] Error fetching book:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load book')
+      } finally {
+        setIsLoadingBook(false)
+      }
+    }
+
+    fetchBook()
+  }, [bookId])
+
+  // Load reading progress/bookmarks once book is available
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    if (!book?.id) return
+
+    const savedProgress = localStorage.getItem(`book-progress-${book.id}`)
+    if (savedProgress) {
+      const page = parseInt(savedProgress, 10)
+      if (!Number.isNaN(page) && page >= 0 && page < totalPages) {
+        setCurrentPage(page)
+      }
+    }
+
+    const savedBookmarks = localStorage.getItem(`book-bookmarks-${book.id}`)
+    if (savedBookmarks) {
+      try {
+        const bookmarks = JSON.parse(savedBookmarks)
+        setBookmarkedPages(new Set(bookmarks))
+      } catch {
+        // ignore invalid JSON
+      }
+    }
+  }, [book?.id, totalPages])
+
+  // All hooks must be declared before conditional returns (React Rules of Hooks)
   // Save reading progress to localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`book-progress-${book.id}`, currentPage.toString())
-    }
-  }, [currentPage, book.id])
+    if (typeof window === "undefined") return
+    if (!book?.id) return
+    localStorage.setItem(`book-progress-${book.id}`, currentPage.toString())
+  }, [currentPage, book?.id])
 
   // Save bookmarks to localStorage
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`book-bookmarks-${book.id}`, JSON.stringify(Array.from(bookmarkedPages)))
-    }
-  }, [bookmarkedPages, book.id])
+    if (typeof window === "undefined") return
+    if (!book?.id) return
+    localStorage.setItem(`book-bookmarks-${book.id}`, JSON.stringify(Array.from(bookmarkedPages)))
+  }, [bookmarkedPages, book?.id])
 
   // Detect orientation
   useEffect(() => {
@@ -233,15 +332,12 @@ export function BookViewer({ onClose }: BookViewerProps) {
 
   // Auto-advance page when TTS finishes (only if autoplay TTS mode is active)
   const handleTTSEnded = useCallback(() => {
-    if (autoplayMode === "tts") {
-      // TTS just finished, wait a bit then advance to next page
+    if (autoplayMode === "tts" && book?.pages) {
       setTimeout(() => {
         setCurrentPage((prevPage) => {
           const nextPage = prevPage + 1
           if (nextPage < totalPages) {
-            // Update direction for animation
             setDirection(1)
-            // Auto-play next page after a short delay
             setTimeout(() => {
               const nextPageText = book.pages[nextPage]?.text
               if (nextPageText) {
@@ -253,14 +349,13 @@ export function BookViewer({ onClose }: BookViewerProps) {
             }, 500)
             return nextPage
           } else {
-            // Reached end of book, stop autoplay
             setAutoplayMode("off")
             return prevPage
           }
         })
-      }, 1000) // 1 second delay between pages
+      }, 1000)
     }
-  }, [autoplayMode, totalPages, book.pages, play, selectedVoice, ttsSpeed])
+  }, [autoplayMode, totalPages, book?.pages, play, selectedVoice, ttsSpeed])
 
   // Set up TTS ended callback
   useEffect(() => {
@@ -273,17 +368,13 @@ export function BookViewer({ onClose }: BookViewerProps) {
   useEffect(() => {
     if (autoplayMode === "timed") {
       setAutoplayCountdown(autoplaySpeed)
-      
-      // Countdown timer
       const countdownInterval = setInterval(() => {
         setAutoplayCountdown((prev) => {
           if (prev <= 1) {
-            // Time's up, go to next page
             if (currentPage < totalPages - 1) {
               goToNextPage()
               return autoplaySpeed
             } else {
-              // Reached end, stop autoplay
               setAutoplayMode("off")
               return 0
             }
@@ -291,7 +382,6 @@ export function BookViewer({ onClose }: BookViewerProps) {
           return prev - 1
         })
       }, 1000)
-
       return () => clearInterval(countdownInterval)
     } else {
       setAutoplayCountdown(0)
@@ -305,8 +395,7 @@ export function BookViewer({ onClose }: BookViewerProps) {
     } else if (isPaused) {
       resume()
     } else {
-      // Start playing current page
-      const currentPageText = book.pages[currentPage]?.text
+      const currentPageText = book?.pages?.[currentPage]?.text
       if (currentPageText) {
         await play(currentPageText, {
           voiceId: selectedVoice,
@@ -314,17 +403,15 @@ export function BookViewer({ onClose }: BookViewerProps) {
         })
       }
     }
-  }, [isPlaying, isPaused, currentPage, book.pages, play, pause, resume, selectedVoice, ttsSpeed])
+  }, [isPlaying, isPaused, currentPage, book?.pages, play, pause, resume, selectedVoice, ttsSpeed])
 
   // Toggle autoplay mode
   const handleAutoplayToggle = useCallback(() => {
     if (autoplayMode === "off") {
-      // Start TTS autoplay
       setAutoplayMode("tts")
-      // Start playing current page immediately
-      const currentPageText = book.pages[currentPage]?.text
+      const currentPageText = book?.pages?.[currentPage]?.text
       if (currentPageText) {
-        stop() // Stop any current playback first
+        stop()
         setTimeout(() => {
           play(currentPageText, {
             voiceId: selectedVoice,
@@ -333,11 +420,10 @@ export function BookViewer({ onClose }: BookViewerProps) {
         }, 100)
       }
     } else {
-      // Stop autoplay
       setAutoplayMode("off")
       stop()
     }
-  }, [autoplayMode, currentPage, book.pages, play, stop, selectedVoice, ttsSpeed])
+  }, [autoplayMode, currentPage, book?.pages, play, stop, selectedVoice, ttsSpeed])
 
   // Toggle bookmark for current page
   const toggleBookmark = useCallback(() => {
@@ -354,6 +440,7 @@ export function BookViewer({ onClose }: BookViewerProps) {
 
   // Share function
   const handleShare = useCallback(async () => {
+    if (!book?.title) return
     try {
       await navigator.share({
         title: book.title,
@@ -361,10 +448,9 @@ export function BookViewer({ onClose }: BookViewerProps) {
         url: window.location.href,
       })
     } catch {
-      // Fallback: copy to clipboard
       await navigator.clipboard.writeText(window.location.href)
     }
-  }, [book.title])
+  }, [book?.title])
 
   // Pause/resume autoplay on tap
   const handleContentTap = useCallback(() => {
@@ -376,22 +462,17 @@ export function BookViewer({ onClose }: BookViewerProps) {
           resume()
         }
       }
-      // For timed mode, just toggle the mode
     }
   }, [autoplayMode, isPlaying, isPaused, pause, resume])
 
-  // Keyboard navigation (moved after function definitions)
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Close thumbnails on any key
       if (showThumbnails && e.key === "Escape") {
         setShowThumbnails(false)
         return
       }
-      
-      // Ignore keyboard shortcuts when thumbnails are open
       if (showThumbnails) return
-      
       switch (e.key) {
         case "ArrowRight":
         case " ":
@@ -471,8 +552,7 @@ export function BookViewer({ onClose }: BookViewerProps) {
   // Stop TTS when page changes manually (but continue autoplay if active)
   useEffect(() => {
     stop()
-    // If autoplay is active and in TTS mode, start playing the new page
-    if (autoplayMode === "tts") {
+    if (autoplayMode === "tts" && book?.pages) {
       const timer = setTimeout(() => {
         const currentPageText = book.pages[currentPage]?.text
         if (currentPageText) {
@@ -481,10 +561,56 @@ export function BookViewer({ onClose }: BookViewerProps) {
             speed: ttsSpeed,
           })
         }
-      }, 500) // Small delay after page change
+      }, 500)
       return () => clearTimeout(timer)
     }
-  }, [currentPage, stop, autoplayMode, book.pages, play, selectedVoice, ttsSpeed])
+  }, [currentPage, stop, autoplayMode, book?.pages, play, selectedVoice, ttsSpeed])
+
+  // Show loading state
+  if (isLoadingBook) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-purple-500 border-t-transparent mx-auto" />
+          <p className="text-gray-600 dark:text-slate-400">Loading book...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error || !book) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400 mb-4">{error || 'Book not found'}</p>
+          {onClose && (
+            <Button onClick={onClose} variant="outline">
+              Go Back
+            </Button>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // Show empty state for cover-only books (no pages)
+  if (book.pages.length === 0) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="text-center max-w-md px-4">
+          <BookOpen className="h-24 w-24 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
+          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{book.title}</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">This book has no pages yet. It's a cover-only book.</p>
+          {onClose && (
+            <Button onClick={onClose} variant="outline">
+              Go Back
+            </Button>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   // Get animation duration based on speed
   const getAnimationDuration = () => {

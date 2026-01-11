@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -147,6 +148,7 @@ const ageGroups: AgeGroup[] = [
 ]
 
 export default function Step3Page() {
+  const router = useRouter()
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null)
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | null>(null)
 
@@ -169,6 +171,31 @@ export default function Step3Page() {
   const handleAgeGroupSelect = (ageGroupId: string) => {
     setSelectedAgeGroup(ageGroupId)
     setValue("ageGroup", ageGroupId as FormData["ageGroup"], { shouldValidate: true })
+  }
+
+  const handleNext = () => {
+    if (!theme || !ageGroup) return
+    
+    // Save theme and age group to localStorage
+    try {
+      const saved = localStorage.getItem("kidstorybook_wizard")
+      const wizardData = saved ? JSON.parse(saved) : {}
+      
+      // Find full theme and age group objects
+      const selectedThemeObj = themes.find((t) => t.id === theme)
+      const selectedAgeGroupObj = ageGroups.find((ag) => ag.id === ageGroup)
+      
+      wizardData.step3 = {
+        theme: selectedThemeObj,
+        ageGroup: selectedAgeGroupObj,
+      }
+      
+      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+    } catch (error) {
+      console.error("Error saving step 3 data:", error)
+    }
+    
+    router.push("/create/step4")
   }
 
   const isFormValid = theme && ageGroup
@@ -461,21 +488,17 @@ export default function Step3Page() {
                 </motion.div>
               </Link>
 
-              <Link
-                href="/create/step4"
-                className={`w-full sm:w-auto ${!isFormValid ? "pointer-events-none" : ""}`}
-              >
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full">
-                  <Button
-                    type="button"
-                    disabled={!isFormValid}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 dark:from-purple-400 dark:to-pink-400 sm:w-auto"
-                  >
-                    <span>Next</span>
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </motion.div>
-              </Link>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
+                <Button
+                  type="button"
+                  disabled={!isFormValid}
+                  onClick={handleNext}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 dark:from-purple-400 dark:to-pink-400 sm:w-auto"
+                >
+                  <span>Next</span>
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
             </motion.div>
           </div>
 

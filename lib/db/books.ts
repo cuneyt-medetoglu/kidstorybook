@@ -25,6 +25,8 @@ export interface Book {
   images_data: any[] // Array of image objects
   cover_image_url?: string
   cover_image_path?: string
+  pdf_url?: string // Generated PDF URL
+  pdf_path?: string // PDF storage path
   status: 'draft' | 'generating' | 'completed' | 'failed' | 'archived'
   generation_metadata: any
   view_count: number
@@ -56,6 +58,8 @@ export interface UpdateBookInput {
   images_data?: any[]
   cover_image_url?: string
   cover_image_path?: string
+  pdf_url?: string
+  pdf_path?: string
   is_favorite?: boolean
   generation_metadata?: any
 }

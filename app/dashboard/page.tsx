@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit } from "lucide-react"
+import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -13,6 +13,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Empty } from "@/components/ui/empty"
+import { useToast } from "@/hooks/use-toast"
 
 type Book = {
   id: string
@@ -58,17 +59,19 @@ const statusConfig = {
 
 export default function LibraryPage() {
   const router = useRouter()
-  const [books] = useState<Book[]>(mockBooks)
+  const { toast } = useToast()
+  const [books, setBooks] = useState<Book[]>([])
   const [filter, setFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [sortBy, setSortBy] = useState<string>("date-newest")
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [downloadingBookId, setDownloadingBookId] = useState<string | null>(null)
 
-  // Check authentication on mount
+  // Check authentication and fetch books
   useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthAndFetchBooks = async () => {
       try {
         const supabase = createClient()
         const { data: { user }, error } = await supabase.auth.getUser()
@@ -83,15 +86,61 @@ export default function LibraryPage() {
         // Authenticated, allow access
         console.log("[Dashboard] Authenticated user:", user.email)
         setIsAuthenticated(true)
-        setIsLoading(false)
+
+        // Fetch books from API
+        console.log("[Dashboard] Fetching books from API...")
+        const response = await fetch('/api/books', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        const result = await response.json()
+
+        if (!response.ok || !result.success) {
+          console.error("[Dashboard] Error fetching books:", result)
+          toast({
+            title: "Error",
+            description: "Failed to load books. Please try again.",
+            variant: "destructive",
+          })
+          setBooks([])
+        } else {
+          console.log("[Dashboard] Books fetched successfully:", result.data?.length || 0, "books")
+          
+          // Transform API response to Book type
+          const transformedBooks: Book[] = (result.data || []).map((book: any) => ({
+            id: book.id,
+            title: book.title,
+            character: book.character_id ? "Character" : "Unknown", // TODO: Fetch character name
+            coverImage: book.cover_image_url || "", // No mock data fallback - empty string if no cover
+            status: book.status === 'completed' ? 'completed' : 
+                   book.status === 'generating' ? 'in-progress' : 'draft',
+            createdDate: new Date(book.created_at).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            }),
+          }))
+
+          setBooks(transformedBooks)
+        }
       } catch (err) {
-        console.error("[Dashboard] Auth check error:", err)
-        router.push("/auth/login")
+        console.error("[Dashboard] Error:", err)
+        toast({
+          title: "Error",
+          description: "Failed to load books. Please try again.",
+          variant: "destructive",
+        })
+        setBooks([])
+      } finally {
+        setIsLoading(false)
       }
     }
     
-    checkAuth()
-  }, [router])
+    checkAuthAndFetchBooks()
+  }, [router, toast])
 
   // Filter and search (moved before early return to fix hooks order)
   const filteredBooks = useMemo(() => {
@@ -149,9 +198,56 @@ export default function LibraryPage() {
     console.log("Edit book:", bookId)
   }
 
-  const handleDownloadBook = (bookId: string) => {
-    // TODO: Download PDF (Faz 3'te implement edilecek)
-    console.log("Download book:", bookId)
+  const handleDownloadBook = async (bookId: string) => {
+    try {
+      setDownloadingBookId(bookId)
+      console.log("[Dashboard] Downloading book:", bookId)
+
+      // Call PDF generation API
+      const response = await fetch(`/api/books/${bookId}/generate-pdf`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || result.details || 'Failed to generate PDF')
+      }
+
+      const pdfUrl = result.data?.pdfUrl
+
+      if (!pdfUrl) {
+        throw new Error('PDF URL not found in response')
+      }
+
+      console.log("[Dashboard] PDF generated successfully:", pdfUrl)
+
+      // Download PDF
+      const link = document.createElement('a')
+      link.href = pdfUrl
+      link.download = `${bookId}.pdf`
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast({
+        title: "PDF Downloaded!",
+        description: "Your book PDF has been downloaded successfully.",
+      })
+    } catch (error) {
+      console.error("[Dashboard] Error downloading book:", error)
+      toast({
+        title: "Download Failed",
+        description: error instanceof Error ? error.message : "Failed to download PDF. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setDownloadingBookId(null)
+    }
   }
 
   const handleShareBook = (bookId: string) => {
@@ -159,9 +255,45 @@ export default function LibraryPage() {
     console.log("Share book:", bookId)
   }
 
-  const handleDeleteBook = (bookId: string) => {
-    // TODO: Delete confirmation modal (Faz 3'te implement edilecek)
-    console.log("Delete book:", bookId)
+  const handleDeleteBook = async (bookId: string) => {
+    try {
+      // TODO: Add confirmation modal later
+      if (!confirm('Are you sure you want to delete this book? This action cannot be undone.')) {
+        return
+      }
+
+      console.log("[Dashboard] Deleting book:", bookId)
+
+      const response = await fetch(`/api/books/${bookId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || result.details || 'Failed to delete book')
+      }
+
+      console.log("[Dashboard] Book deleted successfully:", bookId)
+
+      // Remove book from local state
+      setBooks(books.filter(book => book.id !== bookId))
+
+      toast({
+        title: "Book Deleted",
+        description: "The book has been deleted successfully.",
+      })
+    } catch (error) {
+      console.error("[Dashboard] Error deleting book:", error)
+      toast({
+        title: "Delete Failed",
+        description: error instanceof Error ? error.message : "Failed to delete book. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
@@ -297,11 +429,17 @@ export default function LibraryPage() {
                   <CardContent className="p-4">
                     {/* Book Cover */}
                     <div className="relative mb-4 overflow-hidden rounded-lg aspect-[3/4] bg-muted">
-                      <img
-                        src={book.coverImage}
-                        alt={book.title}
-                        className="w-full h-full object-cover"
-                      />
+                      {book.coverImage ? (
+                        <img
+                          src={book.coverImage}
+                          alt={book.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <BookOpen className="h-16 w-16 text-gray-400 dark:text-gray-600" />
+                        </div>
+                      )}
                     </div>
 
                     {/* Book Info */}
@@ -336,10 +474,15 @@ export default function LibraryPage() {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleDownloadBook(book.id)}
+                        disabled={downloadingBookId === book.id}
                         className="flex-1"
-                        title="Download"
+                        title="Download PDF"
                       >
-                        <Download className="h-4 w-4" />
+                        {downloadingBookId === book.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="h-4 w-4" />
+                        )}
                       </Button>
                       <Button
                         size="sm"

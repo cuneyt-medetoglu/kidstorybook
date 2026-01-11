@@ -228,6 +228,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    console.log('[Cover Generation] ==========================================')
+    console.log('[Cover Generation] Request Configuration:')
+    console.log('[Cover Generation] - Endpoint: /v1/images/edits')
+    console.log('[Cover Generation] - Model:', model)
+    console.log('[Cover Generation] - Size:', size)
+    console.log('[Cover Generation] - Reference Image: Provided')
+    console.log('[Cover Generation] - Prompt Length:', textPrompt.length)
+    console.log('[Cover Generation] - FormData Keys:', Array.from(formData.keys()))
+    console.log('[Cover Generation] ==========================================')
+
     const apiResponse = await fetch('https://api.openai.com/v1/images/edits', {
       method: 'POST',
       headers: {
@@ -237,20 +247,75 @@ export async function POST(request: NextRequest) {
       body: formData,
     })
 
+    console.log('[Cover Generation] API Response Status:', apiResponse.status, apiResponse.statusText)
+    console.log('[Cover Generation] API Response Headers:', Object.fromEntries(apiResponse.headers.entries()))
+
     if (!apiResponse.ok) {
       const errorText = await apiResponse.text()
-      console.error('[Cover Generation] API Error:', apiResponse.status, errorText)
+      console.error('[Cover Generation] ==========================================')
+      console.error('[Cover Generation] API Error Details:')
+      console.error('[Cover Generation] - Status:', apiResponse.status)
+      console.error('[Cover Generation] - Status Text:', apiResponse.statusText)
+      console.error('[Cover Generation] - Error Body:', errorText)
+      console.error('[Cover Generation] ==========================================')
+      
+      // Try to parse error JSON for better error handling
+      try {
+        const errorJson = JSON.parse(errorText)
+        console.error('[Cover Generation] Parsed Error:', JSON.stringify(errorJson, null, 2))
+        
+        // Check if it's a verification error
+        if (errorJson.error?.message?.includes('organization must be verified')) {
+          console.error('[Cover Generation] ❌ ERROR TYPE: Organization Verification Required')
+          console.error('[Cover Generation] 💡 SOLUTION: Verify organization at https://platform.openai.com/settings/organization/general')
+          console.error('[Cover Generation] ⏱️ PROPAGATION TIME: Up to 15 minutes after verification')
+        }
+      } catch (e) {
+        console.error('[Cover Generation] Could not parse error JSON')
+      }
+      
       throw new Error(`GPT-image API error: ${apiResponse.status} - ${errorText}`)
     }
 
     const apiResult = await apiResponse.json()
-    console.log('[Cover Generation] API Response:', JSON.stringify(apiResult).substring(0, 500) + '...')
+    console.log('[Cover Generation] API Response (full):', JSON.stringify(apiResult, null, 2))
 
-    // Extract image URL from response (standard images API format)
-    const coverUrl = apiResult.data?.[0]?.url
+    // Extract image URL from response
+    // GPT-image API /v1/images/edits endpoint returns: { data: [{ url: "...", ... }] }
+    // OR sometimes: { data: [{ b64_json: "...", ... }] } (if output_format is b64_json)
+    let coverUrl: string | null = null
+    
+    if (apiResult.data && Array.isArray(apiResult.data) && apiResult.data.length > 0) {
+      const firstItem = apiResult.data[0]
+      // Try URL first (most common)
+      if (firstItem.url) {
+        coverUrl = firstItem.url
+      } 
+      // Try b64_json (if output_format was b64_json)
+      else if (firstItem.b64_json) {
+        // Convert base64 to data URL
+        coverUrl = `data:image/png;base64,${firstItem.b64_json}`
+      }
+      // Try direct URL (some APIs return directly)
+      else if (typeof apiResult.data[0] === 'string') {
+        coverUrl = apiResult.data[0]
+      }
+    }
+    // Alternative: direct URL in response
+    else if (apiResult.url) {
+      coverUrl = apiResult.url
+    }
 
     if (!coverUrl) {
       console.error('[Cover Generation] Could not extract image URL from response:', JSON.stringify(apiResult, null, 2))
+      console.error('[Cover Generation] Response structure:', {
+        hasData: !!apiResult.data,
+        dataType: typeof apiResult.data,
+        isArray: Array.isArray(apiResult.data),
+        dataLength: apiResult.data?.length,
+        firstItem: apiResult.data?.[0],
+        hasUrl: !!apiResult.url,
+      })
       throw new Error('No image URL found in GPT-image API response')
     }
 

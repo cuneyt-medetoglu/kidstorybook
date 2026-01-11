@@ -45,9 +45,9 @@ export default function Step6Page() {
   const [isTestingCover, setIsTestingCover] = useState(false)
   
   // Model selection
-  const [storyModel, setStoryModel] = useState<string>("gpt-4o")
-  const [imageModel, setImageModel] = useState<string>("gpt-image-1") // GPT-image API
-  const [imageSize, setImageSize] = useState<string>("1024x1024") // Default size
+  const [storyModel, setStoryModel] = useState<string>("gpt-3.5-turbo") // Default: GPT-3.5 Turbo (Legacy)
+  const [imageModel, setImageModel] = useState<string>("gpt-image-1-mini") // Default: GPT-image-1-mini (Fast)
+  const [imageSize, setImageSize] = useState<string>("1024x1024") // Default: 1024x1024 (Square)
   
   // Load wizard data from localStorage
   useEffect(() => {
@@ -64,80 +64,69 @@ export default function Step6Page() {
     }
   }, [])
 
-  // Mock data - in production, this would come from context/localStorage/URL params
-  // TODO: Faz 3'te proper state management ile gerçek data kullanılacak
   // Mock user data - Faz 3'te Supabase'den gelecek
   const userData = {
     freeCoverAvailable: true, // Mock: Faz 3'te users.free_cover_used kontrolü yapılacak
   }
 
+  // Get actual data from wizardData (localStorage)
   const formData = {
-    // Multi-character (Step 2) mock - when available, this section is used
-    characters: [
-      {
-        type: "Child",
-        filename: "arya-photo.jpg",
-        size: "2.5 MB",
-        url: "/arya-photo.jpg",
-        analysis: {
-          hairLength: "Short",
-          hairStyle: "Curly",
-          hairTexture: "Fine",
-          faceShape: "Round",
-          eyeShape: "Round",
-          skinTone: "Fair",
-        },
-      },
-      // Example pet character
-      // {
-      //   type: "Dog",
-      //   filename: "buddy.jpg",
-      //   size: "1.8 MB",
-      //   url: "/arya-photo.jpg",
-      //   analysis: {},
-      // },
-    ],
     character: {
-      name: "Arya",
-      age: 2,
-      gender: "Girl",
-      hairColor: "Light Brown",
-      eyeColor: "Brown",
-      specialFeatures: ["Curly Hair", "Rosy Cheeks"],
+      name: wizardData?.step1?.name || "Child",
+      age: wizardData?.step1?.age || 3,
+      gender: wizardData?.step1?.gender || "Girl",
+      hairColor: wizardData?.step1?.hairColor || "Brown",
+      eyeColor: wizardData?.step1?.eyeColor || "Brown",
+      specialFeatures: wizardData?.step1?.specialFeatures || [],
     },
     photo: {
-      uploaded: true,
-      filename: "arya-photo.jpg",
-      size: "2.5 MB",
-      url: "/arya-photo.jpg",
-      analysis: {
-        hairLength: "Short",
-        hairStyle: "Curly",
-        hairTexture: "Fine",
-        faceShape: "Round",
-        eyeShape: "Round",
-        skinTone: "Fair",
-      },
+      uploaded: !!wizardData?.step2?.characterPhoto,
+      filename: wizardData?.step2?.characterPhoto?.filename || "",
+      size: wizardData?.step2?.characterPhoto?.size || "",
+      url: wizardData?.step2?.characterPhoto?.url || "",
+      analysis: wizardData?.step2?.characterAnalysis || {},
     },
-    theme: {
-      name: "Fairy Tale",
-      description: "Magical kingdoms, enchanted forests, and mystical adventures",
-      icon: "🏰",
-      color: "from-pink-400 to-purple-500",
-    },
-    ageGroup: {
-      name: "6-9 Years",
-      description: "Chapter books with more complex plots and detailed illustrations",
-      icon: "📖",
-      features: ["15-20 pages", "Chapter structure", "Detailed illustrations"],
-    },
-    illustrationStyle: {
-      name: "Watercolor Dreams",
-      description: "Soft, dreamy watercolor illustrations with flowing colors and gentle textures",
-      color: "from-blue-300 to-purple-400",
-    },
-    customRequests:
-      "Include a friendly dragon named Sparkle, have Arya find a magic wand in the forest, and add a tea party scene with woodland creatures.",
+    theme: wizardData?.step3?.theme
+      ? {
+          name: wizardData.step3.theme.title || wizardData.step3.theme.name || "Adventure",
+          description: wizardData.step3.theme.description || "Exciting adventures and explorations",
+          icon: wizardData.step3.theme.icon || "🗺️",
+          color: wizardData.step3.theme.gradientFrom || "from-blue-400 to-cyan-500",
+        }
+      : {
+          name: "Adventure",
+          description: "Exciting adventures and explorations",
+          icon: "🗺️",
+          color: "from-blue-400 to-cyan-500",
+        },
+    ageGroup: wizardData?.step3?.ageGroup
+      ? {
+          name: wizardData.step3.ageGroup.title || wizardData.step3.ageGroup.name || "3-5 Years",
+          description: wizardData.step3.ageGroup.description || "Picture books with simple stories",
+          icon: wizardData.step3.ageGroup.icon || "📚",
+          features: typeof wizardData.step3.ageGroup.features === 'string' 
+            ? [wizardData.step3.ageGroup.features] 
+            : wizardData.step3.ageGroup.features || ["10 pages", "Simple story", "Large illustrations"],
+        }
+      : {
+          name: "3-5 Years",
+          description: "Picture books with simple stories",
+          icon: "📚",
+          features: ["10 pages", "Simple story", "Large illustrations"],
+        },
+    illustrationStyle: wizardData?.step4?.illustrationStyle
+      ? {
+          name: wizardData.step4.illustrationStyle.title || wizardData.step4.illustrationStyle,
+          description: wizardData.step4.illustrationStyle.description || "",
+          color: wizardData.step4.illustrationStyle.gradientFrom || "from-blue-400",
+        }
+      : {
+          name: "3D Animation",
+          description: "Modern 3D animated style",
+          color: "from-purple-400",
+        },
+    customRequests: wizardData?.step5?.customRequests || "",
+    pageCount: wizardData?.step5?.pageCount,
   }
 
   // Floating animations for decorative elements
@@ -147,8 +136,8 @@ export default function Step6Page() {
       rotate: [0, 5, 0, -5, 0],
       transition: {
         duration: 3 + i * 0.5,
-        repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        repeat: Infinity,
+        ease: "easeInOut" as const,
       },
     }),
   }
@@ -407,7 +396,7 @@ export default function Step6Page() {
                           {formData.ageGroup.description}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {formData.ageGroup.features.map((feature, index) => (
+                          {formData.ageGroup.features.map((feature: string, index: number) => (
                             <span
                               key={index}
                               className="rounded bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
@@ -459,7 +448,7 @@ export default function Step6Page() {
                 </div>
               </motion.div>
 
-              {/* 5. Custom Requests Summary */}
+              {/* 5. Custom Requests & Page Count Summary */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -487,6 +476,17 @@ export default function Step6Page() {
                   ) : (
                     <p className="italic text-sm text-gray-500 dark:text-slate-500">No custom requests</p>
                   )}
+
+                  {/* Page Count Display */}
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
+                    <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm font-semibold text-gray-900 dark:text-slate-100">
+                      Page Count:
+                    </span>
+                    <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                      {formData.pageCount ? `${formData.pageCount} pages` : 'Cover Only'}
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -597,8 +597,9 @@ export default function Step6Page() {
                           const characterName = wizardData?.step1?.name || formData.character.name
                           const characterAge = wizardData?.step1?.age || formData.character.age
                           const characterGender = wizardData?.step1?.gender || formData.character.gender.toLowerCase()
-                          const theme = wizardData?.step3?.theme || formData.theme.name.toLowerCase().replace(/\s+/g, "-")
-                          const illustrationStyle = wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-")
+                          // Extract theme and illustration style IDs from objects
+                          const theme = wizardData?.step3?.theme?.id || wizardData?.step3?.theme || formData.theme.name.toLowerCase().replace(/\s+/g, "-")
+                          const illustrationStyle = wizardData?.step4?.illustrationStyle?.id || wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-")
                           const customRequests = wizardData?.step5?.customRequests || formData.customRequests
                           const referencePhotoAnalysis = wizardData?.step2?.characterAnalysis
 
@@ -611,6 +612,7 @@ export default function Step6Page() {
                             customRequests,
                             referencePhotoAnalysis,
                             language: "en",
+                            pageCount: wizardData?.step5?.pageCount, // Use pageCount from Step 5
                           })
 
                           setStoryPrompt(prompt)
@@ -800,8 +802,9 @@ export default function Step6Page() {
                             personalityTraits: ["curious", "friendly"],
                           }
 
-                          const illustrationStyle = wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name
-                          const theme = wizardData?.step3?.theme || formData.theme.name
+                          // Extract theme and illustration style names from objects
+                          const illustrationStyle = wizardData?.step4?.illustrationStyle?.title || wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name
+                          const theme = wizardData?.step3?.theme?.title || wizardData?.step3?.theme || formData.theme.name
                           const characterName = step1.name || formData.character.name
 
                           const coverScene = `A magical book cover for a story titled "${characterName}'s Adventure" in a ${theme} theme, featuring the main character in a whimsical, inviting scene that captures the essence of the story`
@@ -861,8 +864,9 @@ export default function Step6Page() {
                             personalityTraits: ["curious", "friendly"],
                           }
 
-                          const illustrationStyle = wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name
-                          const theme = wizardData?.step3?.theme || formData.theme.name
+                          // Extract theme and illustration style names from objects
+                          const illustrationStyle = wizardData?.step4?.illustrationStyle?.title || wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name
+                          const theme = wizardData?.step3?.theme?.title || wizardData?.step3?.theme || formData.theme.name
                           const characterName = step1.name || formData.character.name
                           const title = `${characterName}'s Adventure`
 
@@ -950,11 +954,11 @@ export default function Step6Page() {
                   </motion.div>
                 </Link>
 
-                {/* Create Book Button - HIDDEN for now, will be enabled after debug */}
+                {/* Create Book Button - ACTIVE */}
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                   <Button
                     type="button"
-                    disabled={true}
+                    disabled={isCreating}
                     onClick={async () => {
                       setIsCreating(true)
                       try {
@@ -973,13 +977,24 @@ export default function Step6Page() {
                           return
                         }
 
+                        // Get page count from wizard data (debug override)
+                        const pageCount = wizardData?.step5?.pageCount || undefined
+
                         // Prepare book creation request
+                        // Extract theme and illustration style IDs from objects
+                        const themeId = wizardData?.step3?.theme?.id || wizardData?.step3?.theme || formData.theme.name.toLowerCase().replace(/\s+/g, "-")
+                        const illustrationStyleId = wizardData?.step4?.illustrationStyle?.id || wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-")
+                        
                         const requestBody = {
                           characterId: characterId,
-                          theme: formData.theme.name.toLowerCase().replace(/\s+/g, "-"),
-                          illustrationStyle: formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-"),
-                          customRequests: formData.customRequests || undefined,
+                          theme: themeId,
+                          illustrationStyle: illustrationStyleId,
+                          customRequests: wizardData?.step5?.customRequests || formData.customRequests || undefined,
+                          pageCount: pageCount, // Debug: Optional page count override
                           language: "en" as const,
+                          storyModel: storyModel, // Use debug mode selection
+                          imageModel: imageModel, // Use debug mode selection
+                          imageSize: imageSize, // Use debug mode selection
                         }
 
                         console.log("[Step 6] Creating book with data:", requestBody)
@@ -1069,7 +1084,7 @@ export default function Step6Page() {
             className="mt-6 text-center"
           >
             <p className="text-sm text-gray-600 dark:text-slate-400">
-              Use DEBUG buttons above to preview prompts. Create Book will be enabled after testing.
+              Use DEBUG buttons above to test cover generation. Book creation will be enabled after cover generation is tested.
             </p>
           </motion.div>
         </motion.div>
@@ -1170,6 +1185,7 @@ export default function Step6Page() {
                           customRequests,
                           referencePhotoAnalysis,
                           language: "en",
+                          pageCount: wizardData?.step5?.pageCount, // Use pageCount from Step 5
                         })
                         setStoryPrompt(prompt)
                       }}

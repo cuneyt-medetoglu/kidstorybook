@@ -35,6 +35,9 @@ docs/
 │
 ├── reports/                    # Raporlar
 │   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu
+│   ├── GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md # GPT-image API hata analizi
+│   ├── CURRENT_STATUS_ANALYSIS.md # Mevcut durum analizi ve eksikler listesi
+│   ├── MISSING_IMPLEMENTATIONS_ANALYSIS.md # Eksik implementasyonlar analizi (MVP için kritik)
 │   └── ...
 │
 ├── strategies/                 # Strateji dokümanları
@@ -213,6 +216,15 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - Roadmap netleştirildi (çok fazla şeye aynı anda bakıyoruz uyarısı eklendi)
     - Odaklanma kuralları belirlendi (bir iş bitmeden diğerine geçme)
     - `docs/implementation/FAZ3_IMPLEMENTATION.md` güncellendi (tüm yapılanlar not edildi)
+  - GPT-image API Entegrasyonu
+    - Organization verification onaylandı ✅
+    - Cover generation API test edildi ve çalışıyor ✅
+    - Step'ler arası veri transferi düzeltildi ✅
+    - Create Book butonu aktif edildi ✅
+    - Debug: Sayfa sayısı override eklendi (Step 5) ✅
+    - Backend log temizliği yapıldı ✅
+    - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
+    - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
 **Son Güncelleme:** 10 Ocak 2026
 

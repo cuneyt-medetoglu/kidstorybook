@@ -33,6 +33,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     theme,
     illustrationStyle,
     customRequests,
+    pageCount, // Debug: Optional page count override
     referencePhotoAnalysis, // Optional: kept for backward compatibility, but not required
     language = 'en',
     // New: Direct character features from Step 1 (optional)
@@ -65,7 +66,7 @@ ${characterDesc}
 # STORY REQUIREMENTS
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
 - Target Age: ${characterAge} years old (${ageGroup} age group)
-- Story Length: ${getPageCount(ageGroup)} pages
+- Story Length: ${getPageCount(ageGroup, pageCount)} pages
 - Language: ${language === 'tr' ? 'Turkish' : 'English'}
 - Illustration Style: ${illustrationStyle}
 
@@ -152,7 +153,12 @@ function getAgeGroup(age: number): string {
   return 'pre-teen'
 }
 
-function getPageCount(ageGroup: string): number {
+function getPageCount(ageGroup: string, override?: number): number {
+  // Debug: Allow page count override (2-20)
+  if (override !== undefined && override >= 2 && override <= 20) {
+    return override
+  }
+  
   // Fixed to 10 pages for all age groups (user request: 10 Ocak 2026)
   return 10
   
