@@ -96,6 +96,7 @@ const mockBook = {
 
 type AnimationType = "flip" | "slide" | "fade" | "curl" | "zoom" | "none"
 type AnimationSpeed = "slow" | "normal" | "fast"
+type MobileLayoutMode = "stacked" | "flip"
 
 interface BookViewerProps {
   bookId?: string
@@ -120,6 +121,8 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
   const [autoplayMode, setAutoplayMode] = useState<"off" | "tts" | "timed">("off")
   const [autoplaySpeed, setAutoplaySpeed] = useState(10) // seconds per page
   const [autoplayCountdown, setAutoplayCountdown] = useState(0)
+  const [mobileLayoutMode, setMobileLayoutMode] = useState<MobileLayoutMode>("stacked")
+  const [showTextOnMobile, setShowTextOnMobile] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -437,6 +440,11 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
       return newBookmarks
     })
   }, [currentPage])
+
+  // Toggle flip for mobile
+  const toggleFlip = useCallback(() => {
+    setShowTextOnMobile((prev) => !prev)
+  }, [])
 
   // Share function
   const handleShare = useCallback(async () => {
@@ -815,6 +823,15 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
                 <span className={cn(autoplaySpeed === 20 && "font-semibold")}>Very Slow (20s per page)</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuLabel>Mobile Layout</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setMobileLayoutMode("stacked")}>
+                <span className={cn(mobileLayoutMode === "stacked" && "font-semibold")}>Stacked (Default)</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setMobileLayoutMode("flip")}>
+                <span className={cn(mobileLayoutMode === "flip" && "font-semibold")}>Flip Mode</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuLabel>Page Animation</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setAnimationType("flip")}>
@@ -1030,7 +1047,13 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
                 filter: animationType === "curl" ? "drop-shadow(0 10px 30px rgba(0,0,0,0.2))" : undefined,
               }}
             >
-              <BookPage page={book.pages[currentPage]} isLandscape={isLandscape} />
+              <BookPage 
+                page={book.pages[currentPage]} 
+                isLandscape={isLandscape} 
+                mobileLayoutMode={mobileLayoutMode}
+                showTextOnMobile={showTextOnMobile}
+                onToggleFlip={toggleFlip}
+              />
             </motion.div>
           </AnimatePresence>
         </div>

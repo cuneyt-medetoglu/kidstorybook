@@ -1316,13 +1316,18 @@ Response: {
 - 🎉 **FAZ 3 TAMAMLANDI (%96 - MVP için %100):** MVP için gerekli tüm backend ve AI entegrasyonları tamamlandı ✅
 - 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (webhook'lar dahil)
 
-**Son Yapılanlar (15 Ocak 2026):**
+**Son Yapılanlar (16 Ocak 2026):**
 - ✅ GPT-image API entegrasyonu (`/v1/images/edits` endpoint)
 - ✅ Size selection eklendi (1024x1024, 1024x1792, 1792x1024)
 - ✅ Model selection eklendi (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
 - ✅ Reference image support (FormData ile multimodal input)
 - ✅ AI Analysis kaldırıldı (Step 2 sadece photo upload)
 - ✅ Character creation basitleştirildi (Step 1 data + photo)
+- ✅ **Kitap Görüntüleme İyileştirmeleri (12 Ocak 2026):**
+  - Desktop görsel kırpılması düzeltildi (`object-cover` → `object-contain`)
+  - Mobil flip modu eklendi (Settings'den ayarlanabilir: Stacked / Flip Mode)
+  - "Tap to read" badge ve "Back to image" butonu eklendi
+  - Detaylar: `docs/guides/BOOK_VIEWER_IMPROVEMENTS_GUIDE.md`
 - **Aktif İşler:** 
   - ✅ Story generation testi tamamlandı ✅
   - ✅ Cover prompt gösterimi eklendi ✅

@@ -31,6 +31,7 @@ docs/
 │   ├── COLOR_PALETTE.md        # Renk paleti rehberi
 │   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
 │   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
+│   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   └── ...
 │
 ├── reports/                    # Raporlar
