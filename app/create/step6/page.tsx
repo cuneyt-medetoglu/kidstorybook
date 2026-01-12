@@ -46,7 +46,7 @@ export default function Step6Page() {
   
   // Model selection
   const [storyModel, setStoryModel] = useState<string>("gpt-3.5-turbo") // Default: GPT-3.5 Turbo (Legacy)
-  // NOTE: Image model/size/quality are now hardcoded to gpt-image-1.5 / 1024x1024 / low
+  // NOTE: Image model/size/quality are now hardcoded to gpt-image-1.5 / 1024x1536 / low
   
   // Load wizard data from localStorage
   useEffect(() => {
@@ -559,7 +559,7 @@ export default function Step6Page() {
                       Image Generation:
                     </label>
                     <div className="w-full rounded border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                      <strong>gpt-image-1.5</strong> / 1024x1024 / quality: low
+                      <strong>gpt-image-1.5</strong> / 1024x1536 (portrait) / quality: low
                       <div className="mt-1 text-[10px] text-gray-500 dark:text-slate-400">
                         Production default - 5 IPM rate limit
                       </div>
@@ -862,7 +862,7 @@ export default function Step6Page() {
                             title,
                             referenceImageUrl, // Reference photo (base64 data URL)
                             useFreeCredit: false, // Test mode, don't use free credit
-                            // NOTE: model/size/quality are hardcoded in API (gpt-image-1.5 / 1024x1024 / low)
+                            // NOTE: model/size/quality are hardcoded in API (gpt-image-1.5 / 1024x1536 / low)
                           }
 
                           console.log("[Step 6] DEBUG: Testing cover generation with:", {
@@ -974,7 +974,7 @@ export default function Step6Page() {
                           pageCount: pageCount, // Debug: Optional page count override
                           language: "en" as const,
                           storyModel: storyModel, // Use debug mode selection
-                          // NOTE: imageModel/imageSize are hardcoded in API (gpt-image-1.5 / 1024x1024 / low)
+                          // NOTE: imageModel/imageSize are hardcoded in API (gpt-image-1.5 / 1024x1536 / low)
                         }
 
                         console.log("[Step 6] Creating book with data:", requestBody)

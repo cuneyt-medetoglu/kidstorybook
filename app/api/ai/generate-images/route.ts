@@ -17,7 +17,7 @@ export interface ImageGenerationRequest {
   bookId: string
   startPage?: number // For resuming failed generations
   endPage?: number   // For partial generation
-  // NOTE: model, size, quality removed - now hardcoded to gpt-image-1.5 / 1024x1024 / low
+  // NOTE: model, size, quality removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
 export interface ImageGenerationResponse {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
 
     // Image generation defaults (hardcoded - no override)
     const model = 'gpt-image-1.5'
-    const size = '1024x1024'
+    const size = '1024x1536' // Portrait orientation
     const quality = 'low'
 
     if (!bookId) {

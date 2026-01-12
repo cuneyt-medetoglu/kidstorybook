@@ -106,7 +106,7 @@
 
 ### v1.0.1 (15 Ocak 2026) - Default Kilidi + Paralel Görsel Üretimi
 - **Model:** gpt-image-1.5 (sabit - override yok)
-- **Size:** 1024x1024 (sabit)
+- **Size:** 1024x1536 (portrait - sabit)
 - **Quality:** low (sabit)
 - **Rate Limiting:** 90 saniyede max 5 görsel (Tier 1: 5 IPM)
 - **Paralel Processing:** Queue sistemi ile batch processing (5 görsel paralel)

@@ -111,7 +111,7 @@ Kullanıcı UI yapmak istediğinde şu akışı takip et:
 | UI Builder | v0.app |
 | Backend | Next.js API Routes + Supabase |
 | Database | Supabase (PostgreSQL) |
-| AI | OpenAI GPT-4o + DALL-E 3 |
+| AI | OpenAI GPT-4o + GPT-image-1.5 (1024x1536 portrait, quality: low) |
 | Ödeme | Stripe + İyzico |
 | Hosting | Vercel |
 
@@ -204,6 +204,7 @@ Kullanıcı şunları diyebilir:
 3. Mimari değişiklik → @architecture-manager'ı bilgilendir
 4. Git commit'leri kullanıcı tarafından yapılır (sen yapma)
 5. Geçici dosyalar (checklist, report, guide) → Uygun alt klasöre koy
+6. Image generation config değişiklikleri → @prompt-manager ile senkronize et
 
 ### Fikir Kaydetme Sistemi
 **Nasıl Çalışır:**
@@ -223,3 +224,31 @@ Kullanıcı şunları diyebilir:
   - İlgili Faz: Faz X
   - Notlar: Ek detaylar
 ```
+
+---
+
+## 🎨 Image Generation Configuration (15 Ocak 2026)
+
+### Production Defaults (Locked)
+- **Model:** `gpt-image-1.5` - Best quality GPT-image modeli
+- **Size:** `1024x1536` - Portrait format (kitap sayfaları için ideal)
+- **Quality:** `low` - Cost/quality balance (Tier 1 için optimize)
+- **Rate Limit:** 5 images per 90 seconds (Tier 1: 5 IPM bazlı)
+
+### Paralel Görsel Üretimi
+- **Batch Processing:** 5 görsel paralel üretimi (Promise.allSettled)
+- **Queue System:** In-memory queue implementasyonu (`lib/queue/image-generation-queue.ts`)
+- **Rate Limiting:** 90 saniye window içinde max 5 görsel
+- **Page Mapping:** Response'da page number tracking ile doğru mapping
+
+### Implementation Status
+- ✅ Model/size/quality backend'de sabit değerlerle kilitlendi (override edilemez)
+- ✅ UI'da dropdown'lar kaldırıldı, sabit değer gösteriliyor
+- ✅ Paralel batch processing implementasyonu tamamlandı
+- ✅ Queue sistemi altyapısı oluşturuldu (gelecekte Redis/Database'e geçilecek)
+- ✅ Rate limiting mekanizması aktif
+
+### Notlar
+- Gelecekte tier yükseldikçe rate limit artırılabilir
+- Dokümanlarda model referansları `gpt-image-1.5 / 1024x1536 / low` olarak güncel
+- Size değişikliği: 1024x1024 (square) → 1024x1536 (portrait) - 15 Ocak 2026

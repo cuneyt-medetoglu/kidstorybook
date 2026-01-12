@@ -12,11 +12,11 @@
 
 ## 📋 Overview
 
-Bu template, **gpt-image-1.5** (default) / **1024x1024** / **quality: low** ayarları için optimize edilmiş görsel üretim prompt'larını içerir. POC'deki detaylı prompt yapısından ilham alınarak oluşturulmuştur ve karakter tutarlılığına özel vurgu yapar.
+Bu template, **gpt-image-1.5** (default) / **1024x1536** (portrait) / **quality: low** ayarları için optimize edilmiş görsel üretim prompt'larını içerir. POC'deki detaylı prompt yapısından ilham alınarak oluşturulmuştur ve karakter tutarlılığına özel vurgu yapar.
 
 **Production Defaults (15 Ocak 2026):**
 - Model: `gpt-image-1.5`
-- Size: `1024x1024`
+- Size: `1024x1536` (portrait orientation)
 - Quality: `low`
 - Rate Limit: 5 images per 90 seconds (Tier 1: 5 IPM)
 

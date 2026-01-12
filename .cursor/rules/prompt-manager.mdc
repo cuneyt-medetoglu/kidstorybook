@@ -325,7 +325,7 @@ interface ABTestConfig {
 
 ### Default Image Model (15 Ocak 2026 - Locked)
 - **Model:** `gpt-image-1.5` (sabit - override yok)
-- **Size:** `1024x1024` (sabit)
+- **Size:** `1024x1536` (portrait - sabit)
 - **Quality:** `low` (sabit)
 - **Karar Tarihi:** 15 Ocak 2026
 - **Karar Gerekçesi:** 
@@ -336,7 +336,7 @@ interface ABTestConfig {
 
 ### Production Defaults (Locked)
 - **Model:** `gpt-image-1.5` - Best quality GPT-image modeli
-- **Size:** `1024x1024` - Square format (kitap sayfaları için ideal)
+- **Size:** `1024x1536` - Portrait format (kitap sayfaları için ideal)
 - **Quality:** `low` - Cost/quality balance (Tier 1 için optimize)
 - **Rate Limit:** 5 images per 90 seconds (Tier 1: 5 IPM bazlı)
 
@@ -350,7 +350,7 @@ interface ABTestConfig {
 - Backend'de model/size/quality sabit değerlerle kilitledi (override edilemez)
 - UI'da dropdown'lar kaldırıldı, sabit değer gösteriliyor
 - Gelecekte tier yükseldikçe rate limit artırılabilir
-- Dokümanlarda model referansları `gpt-image-1.5 / 1024x1024 / low` olarak güncel
+- Dokümanlarda model referansları `gpt-image-1.5 / 1024x1536 / low` olarak güncel
 
 ---
 

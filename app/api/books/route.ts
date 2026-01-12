@@ -35,7 +35,7 @@ export interface CreateBookRequest {
   pageCount?: number // Debug: Optional page count override (3-20)
   language?: 'en' | 'tr'
   storyModel?: string // Story generation model (default: 'gpt-3.5-turbo')
-  // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1024 / low
+  // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
 export interface CreateBookResponse {
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     // Image generation defaults (hardcoded - no override)
     const imageModel = 'gpt-image-1.5'
-    const imageSize = '1024x1024'
+    const imageSize = '1024x1536' // Portrait orientation
     const imageQuality = 'low'
 
     const themeKey = normalizeThemeKey(theme)
@@ -424,11 +424,13 @@ export async function POST(request: NextRequest) {
           formData.append('model', imageModel)
           formData.append('prompt', textPrompt)
           formData.append('size', imageSize)
+          formData.append('quality', imageQuality)
           formData.append('image', imageBlob, 'reference.png')
           
           console.log('[Create Book] 📤 FormData prepared:')
           console.log('[Create Book]   - Model:', imageModel)
           console.log('[Create Book]   - Size:', imageSize)
+          console.log('[Create Book]   - Quality:', imageQuality)
           console.log('[Create Book]   - Image blob size:', imageBlob.size, 'bytes')
           console.log('[Create Book]   - Image format: Blob (multipart/form-data)')
           console.log('[Create Book]   - Prompt included: Yes ✅')
@@ -767,6 +769,8 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`[Create Book] 🎨 Starting page images generation...`)
         console.log(`[Create Book] 📄 Total pages to generate: ${storyData.pages.length}`)
+        console.log(`[Create Book] 🚀 Using PARALLEL batch processing (5 images per 90 seconds)`)
+        console.log(`[Create Book] 📊 Model: ${imageModel} | Size: ${imageSize} | Quality: ${imageQuality}`)
 
         const pages = storyData.pages
         const totalPages = pages.length
@@ -774,11 +778,22 @@ export async function POST(request: NextRequest) {
         const characterPrompt = buildCharacterPrompt(character.description)
         const generatedImages: any[] = []
 
-      for (let i = 0; i < totalPages; i++) {
-        const page = pages[i]
-        const pageNumber = page.pageNumber || (i + 1)
+        // Process pages in batches of 5 (Tier 1: 5 IPM = 5 images per 90 seconds)
+        const BATCH_SIZE = 5
+        const RATE_LIMIT_WINDOW_MS = 90000 // 90 seconds
 
-        console.log(`[Create Book] 🖼️  Generating image for page ${pageNumber}/${totalPages}...`)
+        for (let batchStart = 0; batchStart < totalPages; batchStart += BATCH_SIZE) {
+          const batchEnd = Math.min(batchStart + BATCH_SIZE, totalPages)
+          const batchPages = pages.slice(batchStart, batchEnd)
+          
+          console.log(`[Create Book] 🔄 Processing batch ${Math.floor(batchStart / BATCH_SIZE) + 1}: pages ${batchStart + 1}-${batchEnd} (${batchPages.length} images in parallel)`)
+
+          // Process batch in parallel using Promise.allSettled
+          const batchPromises = batchPages.map(async (page, batchIndex) => {
+            const i = batchStart + batchIndex
+            const pageNumber = page.pageNumber || (i + 1)
+
+            console.log(`[Create Book] 🖼️  [BATCH] Generating image for page ${pageNumber}/${totalPages}...`)
 
         // Build prompt for this page
         const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
@@ -924,6 +939,7 @@ export async function POST(request: NextRequest) {
             console.log(`[Create Book] 🔄 Page ${pageNumber} - Falling back to /v1/images/generations (no reference image or edits failed)`)
             console.log(`[Create Book] 📋 Page ${pageNumber} - Model:`, imageModel)
             console.log(`[Create Book] 📏 Page ${pageNumber} - Size:`, imageSize)
+            console.log(`[Create Book] 🎨 Page ${pageNumber} - Quality:`, imageQuality)
             console.log(`[Create Book] 📝 Page ${pageNumber} - Prompt length:`, fullPrompt.length, 'characters')
             
             const generationsApiStartTime = Date.now()
@@ -965,7 +981,7 @@ export async function POST(request: NextRequest) {
                 console.error(`[Create Book]   Raw Error Text:`, errorText)
               }
               
-              continue // Skip this page, continue with others
+              return null // Skip this page, return null
             }
 
             console.log(`[Create Book] ✅ Page ${pageNumber} - Generations API call successful, parsing response...`)
@@ -993,6 +1009,7 @@ export async function POST(request: NextRequest) {
           console.log(`[Create Book] 🔄 Page ${pageNumber} - No reference image, calling /v1/images/generations directly`)
           console.log(`[Create Book] 📋 Page ${pageNumber} - Model:`, imageModel)
           console.log(`[Create Book] 📏 Page ${pageNumber} - Size:`, imageSize)
+          console.log(`[Create Book] 🎨 Page ${pageNumber} - Quality:`, imageQuality)
           console.log(`[Create Book] 📝 Page ${pageNumber} - Prompt length:`, fullPrompt.length, 'characters')
 
           const generationsApiStartTime = Date.now()
@@ -1024,7 +1041,7 @@ export async function POST(request: NextRequest) {
             console.error(`[Create Book]   Status:`, genResponse.status)
             console.error(`[Create Book]   Status Text:`, genResponse.statusText)
             console.error(`[Create Book]   Error Response:`, errorText)
-            continue
+            return null
           }
 
           console.log(`[Create Book] ✅ Page ${pageNumber} - Generations API call successful, parsing response...`)
@@ -1052,7 +1069,7 @@ export async function POST(request: NextRequest) {
           const totalTime = Date.now() - pageImageStartTime
           console.error(`[Create Book] ❌ Page ${pageNumber} - No image URL or b64_json returned from API`)
           console.error(`[Create Book] ⏱️  Page ${pageNumber} - Total time before failure:`, totalTime, 'ms')
-          continue
+          return null
         }
 
         const totalImageGenTime = Date.now() - pageImageStartTime
@@ -1101,7 +1118,7 @@ export async function POST(request: NextRequest) {
         if (uploadError) {
           console.error(`[Create Book] ❌ Page ${pageNumber} - Error uploading image:`, uploadError)
           console.error(`[Create Book]   Upload error details:`, JSON.stringify(uploadError, null, 2))
-          continue
+          return null
         }
 
         console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded to storage successfully`)
@@ -1116,28 +1133,46 @@ export async function POST(request: NextRequest) {
         console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded:`, storageImageUrl)
         console.log(`[Create Book] 📊 Page ${pageNumber} - Storage URL length:`, storageImageUrl?.length || 0, 'chars')
 
-        // Update page with image URL
-        pages[i].imageUrl = storageImageUrl
+            // Update page with image URL
+            const pageIndex = pages.findIndex(p => (p.pageNumber || pages.indexOf(p) + 1) === pageNumber)
+            if (pageIndex !== -1) {
+              pages[pageIndex].imageUrl = storageImageUrl
+            }
 
-        generatedImages.push({
-          pageNumber,
-          imageUrl: storageImageUrl,
-          storagePath: filePath,
-          prompt: fullPrompt,
-        })
-      }
-
-      // Collect generated images from updated pages
-      for (const page of pages) {
-        if (page.imageUrl) {
-          generatedImages.push({
-            pageNumber: page.pageNumber || pages.indexOf(page) + 1,
-            imageUrl: page.imageUrl,
-            storagePath: `books/${book.id}/page-${page.pageNumber || pages.indexOf(page) + 1}.png`,
-            prompt: '', // Prompt is already logged during generation
+            return {
+              pageNumber,
+              imageUrl: storageImageUrl,
+              storagePath: filePath,
+              prompt: fullPrompt,
+            }
           })
+
+          // Wait for all images in batch to complete (parallel processing)
+          const batchResults = await Promise.allSettled(batchPromises)
+          
+          // Collect successful results
+          for (const result of batchResults) {
+            if (result.status === 'fulfilled' && result.value) {
+              generatedImages.push(result.value)
+              const pageIndex = pages.findIndex(p => (p.pageNumber || pages.indexOf(p) + 1) === result.value.pageNumber)
+              if (pageIndex !== -1) {
+                pages[pageIndex].imageUrl = result.value.imageUrl
+              }
+            } else if (result.status === 'rejected') {
+              console.error(`[Create Book] ❌ Batch image generation failed:`, result.reason)
+            }
+          }
+
+          const successCount = batchResults.filter(r => r.status === 'fulfilled').length
+          const failCount = batchResults.filter(r => r.status === 'rejected').length
+          console.log(`[Create Book] ✅ Batch ${Math.floor(batchStart / BATCH_SIZE) + 1} completed: ${successCount}/${batchPages.length} images generated (${failCount} failed)`)
+
+          // Rate limiting: Wait 90 seconds before next batch (except for last batch)
+          if (batchEnd < totalPages) {
+            console.log(`[Create Book] ⏳ Rate limiting: Waiting 90 seconds before next batch...`)
+            await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_WINDOW_MS))
+          }
         }
-      }
 
       const totalPageImagesTime = Date.now() - startTime
       console.log(`[Create Book] ✅ Generated ${generatedImages.length}/${totalPages} page images (parallel batch processing)`)
