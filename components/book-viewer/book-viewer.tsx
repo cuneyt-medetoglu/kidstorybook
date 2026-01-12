@@ -284,6 +284,22 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
     return () => window.removeEventListener("resize", checkOrientation)
   }, [])
 
+  // Auto-enable flip mode on mobile/tablet (portrait mode)
+  useEffect(() => {
+    if (!isLandscape) {
+      // Mobile/Tablet portrait mode → auto-enable flip mode
+      setMobileLayoutMode("flip")
+    } else {
+      // Desktop landscape mode → use stacked (default)
+      setMobileLayoutMode("stacked")
+    }
+  }, [isLandscape])
+
+  // Reset showTextOnMobile when page changes (always show image first on new page)
+  useEffect(() => {
+    setShowTextOnMobile(false)
+  }, [currentPage])
+
   // Fullscreen handling
   const toggleFullscreen = useCallback(async () => {
     if (!document.fullscreenElement) {
