@@ -2,7 +2,7 @@
  * Image Generation Queue System
  * 
  * Manages parallel image generation with rate limiting
- * - Tier 1: 5 IPM (Images Per Minute) = 5 images per 90 seconds
+ * - Tier 1: 4 IPM (Images Per Minute) = 4 images per 90 seconds
  * - In-memory queue (future: Redis/Database)
  */
 
@@ -50,8 +50,8 @@ class ImageGenerationQueue {
     },
   }
 
-  // Rate limit config (Tier 1: 5 IPM)
-  private readonly MAX_REQUESTS_PER_WINDOW = 5
+  // Rate limit config (Tier 1: 4 IPM)
+  private readonly MAX_REQUESTS_PER_WINDOW = 4
   private readonly WINDOW_DURATION_MS = 90000 // 90 seconds
 
   /**
@@ -76,7 +76,7 @@ class ImageGenerationQueue {
   }
 
   /**
-   * Process next batch of images (up to 5 images in parallel)
+   * Process next batch of images (up to 4 images in parallel)
    */
   async processNextBatch(): Promise<void> {
     // Check if we can process (rate limiting)
@@ -99,8 +99,8 @@ class ImageGenerationQueue {
     console.log(`[Queue] Processing job: ${job.id} (${job.totalPages} pages)`)
 
     try {
-      // Get up to 5 pages to process in parallel
-      const pagesToProcess = job.pages.slice(0, Math.min(5, job.pages.length))
+      // Get up to 4 pages to process in parallel
+      const pagesToProcess = job.pages.slice(0, Math.min(4, job.pages.length))
       console.log(`[Queue] Processing batch of ${pagesToProcess.length} images`)
 
       // Process pages in parallel using Promise.allSettled

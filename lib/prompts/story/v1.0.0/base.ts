@@ -66,7 +66,7 @@ ${characterDesc}
 # STORY REQUIREMENTS
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
 - Target Age: ${characterAge} years old (${ageGroup} age group)
-- Story Length: ${getPageCount(ageGroup, pageCount)} pages
+- Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
 - Language: ${language === 'tr' ? 'Turkish' : 'English'}
 - Illustration Style: ${illustrationStyle}
 - Special Requests: ${customRequests || 'None'}
@@ -116,6 +116,7 @@ Return a valid JSON object with this exact structure:
       "imagePrompt": "Detailed ${illustrationStyle} illustration prompt with character consistency",
       "sceneDescription": "What's happening in this scene"
     }
+    // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
   ],
   "metadata": {
     "ageGroup": "${ageGroup}",
@@ -125,6 +126,8 @@ Return a valid JSON object with this exact structure:
   }
 }
 
+CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
+
 # CRITICAL REMINDERS
 - Character must look EXACTLY the same in every image prompt
 - ${characterName} is the hero and main character in EVERY scene
@@ -133,8 +136,9 @@ Return a valid JSON object with this exact structure:
 - NO scary, violent, or inappropriate content
 - Include subtle educational value
 - Make it engaging and memorable
+- **MOST IMPORTANT: You MUST return EXACTLY ${getPageCount(ageGroup, pageCount)} pages in the "pages" array. Count them before returning!**
 
-Generate the story now in valid JSON format.
+Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.
 `
 
   return prompt.trim()

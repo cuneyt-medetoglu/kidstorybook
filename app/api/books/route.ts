@@ -191,63 +191,108 @@ export async function POST(request: NextRequest) {
 
       console.log(`[Create Book] 🤖 Calling OpenAI for story generation (model: ${storyModel})`)
       console.log('[Create Book] ⏱️  Story request started at:', new Date().toISOString())
-      const storyReqStart = Date.now()
+      
+      // Retry mechanism for story generation (max 3 attempts)
+      const MAX_RETRIES = 3
+      // IMPORTANT: do NOT shadow the outer "storyData" variable (used later for image generation)
+      let generatedStoryData: any = null
+      let lastError: Error | null = null
+      
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          const storyReqStart = Date.now()
+          
+          // Call OpenAI with selected model
+          completion = await openai.chat.completions.create({
+            model: storyModel,
+            messages: [
+              {
+                role: 'system',
+                content:
+                  'You are a professional children\'s book author. Create engaging, age-appropriate stories with detailed image prompts. You MUST return the exact number of pages requested.',
+              },
+              {
+                role: 'user',
+                content: storyPrompt,
+              },
+            ],
+            response_format: { type: 'json_object' },
+            temperature: 0.8,
+            max_tokens: 4000,
+          })
+          const storyReqMs = Date.now() - storyReqStart
+          console.log(`[Create Book] ⏱️  Story response time (attempt ${attempt}/${MAX_RETRIES}):`, storyReqMs, 'ms')
 
-      // Call OpenAI with selected model
-      completion = await openai.chat.completions.create({
-        model: storyModel,
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are a professional children\'s book author. Create engaging, age-appropriate stories with detailed image prompts.',
-          },
-          {
-            role: 'user',
-            content: storyPrompt,
-          },
-        ],
-        response_format: { type: 'json_object' },
-        temperature: 0.8,
-        max_tokens: 4000,
-      })
-      const storyReqMs = Date.now() - storyReqStart
-      console.log('[Create Book] ⏱️  Story response time:', storyReqMs, 'ms')
+          const storyContent = completion.choices[0].message.content
+          if (!storyContent) {
+            throw new Error('No story content generated')
+          }
 
-      const storyContent = completion.choices[0].message.content
-      if (!storyContent) {
-        throw new Error('No story content generated')
-      }
+          // Parse JSON response
+          generatedStoryData = JSON.parse(storyContent)
 
-      // Parse JSON response
-      storyData = JSON.parse(storyContent)
+          // Validate Story Structure
+          if (!generatedStoryData.title || !generatedStoryData.pages || !Array.isArray(generatedStoryData.pages)) {
+            throw new Error('Invalid story structure from AI')
+          }
 
-      // Validate Story Structure
-      if (!storyData.title || !storyData.pages || !Array.isArray(storyData.pages)) {
-        throw new Error('Invalid story structure from AI')
-      }
+          // Enforce requested pageCount strictly
+          if (pageCount !== undefined && pageCount !== null) {
+            const requestedPages = Number(pageCount)
+            const returnedPages = generatedStoryData.pages.length
 
-      // Enforce requested pageCount strictly (no more than requested)
-      if (pageCount !== undefined && pageCount !== null) {
-        const requestedPages = Number(pageCount)
-        const returnedPages = storyData.pages.length
+            console.log(`[Create Book] 📏 Requested pages: ${requestedPages}, AI returned: ${returnedPages} (attempt ${attempt}/${MAX_RETRIES})`)
 
-        console.log(`[Create Book] 📏 Requested pages: ${requestedPages}, AI returned: ${returnedPages}`)
-
-        if (returnedPages > requestedPages) {
-          console.warn(`[Create Book] ⚠️  AI returned more pages than requested. Trimming to ${requestedPages} pages.`)
-          storyData.pages = storyData.pages.slice(0, requestedPages)
-        } else if (returnedPages < requestedPages) {
-          console.error(`[Create Book] ❌ AI returned fewer pages than requested (${returnedPages}/${requestedPages}). Aborting to avoid incorrect book.`)
-          throw new Error(`AI returned fewer pages than requested (${returnedPages}/${requestedPages})`)
+            if (returnedPages > requestedPages) {
+              console.warn(`[Create Book] ⚠️  AI returned more pages than requested. Trimming to ${requestedPages} pages.`)
+              generatedStoryData.pages = generatedStoryData.pages.slice(0, requestedPages)
+              break // Success - exit retry loop
+            } else if (returnedPages < requestedPages) {
+              const errorMsg = `AI returned fewer pages than requested (${returnedPages}/${requestedPages})`
+              console.error(`[Create Book] ❌ ${errorMsg} (attempt ${attempt}/${MAX_RETRIES})`)
+              
+              if (attempt < MAX_RETRIES) {
+                console.log(`[Create Book] 🔄 Retrying story generation...`)
+                lastError = new Error(errorMsg)
+                continue // Retry
+              } else {
+                // Last attempt failed
+                throw new Error(`${errorMsg} after ${MAX_RETRIES} attempts`)
+              }
+            } else {
+              // Exact match - success!
+              break // Success - exit retry loop
+            }
+          } else {
+            // No page count specified - accept whatever AI returns
+            break // Success - exit retry loop
+          }
+        } catch (error: any) {
+          lastError = error
+          console.error(`[Create Book] ❌ Story generation attempt ${attempt}/${MAX_RETRIES} failed:`, error.message)
+          
+          if (attempt < MAX_RETRIES) {
+            console.log(`[Create Book] 🔄 Retrying story generation...`)
+            // Wait a bit before retry (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
+          } else {
+            throw error // Last attempt failed, throw error
+          }
         }
-
-        // Renumber pages consistently (1..N)
-        storyData.pages = storyData.pages.map((page: any, idx: number) => ({
-          ...page,
-          pageNumber: idx + 1,
-        }))
       }
+      
+      if (!generatedStoryData) {
+        throw lastError || new Error('Failed to generate story after all retries')
+      }
+
+      // Renumber pages consistently (1..N)
+      generatedStoryData.pages = generatedStoryData.pages.map((page: any, idx: number) => ({
+        ...page,
+        pageNumber: idx + 1,
+      }))
+
+      // Assign to outer variable for downstream steps (cover + page image generation)
+      storyData = generatedStoryData
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
 
@@ -769,7 +814,7 @@ export async function POST(request: NextRequest) {
       try {
         console.log(`[Create Book] 🎨 Starting page images generation...`)
         console.log(`[Create Book] 📄 Total pages to generate: ${storyData.pages.length}`)
-        console.log(`[Create Book] 🚀 Using PARALLEL batch processing (5 images per 90 seconds)`)
+        console.log(`[Create Book] 🚀 Using PARALLEL batch processing (4 images per 90 seconds)`)
         console.log(`[Create Book] 📊 Model: ${imageModel} | Size: ${imageSize} | Quality: ${imageQuality}`)
 
         const pages = storyData.pages
@@ -778,8 +823,8 @@ export async function POST(request: NextRequest) {
         const characterPrompt = buildCharacterPrompt(character.description)
         const generatedImages: any[] = []
 
-        // Process pages in batches of 5 (Tier 1: 5 IPM = 5 images per 90 seconds)
-        const BATCH_SIZE = 5
+        // Process pages in batches of 4 (Tier 1: 4 IPM = 4 images per 90 seconds)
+        const BATCH_SIZE = 4
         const RATE_LIMIT_WINDOW_MS = 90000 // 90 seconds
 
         for (let batchStart = 0; batchStart < totalPages; batchStart += BATCH_SIZE) {

@@ -331,19 +331,19 @@ interface ABTestConfig {
 - **Karar Gerekçesi:** 
   - Kalite iyileştirmesi (`gpt-image-1-mini` → `gpt-image-1.5`)
   - Maliyet optimizasyonu (quality: low ile hız/maliyet dengesi)
-  - Rate limiting (Tier 1: 5 IPM - 90 saniyede 5 görsel)
+  - Rate limiting (Tier 1: 4 IPM - 90 saniyede 4 görsel)
 - **Önceki Default:** `gpt-image-1-mini` / variable size / no quality param
 
 ### Production Defaults (Locked)
 - **Model:** `gpt-image-1.5` - Best quality GPT-image modeli
 - **Size:** `1024x1536` - Portrait format (kitap sayfaları için ideal)
 - **Quality:** `low` - Cost/quality balance (Tier 1 için optimize)
-- **Rate Limit:** 5 images per 90 seconds (Tier 1: 5 IPM bazlı)
+- **Rate Limit:** 4 images per 90 seconds (Tier 1: 4 IPM bazlı)
 
 ### Paralel Görsel Üretimi
-- **Batch Processing:** 5 görsel paralel üretimi
+- **Batch Processing:** 4 görsel paralel üretimi
 - **Queue System:** In-memory queue (gelecekte Redis/Database'e geçilecek)
-- **Rate Limiting:** 90 saniye window içinde max 5 görsel
+- **Rate Limiting:** 90 saniye window içinde max 4 görsel
 - **Page Mapping:** Response'da page number tracking
 
 ### Model Kullanım Notları

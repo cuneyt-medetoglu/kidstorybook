@@ -233,12 +233,12 @@ Kullanıcı şunları diyebilir:
 - **Model:** `gpt-image-1.5` - Best quality GPT-image modeli
 - **Size:** `1024x1536` - Portrait format (kitap sayfaları için ideal)
 - **Quality:** `low` - Cost/quality balance (Tier 1 için optimize)
-- **Rate Limit:** 5 images per 90 seconds (Tier 1: 5 IPM bazlı)
+- **Rate Limit:** 4 images per 90 seconds (Tier 1: 4 IPM bazlı)
 
 ### Paralel Görsel Üretimi
-- **Batch Processing:** 5 görsel paralel üretimi (Promise.allSettled)
+- **Batch Processing:** 4 görsel paralel üretimi (Promise.allSettled)
 - **Queue System:** In-memory queue implementasyonu (`lib/queue/image-generation-queue.ts`)
-- **Rate Limiting:** 90 saniye window içinde max 5 görsel
+- **Rate Limiting:** 90 saniye window içinde max 4 görsel
 - **Page Mapping:** Response'da page number tracking ile doğru mapping
 
 ### Implementation Status
