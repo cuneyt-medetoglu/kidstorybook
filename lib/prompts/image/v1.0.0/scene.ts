@@ -1,10 +1,17 @@
 import type { PromptVersion } from '../../types'
+import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes } from './style-descriptions'
 
 /**
  * Scene Generation Prompts - Version 1.0.0
  * 
  * Creates detailed scene descriptions for each page
  * Works in conjunction with character prompts
+ * 
+ * Updated: 15 Ocak 2026
+ * - Enhanced with POC's detailed prompt structure
+ * - Added character consistency emphasis
+ * - Added book cover special instructions
+ * - Added 3D Animation style special notes
  */
 
 export const VERSION: PromptVersion = {
@@ -16,6 +23,10 @@ export const VERSION: PromptVersion = {
     'Scene composition rules',
     'Age-appropriate scenes',
     'Theme-based environments',
+    'Enhanced with POC detailed prompt structure (15 Ocak 2026)',
+    'Added character consistency emphasis',
+    'Added book cover special instructions',
+    'Added 3D Animation style special notes',
   ],
   author: '@prompt-manager',
 }
@@ -42,9 +53,17 @@ export function generateScenePrompt(
 ): string {
   const parts: string[] = []
 
-  // Start with illustration style and character
-  parts.push(`${illustrationStyle} illustration`)
+  // Get detailed style description (POC style - enhanced)
+  const styleDesc = getStyleDescription(illustrationStyle)
+  
+  // Start with detailed illustration style description
+  parts.push(`${styleDesc} illustration`)
+  
+  // Character with emphasis on consistency (POC style)
   parts.push(`${characterPrompt}`)
+  parts.push(`consistent character design, same character as previous pages`)
+  
+  // Character action
   parts.push(`${scene.characterAction}`)
 
   // Environment based on theme
@@ -69,11 +88,14 @@ export function generateScenePrompt(
   const composition = getCompositionRules(scene.focusPoint, scene.pageNumber)
   parts.push(composition)
 
-  // Quality and style consistency
+  // Quality and style consistency (enhanced)
   parts.push('professional children\'s book illustration')
-  parts.push('high quality')
+  parts.push('high quality, print-ready')
   parts.push('detailed but age-appropriate')
   parts.push('warm and inviting atmosphere')
+  
+  // Character consistency emphasis (POC style)
+  parts.push('character must match reference photo exactly, same features on every page')
 
   return parts.join(', ')
 }
@@ -288,14 +310,42 @@ export function generateFullPagePrompt(
   illustrationStyle: string,
   ageGroup: string
 ): string {
-  // Build scene prompt
+  // Build scene prompt (enhanced with POC style)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
   
   // Add age-appropriate rules
   const ageRules = getAgeAppropriateSceneRules(ageGroup)
   
+  // Start building prompt parts
+  const promptParts: string[] = []
+  promptParts.push(scenePrompt)
+  promptParts.push(ageRules.join(', '))
+  
+  // Special instructions for Page 1 (Book Cover) - POC style
+  if (sceneInput.pageNumber === 1) {
+    promptParts.push('BOOK COVER ILLUSTRATION (NOT a book mockup, NOT a 3D book object, NOT a book on a shelf)')
+    promptParts.push('FLAT, STANDALONE ILLUSTRATION that can be used as a book cover')
+    promptParts.push('main character prominently featured in center or foreground')
+    promptParts.push('visually striking, colorful, and appealing to children')
+    promptParts.push('professional and print-ready')
+    promptParts.push('NO TEXT, NO WRITING, NO LETTERS, NO WORDS in the image - text will be added separately as a separate layer')
+  }
+  
+  // 3D Animation style special notes (POC style)
+  if (is3DAnimationStyle(illustrationStyle)) {
+    promptParts.push(get3DAnimationNotes())
+  }
+  
+  // Additional character consistency emphasis (POC style)
+  promptParts.push('character must RESEMBLE the child in the reference photo but MUST be an ILLUSTRATION, NOT a photorealistic rendering')
+  promptParts.push('character should look like a stylized illustration that captures the child\'s features but in the chosen illustration style')
+  promptParts.push('clearly an illustration, not a photograph')
+  
+  // CRITICAL: No text in images - text will be added separately as a separate layer
+  promptParts.push('NO TEXT, NO WRITING, NO LETTERS, NO WORDS, NO TITLES in the image - text will be added separately as a separate layer')
+  
   // Combine everything
-  const fullPrompt = `${scenePrompt}, ${ageRules.join(', ')}`
+  const fullPrompt = promptParts.join(', ')
   
   return fullPrompt
 }

@@ -69,6 +69,7 @@ ${characterDesc}
 - Story Length: ${getPageCount(ageGroup, pageCount)} pages
 - Language: ${language === 'tr' ? 'Turkish' : 'English'}
 - Illustration Style: ${illustrationStyle}
+- Special Requests: ${customRequests || 'None'}
 
 # AGE-APPROPRIATE GUIDELINES
 - Vocabulary: ${getVocabularyLevel(ageGroup)}
@@ -103,8 +104,6 @@ For each page, provide:
 3. Character appearance (consistent across all pages)
 4. Setting details (colors, lighting, mood)
 5. Composition (what's in focus, perspective)
-
-${customRequests ? `\n# CUSTOM REQUESTS\n${customRequests}\n` : ''}
 
 # OUTPUT FORMAT (JSON)
 Return a valid JSON object with this exact structure:

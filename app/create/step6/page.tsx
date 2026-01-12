@@ -46,8 +46,7 @@ export default function Step6Page() {
   
   // Model selection
   const [storyModel, setStoryModel] = useState<string>("gpt-3.5-turbo") // Default: GPT-3.5 Turbo (Legacy)
-  const [imageModel, setImageModel] = useState<string>("gpt-image-1-mini") // Default: GPT-image-1-mini (Fast)
-  const [imageSize, setImageSize] = useState<string>("1024x1024") // Default: 1024x1024 (Square)
+  // NOTE: Image model/size/quality are now hardcoded to gpt-image-1.5 / 1024x1024 / low
   
   // Load wizard data from localStorage
   useEffect(() => {
@@ -540,7 +539,7 @@ export default function Step6Page() {
                 </p>
                 
                 {/* Model & Size Selection */}
-                <div className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-yellow-300 bg-white p-3 dark:border-yellow-700 dark:bg-slate-800 sm:grid-cols-3">
+                <div className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-yellow-300 bg-white p-3 dark:border-yellow-700 dark:bg-slate-800 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
                       Story Model:
@@ -557,31 +556,14 @@ export default function Step6Page() {
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
-                      Image Model:
+                      Image Generation:
                     </label>
-                    <select
-                      value={imageModel}
-                      onChange={(e) => setImageModel(e.target.value)}
-                      className="w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                    >
-                      <option value="gpt-image-1.5">GPT-image-1.5 (Best Quality)</option>
-                      <option value="gpt-image-1">GPT-image-1 (Balanced)</option>
-                      <option value="gpt-image-1-mini">GPT-image-1-mini (Fast)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-700 dark:text-slate-300">
-                      Image Size:
-                    </label>
-                    <select
-                      value={imageSize}
-                      onChange={(e) => setImageSize(e.target.value)}
-                      className="w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                    >
-                      <option value="1024x1024">1024x1024 (Square)</option>
-                      <option value="1024x1792">1024x1792 (Portrait)</option>
-                      <option value="1792x1024">1792x1024 (Landscape)</option>
-                    </select>
+                    <div className="w-full rounded border border-gray-300 bg-gray-50 px-3 py-2 text-xs text-gray-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      <strong>gpt-image-1.5</strong> / 1024x1024 / quality: low
+                      <div className="mt-1 text-[10px] text-gray-500 dark:text-slate-400">
+                        Production default - 5 IPM rate limit
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -880,8 +862,7 @@ export default function Step6Page() {
                             title,
                             referenceImageUrl, // Reference photo (base64 data URL)
                             useFreeCredit: false, // Test mode, don't use free credit
-                            model: imageModel, // GPT-image model selection
-                            size: imageSize, // Image size selection
+                            // NOTE: model/size/quality are hardcoded in API (gpt-image-1.5 / 1024x1024 / low)
                           }
 
                           console.log("[Step 6] DEBUG: Testing cover generation with:", {
@@ -993,8 +974,7 @@ export default function Step6Page() {
                           pageCount: pageCount, // Debug: Optional page count override
                           language: "en" as const,
                           storyModel: storyModel, // Use debug mode selection
-                          imageModel: imageModel, // Use debug mode selection
-                          imageSize: imageSize, // Use debug mode selection
+                          // NOTE: imageModel/imageSize are hardcoded in API (gpt-image-1.5 / 1024x1024 / low)
                         }
 
                         console.log("[Step 6] Creating book with data:", requestBody)

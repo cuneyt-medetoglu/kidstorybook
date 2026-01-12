@@ -35,8 +35,7 @@ export interface CreateBookRequest {
   pageCount?: number // Debug: Optional page count override (3-20)
   language?: 'en' | 'tr'
   storyModel?: string // Story generation model (default: 'gpt-3.5-turbo')
-  imageModel?: string // Image generation model (default: 'gpt-image-1-mini')
-  imageSize?: string // Image size (default: '1024x1024')
+  // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1024 / low
 }
 
 export interface CreateBookResponse {
@@ -83,9 +82,12 @@ export async function POST(request: NextRequest) {
       pageCount, // Debug: Optional page count override (0 or undefined = cover only)
       language = 'en',
       storyModel = 'gpt-3.5-turbo', // Default: GPT-3.5 Turbo (Legacy)
-      imageModel = 'gpt-image-1-mini', // Default: GPT-image-1-mini (Fast)
-      imageSize = '1024x1024', // Default: 1024x1024 (Square)
     } = body
+
+    // Image generation defaults (hardcoded - no override)
+    const imageModel = 'gpt-image-1.5'
+    const imageSize = '1024x1024'
+    const imageQuality = 'low'
 
     const themeKey = normalizeThemeKey(theme)
 
@@ -127,7 +129,11 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] 📝 Creating book with minimal data...')
 
       // Create book with minimal data (no story, just metadata)
+      // Use default title format (POC style - customRequests is used in story generation, not as title)
       const bookTitle = `${character.name}'s ${themeKey.charAt(0).toUpperCase() + themeKey.slice(1)} Adventure`
+      
+      console.log('[Create Book] 📝 Book title (default format):', bookTitle)
+      console.log('[Create Book] ℹ️  Note: customRequests will be used in story generation prompt (not as title)')
       
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
         character_id: characterId,
@@ -288,20 +294,48 @@ export async function POST(request: NextRequest) {
       await updateBook(supabase, book.id, { status: 'generating' })
       console.log(`[Create Book] Status updated to 'generating'`)
 
-      // Build cover generation request
-      const coverScene = `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+      // Build cover generation request using generateFullPagePrompt (POC style)
+      // Use customRequests if provided to enhance cover scene description
+      const coverSceneDescription = customRequests && customRequests.trim()
+        ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+        : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
 
-      const characterDescription = character.description
-      const textPrompt = buildDetailedCharacterPrompt(
-        characterDescription,
+      console.log('[Create Book] 📝 Cover scene description:', coverSceneDescription.substring(0, 150) + '...')
+      if (customRequests && customRequests.trim()) {
+        console.log('[Create Book] ✅ Using customRequests in cover scene:', customRequests)
+      }
+
+      // Build character prompt
+      const characterPrompt = buildCharacterPrompt(character.description)
+      
+      // Determine age group (default for cover only mode)
+      const ageGroup = isCoverOnlyMode ? 'preschool' : (storyData?.metadata?.ageGroup || 'preschool')
+      
+      // Create SceneInput for cover (Page 1)
+      const coverSceneInput = {
+        pageNumber: 1, // Cover is always page 1
+        sceneDescription: coverSceneDescription,
+        theme: themeKey,
+        mood: themeKey === 'adventure' ? 'exciting' : 
+              themeKey === 'fantasy' ? 'mysterious' :
+              themeKey === 'space' ? 'inspiring' :
+              themeKey === 'sports' ? 'exciting' :
+              'happy',
+        characterAction: 'standing prominently in the center, looking at the viewer with a sense of wonder and adventure',
+        focusPoint: 'character' as const, // Cover should focus on character
+      }
+      
+      // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
+      const textPrompt = generateFullPagePrompt(
+        characterPrompt,
+        coverSceneInput,
         illustrationStyle,
-        coverScene
+        ageGroup
       )
 
       console.log('[Create Book] 🖼️  Calling GPT-image API for cover generation...')
-      console.log('[Create Book] 📝 Cover scene description:', coverScene.substring(0, 100) + '...')
+      console.log('[Create Book] ✅ Using generateFullPagePrompt for cover generation (POC style)')
       console.log('[Create Book] 🎨 Illustration style:', illustrationStyle)
-      console.log('[Create Book] 📋 Character description keys:', Object.keys(characterDescription || {}))
       console.log('[Create Book] 📏 Final prompt length:', textPrompt.length, 'characters')
       console.log('[Create Book] 📄 Prompt preview (first 200 chars):', textPrompt.substring(0, 200) + '...')
 
@@ -317,8 +351,16 @@ export async function POST(request: NextRequest) {
       let coverImageOutputFormat: string | null = null
       let referenceImageBlobCreated = false
       let referenceImageBlobSizeBytes: number | null = null
+      let editsApiSuccess = false // Track if edits API was successful
 
       console.log('[Create Book] 📸 Reference image URL:', referenceImageUrl ? 'Provided ✅' : 'Not provided ❌')
+      if (referenceImageUrl) {
+        console.log('[Create Book] 📸 Reference image URL length:', referenceImageUrl.length, 'chars')
+        console.log('[Create Book] 📸 Reference image URL preview:', referenceImageUrl.substring(0, 100) + '...')
+        console.log('[Create Book] 🔍 Reference image will be used for /v1/images/edits API (multimodal input)')
+      } else {
+        console.log('[Create Book] ⚠️  No reference image - will use /v1/images/generations (text-only)')
+      }
 
       // Use /v1/images/edits if reference image available, otherwise /v1/images/generations
       if (referenceImageUrl) {
@@ -444,12 +486,20 @@ export async function POST(request: NextRequest) {
                 coverImageB64 = editsResult.data[0]?.b64_json || null
                 coverImageOutputFormat = editsResult.output_format || null
 
+                console.log('[Create Book] ✅ Edits API response parsed successfully')
                 console.log('[Create Book] ✅ Edits response image field:', coverImageUrl ? 'url ✅' : (coverImageB64 ? 'b64_json ✅' : 'missing ❌'))
+                
                 if (coverImageUrl) {
                   console.log('[Create Book] 🖼️  Cover image URL received (length:', coverImageUrl.length, 'chars)')
+                  editsApiSuccess = true
+                  console.log('[Create Book] ✅✅✅ /v1/images/edits API SUCCESSFUL - Reference image was used! ✅✅✅')
                 }
                 if (coverImageB64) {
-                  console.log('[Create Book] 🧩 Cover image b64 received (length:', coverImageB64.length, 'chars)')                  
+                  console.log('[Create Book] 🧩 Cover image b64 received (length:', coverImageB64.length, 'chars)')
+                  editsApiSuccess = true
+                  console.log('[Create Book] ✅✅✅ /v1/images/edits API SUCCESSFUL - Reference image was used! ✅✅✅')
+                  console.log('[Create Book] 🔍 CRITICAL: Edits API returned b64_json (not URL) - this is NORMAL and SUCCESSFUL')
+                  console.log('[Create Book] 🔍 CRITICAL: Do NOT fallback to generations API - edits API was successful!')
                 }
               } else {
                 console.error('[Create Book] ❌ Response data is missing or invalid')
@@ -474,9 +524,11 @@ export async function POST(request: NextRequest) {
           console.log('[Create Book] ⚠️  No valid image blob, skipping /v1/images/edits')
         }
 
-        // Fall back to /v1/images/generations if edits failed or no image blob
-        if (!coverImageUrl) {
-          console.log('[Create Book] 🔄 Using /v1/images/generations (no reference image)')
+        // Fall back to /v1/images/generations ONLY if edits failed AND no image blob
+        // CRITICAL: If edits API returned b64_json (even without URL), it was SUCCESSFUL - do NOT fallback!
+        if (!coverImageUrl && !coverImageB64 && !editsApiSuccess) {
+          console.log('[Create Book] 🔄 Falling back to /v1/images/generations (edits API failed or no reference image)')
+          console.log('[Create Book] ⚠️  WARNING: Reference image was NOT used - using text-only generation')
           console.log('[Create Book] 📋 Model:', imageModel)
           console.log('[Create Book] 📏 Size:', imageSize)
           console.log('[Create Book] 📝 Prompt length:', textPrompt.length, 'characters')
@@ -626,6 +678,13 @@ export async function POST(request: NextRequest) {
 
       console.log('[Create Book] ✅ Cover image generated successfully')
       console.log('[Create Book] 🖼️  Cover image field:', coverImageUrl ? 'url ✅' : 'b64_json ✅')
+      if (editsApiSuccess) {
+        console.log('[Create Book] ✅✅✅ SUCCESS: Reference image was used via /v1/images/edits API ✅✅✅')
+      } else if (referenceImageUrl) {
+        console.log('[Create Book] ⚠️  WARNING: Reference image was provided but edits API was not used')
+      } else {
+        console.log('[Create Book] ℹ️  INFO: No reference image provided - used text-only generation')
+      }
 
       // Download and upload to Supabase Storage
       let uploadBytes: ArrayBuffer | Buffer
@@ -818,6 +877,7 @@ export async function POST(request: NextRequest) {
             formData.append('model', imageModel)
             formData.append('prompt', fullPrompt)
             formData.append('size', imageSize)
+            formData.append('quality', imageQuality)
             formData.append('image', imageBlob, 'reference.png')
 
             const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
@@ -881,6 +941,7 @@ export async function POST(request: NextRequest) {
                 prompt: fullPrompt,
                 n: 1,
                 size: imageSize,
+                quality: imageQuality,
                 // Note: GPT-image API doesn't support response_format parameter
               }),
             })
@@ -949,6 +1010,7 @@ export async function POST(request: NextRequest) {
               prompt: fullPrompt,
               n: 1,
               size: imageSize,
+              quality: imageQuality,
             }),
           })
 
@@ -1065,8 +1127,20 @@ export async function POST(request: NextRequest) {
         })
       }
 
+      // Collect generated images from updated pages
+      for (const page of pages) {
+        if (page.imageUrl) {
+          generatedImages.push({
+            pageNumber: page.pageNumber || pages.indexOf(page) + 1,
+            imageUrl: page.imageUrl,
+            storagePath: `books/${book.id}/page-${page.pageNumber || pages.indexOf(page) + 1}.png`,
+            prompt: '', // Prompt is already logged during generation
+          })
+        }
+      }
+
       const totalPageImagesTime = Date.now() - startTime
-      console.log(`[Create Book] ✅ Generated ${generatedImages.length}/${totalPages} page images`)
+      console.log(`[Create Book] ✅ Generated ${generatedImages.length}/${totalPages} page images (parallel batch processing)`)
       console.log(`[Create Book] ⏱️  Total page images generation time:`, totalPageImagesTime, 'ms')
       console.log(`[Create Book] 📊 Average time per page:`, Math.round(totalPageImagesTime / totalPages), 'ms')
       console.log(`[Create Book] 📦 Generated images data:`, generatedImages.map(img => ({

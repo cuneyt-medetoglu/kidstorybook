@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { getCharacterById } from '@/lib/db/characters'
-import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { buildCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
 import { generateFullPagePrompt } from '@/lib/prompts/image/v1.0.0/scene'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 
@@ -17,8 +17,7 @@ export interface ImageGenerationRequest {
   bookId: string
   startPage?: number // For resuming failed generations
   endPage?: number   // For partial generation
-  model?: string     // gpt-image-1.5, gpt-image-1, gpt-image-1-mini
-  size?: string      // 1024x1024, 1024x1792, 1792x1024
+  // NOTE: model, size, quality removed - now hardcoded to gpt-image-1.5 / 1024x1024 / low
 }
 
 export interface ImageGenerationResponse {
@@ -57,7 +56,12 @@ export async function POST(request: NextRequest) {
     // 2. PARSE & VALIDATE REQUEST
     // ====================================================================
     const body: ImageGenerationRequest = await request.json()
-    const { bookId, startPage = 1, endPage, model = 'gpt-image-1', size = '1024x1024' } = body
+    const { bookId, startPage = 1, endPage } = body
+
+    // Image generation defaults (hardcoded - no override)
+    const model = 'gpt-image-1.5'
+    const size = '1024x1024'
+    const quality = 'low'
 
     if (!bookId) {
       return errorResponse('Missing required field: bookId', 400)
@@ -103,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[Image Generation] Starting generation for book ${bookId}`)
     console.log(`[Image Generation] Pages: ${startPage}-${actualEndPage} of ${totalPages}`)
-    console.log(`[Image Generation] Model: ${model}`)
+    console.log(`[Image Generation] Model: ${model} | Size: ${size} | Quality: ${quality}`)
     console.log(`[Image Generation] Character: ${character.name} (${character.id})`)
 
     // ====================================================================
@@ -124,6 +128,15 @@ export async function POST(request: NextRequest) {
     // Get reference photo URL if available
     const referenceImageUrl = character.reference_photo_url || null
 
+    // Build character prompt once (used for all pages)
+    const characterPrompt = buildCharacterPrompt(character.description)
+    
+    // Get age group from book metadata or default
+    const ageGroup = book.story_data?.metadata?.ageGroup || book.age_group || 'preschool'
+    
+    // Get theme key from book
+    const themeKey = book.theme || 'adventure'
+
     for (let i = startPage - 1; i < actualEndPage; i++) {
       const page = pages[i]
       const pageNumber = page.pageNumber
@@ -131,16 +144,41 @@ export async function POST(request: NextRequest) {
       console.log(`[Image Generation] Generating image for page ${pageNumber}/${totalPages}`)
 
       // Build prompt for this page
-      const characterDescription = character.description
       const illustrationStyle = book.illustration_style
-      const sceneDescription = page.imagePrompt || page.text
-
-      const fullPrompt = generateFullPagePrompt(
-        characterDescription,
-        illustrationStyle,
-        sceneDescription,
+      const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
+      
+      // Extract character action from page text
+      const characterAction = page.text || sceneDescription
+      
+      // Determine focus point (first page = character focus, last page = balanced, others = balanced)
+      const focusPoint: 'character' | 'environment' | 'balanced' = 
+        pageNumber === 1 ? 'character' : 
+        pageNumber === totalPages ? 'balanced' : 
+        'balanced'
+      
+      // Determine mood from theme or use default
+      const mood = themeKey === 'adventure' ? 'exciting' :
+                   themeKey === 'fantasy' ? 'mysterious' :
+                   themeKey === 'space' ? 'inspiring' :
+                   themeKey === 'sports' ? 'exciting' :
+                   'happy'
+      
+      // Create SceneInput object for generateFullPagePrompt
+      const sceneInput = {
         pageNumber,
-        totalPages
+        sceneDescription,
+        theme: themeKey,
+        mood,
+        characterAction,
+        focusPoint,
+      }
+
+      // Generate full page prompt with correct parameters
+      const fullPrompt = generateFullPagePrompt(
+        characterPrompt,
+        sceneInput,
+        illustrationStyle,
+        ageGroup
       )
 
       console.log(`[Image Generation] Page ${pageNumber} prompt:`, fullPrompt.substring(0, 200) + '...')
@@ -174,9 +212,10 @@ export async function POST(request: NextRequest) {
       // This endpoint supports text prompt + reference image (multimodal)
       
       const formData = new FormData()
-      formData.append('model', model) // gpt-image-1.5, gpt-image-1, gpt-image-1-mini
+      formData.append('model', model)
       formData.append('prompt', fullPrompt)
-      formData.append('size', size) // 1024x1024, 1024x1792, 1792x1024
+      formData.append('size', size)
+      formData.append('quality', quality)
       
       // Add reference image if available
       if (referenceImageUrl) {
@@ -211,10 +250,11 @@ export async function POST(request: NextRequest) {
               'Authorization': `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-              model: model,
+              model,
               prompt: fullPrompt,
               n: 1,
-              size: size, // Use provided size parameter
+              size,
+              quality,
               // NOTE: response_format is NOT supported for GPT-image models
               // Response always returns URL format by default
             })
