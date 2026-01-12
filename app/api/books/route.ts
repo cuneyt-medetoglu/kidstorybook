@@ -812,10 +812,12 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] ✅ Cover only book cover generated (status: generating - no content yet)')
     } else {
       try {
+        const pageImagesStartTime = Date.now()
         console.log(`[Create Book] 🎨 Starting page images generation...`)
         console.log(`[Create Book] 📄 Total pages to generate: ${storyData.pages.length}`)
         console.log(`[Create Book] 🚀 Using PARALLEL batch processing (4 images per 90 seconds)`)
         console.log(`[Create Book] 📊 Model: ${imageModel} | Size: ${imageSize} | Quality: ${imageQuality}`)
+        console.log(`[Create Book] ⏱️  Page images generation started at: ${new Date().toISOString()}`)
 
         const pages = storyData.pages
         const totalPages = pages.length
@@ -1219,10 +1221,14 @@ export async function POST(request: NextRequest) {
           }
         }
 
-      const totalPageImagesTime = Date.now() - startTime
+      const totalPageImagesTime = Date.now() - pageImagesStartTime
+      const totalPageImagesTimeSeconds = Math.round(totalPageImagesTime / 1000)
+      const totalPageImagesTimeMinutes = Math.floor(totalPageImagesTimeSeconds / 60)
+      const remainingSeconds = totalPageImagesTimeSeconds % 60
+      
       console.log(`[Create Book] ✅ Generated ${generatedImages.length}/${totalPages} page images (parallel batch processing)`)
-      console.log(`[Create Book] ⏱️  Total page images generation time:`, totalPageImagesTime, 'ms')
-      console.log(`[Create Book] 📊 Average time per page:`, Math.round(totalPageImagesTime / totalPages), 'ms')
+      console.log(`[Create Book] ⏱️  Total page images generation time: ${totalPageImagesTime}ms (${totalPageImagesTimeMinutes}m ${remainingSeconds}s)`)
+      console.log(`[Create Book] 📊 Average time per page: ${Math.round(totalPageImagesTime / totalPages)}ms (${(totalPageImagesTime / totalPages / 1000).toFixed(1)}s)`)
       console.log(`[Create Book] 📦 Generated images data:`, generatedImages.map(img => ({
         pageNumber: img.pageNumber,
         hasImageUrl: !!img.imageUrl,
