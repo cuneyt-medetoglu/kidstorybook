@@ -383,6 +383,19 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] 🎨 Illustration style:', illustrationStyle)
       console.log('[Create Book] 📏 Final prompt length:', textPrompt.length, 'characters')
       console.log('[Create Book] 📄 Prompt preview (first 200 chars):', textPrompt.substring(0, 200) + '...')
+      
+      // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
+      const hasClothingDirective = textPrompt.toLowerCase().includes('clothing') || 
+                                   textPrompt.toLowerCase().includes('wear') ||
+                                   textPrompt.toLowerCase().includes('outdoor') ||
+                                   textPrompt.toLowerCase().includes('casual')
+      const hasFormalWearWarning = textPrompt.toLowerCase().includes('formal') ||
+                                   textPrompt.toLowerCase().includes('suits') ||
+                                   textPrompt.toLowerCase().includes('dress shoes')
+      console.log('[Create Book] 👔 Cover clothing directive:', hasClothingDirective ? '✅ Found' : '⚠️ Missing')
+      if (hasFormalWearWarning) {
+        console.log('[Create Book] 👔 Cover formal wear warning: ✅ Found (good - prevents formal wear)')
+      }
 
       // Call GPT-image API (text-to-image via /v1/images/generations)
       const apiKey = process.env.OPENAI_API_KEY
@@ -894,6 +907,19 @@ export async function POST(request: NextRequest) {
         console.log(`[Create Book] 📝 Page ${pageNumber} prompt (first 200 chars):`, fullPrompt.substring(0, 200) + '...')
         console.log(`[Create Book] 📏 Page ${pageNumber} prompt length:`, fullPrompt.length, 'characters')
         console.log(`[Create Book] 🎨 Page ${pageNumber} illustration style in prompt:`, illustrationStyle)
+        
+        // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
+        const hasClothingDirective = fullPrompt.toLowerCase().includes('clothing') || 
+                                     fullPrompt.toLowerCase().includes('wear') ||
+                                     fullPrompt.toLowerCase().includes('outdoor') ||
+                                     fullPrompt.toLowerCase().includes('casual')
+        const hasFormalWearWarning = fullPrompt.toLowerCase().includes('formal') ||
+                                     fullPrompt.toLowerCase().includes('suits') ||
+                                     fullPrompt.toLowerCase().includes('dress shoes')
+        console.log(`[Create Book] 👔 Page ${pageNumber} clothing directive: ${hasClothingDirective ? '✅ Found' : '⚠️ Missing'}`)
+        if (hasFormalWearWarning) {
+          console.log(`[Create Book] 👔 Page ${pageNumber} formal wear warning: ✅ Found (good - prevents formal wear)`)
+        }
 
         // Call GPT-image API
         const apiKey = process.env.OPENAI_API_KEY

@@ -156,6 +156,49 @@ export async function POST(request: NextRequest) {
     }
 
     // ====================================================================
+    // 6.1. LOG: Word Count Analysis (NEW: 15 Ocak 2026 - Quality Check)
+    // ====================================================================
+    console.log('[Story Generation] 📊 WORD COUNT ANALYSIS:')
+    const ageGroup = storyData.metadata?.ageGroup || 'preschool'
+    const expectedWordCount = ageGroup === 'toddler' ? '35-45' : 
+                             ageGroup === 'preschool' ? '50-70' :
+                             ageGroup === 'early-elementary' ? '80-100' : '110-130'
+    
+    storyData.pages.forEach((page: any, index: number) => {
+      const wordCount = page.text ? page.text.split(/\s+/).length : 0
+      const pageNum = page.pageNumber || index + 1
+      const isTooShort = (ageGroup === 'toddler' && wordCount < 35) ||
+                        (ageGroup === 'preschool' && wordCount < 50) ||
+                        (ageGroup === 'early-elementary' && wordCount < 80) ||
+                        (ageGroup === 'elementary' && wordCount < 110)
+      
+      console.log(`  Page ${pageNum}: ${wordCount} words (target: ${expectedWordCount} avg)${isTooShort ? ' ⚠️ TOO SHORT!' : ' ✓'}`)
+    })
+    
+    const avgWordCount = storyData.pages.reduce((sum: number, page: any) => {
+      return sum + (page.text ? page.text.split(/\s+/).length : 0)
+    }, 0) / storyData.pages.length
+    console.log(`  Average: ${avgWordCount.toFixed(1)} words per page (target: ${expectedWordCount})`)
+    
+    // ====================================================================
+    // 6.2. LOG: Theme & Clothing Style (NEW: 15 Ocak 2026 - Quality Check)
+    // ====================================================================
+    console.log('[Story Generation] 👔 THEME & CLOTHING ANALYSIS:')
+    console.log(`  Theme: ${theme}`)
+    const themeClothingMap: Record<string, string> = {
+      adventure: 'comfortable outdoor clothing',
+      sports: 'sportswear',
+      fantasy: 'fantasy-appropriate casual clothing',
+      animals: 'casual comfortable clothing for nature/outdoors',
+      'daily-life': 'everyday casual clothing',
+      space: 'space/exploration-appropriate clothing',
+      underwater: 'swimwear or beach-appropriate clothing',
+    }
+    const expectedClothing = themeClothingMap[theme] || 'age-appropriate casual clothing'
+    console.log(`  Expected clothing: ${expectedClothing}`)
+    console.log(`  ✅ Clothing style directives added to prompt`)
+
+    // ====================================================================
     // 7. Save to Database
     // ====================================================================
     const { data: book, error: bookError } = await supabase

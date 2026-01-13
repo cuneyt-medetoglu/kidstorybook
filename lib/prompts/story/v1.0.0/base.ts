@@ -89,37 +89,47 @@ Setting: ${themeConfig.setting}
 Include: ${themeConfig.commonElements.join(', ')}
 Mood: ${themeConfig.mood}, warm, inviting
 Educational Focus: ${getEducationalFocus(ageGroup, theme)}
+Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
+
+CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle || 'age-appropriate casual clothing'} throughout the story. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding"). Clothing must be appropriate for the theme and setting (e.g., camping → outdoor/casual clothes, NOT formal wear).
 
 # WRITING STYLE REQUIREMENTS (CRITICAL - NEW: 15 Ocak 2026)
+
+**TEXT LENGTH REQUIREMENT:** Each page MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE). This means detailed, rich text - NOT short, simple sentences.
+
 1. **Include dialogue between characters** (use quotation marks)
    - Characters should talk to each other naturally
    - Include character actions with dialogue (e.g., "Look!" ${characterName} said, pointing)
    - Use dialogue to show personality and emotions
    - Balance dialogue with descriptive narration
+   - **Dialogue adds length and richness - use it!**
    
 2. **Describe emotions and feelings**
    - Show character's internal thoughts and emotional responses
    - Use sensory details (what they see, hear, feel)
    - Example: "${characterName} felt proud and warm, even as the evening air grew cooler"
+   - **Detailed emotions add word count - be descriptive!**
    
 3. **Use descriptive language for atmosphere and setting**
    - Paint a vivid picture with words
    - Describe lighting, colors, textures, sounds
    - Create immersive scenes
-   - Example: "As the sun began to set, the sky turned orange and pink and purple"
+   - Example: "As the sun began to set, the sky turned orange and pink and purple, painting everything with magical colors"
+   - **Atmospheric descriptions are essential for reaching ${getWordCount(ageGroup)} words**
    
 4. **Show, don't just tell**
-   - Instead of: "${characterName} went to the forest"
-   - Write: "As ${characterName} stepped into the forest, sunlight filtered through the leaves, creating dancing shadows on the path ahead"
+   - **BAD (TOO SHORT):** "${characterName} went to the forest. She saw trash. She cleaned it." (3 sentences, ~15 words - TOO SHORT!)
+   - **GOOD (${getWordCount(ageGroup)} words):** "As ${characterName} stepped into the forest, sunlight filtered through the leaves, creating dancing shadows on the path ahead. The air smelled fresh and earthy. 'Look at all these beautiful flowers!' ${characterName} said, pointing at the colorful wildflowers. But then she noticed something that made her stop. 'Oh no,' she said softly, her smile fading. Scattered among the beautiful flowers were candy wrappers and plastic bottles. Her heart sank. 'Someone left trash here. The flowers look sad.' She knelt down to look closer, wanting to help."
    
-5. **Page structure** (each page should include):
-   - Opening description (setting the scene atmospherically)
-   - Character action or dialogue
-   - Emotional response or internal thought
-   - Transition or scene continuation
+5. **Page structure** (each page should include ALL of these to reach ${getWordCount(ageGroup)} words):
+   - Opening description (setting the scene atmospherically - 2-3 sentences)
+   - Character action or dialogue (2-3 sentences with dialogue)
+   - Emotional response or internal thought (1-2 sentences)
+   - Transition or scene continuation (1-2 sentences)
+   - **Total: 6-10 sentences per page = ${getWordCount(ageGroup)} words**
    
-6. **Example of quality writing**:
-   "${characterName} couldn't believe what she saw. The egg was much larger than expected, glowing with soft golden light. She carefully approached it, her heart beating with excitement and a little bit of fear. 'Should we touch it?' Mom asked, staying close. ${characterName} reached out slowly, her fingers trembling with wonder."
+6. **Example of quality writing (${getWordCount(ageGroup)} words):**
+   "${characterName} couldn't believe what she saw. The egg was much larger than expected, glowing with soft golden light that seemed to pulse gently. She carefully approached it, her heart beating with excitement and a little bit of fear. The air around the egg felt warm and tingly. 'Should we touch it?' Mom asked, staying close to ${characterName}. ${characterName} reached out slowly, her fingers trembling slightly. 'I think... I think it wants us to,' she whispered, her eyes wide with wonder."
 
 # SAFETY RULES (CRITICAL - MUST FOLLOW)
 ## MUST INCLUDE:
@@ -143,7 +153,7 @@ Return a valid JSON object with this exact structure:
   "pages": [
     {
       "pageNumber": 1,
-      "text": "Page text (age-appropriate, ${getWordCount(ageGroup)} words)",
+      "text": "Page text (CRITICAL: Must be ${getWordCount(ageGroup)} words - this is the AVERAGE, write detailed text with dialogue and descriptions)",
       "imagePrompt": "Detailed ${illustrationStyle} illustration prompt with character consistency",
       "sceneDescription": "What's happening in this scene"
     }
@@ -160,8 +170,26 @@ Return a valid JSON object with this exact structure:
 CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
 
 # CRITICAL REMINDERS
+
+## TEXT LENGTH (VERY IMPORTANT):
+- **Each page text MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE)**
+- **DO NOT write short, simple sentences like "Lisa went to forest. She saw trash. She cleaned it."**
+- **INSTEAD, write detailed, rich text with:**
+  - Dialogue between characters (use quotation marks)
+  - Atmospheric descriptions (setting the scene)
+  - Character emotions and feelings
+  - Sensory details (what they see, hear, feel)
+  - Multiple sentences per page (NOT just 2-3 sentences)
+- **Example of GOOD text (${getWordCount(ageGroup)} words):**
+  "As ${characterName} stepped into the forest, sunlight filtered through the tall trees, creating a magical atmosphere. She noticed something that made her stop. 'Oh no,' ${characterName} said softly, her smile fading. Scattered among the beautiful flowers were candy wrappers and plastic bottles. Her heart sank. 'Someone left trash here. The flowers look sad.' She knelt down to look closer, wanting to help."
+- **Example of BAD text (TOO SHORT - DO NOT DO THIS):**
+  "${characterName} went to forest. She saw trash. She cleaned it."
+- **Target: ${getWordCount(ageGroup)} words per page - write DETAILED, DESCRIPTIVE text with dialogue and atmosphere**
+
+## CHARACTER & STORY:
 - Character must look EXACTLY the same in every image prompt
 - ${characterName} is the hero and main character in EVERY scene
+- Character must wear ${themeConfig.clothingStyle || 'theme-appropriate casual clothing'} (NOT formal wear like suits, ties, dress shoes)
 - Keep it positive, fun, and inspiring
 - Age-appropriate vocabulary and concepts
 - NO scary, violent, or inappropriate content
@@ -300,42 +328,49 @@ function getThemeConfig(theme: string) {
       mood: 'exciting',
       setting: 'outdoor exploration (forest, mountain, beach)',
       commonElements: ['discovery', 'nature', 'exploration', 'teamwork'],
+      clothingStyle: 'comfortable outdoor clothing appropriate for adventure (casual pants/shorts, t-shirts, sneakers, outdoor gear)',
     },
     sports: {
       name: 'Sports & Activities',
       mood: 'exciting',
       setting: 'playground, sports field, or indoor activity space',
       commonElements: ['movement', 'teamwork', 'practice', 'friendly competition', 'having fun'],
+      clothingStyle: 'sportswear (athletic clothes, sports shoes, comfortable activewear)',
     },
     fantasy: {
       name: 'Fantasy',
       mood: 'magical',
       setting: 'magical world or enchanted place',
       commonElements: ['magic', 'wonder', 'imagination', 'friendly creatures'],
+      clothingStyle: 'fantasy-appropriate clothing (adventure-style casual, magical themes, not formal)',
     },
     animals: {
       name: 'Animals',
       mood: 'fun',
       setting: 'farm, zoo, or natural habitat',
       commonElements: ['animal friends', 'nature', 'care', 'learning'],
+      clothingStyle: 'casual comfortable clothing appropriate for nature/outdoors (jeans, t-shirts, casual shoes)',
     },
     'daily-life': {
       name: 'Daily Life',
       mood: 'relatable',
       setting: 'home, school, or neighborhood',
       commonElements: ['family', 'friends', 'everyday activities', 'growth'],
+      clothingStyle: 'everyday casual clothing (normal kids clothes, casual outfits)',
     },
     space: {
       name: 'Space',
       mood: 'inspiring',
       setting: 'space, planets, or stars',
       commonElements: ['exploration', 'discovery', 'wonder', 'science'],
+      clothingStyle: 'space/exploration-appropriate clothing (casual futuristic style, comfortable adventure clothes)',
     },
     underwater: {
       name: 'Underwater',
       mood: 'mysterious',
       setting: 'ocean, sea, or underwater world',
       commonElements: ['sea creatures', 'exploration', 'discovery', 'beauty'],
+      clothingStyle: 'swimwear or beach-appropriate clothing (swimsuit, beach clothes, casual summer wear)',
     },
   }
   

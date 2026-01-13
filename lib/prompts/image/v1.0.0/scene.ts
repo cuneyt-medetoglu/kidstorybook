@@ -420,6 +420,34 @@ export function getAgeAppropriateSceneRules(ageGroup: string): string[] {
 }
 
 // ============================================================================
+// Theme-Appropriate Clothing (NEW: 15 Ocak 2026)
+// ============================================================================
+
+/**
+ * Returns theme-appropriate clothing description
+ * Ensures clothing matches story theme (camping → casual outdoor, NOT formal)
+ */
+function getThemeAppropriateClothing(theme: string): string {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
+  const clothingStyles: Record<string, string> = {
+    adventure: 'comfortable outdoor clothing (casual pants/shorts, t-shirts, sneakers, outdoor gear)',
+    sports: 'sportswear (athletic clothes, sports shoes, comfortable activewear)',
+    fantasy: 'fantasy-appropriate casual clothing (adventure-style, not formal)',
+    animals: 'casual comfortable clothing for nature/outdoors (jeans, t-shirts, casual shoes)',
+    'daily-life': 'everyday casual clothing (normal kids clothes, casual outfits)',
+    space: 'space/exploration-appropriate clothing (casual futuristic style, comfortable adventure clothes)',
+    underwater: 'swimwear or beach-appropriate clothing (swimsuit, beach clothes, casual summer wear)',
+  }
+
+  return clothingStyles[normalizedTheme] || 'age-appropriate casual clothing'
+}
+
+// ============================================================================
 // CHARACTER CLOTHING CONSISTENCY (NEW: 15 Ocak 2026)
 // ============================================================================
 
@@ -549,11 +577,19 @@ export function generateFullPagePrompt(
   promptParts.push('character should look like a stylized illustration that captures the child\'s features but in the chosen illustration style')
   promptParts.push('clearly an illustration, not a photograph')
   
-  // CLOTHING CONSISTENCY (NEW: 15 Ocak 2026)
-  if (sceneInput.pageNumber > 1) {
-    promptParts.push('CHARACTER CLOTHING CONSISTENCY: If the story does NOT mention clothing change, character must wear the SAME clothing as previous pages')
+  // CLOTHING CONSISTENCY & THEME APPROPRIATENESS (ENHANCED: 15 Ocak 2026)
+  const themeClothingStyle = getThemeAppropriateClothing(sceneInput.theme)
+  if (sceneInput.pageNumber === 1) {
+    // First page: Use theme-appropriate clothing
+    promptParts.push(`CHARACTER CLOTHING: Character must wear ${themeClothingStyle} - appropriate for ${sceneInput.theme} theme`)
+    promptParts.push('DO NOT use formal wear (suits, ties, dress shoes, formal dresses) unless explicitly required by story')
+    promptParts.push('Clothing must match the theme and setting (e.g., camping → casual outdoor clothes, sports → sportswear)')
+  } else {
+    // Subsequent pages: Maintain consistency AND theme-appropriateness
+    promptParts.push(`CHARACTER CLOTHING CONSISTENCY: Character must wear the SAME clothing as previous pages, maintaining ${themeClothingStyle}`)
     promptParts.push('Only change clothing if story specifically mentions it (e.g., "changed into pajamas", "put on jacket")')
     promptParts.push('Maintain exact same outfit (colors, style, details) throughout story unless explicitly changed in narrative')
+    promptParts.push('DO NOT use formal wear - keep clothing theme-appropriate and casual')
   }
   
   // ANATOMICAL CORRECTNESS (NEW: 15 Ocak 2026 - CRITICAL)
