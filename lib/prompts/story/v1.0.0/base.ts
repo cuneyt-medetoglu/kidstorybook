@@ -21,6 +21,10 @@ export const VERSION: PromptVersion = {
     'Safety filters implemented',
     'Educational themes integrated',
     'Image prompt generation included',
+    '8 language support added (tr, en, de, fr, es, zh, pt, ru) - 24 Ocak 2026',
+    'Strong language enforcement directives added - 24 Ocak 2026',
+    'Language mixing prevention (no English words in non-English stories) - 24 Ocak 2026',
+    'Final language check mechanism added - 24 Ocak 2026',
   ],
   author: '@prompt-manager',
 }

@@ -202,6 +202,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [ ] Seçilen karakter bilgisi localStorage'a kaydet
     - [ ] Empty state (karakter yoksa mevcut flow devam eder)
 - [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi
+  - ✅ **Dil Seçimi Özelliği Eklendi (24 Ocak 2026):** Step 3'e dil seçimi bölümü eklendi
+  - ✅ 8 dil desteği: Türkçe (tr), İngilizce (en), Almanca (de), Fransızca (fr), İspanyolca (es), Çince (zh), Portekizce (pt), Rusça (ru)
+  - ✅ Dil seçimi UI kartları eklendi (2x4 grid layout)
+  - ✅ Form validation'a dil seçimi eklendi
+  - ✅ localStorage'a dil bilgisi kaydediliyor
+  - ✅ Step 6'da dil bilgisi review'da gösteriliyor
+  - ✅ Book creation request'inde dil parametresi gönderiliyor
+  - ✅ **Dil Karışıklığı Sorunu Çözüldü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi, İngilizce kelime kullanımı yasaklandı
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
@@ -217,6 +225,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ✅ Test Story Generation düzeltildi (mock ID kontrolü, otomatik karakter oluşturma)
   - ✅ API endpoint'ine skipOpenAI desteği eklendi (mock analysis için)
   - ✅ Sayfa sayısı 10'a sabitlendi (tüm yaş grupları için)
+  - ✅ **Dil Seçimi Özelliği (24 Ocak 2026):** Step 3'e dil seçimi eklendi, 8 dil desteği (tr, en, de, fr, es, zh, pt, ru)
+  - ✅ **Dil Karışıklığı Çözümü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
   - ✅ Model selection eklendi (GPT-4o/4o-mini/3.5-turbo for story, GPT-image-1.5/1/1-mini for cover)
   - ✅ Size selection eklendi (1024x1024, 1024x1792, 1792x1024)
   - ✅ Storage RLS policy düzeltildi (user_id/covers/ folder structure)
@@ -408,6 +418,13 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 3.5 AI Entegrasyonu ✅
 - [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
 - [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
+  - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça
+  - ✅ **Dil Karışıklığı Çözümü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
+    - "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi
+    - "ONLY use [language] words" direktifi
+    - "DO NOT use ANY English words" yasağı
+    - Final check mekanizması eklendi
+    - System message'a dil talimatı eklendi
 - [x] **3.5.3** Image Generation Prompts v1.0.0 - ✅ Character consistency, scene generation, negative prompts
 - [x] **3.5.4** Character Consistency System - ✅ Master Character concept, multi-book tutarlılığı
 - [x] **3.5.5** `POST /api/ai/generate-story` - Hikaye üret - ✅ GPT-4o entegrasyonu, Master Character kullanımı
@@ -868,6 +885,40 @@ Requirements:
     - Detaylı analiz: `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md`
   - **Aksiyon:** Test edildi, çalışıyor
 
+### Dil Seçimi Özelliği (24 Ocak 2026)
+- [x] **Dil Seçimi Özelliği** - Hikaye oluşturma akışına dil seçimi eklendi
+  - **Tarih:** 24 Ocak 2026
+  - **Kategori:** MVP
+  - **Öncelik:** 🔴 Kritik
+  - **İlgili Fazlar:** Faz 2.4.3 (Step 3), Faz 3.5 (AI Entegrasyonu)
+  - **Açıklama:**
+    - Step 3'e dil seçimi bölümü eklendi (tema ve yaş grubundan sonra)
+    - 8 dil desteği: Türkçe (tr), İngilizce (en), Almanca (de), Fransızca (fr), İspanyolca (es), Çince (zh), Portekizce (pt), Rusça (ru)
+    - Dil seçimi UI kartları eklendi (2x4 grid layout, responsive)
+    - Form validation'a dil seçimi eklendi
+    - localStorage'a dil bilgisi kaydediliyor
+    - Step 6'da dil bilgisi review'da gösteriliyor
+    - Book creation request'inde dil parametresi gönderiliyor
+  - **Dil Karışıklığı Çözümü (24 Ocak 2026):**
+    - Prompt'lara güçlü dil talimatları eklendi
+    - "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi
+    - "ONLY use [language] words" direktifi
+    - "DO NOT use ANY English words" yasağı
+    - Final check mekanizması eklendi
+    - System message'a dil talimatı eklendi (API route'larda)
+    - İngilizce kelime kullanımı yasaklandı
+  - **Gelecek Geliştirmeler:**
+    - Site dili algılama: Gelecekte site dili (i18n) sistemi eklendiğinde, default dil seçimi site diline göre yapılabilir
+    - Daha fazla dil: İleride daha fazla dil eklenebilir (sadece prompt ve UI güncellemesi gerekir)
+  - **Implementasyon:**
+    - `app/create/step3/page.tsx` - Dil seçimi UI eklendi
+    - `app/create/step6/page.tsx` - Dil bilgisi review'da gösteriliyor
+    - `lib/prompts/story/v1.0.0/base.ts` - Dil desteği genişletildi, güçlü dil talimatları eklendi
+    - `app/api/books/route.ts` - System message güçlendirildi
+    - `app/api/ai/generate-story/route.ts` - System message güçlendirildi
+    - `lib/prompts/types.ts` - Type definitions güncellendi (8 dil)
+  - **Status:** ✅ Tamamlandı
+
 ### Karakter Yönetimi Sistemi (Character Library) (15 Ocak 2026)
 - [ ] **Karakter Yönetimi Sistemi** - Kullanıcıların birden fazla çocuğu için karakter profilleri oluşturması ve yönetmesi
   - **Tarih:** 15 Ocak 2026
@@ -1324,9 +1375,9 @@ Response: {
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026  
+**Son Güncelleme:** 24 Ocak 2026  
 **Güncelleyen:** @project-manager agent  
-**Son Eklenen:** Karakter Yönetimi Sistemi (Character Library) - 15 Ocak 2026
+**Son Eklenen:** Dil Seçimi Özelliği ve Dil Karışıklığı Çözümü - 24 Ocak 2026
 
 **Not:** 
 - Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)
@@ -1345,6 +1396,16 @@ Response: {
   - İyzico webhook handler → Faz 4.2.5
 - 🎉 **FAZ 3 TAMAMLANDI (%96 - MVP için %100):** MVP için gerekli tüm backend ve AI entegrasyonları tamamlandı ✅
 - 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (webhook'lar dahil)
+
+**Son Yapılanlar (24 Ocak 2026):**
+- ✅ **Dil Seçimi Özelliği:** Step 3'e dil seçimi eklendi (8 dil: tr, en, de, fr, es, zh, pt, ru)
+- ✅ **Dil Karışıklığı Çözümü:** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
+  - Story prompt'a "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi
+  - System message'a dil talimatı eklendi (API route'larda)
+  - İngilizce kelime kullanımı yasaklandı
+  - Final check mekanizması eklendi
+- ✅ Type definitions güncellendi (8 dil desteği)
+- ✅ Step 6'da dil bilgisi review'da gösteriliyor ve book creation request'ine ekleniyor
 
 **Son Yapılanlar (16 Ocak 2026):**
 - ✅ GPT-image API entegrasyonu (`/v1/images/edits` endpoint)
