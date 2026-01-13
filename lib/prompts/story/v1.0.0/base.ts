@@ -67,9 +67,35 @@ ${characterDesc}
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
 - Target Age: ${characterAge} years old (${ageGroup} age group)
 - Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
-- Language: ${language === 'tr' ? 'Turkish' : 'English'}
+- Language: ${getLanguageName(language)}
 - Illustration Style: ${illustrationStyle}
 - Special Requests: ${customRequests || 'None'}
+
+# CRITICAL - LANGUAGE REQUIREMENT (MANDATORY - NO EXCEPTIONS)
+**YOU MUST WRITE THE ENTIRE STORY IN ${getLanguageName(language).toUpperCase()} ONLY.**
+
+- **ONLY use ${getLanguageName(language)} words and sentences**
+- **DO NOT use ANY English words, phrases, or sentences**
+- **DO NOT mix languages - use ${getLanguageName(language)} exclusively**
+- **Every single word in the story text MUST be in ${getLanguageName(language)}**
+- **Character names can remain as provided, but all dialogue and narration MUST be in ${getLanguageName(language)}**
+- **If you use any English words, the story will be REJECTED**
+
+**Examples of what is FORBIDDEN:**
+- Using English words like "hello", "yes", "no", "okay", "good", "bad", "happy", "sad" in a ${getLanguageName(language)} story
+- Mixing languages: "Merhaba hello" or "Güzel good"
+- Using English phrases or expressions
+
+**Examples of what is CORRECT:**
+- If language is Turkish: Use ONLY Turkish words like "merhaba", "evet", "hayır", "güzel", "mutlu", "üzgün"
+- If language is German: Use ONLY German words like "hallo", "ja", "nein", "schön", "glücklich", "traurig"
+- If language is French: Use ONLY French words like "bonjour", "oui", "non", "beau", "heureux", "triste"
+- If language is Spanish: Use ONLY Spanish words like "hola", "sí", "no", "hermoso", "feliz", "triste"
+- If language is Chinese: Use ONLY Chinese characters and words
+- If language is Portuguese: Use ONLY Portuguese words like "olá", "sim", "não", "bonito", "feliz", "triste"
+- If language is Russian: Use ONLY Russian words like "привет", "да", "нет", "красивый", "счастливый", "грустный"
+
+**VERIFICATION:** Before returning the JSON, check EVERY word in EVERY page text. If you find ANY English word, replace it with the ${getLanguageName(language)} equivalent.
 
 # AGE-APPROPRIATE GUIDELINES
 - Vocabulary: ${getVocabularyLevel(ageGroup)}
@@ -119,7 +145,8 @@ CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle |
    
 4. **Show, don't just tell**
    - **BAD (TOO SHORT):** "${characterName} went to the forest. She saw trash. She cleaned it." (3 sentences, ~15 words - TOO SHORT!)
-   - **GOOD (${getWordCount(ageGroup)} words):** "As ${characterName} stepped into the forest, sunlight filtered through the leaves, creating dancing shadows on the path ahead. The air smelled fresh and earthy. 'Look at all these beautiful flowers!' ${characterName} said, pointing at the colorful wildflowers. But then she noticed something that made her stop. 'Oh no,' she said softly, her smile fading. Scattered among the beautiful flowers were candy wrappers and plastic bottles. Her heart sank. 'Someone left trash here. The flowers look sad.' She knelt down to look closer, wanting to help."
+   - **GOOD (${getWordCount(ageGroup)} words):** Write detailed, descriptive text with dialogue and atmosphere in ${getLanguageName(language)} ONLY
+   - **IMPORTANT:** All examples in this prompt are in English for instruction purposes, but YOUR story text MUST be written entirely in ${getLanguageName(language)}
    
 5. **Page structure** (each page should include ALL of these to reach ${getWordCount(ageGroup)} words):
    - Opening description (setting the scene atmospherically - 2-3 sentences)
@@ -128,8 +155,10 @@ CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle |
    - Transition or scene continuation (1-2 sentences)
    - **Total: 6-10 sentences per page = ${getWordCount(ageGroup)} words**
    
-6. **Example of quality writing (${getWordCount(ageGroup)} words):**
-   "${characterName} couldn't believe what she saw. The egg was much larger than expected, glowing with soft golden light that seemed to pulse gently. She carefully approached it, her heart beating with excitement and a little bit of fear. The air around the egg felt warm and tingly. 'Should we touch it?' Mom asked, staying close to ${characterName}. ${characterName} reached out slowly, her fingers trembling slightly. 'I think... I think it wants us to,' she whispered, her eyes wide with wonder."
+6. **Example of quality writing structure (${getWordCount(ageGroup)} words):**
+   - Write detailed, descriptive text with dialogue and atmosphere
+   - Include character emotions, sensory details, and dialogue
+   - **CRITICAL:** All text in your story MUST be in ${getLanguageName(language)} - the examples above are in English only for instruction purposes
 
 # SAFETY RULES (CRITICAL - MUST FOLLOW)
 ## MUST INCLUDE:
@@ -180,10 +209,11 @@ CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCo
   - Character emotions and feelings
   - Sensory details (what they see, hear, feel)
   - Multiple sentences per page (NOT just 2-3 sentences)
-- **Example of GOOD text (${getWordCount(ageGroup)} words):**
-  "As ${characterName} stepped into the forest, sunlight filtered through the tall trees, creating a magical atmosphere. She noticed something that made her stop. 'Oh no,' ${characterName} said softly, her smile fading. Scattered among the beautiful flowers were candy wrappers and plastic bottles. Her heart sank. 'Someone left trash here. The flowers look sad.' She knelt down to look closer, wanting to help."
+- **Example of GOOD text structure (${getWordCount(ageGroup)} words):**
+  Write detailed, descriptive text with dialogue, emotions, and sensory details - ALL in ${getLanguageName(language)}
 - **Example of BAD text (TOO SHORT - DO NOT DO THIS):**
-  "${characterName} went to forest. She saw trash. She cleaned it."
+  Short, simple sentences without detail
+- **CRITICAL REMINDER:** All examples in this prompt are in English for instruction, but YOUR story MUST be written entirely in ${getLanguageName(language)}. Do NOT copy English words from examples.
 - **Target: ${getWordCount(ageGroup)} words per page - write DETAILED, DESCRIPTIVE text with dialogue and atmosphere**
 
 ## CHARACTER & STORY:
@@ -196,6 +226,17 @@ CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCo
 - Include subtle educational value
 - Make it engaging and memorable
 - **MOST IMPORTANT: You MUST return EXACTLY ${getPageCount(ageGroup, pageCount)} pages in the "pages" array. Count them before returning!**
+
+## LANGUAGE COMPLIANCE (CRITICAL - FINAL CHECK):
+Before submitting your response, perform this final check:
+1. Read EVERY word in EVERY page's "text" field
+2. If you find ANY English word (like "hello", "yes", "good", "happy", "sad", "beautiful", "amazing", etc.), REPLACE it immediately with the ${getLanguageName(language)} equivalent
+3. Ensure ALL dialogue is in ${getLanguageName(language)}
+4. Ensure ALL narration is in ${getLanguageName(language)}
+5. The ONLY exception: Character name "${characterName}" can remain as is
+6. If you cannot write a word in ${getLanguageName(language)}, use a ${getLanguageName(language)} synonym instead - NEVER use English
+
+**REMEMBER: A single English word in a ${getLanguageName(language)} story is a CRITICAL ERROR. Check every word before returning.**
 
 Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.
 `
@@ -519,6 +560,24 @@ function buildCharacterDescription(
   }
   
   return desc
+}
+
+// ============================================================================
+// Language Helper Functions
+// ============================================================================
+
+function getLanguageName(language: string = 'en'): string {
+  const languageMap: Record<string, string> = {
+    'en': 'English',
+    'tr': 'Turkish',
+    'de': 'German',
+    'fr': 'French',
+    'es': 'Spanish',
+    'zh': 'Chinese (Mandarin)',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+  }
+  return languageMap[language] || 'English'
 }
 
 export default {

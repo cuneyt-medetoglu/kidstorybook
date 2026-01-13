@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Star,
   Heart,
+  Globe,
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -31,6 +32,9 @@ const formSchema = z.object({
   }),
   ageGroup: z.enum(["0-2", "3-5", "6-9"], {
     required_error: "Please select an age group",
+  }),
+  language: z.enum(["en", "tr", "de", "fr", "es", "zh", "pt", "ru"], {
+    required_error: "Please select a language for your story",
   }),
 })
 
@@ -52,6 +56,16 @@ type AgeGroup = {
   title: string
   description: string
   features: string
+  gradientFrom: string
+  gradientTo: string
+  borderColor: string
+}
+
+type Language = {
+  id: "en" | "tr" | "de" | "fr" | "es" | "zh" | "pt" | "ru"
+  Icon: typeof Globe
+  title: string
+  nativeName: string
   gradientFrom: string
   gradientTo: string
   borderColor: string
@@ -147,10 +161,86 @@ const ageGroups: AgeGroup[] = [
   },
 ]
 
+const languages: Language[] = [
+  {
+    id: "en",
+    Icon: Globe,
+    title: "English",
+    nativeName: "English",
+    gradientFrom: "from-blue-500",
+    gradientTo: "to-indigo-500",
+    borderColor: "border-blue-500",
+  },
+  {
+    id: "tr",
+    Icon: Globe,
+    title: "Türkçe",
+    nativeName: "Türkçe",
+    gradientFrom: "from-red-500",
+    gradientTo: "to-rose-500",
+    borderColor: "border-red-500",
+  },
+  {
+    id: "de",
+    Icon: Globe,
+    title: "Deutsch",
+    nativeName: "Deutsch",
+    gradientFrom: "from-yellow-500",
+    gradientTo: "to-amber-500",
+    borderColor: "border-yellow-500",
+  },
+  {
+    id: "fr",
+    Icon: Globe,
+    title: "Français",
+    nativeName: "Français",
+    gradientFrom: "from-blue-500",
+    gradientTo: "to-cyan-500",
+    borderColor: "border-blue-500",
+  },
+  {
+    id: "es",
+    Icon: Globe,
+    title: "Español",
+    nativeName: "Español",
+    gradientFrom: "from-orange-500",
+    gradientTo: "to-red-500",
+    borderColor: "border-orange-500",
+  },
+  {
+    id: "zh",
+    Icon: Globe,
+    title: "中文",
+    nativeName: "中文 (Mandarin)",
+    gradientFrom: "from-red-500",
+    gradientTo: "to-yellow-500",
+    borderColor: "border-red-500",
+  },
+  {
+    id: "pt",
+    Icon: Globe,
+    title: "Português",
+    nativeName: "Português",
+    gradientFrom: "from-green-500",
+    gradientTo: "to-emerald-500",
+    borderColor: "border-green-500",
+  },
+  {
+    id: "ru",
+    Icon: Globe,
+    title: "Русский",
+    nativeName: "Русский",
+    gradientFrom: "from-blue-500",
+    gradientTo: "to-slate-500",
+    borderColor: "border-blue-500",
+  },
+]
+
 export default function Step3Page() {
   const router = useRouter()
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null)
   const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | null>(null)
+  const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null)
 
   const {
     setValue,
@@ -162,6 +252,7 @@ export default function Step3Page() {
 
   const theme = watch("theme")
   const ageGroup = watch("ageGroup")
+  const language = watch("language")
 
   const handleThemeSelect = (themeId: string) => {
     setSelectedTheme(themeId)
@@ -173,21 +264,28 @@ export default function Step3Page() {
     setValue("ageGroup", ageGroupId as FormData["ageGroup"], { shouldValidate: true })
   }
 
+  const handleLanguageSelect = (languageId: string) => {
+    setSelectedLanguage(languageId)
+    setValue("language", languageId as FormData["language"], { shouldValidate: true })
+  }
+
   const handleNext = () => {
-    if (!theme || !ageGroup) return
+    if (!theme || !ageGroup || !language) return
     
-    // Save theme and age group to localStorage
+    // Save theme, age group, and language to localStorage
     try {
       const saved = localStorage.getItem("kidstorybook_wizard")
       const wizardData = saved ? JSON.parse(saved) : {}
       
-      // Find full theme and age group objects
+      // Find full theme, age group, and language objects
       const selectedThemeObj = themes.find((t) => t.id === theme)
       const selectedAgeGroupObj = ageGroups.find((ag) => ag.id === ageGroup)
+      const selectedLanguageObj = languages.find((l) => l.id === language)
       
       wizardData.step3 = {
         theme: selectedThemeObj,
         ageGroup: selectedAgeGroupObj,
+        language: selectedLanguageObj,
       }
       
       localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
@@ -198,7 +296,7 @@ export default function Step3Page() {
     router.push("/create/step4")
   }
 
-  const isFormValid = theme && ageGroup
+  const isFormValid = theme && ageGroup && language
 
   // Floating animations for decorative elements
   const floatingVariants = {
@@ -260,7 +358,7 @@ export default function Step3Page() {
           <div className="mx-auto max-w-4xl">
             <div className="mb-3 flex items-center justify-between text-sm font-medium text-gray-700 dark:text-slate-300">
               <span>Step 3 of 6</span>
-              <span>Theme & Age Group</span>
+              <span>Theme, Age Group & Language</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-slate-700">
               <motion.div
@@ -288,9 +386,9 @@ export default function Step3Page() {
               transition={{ delay: 0.3, duration: 0.4 }}
               className="mb-8 text-center"
             >
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-50">Choose Theme & Age Group</h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-50">Choose Theme, Age Group & Language</h1>
               <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
-                Select the perfect story theme and age-appropriate content
+                Select the perfect story theme, age-appropriate content, and language
               </p>
             </motion.div>
 
@@ -468,11 +566,94 @@ export default function Step3Page() {
               )}
             </div>
 
+            {/* Language Selection Section */}
+            <div className="mb-8">
+              <motion.h2
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8, duration: 0.4 }}
+                className="mb-4 text-xl font-semibold text-gray-900 dark:text-slate-50"
+              >
+                Select Story Language
+              </motion.h2>
+
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {languages.map((languageItem, index) => {
+                  const Icon = languageItem.Icon
+                  const isSelected = selectedLanguage === languageItem.id
+
+                  return (
+                    <motion.button
+                      key={languageItem.id}
+                      type="button"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + 0.1 * index, duration: 0.4 }}
+                      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleLanguageSelect(languageItem.id)}
+                      className={`group relative overflow-hidden rounded-xl border-2 p-4 text-center transition-all ${
+                        isSelected
+                          ? `border-transparent bg-gradient-to-br ${languageItem.gradientFrom} ${languageItem.gradientTo} shadow-xl`
+                          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
+                      }`}
+                    >
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/30 backdrop-blur-sm"
+                        >
+                          <div className="h-3 w-3 rounded-full bg-white" />
+                        </motion.div>
+                      )}
+
+                      <div
+                        className={`mb-3 flex h-10 w-10 items-center justify-center rounded-full transition-all mx-auto ${
+                          isSelected
+                            ? "bg-white/20 backdrop-blur-sm"
+                            : `bg-gradient-to-br ${languageItem.gradientFrom} ${languageItem.gradientTo}`
+                        }`}
+                      >
+                        <Icon className={`h-5 w-5 ${isSelected ? "text-white" : "text-white"}`} />
+                      </div>
+
+                      <h3
+                        className={`mb-1 text-base font-bold transition-colors ${
+                          isSelected ? "text-white" : "text-gray-900 dark:text-slate-50"
+                        }`}
+                      >
+                        {languageItem.title}
+                      </h3>
+
+                      <p
+                        className={`text-xs transition-colors ${
+                          isSelected ? "text-white/80" : "text-gray-500 dark:text-slate-500"
+                        }`}
+                      >
+                        {languageItem.nativeName}
+                      </p>
+                    </motion.button>
+                  )
+                })}
+              </div>
+
+              {errors.language && (
+                <motion.p
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 text-sm text-red-600 dark:text-red-400"
+                >
+                  {errors.language.message}
+                </motion.p>
+              )}
+            </div>
+
             {/* Navigation Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.4 }}
+              transition={{ delay: 1.0, duration: 0.4 }}
               className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-between"
             >
               <Link href="/create/step2" className="w-full sm:w-auto">

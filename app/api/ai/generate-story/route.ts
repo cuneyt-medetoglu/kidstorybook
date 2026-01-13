@@ -21,7 +21,7 @@ export interface StoryGenerationRequest {
   theme: string
   illustrationStyle: string
   customRequests?: string
-  language?: 'en' | 'tr'
+  language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
 }
 
 export interface StoryGenerationResponse {
@@ -122,13 +122,28 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 5. Call OpenAI
     // ====================================================================
+    // Get language name for system message
+    const languageNames: Record<string, string> = {
+      'en': 'English',
+      'tr': 'Turkish',
+      'de': 'German',
+      'fr': 'French',
+      'es': 'Spanish',
+      'zh': 'Chinese (Mandarin)',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+    }
+    const languageName = languageNames[language] || 'English'
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o', // or gpt-4o-mini for cheaper option
       messages: [
         {
           role: 'system',
           content:
-            'You are a professional children\'s book author. Create engaging, age-appropriate stories with detailed image prompts.',
+            `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts.
+
+CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageName} ONLY. DO NOT use any English words, phrases, or sentences. Every single word in the story text must be in ${languageName}. If you use any English words, the story will be rejected.`,
         },
         {
           role: 'user',

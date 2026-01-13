@@ -27,7 +27,7 @@ export interface StoryGenerationInput {
   illustrationStyle: string
   customRequests?: string
   referencePhotoAnalysis?: CharacterAnalysis // Optional: kept for backward compatibility, but not required
-  language?: 'en' | 'tr'
+  language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
   pageCount?: number // Debug: Optional page count override (3-20)
   // Step 1 data (preferred, no AI Analysis needed)
   hairColor?: string

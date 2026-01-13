@@ -113,6 +113,17 @@ export default function Step6Page() {
           icon: "📚",
           features: ["10 pages", "Simple story", "Large illustrations"],
         },
+    language: wizardData?.step3?.language
+      ? {
+          id: wizardData.step3.language.id || "en",
+          title: wizardData.step3.language.title || "English",
+          nativeName: wizardData.step3.language.nativeName || "English",
+        }
+      : {
+          id: "en",
+          title: "English",
+          nativeName: "English",
+        },
     illustrationStyle: wizardData?.step4?.illustrationStyle
       ? {
           name: wizardData.step4.illustrationStyle.title || wizardData.step4.illustrationStyle,
@@ -355,7 +366,7 @@ export default function Step6Page() {
                 </div>
               </motion.div>
 
-              {/* 3. Theme & Age Group Summary */}
+              {/* 3. Theme, Age Group & Language Summary */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -365,7 +376,7 @@ export default function Step6Page() {
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-6 w-6 text-purple-500" />
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Theme & Age Group</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Theme, Age Group & Language</h2>
                     </div>
                     <Link
                       href="/create/step3"
@@ -376,7 +387,7 @@ export default function Step6Page() {
                     </Link>
                   </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-3">
                     {/* Theme */}
                     <div className="flex gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-900">
                       <div className="text-3xl">{formData.theme.icon}</div>
@@ -404,6 +415,17 @@ export default function Step6Page() {
                             </span>
                           ))}
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Language */}
+                    <div className="flex gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+                      <div className="text-3xl">🌐</div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 dark:text-slate-50">{formData.language.title}</h3>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
+                          {formData.language.nativeName}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -593,7 +615,7 @@ export default function Step6Page() {
                             illustrationStyle,
                             customRequests,
                             referencePhotoAnalysis,
-                            language: "en",
+                            language: (wizardData?.step3?.language?.id || formData.language.id) as any,
                             pageCount: wizardData?.step5?.pageCount, // Use pageCount from Step 5
                           })
 
@@ -699,7 +721,7 @@ export default function Step6Page() {
                             theme: theme,
                             illustrationStyle: illustrationStyle,
                             customRequests: customRequests || undefined,
-                            language: "en" as const,
+                            language: (wizardData?.step3?.language?.id || formData.language.id) as any,
                           }
 
                           console.log("[Step 6] DEBUG: Testing story generation with:", requestBody)
@@ -972,7 +994,7 @@ export default function Step6Page() {
                           illustrationStyle: illustrationStyleId,
                           customRequests: wizardData?.step5?.customRequests || formData.customRequests || undefined,
                           pageCount: pageCount, // Debug: Optional page count override
-                          language: "en" as const,
+                          language: (wizardData?.step3?.language?.id || formData.language.id) as any,
                           storyModel: storyModel, // Use debug mode selection
                           // NOTE: imageModel/imageSize are hardcoded in API (gpt-image-1.5 / 1024x1536 / low)
                         }
@@ -1164,7 +1186,7 @@ export default function Step6Page() {
                           illustrationStyle,
                           customRequests,
                           referencePhotoAnalysis,
-                          language: "en",
+                          language: (wizardData?.step3?.language?.id || formData.language.id) as any,
                           pageCount: wizardData?.step5?.pageCount, // Use pageCount from Step 5
                         })
                         setStoryPrompt(prompt)

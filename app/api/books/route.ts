@@ -33,7 +33,7 @@ export interface CreateBookRequest {
   illustrationStyle: string
   customRequests?: string
   pageCount?: number // Debug: Optional page count override (3-20)
-  language?: 'en' | 'tr'
+  language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
   storyModel?: string // Story generation model (default: 'gpt-3.5-turbo')
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
@@ -202,6 +202,19 @@ export async function POST(request: NextRequest) {
         try {
           const storyReqStart = Date.now()
           
+          // Get language name for system message
+          const languageNames: Record<string, string> = {
+            'en': 'English',
+            'tr': 'Turkish',
+            'de': 'German',
+            'fr': 'French',
+            'es': 'Spanish',
+            'zh': 'Chinese (Mandarin)',
+            'pt': 'Portuguese',
+            'ru': 'Russian',
+          }
+          const languageName = languageNames[language] || 'English'
+
           // Call OpenAI with selected model
           completion = await openai.chat.completions.create({
             model: storyModel,
@@ -209,7 +222,9 @@ export async function POST(request: NextRequest) {
               {
                 role: 'system',
                 content:
-                  'You are a professional children\'s book author. Create engaging, age-appropriate stories with detailed image prompts. You MUST return the exact number of pages requested.',
+                  `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. You MUST return the exact number of pages requested.
+
+CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageName} ONLY. DO NOT use any English words, phrases, or sentences. Every single word in the story text must be in ${languageName}. If you use any English words, the story will be rejected.`,
               },
               {
                 role: 'user',
