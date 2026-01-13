@@ -90,6 +90,37 @@ Include: ${themeConfig.commonElements.join(', ')}
 Mood: ${themeConfig.mood}, warm, inviting
 Educational Focus: ${getEducationalFocus(ageGroup, theme)}
 
+# WRITING STYLE REQUIREMENTS (CRITICAL - NEW: 15 Ocak 2026)
+1. **Include dialogue between characters** (use quotation marks)
+   - Characters should talk to each other naturally
+   - Include character actions with dialogue (e.g., "Look!" ${characterName} said, pointing)
+   - Use dialogue to show personality and emotions
+   - Balance dialogue with descriptive narration
+   
+2. **Describe emotions and feelings**
+   - Show character's internal thoughts and emotional responses
+   - Use sensory details (what they see, hear, feel)
+   - Example: "${characterName} felt proud and warm, even as the evening air grew cooler"
+   
+3. **Use descriptive language for atmosphere and setting**
+   - Paint a vivid picture with words
+   - Describe lighting, colors, textures, sounds
+   - Create immersive scenes
+   - Example: "As the sun began to set, the sky turned orange and pink and purple"
+   
+4. **Show, don't just tell**
+   - Instead of: "${characterName} went to the forest"
+   - Write: "As ${characterName} stepped into the forest, sunlight filtered through the leaves, creating dancing shadows on the path ahead"
+   
+5. **Page structure** (each page should include):
+   - Opening description (setting the scene atmospherically)
+   - Character action or dialogue
+   - Emotional response or internal thought
+   - Transition or scene continuation
+   
+6. **Example of quality writing**:
+   "${characterName} couldn't believe what she saw. The egg was much larger than expected, glowing with soft golden light. She carefully approached it, her heart beating with excitement and a little bit of fear. 'Should we touch it?' Mom asked, staying close. ${characterName} reached out slowly, her fingers trembling with wonder."
+
 # SAFETY RULES (CRITICAL - MUST FOLLOW)
 ## MUST INCLUDE:
 ${safetyRules.mustInclude.map(rule => `- ${rule}`).join('\n')}
@@ -210,14 +241,16 @@ function getComplexityLevel(ageGroup: string): string {
 }
 
 function getWordCount(ageGroup: string): string {
+  // Updated word counts (15 Ocak 2026): All values are AVERAGES, not fixed
+  // Designed to match quality examples (Magical Children's Book)
   const counts: Record<string, string> = {
-    toddler: '20-40',
-    preschool: '40-80',
-    'early-elementary': '80-120',
-    elementary: '120-180',
-    'pre-teen': '180-250',
+    toddler: '35-45',           // avg 40 words
+    preschool: '50-70',          // avg 60 words
+    'early-elementary': '80-100', // avg 90 words
+    elementary: '110-130',       // avg 120 words (max 120)
+    'pre-teen': '110-130',       // avg 120 words (max 120)
   }
-  return counts[ageGroup] || '100-150'
+  return counts[ageGroup] || '80-100'
 }
 
 function getReadingTime(ageGroup: string): number {

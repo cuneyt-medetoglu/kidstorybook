@@ -174,6 +174,76 @@ export const THEME_NEGATIVE: Record<string, string[]> = {
 }
 
 // ============================================================================
+// ANATOMICAL ERROR PREVENTION (ENHANCED: 15 Ocak 2026)
+// ============================================================================
+
+/**
+ * Comprehensive anatomical negative prompts
+ * Critical for preventing common AI errors (extra fingers, wrong limb count, etc.)
+ */
+export const ANATOMICAL_NEGATIVE = [
+  // Hand/Finger Errors (CRITICAL - most common AI mistake)
+  'extra fingers', 'more than 5 fingers', '6 fingers', '7 fingers', '8 fingers', '9 fingers', '10 fingers',
+  'missing fingers', 'less than 5 fingers', '4 fingers', '3 fingers', '2 fingers', '1 finger',
+  'deformed fingers', 'wrong finger count', 'incorrect number of fingers',
+  'fingers fused together', 'fingers missing joints', 'fingers without knuckles',
+  'fingers too long', 'fingers too short', 'weird fingers', 'alien fingers',
+  'floating fingers', 'disconnected fingers', 'finger growing from wrong place',
+  
+  // Hand/Arm Errors
+  'extra hands', 'three hands', 'four hands', 'multiple hands', 'too many hands',
+  'missing hands', 'no hands', 'invisible hands', 'hands disappearing',
+  'wrong hand position', 'impossible hand angle', 'broken wrist', 'twisted wrist',
+  'hand growing from wrong place', 'hand attached incorrectly', 'hand on head',
+  'deformed hands', 'malformed hands', 'weird hands', 'ugly hands',
+  'extra arms', 'three arms', 'four arms', 'too many arms', 'multiple arms',
+  'missing arms', 'no arms', 'invisible arms', 'one arm',
+  'arms growing from head', 'arms in wrong position', 'arms from stomach',
+  'deformed arms', 'twisted arms', 'broken arms', 'impossible arm position',
+  
+  // Foot/Leg Errors
+  'extra feet', 'three feet', 'four feet', 'too many feet', 'multiple feet',
+  'missing feet', 'no feet', 'invisible feet', 'one foot',
+  'wrong number of toes', 'extra toes', 'missing toes', '6 toes', '7 toes',
+  'deformed feet', 'feet facing wrong direction', 'backwards feet',
+  'feet on backwards', 'twisted feet', 'broken ankles',
+  'extra legs', 'three legs', 'four legs', 'too many legs', 'multiple legs',
+  'missing legs', 'no legs', 'one leg', 'invisible legs',
+  'legs in wrong position', 'legs from chest', 'legs from head',
+  'deformed legs', 'twisted legs', 'broken legs', 'impossible leg position',
+  
+  // Body Proportion Errors
+  'wrong proportions', 'bad proportions', 'incorrect proportions',
+  'head too large', 'head too small', 'giant head', 'tiny head', 'oversized head',
+  'body too long', 'body too short', 'elongated body', 'compressed body',
+  'limbs too long', 'limbs too short', 'giant limbs', 'tiny limbs',
+  'incorrect body proportions', 'deformed body', 'malformed body',
+  'extra limbs', 'missing limbs', 'limbs in wrong places',
+  'body parts growing from wrong places', 'misplaced body parts',
+  
+  // Face Errors
+  'extra eyes', 'three eyes', 'four eyes', 'wrong number of eyes', 'too many eyes',
+  'missing eyes', 'no eyes', 'one eye', 'eyes in wrong place',
+  'asymmetric eyes', 'uneven eyes', 'different sized eyes',
+  'eyes too far apart', 'eyes too close together', 'floating eyes',
+  'extra nose', 'two noses', 'missing nose', 'no nose', 'nose in wrong place',
+  'extra mouth', 'two mouths', 'missing mouth', 'no mouth', 'mouth in wrong place',
+  'face distorted', 'face deformed', 'face misaligned', 'asymmetric face',
+  'melted face', 'stretched face', 'squished face', 'weird face',
+  'extra ears', 'missing ears', 'ears in wrong position',
+  
+  // General Anatomical Issues
+  'bad anatomy', 'anatomically incorrect', 'anatomy mistakes', 'anatomy errors',
+  'human anatomy errors', 'wrong anatomy', 'impossible anatomy',
+  'physical impossibilities', 'impossible poses', 'physics-defying',
+  'body parts in wrong positions', 'impossible body structure',
+  'mutated', 'mutation', 'mutant', 'deformed', 'malformed',
+  'extra body parts', 'missing body parts', 'duplicate body parts',
+  'fused limbs', 'merged fingers', 'conjoined',
+  'skeleton wrong', 'bones wrong', 'joints wrong', 'no joints',
+]
+
+// ============================================================================
 // Character-Specific Negative Prompts
 // ============================================================================
 
@@ -183,11 +253,9 @@ export const CHARACTER_NEGATIVE = [
   'multiple versions of same character',
   'inconsistent appearance',
   
-  // Avoid bad character rendering
+  // Avoid bad character rendering (merged with anatomical)
   'distorted face', 'weird face', 'ugly face',
   'bad eyes', 'asymmetric eyes', 'crossed eyes',
-  'bad hands', 'extra fingers', 'missing fingers',
-  'deformed body', 'wrong proportions',
   
   // Avoid inappropriate character elements
   'revealing clothing', 'inappropriate outfit',
@@ -207,6 +275,9 @@ export function getNegativePrompt(
   
   // Add universal negatives
   negatives.push(...UNIVERSAL_NEGATIVE)
+  
+  // Add ANATOMICAL negatives (NEW: 15 Ocak 2026 - CRITICAL)
+  negatives.push(...ANATOMICAL_NEGATIVE)
   
   // Add age-specific negatives
   if (AGE_SPECIFIC_NEGATIVE[ageGroup]) {
@@ -232,6 +303,23 @@ export function getNegativePrompt(
   return uniqueNegatives.join(', ')
 }
 
+/**
+ * Get anatomical correctness directives for POSITIVE prompt
+ * These are instructions to add to the positive prompt, not negative
+ */
+export function getAnatomicalCorrectnessDirectives(): string {
+  return [
+    'ANATOMICAL CORRECTNESS (CRITICAL):',
+    'character must have exactly 5 fingers on each hand (no more, no less)',
+    'character must have exactly 2 hands, 2 arms, 2 feet, 2 legs',
+    'all body parts must be anatomically correct and properly proportioned',
+    'hands, feet, and limbs must be in natural, possible positions',
+    'face features must be symmetrical and correctly placed',
+    'proper human anatomy, realistic body structure',
+    'correct finger count, correct limb count, correct facial features'
+  ].join(', ')
+}
+
 export function getContentSafetyFilter(): string[] {
   return [
     'violence', 'scary', 'frightening', 'horror',
@@ -249,7 +337,9 @@ export default {
   STYLE_NEGATIVE,
   THEME_NEGATIVE,
   CHARACTER_NEGATIVE,
+  ANATOMICAL_NEGATIVE,
   getNegativePrompt,
   getContentSafetyFilter,
+  getAnatomicalCorrectnessDirectives,
 }
 

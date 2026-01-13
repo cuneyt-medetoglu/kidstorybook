@@ -104,26 +104,81 @@ Now create the story!
 
 ## 👶 Age Group Specific Requirements
 
+**IMPORTANT UPDATE (15 Ocak 2026):** Word counts are now AVERAGES, not fixed values. AI can vary within the range.
+
 ### 0-2 Years (Toddler)
-- **Word Count:** 20-30 words per page
+- **Word Count:** 35-45 words per page (AVERAGE: 40 - can vary within range)
 - **Language:** Very simple words, repetitive phrases
 - **Structure:** Short sentences (3-5 words max)
-- **Features:** Onomatopoeia (sound words), rhythmic like a song
-- **Example:** "Elif sees a big ball. Bounce, bounce, bounce! The ball is red and round. Bounce, bounce, bounce!"
+- **Features:** Onomatopoeia (sound words), rhythmic like a song, simple dialogue
+- **Example:** "Elif sees a big ball. Bounce, bounce, bounce! The ball is red and round. 'Ball!' Elif said happily. Bounce, bounce, bounce! Elif and the ball play together."
 
 ### 3-5 Years (Preschool)
-- **Word Count:** 40-60 words per page
+- **Word Count:** 50-70 words per page (AVERAGE: 60 - can vary within range)
 - **Language:** Simple but varied vocabulary
-- **Structure:** Short sentences (5-8 words)
-- **Features:** Action words, emotions, dialogue, fun and energetic
-- **Example:** "Elif and Mert walked to the park. The sun was shining brightly. 'Look!' said Elif, pointing. 'What's that?' They saw something glowing behind the big oak tree."
+- **Structure:** Short sentences (5-8 words), include dialogue
+- **Features:** Action words, emotions, dialogue, descriptive language, fun and energetic
+- **NEW:** Emphasis on dialogue and atmospheric description
+- **Example:** "Elif and Mert walked to the park. The sun was shining brightly, warming their faces. 'Look!' said Elif, pointing excitedly. 'What's that?' Behind the big oak tree, they saw something glowing softly. Elif felt curious and a little bit excited. 'Should we go see?' Mert nodded with a big smile."
 
 ### 6-9 Years (Early Elementary)
-- **Word Count:** 60-100 words per page
+- **Word Count:** 80-100 words per page (AVERAGE: 90 - can vary within range)
 - **Language:** More complex vocabulary appropriate for early readers
-- **Structure:** Longer sentences (8-12 words)
-- **Features:** Dialogue, character interactions, problem-solving, adventure with challenges
-- **Example:** "Elif couldn't believe her eyes. The egg was much larger than she expected, and it was glowing with a soft golden light. She carefully approached it, her heart beating with excitement and a little bit of fear. 'Should we touch it?' Mert asked, staying close to his sister."
+- **Structure:** Longer sentences (8-12 words), rich dialogue
+- **Features:** Dialogue, character interactions, problem-solving, adventure with challenges, detailed descriptions
+- **NEW:** Strong emphasis on atmosphere, emotions, and "show don't tell"
+- **Example:** "Elif couldn't believe her eyes. The egg was much larger than she expected, glowing with soft golden light that seemed to pulse gently. She carefully approached it, her heart beating with excitement and a little bit of fear. The air around the egg felt warm and tingly. 'Should we touch it?' Mert asked, staying close to his sister. Elif reached out slowly, her fingers trembling slightly. 'I think... I think it wants us to,' she whispered."
+
+### 10+ Years (Elementary)
+- **Word Count:** 110-130 words per page (AVERAGE: 120 - MAXIMUM 120 words)
+- **Language:** Rich vocabulary, complex concepts
+- **Structure:** Varied sentence lengths, sophisticated dialogue
+- **Features:** Complex problem-solving, deeper emotional exploration, detailed world-building
+- **Example:** Extended narratives with multiple paragraphs, dialogue exchanges, and detailed sensory descriptions
+
+---
+
+## ✍️ Writing Style Requirements (NEW: 15 Ocak 2026)
+
+**Critical for quality improvement - matching Magical Children's Book examples**
+
+### 1. Include Dialogue
+- Characters should talk to each other naturally
+- Use quotation marks for speech
+- Include character actions with dialogue
+- Example: `"Look!" Lisa said, pointing excitedly at the sky`
+
+### 2. Describe Emotions and Feelings
+- Show character's internal thoughts
+- Use sensory details (what they see, hear, feel, smell)
+- Example: `Lisa felt proud and warm, even as the evening air grew cooler`
+
+### 3. Use Descriptive Language for Atmosphere
+- Paint vivid pictures with words
+- Describe lighting, colors, textures, sounds
+- Create immersive scenes
+- Example: `As the sun began to set, the sky turned orange and pink and purple, painting everything with magical colors`
+
+### 4. Show, Don't Just Tell
+- **Instead of:** "Lisa went to the forest"
+- **Write:** "As Lisa stepped into the forest, sunlight filtered through the leaves, creating dancing shadows on the path ahead"
+
+### 5. Page Structure Template
+Each page should include:
+1. **Opening description** - Set the scene atmospherically
+2. **Character action or dialogue** - What's happening
+3. **Emotional response** - How character feels
+4. **Transition or continuation** - Move story forward
+
+**Example Structure:**
+```
+[Atmospheric description]. [Character action]. "[Dialogue]," [Character name] said [with action]. [Emotional response]. [Scene continuation with sensory details].
+```
+
+**Full Example (3-5 years, ~60 words):**
+```
+As Lisa stepped into the forest, sunlight filtered through the tall trees, creating a magical atmosphere. She noticed something that made her stop. "Oh no," Lisa said softly, her smile fading. Scattered among the beautiful flowers were candy wrappers and plastic bottles. Her heart sank. "Someone left trash here. The flowers look sad." She knelt down to look closer, wanting to help.
+```
 
 ---
 

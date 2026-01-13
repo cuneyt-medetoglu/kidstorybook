@@ -243,6 +243,10 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 4. **3D Animation stil için özel notlar ekle** (photorealistic olmamalı)
 5. **Kitap kapağı için özel talimatlar** (flat illustration, book mockup değil)
 6. **Karakter tutarlılığını her sayfada vurgula**
+7. **NEW (15 Ocak 2026): Cinematic elements ekle** (lighting, depth, composition)
+8. **NEW: Foreground/Midground/Background layer sistemi kullan**
+9. **NEW: Kıyafet tutarlılığını belirt** (hikayede değişim yoksa aynı kıyafet)
+10. **NEW: Anatomik doğruluk direktifleri ekle** (5 parmak, doğru limb sayısı)
 
 ---
 
@@ -256,6 +260,97 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 - ✅ Kitap kapağı için özel talimatlar
 - ✅ Yaş grubu kuralları
 - ✅ Çok dilli destek (story text için)
+
+### v1.0.1 (15 Ocak 2026 - Kalite İyileştirmeleri)
+- ✅ **Cinematic composition elements** - Lighting, depth of field, camera angles
+- ✅ **3-level environment descriptions** - General, Detailed, Cinematic
+- ✅ **Hybrid prompt system** - Cinematic + Descriptive combination
+- ✅ **Foreground/Midground/Background layers** - Proper depth hierarchy
+- ✅ **Clothing consistency system** - Maintain same outfit unless story changes it
+- ✅ **Anatomical error prevention** - Comprehensive negative prompts for hands, fingers, limbs
+- ✅ **Anatomical correctness directives** - Positive prompts for proper anatomy (5 fingers, 2 hands, etc.)
+- 🎯 **Goal:** Match quality of Magical Children's Book examples
+
+---
+
+## 🎬 Cinematic Quality Enhancements (NEW: 15 Ocak 2026)
+
+### Cinematic Composition Elements
+
+Her image prompt şimdi cinematic kalite elementleri içerir:
+
+1. **Depth & Layers**
+   - Clear foreground, midground, background separation
+   - Depth of field with atmospheric perspective
+   - Sense of three-dimensional space
+
+2. **Composition**
+   - Rule of thirds
+   - Balanced visual weight
+   - Dynamic framing
+
+3. **Lighting** (mood-based)
+   - Exciting: Dynamic lighting with highlights and shadows
+   - Calm: Soft ambient lighting
+   - Mysterious: Atmospheric lighting with soft glow
+
+4. **Camera Angle**
+   - Page 1: Hero shot, medium-wide angle
+   - Other pages: Varied perspective for visual interest
+
+### Foreground/Midground/Background System
+
+**Template Structure:**
+```
+FOREGROUND: [Character action], main character in clear focus with detailed features visible.
+MIDGROUND: [Story elements and contextual objects].
+BACKGROUND: [Environment with depth and atmosphere].
+```
+
+**Example:**
+```
+FOREGROUND: Lisa kneeling on forest path, looking concerned at trash, wearing floral dress and glasses.
+MIDGROUND: Scattered trash items (candy wrappers, plastic bottles) among wildflowers (daisies, violets).
+BACKGROUND: Tall oak and pine trees with dappled sunlight filtering through leaves, creating soft shadows, gentle breeze rustling canopy.
+```
+
+### 3-Level Environment Descriptions
+
+Her tema için 3 seviye detay:
+
+**Level 1 - General:** `lush forest`
+
+**Level 2 - Detailed:** `lush forest with tall oak and pine trees, dappled sunlight filtering through leaves`
+
+**Level 3 - Cinematic (KULLANILAN):** `lush forest with tall oak and pine trees, dappled sunlight filtering through leaves creating dancing shadows on the mossy ground, wildflowers (daisies, violets, buttercups) dotting the forest floor, gentle breeze rustling the canopy, birds chirping in the distance`
+
+### Clothing Consistency
+
+**Kural:** Hikayede kıyafet değişikliği belirtilmediyse, karakter tüm sayfalarda aynı kıyafeti giyer.
+
+**Prompt directive:**
+```
+CHARACTER CLOTHING CONSISTENCY: If the story does NOT mention clothing change, character must wear the SAME clothing as previous pages. Only change clothing if story specifically mentions it (e.g., "changed into pajamas", "put on jacket"). Maintain exact same outfit (colors, style, details) throughout story unless explicitly changed in narrative.
+```
+
+### Anatomical Correctness
+
+**Negative Prompts (100+ items):**
+- Hand/Finger errors: extra fingers, missing fingers, deformed fingers
+- Hand/Arm errors: extra hands, missing hands, wrong position
+- Foot/Leg errors: extra feet, missing toes, wrong position
+- Body proportion errors: wrong proportions, extra limbs
+- Face errors: extra eyes, missing features
+
+**Positive Directives:**
+```
+ANATOMICAL CORRECTNESS (CRITICAL):
+- Character must have exactly 5 fingers on each hand (no more, no less)
+- Character must have exactly 2 hands, 2 arms, 2 feet, 2 legs
+- All body parts must be anatomically correct and properly proportioned
+- Hands, feet, and limbs must be in natural, possible positions
+- Face features must be symmetrical and correctly placed
+```
 
 ---
 

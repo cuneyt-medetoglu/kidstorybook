@@ -467,6 +467,36 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **3.5.12** Queue sistemi (uzun işlemler için) - ⏸️ **Ertelendi (daha sonra)**
 - [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
 - [x] **3.5.14** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing)
+- [x] **3.5.15** Prompt Kalite İyileştirmesi v2.0 - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - **Hedef:** Magical Children's Book kalitesini yakalamak
+  - **Story Prompts:**
+    - [x] Word count güncelleme (yaş gruplarına göre ORTALAMA değerler: 40/60/90/120)
+    - [x] Diyalog ve detaylı anlatım direktifleri eklendi
+    - [x] Writing style requirements (show don't tell, atmospheric description)
+    - [x] Page structure template (opening, action, emotion, transition)
+  - **Image Prompts:**
+    - [x] Cinematic composition elements (lighting, depth, camera angle)
+    - [x] 3-level environment descriptions (general → detailed → cinematic)
+    - [x] Hybrid prompt system (cinematic + descriptive combination)
+    - [x] Foreground/Midground/Background layer system
+    - [x] Clothing consistency system (same outfit unless story changes it)
+    - [x] Anatomical error prevention (100+ negative prompts for hands, fingers, limbs)
+    - [x] Anatomical correctness directives (5 fingers, 2 hands, proper proportions)
+  - **Documentation:**
+    - [x] `STORY_PROMPT_TEMPLATE_v1.0.0.md` güncellendi
+    - [x] `IMAGE_PROMPT_TEMPLATE_v1.0.0.md` güncellendi (v1.0.1 features)
+  - **Kod Değişiklikleri:**
+    - [x] `lib/prompts/story/v1.0.0/base.ts` - Word counts, writing style directives
+    - [x] `lib/prompts/image/v1.0.0/scene.ts` - Cinematic elements, layered composition
+    - [x] `lib/prompts/image/v1.0.0/negative.ts` - ANATOMICAL_NEGATIVE (100+ items)
+  - **Success Metrics:**
+    - ✅ Hikaye metinleri 40-120 kelime arası (yaş grubuna göre)
+    - ✅ Her sayfada diyalog ve detaylı atmosfer
+    - ✅ Sahne detayları artmış (foreground/midground/background)
+    - ✅ Karakter kıyafet tutarlılığı
+    - ✅ Anatomik hatalar minimize edildi
+  - **İlham:** Magical Children's Book örnekleri analizi
+  - **Durum:** Production'da aktif ✅
 
 ### 3.6 PDF Generation ✅
 - [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
