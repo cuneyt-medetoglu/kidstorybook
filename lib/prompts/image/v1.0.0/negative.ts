@@ -16,6 +16,9 @@ export const VERSION: PromptVersion = {
     'Safety-focused negative prompts',
     'Age-specific restrictions',
     'Quality control filters',
+    'Added facial skin quality controls - blemishes, moles, marks (15 Ocak 2026)',
+    'Added logical/pose error prevention - body rotation, orientation consistency (15 Ocak 2026)',
+    'Enhanced anatomical correctness directives with skin quality and pose consistency (15 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -232,6 +235,12 @@ export const ANATOMICAL_NEGATIVE = [
   'melted face', 'stretched face', 'squished face', 'weird face',
   'extra ears', 'missing ears', 'ears in wrong position',
   
+  // Face Skin Quality (NEW: 15 Ocak 2026 - Quality Improvement)
+  'blemishes', 'acne', 'pimples', 'moles', 'marks on face', 'spots on face',
+  'marks between eyebrows', 'mark between eyes', 'blemish on forehead',
+  'skin imperfections', 'facial marks', 'facial blemishes', 'skin marks',
+  'unclean skin', 'blemished skin', 'marked skin',
+  
   // General Anatomical Issues
   'bad anatomy', 'anatomically incorrect', 'anatomy mistakes', 'anatomy errors',
   'human anatomy errors', 'wrong anatomy', 'impossible anatomy',
@@ -241,6 +250,15 @@ export const ANATOMICAL_NEGATIVE = [
   'extra body parts', 'missing body parts', 'duplicate body parts',
   'fused limbs', 'merged fingers', 'conjoined',
   'skeleton wrong', 'bones wrong', 'joints wrong', 'no joints',
+  
+  // Logical/Pose Errors (NEW: 15 Ocak 2026 - Quality Improvement)
+  'impossible body rotation', 'body facing wrong direction', 'contradictory body position',
+  'upper body twisted incorrectly', 'body rotation error', 'torso facing wrong way',
+  'body orientation mismatch', 'body direction contradiction', 'inconsistent body pose',
+  'arms/hands in impossible position', 'body physics error', 'unnatural body twist',
+  'logically inconsistent pose', 'body parts pointing wrong direction',
+  'character facing wrong way for action', 'body alignment error',
+  'contradictory movement direction', 'physically impossible body position',
 ]
 
 // ============================================================================
@@ -316,7 +334,13 @@ export function getAnatomicalCorrectnessDirectives(): string {
     'hands, feet, and limbs must be in natural, possible positions',
     'face features must be symmetrical and correctly placed',
     'proper human anatomy, realistic body structure',
-    'correct finger count, correct limb count, correct facial features'
+    'correct finger count, correct limb count, correct facial features',
+    'clean, clear skin without blemishes, marks, moles, or spots on face',
+    'body orientation and pose must be logically consistent',
+    'character\'s body direction must match movement direction',
+    'upper body and lower body must face the same direction (unless explicitly turning)',
+    'arms and hands must align with body orientation naturally',
+    'no contradictory body positions or impossible rotations'
   ].join(', ')
 }
 

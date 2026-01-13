@@ -12,6 +12,7 @@ Bu klasör, KidStoryBook platformunun AI prompt template'lerini içerir.
 docs/prompts/
 ├── README.md (bu dosya)
 ├── CHANGELOG.md - Versiyon geçmişi ve değişiklikler
+├── VERSION_SYNC_GUIDE.md - Version sync ve takip sistemi rehberi (YENİ - 15 Ocak 2026)
 ├── IMAGE_PROMPT_TEMPLATE_v1.0.0.md - Görsel üretimi prompt template
 └── STORY_PROMPT_TEMPLATE_v1.0.0.md - Hikaye üretimi prompt template
 ```
@@ -42,6 +43,21 @@ Template'ler semantic versioning (v1.0.0) kullanır:
 - **Patch (v1.0.1, v1.0.2...):** Bug düzeltmeleri, typo düzeltmeleri
 
 Detaylı versiyon geçmişi için: `CHANGELOG.md`
+
+### Version Sync Sistemi (YENİ - 15 Ocak 2026)
+
+**Sorumlu:** @project-manager
+
+Kod (`lib/prompts/`) ve dokümantasyon (`docs/prompts/`) arasında otomatik sync ve takip sistemi:
+- ✅ Semantic versioning takibi
+- ✅ Changelog senkronizasyonu
+- ✅ Kod-dokümantasyon sync kontrolü
+- ✅ Version bump önerileri
+
+**Rehber:** `VERSION_SYNC_GUIDE.md`  
+**Utility:** `lib/prompts/version-sync.ts`
+
+**Önemli:** Her kod değişikliği version bump ve changelog güncellemesi gerektirir!
 
 ---
 

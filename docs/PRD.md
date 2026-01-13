@@ -1,10 +1,10 @@
 # 📄 Product Requirements Document (PRD)
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 1.1  
+**Doküman Versiyonu:** 1.2  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 21 Aralık 2025  
-**Durum:** TASLAK - FAZ 1 (Güncellendi: Üyelik, Fiyatlandırma, Edit, Kitaplık eklendi)
+**Son Güncelleme:** 15 Ocak 2026  
+**Durum:** TASLAK - FAZ 1 (Güncellendi: Üyelik, Fiyatlandırma, Edit, Kitaplık, Prompt Yönetimi eklendi)
 
 ---
 
@@ -440,22 +440,124 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 ### 3.1 AI Gereksinimleri
 **Öncelik:** 🔴 YÜKSEK
 
-**Hikaye Metni Üretimi:**
+#### 3.1.1 Hikaye Metni Üretimi
+**Production (Aktif):**
+- ✅ GPT-4o (OpenAI) - Aktif kullanılan model
+- ✅ JSON format çıktısı
+- ✅ Yaş grubuna göre özelleştirilmiş prompt'lar
+- ✅ 4000 token limit
+
+**Alternatif Modeller (Gelecek):**
 - GPT-4 / GPT-4 Turbo (OpenAI)
 - Gemini Pro (Google)
 - Claude 3 (Anthropic)
 
-**Görsel Üretimi:**
+#### 3.1.2 Görsel Üretimi
+**Production (Aktif):**
+- ✅ GPT-image-1.5 (OpenAI) - Aktif kullanılan model
+- ✅ 1024x1536 portrait format (kitap sayfaları için optimize)
+- ✅ Quality: low (cost/quality balance)
+- ✅ Reference image kullanımı (karakter tutarlılığı için)
+- ✅ Rate limiting: 4 images per 90 seconds (Tier 1)
+
+**Alternatif Modeller (Gelecek):**
 - DALL-E 3 (OpenAI)
 - Midjourney (API bekleniyor)
 - Stable Diffusion XL
 - Leonardo.ai
 - Ideogram
 
-**Karakter Tutarlılığı:**
+#### 3.1.3 Karakter Tutarlılığı
+**Production (Aktif):**
+- ✅ Reference image kullanımı (GPT-image-1.5 edits API)
+- ✅ Detaylı karakter açıklamaları (prompt'larda)
+- ✅ Kıyafet tutarlılığı sistemi (hikaye boyunca aynı kıyafet)
+- ✅ Anatomik doğruluk kontrolleri (5 parmak, 2 el, vb.)
+
+**Alternatif Yöntemler (Gelecek):**
 - Consistent Character özelliği (Midjourney v6)
 - LoRA training (Stable Diffusion)
-- Seed ve reference image kullanımı
+- Seed ve reference image kombinasyonu
+
+#### 3.1.4 Prompt Yönetimi ve Version Control ✅ (15 Ocak 2026)
+**Öncelik:** 🔴 YÜKSEK
+
+**Sistem:**
+- ✅ Semantic versioning (major.minor.patch)
+- ✅ Kod-Dokümantasyon sync mekanizması
+- ✅ Changelog yönetimi
+- ✅ Version tracking sistemi
+
+**Yapı:**
+- `lib/prompts/` - Kod tarafı (TypeScript)
+- `docs/prompts/` - Dokümantasyon tarafı (Markdown)
+- Her prompt modülünde `VERSION` objesi
+- Otomatik sync kontrolü (`lib/prompts/version-sync.ts`)
+
+**Sorumluluk:**
+- @project-manager: Version sync ve takip
+- @prompt-manager: Prompt geliştirme ve kalite iyileştirme
+
+**Kurallar:**
+- Her kod değişikliği → version bump gerektirir
+- Her version bump → changelog entry gerektirir
+- Kod ve dokümantasyon version'ları sync olmalı
+
+**Dokümantasyon:**
+- `docs/prompts/VERSION_SYNC_GUIDE.md` - Sync sistemi rehberi
+- `docs/prompts/VERSION_STATUS.md` - Mevcut sync durumu
+- `docs/prompts/CHANGELOG.md` - Version geçmişi
+
+#### 3.1.5 Prompt Kalite İyileştirme Süreçleri ✅ (15 Ocak 2026)
+**Öncelik:** 🔴 YÜKSEK
+
+**Story Prompt Kalite Özellikleri:**
+- ✅ Word count sistemi (yaş gruplarına göre ortalama):
+  - 0-2 yaş: 35-45 kelime/sayfa (ortalama 40)
+  - 3-5 yaş: 50-70 kelime/sayfa (ortalama 60)
+  - 6-9 yaş: 80-100 kelime/sayfa (ortalama 90)
+  - 10+ yaş: 110-130 kelime/sayfa (ortalama 120, maksimum 120)
+- ✅ Diyalog ve detaylı anlatım direktifleri
+- ✅ Writing style requirements (show don't tell, atmospheric description)
+- ✅ Page structure template (opening, action, emotion, transition)
+- ✅ Tema-uyumlu kıyafet sistemi
+
+**Image Prompt Kalite Özellikleri:**
+- ✅ Cinematic composition elements (lighting, depth, camera angle)
+- ✅ 3-level environment descriptions (general → detailed → cinematic)
+- ✅ Hybrid prompt system (cinematic + descriptive combination)
+- ✅ Foreground/Midground/Background layer system
+- ✅ Clothing consistency system (same outfit unless story changes it)
+- ✅ Anatomical error prevention (100+ negative prompts)
+- ✅ Anatomical correctness directives (5 fingers, 2 hands, proper proportions)
+- ✅ Facial skin quality controls (blemishes, moles, marks prevention)
+- ✅ Logical/pose error prevention (body rotation, orientation consistency)
+
+**Kalite İyileştirme Süreci:**
+- ✅ Kullanıcı feedback'leri → Prompt iyileştirmeleri
+- ✅ Görsel kalite sorunları → Negative/Positive prompt eklemeleri
+- ✅ Mantık hataları → Prompt direktifleri
+- ✅ Log sistemi (word count analizi, clothing directive kontrolü)
+
+**Dokümantasyon:**
+- `docs/prompts/STORY_PROMPT_TEMPLATE_v1.0.0.md`
+- `docs/prompts/IMAGE_PROMPT_TEMPLATE_v1.0.0.md`
+- `docs/prompts/CHANGELOG.md`
+
+#### 3.1.6 Prompt Monitoring ve Logging ✅ (15 Ocak 2026)
+**Öncelik:** 🟡 ORTA
+
+**Log Sistemleri:**
+- ✅ Story generation word count analizi
+- ✅ Theme & clothing style kontrolü
+- ✅ Image generation clothing directive kontrolü
+- ✅ Formal wear warning kontrolü
+
+**Metrikler:**
+- Word count per page (yaş grubuna göre)
+- Clothing directive presence
+- Anatomical error frequency
+- Quality feedback tracking
 
 ### 3.2 E-Book Teknolojisi
 **Öncelik:** 🔴 YÜKSEK
@@ -555,11 +657,20 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 ---
 
 **Sonraki Adımlar:**
-1. Teknik araştırma tamamlanacak
-2. AI stratejisi belirlenecek
-3. Platform kararı verilecek (Shopify vs Custom)
-4. MVP özellikleri netleştirilecek
+1. ✅ Teknik araştırma tamamlandı
+2. ✅ AI stratejisi belirlendi (GPT-4o + GPT-image-1.5)
+3. ✅ Platform kararı verildi (Next.js + Supabase)
+4. ✅ MVP özellikleri netleştirildi
+5. ✅ Prompt yönetimi sistemi kuruldu (15 Ocak 2026)
+6. ✅ Prompt kalite iyileştirme süreçleri implement edildi (15 Ocak 2026)
+
+**Eklenen Özellikler (15 Ocak 2026):**
+- Prompt version sync ve takip sistemi
+- Semantic versioning sistemi (major.minor.patch)
+- Kod-dokümantasyon sync mekanizması
+- Prompt kalite iyileştirme özellikleri (word count, cinematic composition, anatomical error prevention)
+- Log ve monitoring sistemi
 
 **Doküman Sahibi:** Proje Ekibi  
-**Son Güncelleme:** 21 Aralık 2025
+**Son Güncelleme:** 15 Ocak 2026
 

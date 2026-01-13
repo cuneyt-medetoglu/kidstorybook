@@ -79,7 +79,21 @@ Kullanıcı ilerleme sorduğunda:
 - İlgili fazın `docs/implementation/FAZ{X}_IMPLEMENTATION.md` dosyasındaki istatistikleri göster
 - Tamamlanan/kalan iş sayısını göster
 
-### 6. Yeni Dokümantasyon Dosyası Oluşturma
+### 6. Prompt Version Sync ve Takip (YENİ - 15 Ocak 2026)
+Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğunda:
+- **Sync Kontrolü:** `lib/prompts/version-sync.ts` kullanarak kod-dokümantasyon sync durumunu kontrol et
+- **Version Bump:** Değişiklik tipine göre (major/minor/patch) uygun version artışını öner
+- **Changelog Güncelleme:** Hem kod hem dokümantasyon changelog'larını güncelle
+- **Dokümantasyon Sync:** Template dosyalarındaki version numaralarını kod ile eşleştir
+- **Checklist:** `docs/prompts/VERSION_SYNC_GUIDE.md` içindeki checklist'i takip et
+
+**Önemli Kurallar:**
+- Her kod değişikliği → version bump gerektirir (en az patch)
+- Her version bump → changelog entry gerektirir
+- Her changelog entry → dokümantasyon güncellemesi gerektirir
+- Kod ve dokümantasyon version'ları her zaman sync olmalı
+
+### 7. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
 1. **Dosya tipini belirle:**
    - Checklist → `docs/checklists/`
@@ -162,6 +176,7 @@ Kullanıcı şunları diyebilir:
   - Yeni prompt version'ları
   - A/B test sonuçları
   - Performance iyileştirmeleri
+  - **ÖNEMLİ:** Prompt'ların sürekli geliştirilmesi ve kalite iyileştirmeleri @prompt-manager'ın sorumluluğundadır
 - **@api-manager:** API değişikliklerinde bildir
   - Yeni endpoint'ler eklendiğinde
   - Breaking changes olduğunda
@@ -174,9 +189,19 @@ Kullanıcı şunları diyebilir:
   - `docs/checklists/` - Kontrol listeleri
   - `docs/reports/` - Raporlar
   - `docs/guides/` - Rehberler
+  - **Prompt Version Sync ve Takip (YENİ - 15 Ocak 2026):**
+    - `lib/prompts/` (kod) ve `docs/prompts/` (dokümantasyon) arasındaki sync kontrolü
+    - Semantic versioning takibi (major.minor.patch)
+    - Changelog güncellemeleri ve tutarlılığı
+    - Version bump kontrolü (her değişiklik için uygun version artışı)
+    - Dokümantasyon-kod senkronizasyonu
+    - Rehber: `docs/prompts/VERSION_SYNC_GUIDE.md`
+    - Utility: `lib/prompts/version-sync.ts`
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
 - **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
 - **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
+  - **Sorumluluk:** Prompt'ların sürekli geliştirilmesi, kalite iyileştirmeleri, feedback'lerin prompt'lara yansıtılması
+  - Prompt'lar sürekli gelişen dokümanlardır ve @prompt-manager bu gelişimin sorumlusudur
 - **@api-manager:** `app/api/`, `docs/api/API_DOCUMENTATION.md`, `postman/`, `docs/api/POSTMAN_COLLECTION.md`
 
 ### Dokümantasyon Yapısı Kuralları
