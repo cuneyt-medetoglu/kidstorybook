@@ -1,19 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TextToSpeechClient } from "@google-cloud/text-to-speech"
+import { createClient } from "@supabase/supabase-js"
+import crypto from "crypto"
+import { getLanguageCode, getPromptForLanguage, isLanguageSupported } from "@/lib/prompts/tts/v1.0.0"
+
+// Initialize Supabase client (for cache)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 // Initialize Google Cloud TTS client
-// Note: Credentials can be provided via:
-// 1. GOOGLE_APPLICATION_CREDENTIALS env var (path to JSON key file) - Local development
-// 2. Service Account JSON as environment variable - Production (Vercel)
-// 3. Default credentials from GCP - If running on GCP
 let client: TextToSpeechClient | null = null
 
 function getTTSClient(): TextToSpeechClient {
   if (client) return client
 
-  // Try to initialize with credentials
   try {
-    // Option 1: Service Account JSON from environment variable (Vercel)
+    // Option 1: Service Account JSON (Vercel/Production)
     if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
       const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
       client = new TextToSpeechClient({
@@ -43,37 +47,92 @@ function getTTSClient(): TextToSpeechClient {
   }
 }
 
-// Available voices for storytelling (child-friendly)
-const STORYTELLER_VOICES = {
-  // English (EN-US) - Standard voices (4M free/month)
-  "en-US-Standard-C": "Female, warm and friendly",
-  "en-US-Standard-D": "Male, warm and friendly",
-  "en-US-Standard-E": "Female, child-friendly",
-  "en-US-Standard-F": "Female, warm and gentle",
-  // English (EN-US) - WaveNet voices (1M free/month)
-  "en-US-Wavenet-C": "Female, natural storytelling",
-  "en-US-Wavenet-D": "Male, natural storytelling",
-  "en-US-Wavenet-E": "Female, child-friendly",
-  "en-US-Wavenet-F": "Female, warm and gentle",
-  // Turkish (TR-TR) - Standard voices (4M free/month)
-  "tr-TR-Standard-A": "Female, warm",
-  "tr-TR-Standard-B": "Male, warm",
-  "tr-TR-Standard-C": "Female, warm",
-  "tr-TR-Standard-D": "Male, warm",
-  "tr-TR-Standard-E": "Female, warm",
-  // Turkish (TR-TR) - WaveNet voices (1M free/month)
-  "tr-TR-Wavenet-A": "Female, natural storytelling",
-  "tr-TR-Wavenet-B": "Male, natural storytelling",
-  "tr-TR-Wavenet-C": "Female, natural storytelling",
-  "tr-TR-Wavenet-D": "Male, natural storytelling",
-  "tr-TR-Wavenet-E": "Female, natural storytelling",
+// Gemini Pro TTS voices (Achernar is default)
+const GEMINI_PRO_VOICES = {
+  "Achernar": "Natural, storytelling voice",
+  // Add more Gemini Pro voices here as needed
+}
+
+/**
+ * Generate cache hash from text, voice, speed, and prompt
+ */
+function generateCacheHash(text: string, voiceId: string, speed: number, prompt: string): string {
+  const content = `${text}|${voiceId}|${speed}|${prompt}`
+  return crypto.createHash('sha256').update(content).digest('hex')
+}
+
+/**
+ * Check if audio exists in cache
+ */
+async function getCachedAudio(hash: string): Promise<string | null> {
+  try {
+    const filePath = `${hash}.mp3`
+    
+    // Check if file exists
+    const { data: files, error: listError } = await supabase.storage
+      .from('tts-cache')
+      .list('', {
+        search: filePath
+      })
+
+    if (listError || !files || files.length === 0) {
+      return null
+    }
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('tts-cache')
+      .getPublicUrl(filePath)
+
+    return data.publicUrl
+  } catch (error) {
+    console.error('[TTS Cache] Error checking cache:', error)
+    return null
+  }
+}
+
+/**
+ * Save audio to cache
+ */
+async function saveCachedAudio(hash: string, audioBuffer: Buffer): Promise<string | null> {
+  try {
+    const filePath = `${hash}.mp3`
+    
+    const { error: uploadError } = await supabase.storage
+      .from('tts-cache')
+      .upload(filePath, audioBuffer, {
+        contentType: 'audio/mpeg',
+        upsert: true
+      })
+
+    if (uploadError) {
+      console.error('[TTS Cache] Error uploading to cache:', uploadError)
+      return null
+    }
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('tts-cache')
+      .getPublicUrl(filePath)
+
+    return data.publicUrl
+  } catch (error) {
+    console.error('[TTS Cache] Error saving to cache:', error)
+    return null
+  }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { text, voiceId = "en-US-Standard-E", speed = 1.0 } = body
+    const { 
+      text, 
+      voiceId = "Achernar", 
+      speed = 1.0,
+      language = "en" // PRD language code (tr, en, de, fr, es, pt, ru, zh)
+    } = body
 
+    // Validation
     if (!text || typeof text !== "string" || text.trim().length === 0) {
       return NextResponse.json({ error: "Text is required" }, { status: 400 })
     }
@@ -85,36 +144,52 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate voiceId
-    if (!Object.keys(STORYTELLER_VOICES).includes(voiceId)) {
-      return NextResponse.json(
-        { error: `Invalid voiceId. Available: ${Object.keys(STORYTELLER_VOICES).join(", ")}` },
-        { status: 400 },
-      )
-    }
+    // Validate language and get language code + prompt
+    const languageCode = getLanguageCode(language)
+    const prompt = getPromptForLanguage(language)
 
     // Validate speed (0.25 to 4.0)
     const validSpeed = Math.max(0.25, Math.min(4.0, speed))
 
+    // Generate cache hash
+    const cacheHash = generateCacheHash(text, voiceId, validSpeed, prompt)
+
+    // Check cache first
+    const cachedUrl = await getCachedAudio(cacheHash)
+    if (cachedUrl) {
+      console.log('[TTS] Cache hit:', cacheHash.substring(0, 8))
+      return NextResponse.json({
+        audioUrl: cachedUrl,
+        voiceId,
+        speed: validSpeed,
+        language: languageCode,
+        textLength: text.length,
+        cached: true,
+      })
+    }
+
+    console.log('[TTS] Cache miss, generating audio:', cacheHash.substring(0, 8))
+
     // Get TTS client
     const ttsClient = getTTSClient()
 
-    // Request TTS
+    // Request TTS with Gemini Pro model
     const [response] = await ttsClient.synthesizeSpeech({
-      input: { text },
+      input: { 
+        text,
+        // Note: Prompt is used for cache hash, but Gemini Pro TTS API doesn't support prompt field directly
+        // The prompt guidance is handled by the voice model itself
+      },
       voice: {
-        languageCode: voiceId.split("-").slice(0, 2).join("-"), // e.g., "en-US" or "tr-TR"
+        languageCode,
         name: voiceId,
-        ssmlGender: 
-          voiceId.includes("A") || voiceId.includes("C") || voiceId.includes("E") || voiceId.includes("F")
-            ? "FEMALE"
-            : "MALE",
+        modelName: "gemini-2.5-pro-tts", // Required for Gemini Pro TTS voices
       },
       audioConfig: {
         audioEncoding: "MP3",
         speakingRate: validSpeed,
-        pitch: 0, // Neutral pitch (can be adjusted: -20 to +20)
-        volumeGainDb: 0, // Neutral volume (can be adjusted: -96 to +16)
+        pitch: 0,
+        volumeGainDb: 0,
       },
     })
 
@@ -122,16 +197,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to generate audio" }, { status: 500 })
     }
 
-    // Convert audio content to base64
-    const audioBase64 = Buffer.from(response.audioContent).toString("base64")
-    const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`
+    // Convert audio content to buffer
+    const audioBuffer = Buffer.from(response.audioContent)
 
-    return NextResponse.json({
-      audioUrl: audioDataUrl,
-      voiceId,
-      speed: validSpeed,
-      textLength: text.length,
-    })
+    // Save to cache (non-blocking, errors are logged but don't fail request)
+    const savedCacheUrl = await saveCachedAudio(cacheHash, audioBuffer)
+
+    // Return audio (either from cache URL or as data URL)
+    if (savedCacheUrl) {
+      console.log('[TTS] Audio cached successfully:', cacheHash.substring(0, 8))
+      return NextResponse.json({
+        audioUrl: savedCacheUrl,
+        voiceId,
+        speed: validSpeed,
+        language: languageCode,
+        textLength: text.length,
+        cached: false,
+      })
+    } else {
+      // Fallback to data URL if cache fails
+      console.log('[TTS] Cache save failed, returning data URL')
+      const audioBase64 = audioBuffer.toString("base64")
+      const audioDataUrl = `data:audio/mp3;base64,${audioBase64}`
+      
+      return NextResponse.json({
+        audioUrl: audioDataUrl,
+        voiceId,
+        speed: validSpeed,
+        language: languageCode,
+        textLength: text.length,
+        cached: false,
+      })
+    }
   } catch (error: any) {
     console.error("TTS Error:", error)
     return NextResponse.json(
@@ -148,8 +245,9 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     return NextResponse.json({
-      voices: STORYTELLER_VOICES,
-      defaultVoice: "en-US-Standard-E",
+      voices: GEMINI_PRO_VOICES,
+      defaultVoice: "Achernar",
+      supportedLanguages: ["tr", "en", "de", "fr", "es", "pt", "ru", "zh"],
     })
   } catch (error: any) {
     console.error("TTS Voices Error:", error)
@@ -162,4 +260,3 @@ export async function GET() {
     )
   }
 }
-

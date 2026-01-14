@@ -6,6 +6,7 @@ interface TTSOptions {
   voiceId?: string
   speed?: number
   volume?: number
+  language?: string // PRD language code (tr, en, de, fr, es, pt, ru, zh)
 }
 
 interface UseTTSReturn {
@@ -71,8 +72,8 @@ export function useTTS(): UseTTSReturn {
       setCurrentText(text)
       setWords(text.split(/\s+/))
 
-      const { voiceId = "en-US-Wavenet-C", speed = 1.0, volume = 1.0 } = options
-      currentOptionsRef.current = { voiceId, speed, volume }
+      const { voiceId = "Achernar", speed = 1.0, volume = 1.0, language = "en" } = options
+      currentOptionsRef.current = { voiceId, speed, volume, language }
 
       // Call TTS API
       const response = await fetch("/api/tts/generate", {
@@ -84,6 +85,7 @@ export function useTTS(): UseTTSReturn {
           text,
           voiceId,
           speed,
+          language,
         }),
       })
 

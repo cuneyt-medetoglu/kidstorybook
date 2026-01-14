@@ -1351,31 +1351,52 @@
 - ⏳ Touch gestures (pinch to zoom, double tap): Sonraki adım (zoom ile birlikte)
 - ⏳ PWA optimizasyonu: Faz 6'da yapılacak
 
-**2.5.3 - Sesli Okuma (Text-to-Speech):**
-- ✅ Backend API endpoint: `app/api/tts/generate/route.ts` oluşturuldu
-- ✅ Google Cloud Text-to-Speech entegrasyonu
-- ✅ Frontend hook: `hooks/useTTS.ts` oluşturuldu
-- ✅ Book Viewer'a TTS entegrasyonu yapıldı
+**2.5.3 - Sesli Okuma (Text-to-Speech) - ✅ GÜNCELLENDİ (15 Ocak 2026):**
+- ✅ Backend API endpoint: `app/api/tts/generate/route.ts` oluşturuldu ve güncellendi
+- ✅ **Gemini Pro TTS entegrasyonu (15 Ocak 2026):**
+  - ✅ Google Cloud Gemini Pro TTS modeline geçildi (`gemini-2.5-pro-tts`)
+  - ✅ Achernar sesi default olarak kullanılıyor
+  - ✅ WaveNet ve Standard sesler kaldırıldı
+  - ✅ Vertex AI API aktifleştirildi ve service account'a izinler verildi
+- ✅ Frontend hook: `hooks/useTTS.ts` oluşturuldu ve güncellendi (language parametresi eklendi)
+- ✅ Book Viewer'a TTS entegrasyonu yapıldı (eski ses dropdown'ları kaldırıldı, sadece Achernar)
 - ✅ Play/Pause butonu TTS ile çalışıyor
-- ✅ Settings dropdown'a Voice ve Speed seçenekleri eklendi
+- ✅ Settings dropdown'a Voice (Achernar) ve Speed seçenekleri eklendi
 - ✅ Sayfa değiştiğinde TTS otomatik duruyor
 - ✅ TTS bittiğinde otomatik sayfa ilerleme
 - ✅ Loading state gösterimi (spinner animasyonu)
-- ⚠️ Google Cloud TTS credentials kurulumu gerekiyor
+- ✅ **8 Dil Desteği (15 Ocak 2026):**
+  - ✅ TR, EN, DE, FR, ES, PT, RU, ZH dilleri için prompt dosyaları oluşturuldu
+  - ✅ Dil mapping sistemi (`lib/prompts/tts/v1.0.0/index.ts`)
+  - ✅ Her dil için özel prompt'lar (`lib/prompts/tts/v1.0.0/{lang}.ts`)
+  - ✅ Book Viewer'da `book.language` parametresi ile otomatik dil seçimi
+- ✅ **TTS Cache Mekanizması (15 Ocak 2026):**
+  - ✅ Supabase Storage cache bucket'ı oluşturuldu (`tts-cache`)
+  - ✅ SHA-256 hash ile cache kontrolü (`text + voiceId + speed + prompt`)
+  - ✅ Cache hit: Public URL döndürme (ücretsiz, hızlı)
+  - ✅ Cache miss: API'den al, cache'le, döndür
+  - ✅ Migration: `supabase/migrations/008_create_tts_cache_bucket.sql`
+  - ✅ Cleanup fonksiyonu: 30 günden eski dosyalar otomatik silinir
+- ⏳ **TTS Cache Temizleme (Hikaye Değişikliğinde):** Planlanıyor
+  - Hikaye metni değiştiğinde eski cache dosyalarını silme özelliği eklenecek
 - ⏳ Word highlighting: Basit implementasyon, gelişmiş versiyon için Web Speech API word timing gerekli
 - ⏳ Volume kontrolü: UI'da henüz yok, hook'ta mevcut
 
 **Teknik Detaylar:**
 - Package: `@google-cloud/text-to-speech` kuruldu
 - API Route: `/api/tts/generate`
-- Audio Format: MP3 (base64 encoded data URL)
-- Ses Seçenekleri: 8 farklı hikaye anlatıcı sesi (Female/Male, Standard/Wavenet)
+- Audio Format: MP3 (cache: Supabase Storage public URL, fallback: base64 data URL)
+- Ses Seçenekleri: Achernar (Gemini Pro TTS) - tüm dillerde kullanılabilir
 - Hız Kontrolü: 0.25x - 4.0x arası (UI'da 0.75x, 1.0x, 1.25x)
 - Environment Variables: `GOOGLE_CLOUD_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_SERVICE_ACCOUNT_JSON`
+- **Fiyatlandırma (Gemini Pro TTS):**
+  - Input: $1.00 / 1M text token
+  - Output: $20.00 / 1M audio token (25 token/saniye)
+  - Cache ile maliyet optimizasyonu: Aynı metin tekrar okutulduğunda $0
 
 **Notlar:**
-- ElevenLabs alternatif olarak roadmap'e not edildi (Post-MVP değerlendirilecek)
-- İlk 4 milyon karakter/ay ücretsiz, sonrası $4/1M karakter
+- Vertex AI API aktifleştirildi ve service account'a Owner rolü verildi (development için)
+- Cache mekanizması sayesinde aynı metin tekrar okutulduğunda maliyet $0
 - Environment setup guide'a Google Cloud TTS kurulum bilgileri eklendi
 
 **2.5.4 - Otomatik Oynatma (Autoplay):**

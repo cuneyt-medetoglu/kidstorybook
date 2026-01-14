@@ -255,8 +255,10 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Özet:**
 - ✅ Temel görüntüleme ve navigasyon (6 animasyon tipi, fullscreen, thumbnails)
 - ✅ Mobil ve responsive (portrait/landscape, swipe gestures)
-- ✅ Text-to-Speech entegrasyonu (Google Cloud TTS, 8 ses seçeneği)
+- ✅ Text-to-Speech entegrasyonu (Gemini Pro TTS, Achernar ses)
 - ✅ Otomatik oynatma (TTS Synced, Timed modes)
+- ✅ TTS Cache mekanizması (15 Ocak 2026)
+- ✅ 8 dil desteği (TR, EN, DE, FR, ES, PT, RU, ZH)
 - ✅ UX iyileştirmeleri (Bookmark, Reading Progress, Keyboard Shortcuts, Share)
 - ✅ Görsel ve animasyonlar (6 animasyon tipi, 3 hız seçeneği, shadow/depth effects)
 
@@ -279,14 +281,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.) - ⏳ Faz 6'da yapılacak
 
 #### 2.5.3 Sesli Okuma (Text-to-Speech)
-- [x] **2.5.3.1** Text-to-Speech entegrasyonu (Google Cloud TTS - MVP, ElevenLabs alternatif olarak değerlendirilecek) - ✅ Backend API ve frontend hook oluşturuldu
-- [x] **2.5.3.2** Farklı ses seçenekleri (3-5 farklı ses: erkek, kadın, çocuk sesleri) - ✅ 8 ses seçeneği (Settings dropdown'da 3 ana seçenek)
+- [x] **2.5.3.1** Text-to-Speech entegrasyonu (Gemini Pro TTS) - ✅ Backend API ve frontend hook oluşturuldu, WaveNet/Standard sesler kaldırıldı (15 Ocak 2026)
+- [x] **2.5.3.2** Ses seçeneği (Achernar - Gemini Pro TTS) - ✅ Settings dropdown'da Achernar sesi mevcut, eski sesler kaldırıldı (15 Ocak 2026)
 - [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x)
 - [ ] **2.5.3.4** Volume kontrolü - ⏳ Hook'ta mevcut, UI'da henüz yok
 - [x] **2.5.3.5** Play/Pause/Stop butonları - ✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok
 - [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence) - ⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli
 - [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme
-- [ ] **2.5.3.8** TTS Cache mekanizması - ⏳ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz)
+- [x] **2.5.3.8** TTS Cache mekanizması - ✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026
+- [ ] **2.5.3.9** TTS Cache temizleme (hikaye değişikliğinde) - ⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
 - [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi
@@ -1212,37 +1215,38 @@ Requirements:
     - Düzgün çözüm: Faz 3'te server-side auth state yönetimi
     - Konum: `components/layout/Header.tsx`, `docs/guides/AUTHENTICATION_ISSUES.md`
   - **Detaylı Dokümantasyon:** `docs/guides/AUTHENTICATION_ISSUES.md`
-- **Text-to-Speech (TTS) Stratejisi (6 Ocak 2026):**
-  - **MVP:** Google Cloud Text-to-Speech kullanılacak
-    - WaveNet sesleri: İlk 1 milyon karakter/ay ücretsiz, sonrası $16/1M karakter
-    - Standart sesler: İlk 4 milyon karakter/ay ücretsiz, sonrası $4/1M karakter
-    - Yüksek kalite, makul fiyat
-  - **TTS Cache Mekanizması (6 Ocak 2026):**
-    - **Sorun:** Aynı metin tekrar okutulduğunda her seferinde API ücreti alınıyor
-    - **Çözüm:** Ses dosyalarını Supabase Storage'da cache'leyelim
-    - **Implementasyon:**
-      - Text'i SHA-256 hash'le (unique identifier)
-      - İlk okuma: API'den al, Supabase Storage'a kaydet (`/tts-cache/{hash}.mp3`)
-      - Sonraki okumalar: Storage'dan çek (ücretsiz, API çağrısı yok)
-      - Storage maliyeti: Supabase Storage (500MB ücretsiz, sonrası $0.021/GB/ay)
-    - **Faydalar:**
-      - Aynı metin tekrar okutulduğunda ücretsiz
-      - Daha hızlı yükleme (API çağrısı yok)
-      - API kullanımını azaltır (maliyet tasarrufu)
-    - **Not:** Faz 2.5.3.8'de implement edilecek
-  - **TTS Gelişmiş Özellikler (6 Ocak 2026):**
-    - **Çok Dilli Destek (TR/EN):** ✅ TR-TR sesleri eklendi. Şu an manuel seçim yapılabiliyor.
-    - **Otomatik Dil Algılama (Localization ile):** Localization altyapısı (i18n) yapılınca, hikayenin diline göre otomatik ses seçilecek. Örnek: Türkçe hikaye → `tr-TR-Standard-A`, İngilizce hikaye → `en-US-Standard-E`. Bu özellik Faz 5 (Localization) ile birlikte implement edilecek.
-    - **Yaş Grubuna Göre Özelleştirme:** 3-5 yaş (yavaş, yüksek pitch), 6-8 yaş (normal), 9-12 yaş (biraz hızlı) - Planlanıyor
-    - **Modlar:** Uyku modu (yavaş, düşük pitch), Neşeli mod (enerjik), Samimi mod (sıcak) - Planlanıyor
-    - **Achernar Ses:** Gemini Pro TTS modelinde mevcut, ancak ücretli. Şu an WaveNet kullanıyoruz (ücretsiz tier mevcut). Achernar'ı default yapmak için Gemini Pro TTS entegrasyonu gerekli (Post-MVP)
-    - **Strateji Dokümanı:** `docs/strategies/TTS_STRATEGY.md` - Detaylı TTS stratejisi ve gereksinimler
-  - **Alternatif (Post-MVP):** ElevenLabs API değerlendirilecek
-    - Daha doğal, hikaye anlatıcı tonu
-    - Daha pahalı: Starter $5/ay (30K karakter), Creator $22/ay (100K karakter)
-    - Ses kalitesi çok yüksek, emotion ve tone kontrolü mevcut
-    - **Geçiş Kriteri:** Google Cloud TTS kalitesi yetersiz kalırsa veya kullanıcı geri bildirimleri olumsuz olursa
-    - **Not:** Her iki API de backend'de entegre edilebilir, kullanıcı tercihine göre seçilebilir
+- **Text-to-Speech (TTS) Stratejisi (15 Ocak 2026 - GÜNCELLENDİ):**
+  - ✅ **Gemini Pro TTS'e Geçiş (15 Ocak 2026):**
+    - ✅ Google Cloud Gemini Pro TTS modeli aktif
+    - ✅ Achernar sesi default olarak kullanılıyor
+    - ✅ WaveNet ve Standard sesler kaldırıldı
+    - **Fiyatlandırma:**
+      - Input: $1.00 / 1M text token
+      - Output: $20.00 / 1M audio token (25 token/saniye)
+      - Örnek maliyet: ~500 karakter → ~$0.005/okuma
+  - ✅ **TTS Cache Mekanizması (15 Ocak 2026 - TAMAMLANDI):**
+    - ✅ Implementasyon tamamlandı (`app/api/tts/generate/route.ts`)
+    - ✅ Text'i SHA-256 hash'le (unique identifier)
+    - ✅ İlk okuma: API'den al, Supabase Storage'a kaydet (`tts-cache/{hash}.mp3`)
+    - ✅ Sonraki okumalar: Storage'dan çek (ücretsiz, API çağrısı yok)
+    - ✅ Migration: `supabase/migrations/008_create_tts_cache_bucket.sql`
+    - ✅ Cleanup: 30 günden eski dosyalar otomatik silinir
+    - **Maliyet Tasarrufu:** Aynı metin 10 kez okutulursa → 9 API çağrısı bedava
+  - ✅ **8 Dil Desteği (15 Ocak 2026):**
+    - ✅ Türkçe (TR), İngilizce (EN), Almanca (DE), Fransızca (FR)
+    - ✅ İspanyolca (ES), Portekizce (PT), Rusça (RU), Çince (ZH)
+    - ✅ Her dil için özel prompt'lar (`lib/prompts/tts/v1.0.0/`)
+    - ✅ Dil mapping sistemi (PRD kodu → Gemini TTS kodu)
+  - **TTS Gelişmiş Özellikler (Gelecek):**
+    - [ ] **TTS Cache Temizleme (Hikaye Değişikliğinde):** Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur - ⏳ Planlanıyor (15 Ocak 2026)
+      - **Sorun:** Hikaye metni düzenlendiğinde eski cache'den yanlış ses çalıyor
+      - **Çözüm:** Hikaye güncellendiğinde ilgili sayfaların cache hash'lerini hesapla, eski dosyaları Supabase Storage'dan sil
+      - **Implementasyon:** Book edit API'sinde veya sayfa metni değiştiğinde cache temizleme fonksiyonu çağır
+    - [ ] Otomatik Dil Algılama: Localization altyapısı ile birlikte (Faz 5)
+    - [ ] Yaş Grubuna Göre Özelleştirme: 3-5 yaş (yavaş), 6-8 yaş (normal), 9-12 yaş (hızlı)
+    - [ ] Modlar: Uyku modu (yavaş), Neşeli mod (enerjik), Samimi mod (sıcak)
+    - [ ] Alternatif Gemini Pro Sesler: 30 ses mevcut, eklenebilir
+    - **Strateji Dokümanı:** `docs/strategies/TTS_STRATEGY.md` (v2.0 - 15 Ocak 2026)
 
 ### v0.app vs bolt.new Karşılaştırması
 

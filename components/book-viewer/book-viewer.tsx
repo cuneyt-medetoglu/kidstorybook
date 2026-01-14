@@ -116,7 +116,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
   const [showThumbnails, setShowThumbnails] = useState(false)
   const [isLandscape, setIsLandscape] = useState(false)
   const [direction, setDirection] = useState(0)
-  const [selectedVoice, setSelectedVoice] = useState("en-US-Standard-E")
+  const [selectedVoice, setSelectedVoice] = useState("Achernar")
   const [ttsSpeed, setTtsSpeed] = useState(1.0)
   const [autoplayMode, setAutoplayMode] = useState<"off" | "tts" | "timed">("off")
   const [autoplaySpeed, setAutoplaySpeed] = useState(10) // seconds per page
@@ -363,6 +363,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
                 play(nextPageText, {
                   voiceId: selectedVoice,
                   speed: ttsSpeed,
+                  language: book?.language || "en",
                 })
               }
             }, 500)
@@ -419,6 +420,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
         await play(currentPageText, {
           voiceId: selectedVoice,
           speed: ttsSpeed,
+          language: book?.language || "en",
         })
       }
     }
@@ -435,6 +437,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           play(currentPageText, {
             voiceId: selectedVoice,
             speed: ttsSpeed,
+            language: book?.language || "en",
           })
         }, 100)
       }
@@ -583,6 +586,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           play(currentPageText, {
             voiceId: selectedVoice,
             speed: ttsSpeed,
+            language: book?.language || "en",
           })
         }
       }, 500)
@@ -881,98 +885,11 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
                 <span className={cn(animationSpeed === "fast" && "font-semibold")}>Fast</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuLabel>Voice (English)</DropdownMenuLabel>
+              <DropdownMenuLabel>Voice</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-E")}>
-                <span className={cn(selectedVoice === "en-US-Standard-E" && "font-semibold")}>
-                  Child-Friendly (Default)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-C")}>
-                <span className={cn(selectedVoice === "en-US-Standard-C" && "font-semibold")}>
-                  Warm & Friendly
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-F")}>
-                <span className={cn(selectedVoice === "en-US-Standard-F" && "font-semibold")}>
-                  Warm & Gentle
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Standard-D")}>
-                <span className={cn(selectedVoice === "en-US-Standard-D" && "font-semibold")}>
-                  Male Voice
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Voice (Turkish)</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-A")}>
-                <span className={cn(selectedVoice === "tr-TR-Standard-A" && "font-semibold")}>
-                  Female (TR) - Recommended
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-C")}>
-                <span className={cn(selectedVoice === "tr-TR-Standard-C" && "font-semibold")}>
-                  Female (TR) - Alternative
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-E")}>
-                <span className={cn(selectedVoice === "tr-TR-Standard-E" && "font-semibold")}>
-                  Female (TR) - Alternative 2
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-B")}>
-                <span className={cn(selectedVoice === "tr-TR-Standard-B" && "font-semibold")}>
-                  Male (TR)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Standard-D")}>
-                <span className={cn(selectedVoice === "tr-TR-Standard-D" && "font-semibold")}>
-                  Male (TR) - Alternative
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Premium Voices (WaveNet)</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-C")}>
-                <span className={cn(selectedVoice === "en-US-Wavenet-C" && "font-semibold")}>
-                  Female Storyteller (EN)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-D")}>
-                <span className={cn(selectedVoice === "en-US-Wavenet-D" && "font-semibold")}>
-                  Male Storyteller (EN)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("en-US-Wavenet-E")}>
-                <span className={cn(selectedVoice === "en-US-Wavenet-E" && "font-semibold")}>
-                  Child-Friendly (EN)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-A")}>
-                <span className={cn(selectedVoice === "tr-TR-Wavenet-A" && "font-semibold")}>
-                  Female (TR) - Premium
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-C")}>
-                <span className={cn(selectedVoice === "tr-TR-Wavenet-C" && "font-semibold")}>
-                  Female (TR) - Premium Alt
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-E")}>
-                <span className={cn(selectedVoice === "tr-TR-Wavenet-E" && "font-semibold")}>
-                  Female (TR) - Premium Alt 2
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-B")}>
-                <span className={cn(selectedVoice === "tr-TR-Wavenet-B" && "font-semibold")}>
-                  Male (TR) - Premium
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSelectedVoice("tr-TR-Wavenet-D")}>
-                <span className={cn(selectedVoice === "tr-TR-Wavenet-D" && "font-semibold")}>
-                  Male (TR) - Premium Alt
+              <DropdownMenuItem onClick={() => setSelectedVoice("Achernar")}>
+                <span className={cn(selectedVoice === "Achernar" && "font-semibold")}>
+                  Achernar (Gemini Pro TTS)
                 </span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
