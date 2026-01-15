@@ -1,12 +1,67 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.1  
-**Son Güncelleme:** 15 Ocak 2026 (Illustration Style İyileştirmesi)
+**Doküman Versiyonu:** 2.2  
+**Son Güncelleme:** 16 Ocak 2026 (El/Parmak Anatomisi ve Çoklu Karakter İyileştirmeleri)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.3 (16 Ocak 2026) - El/Parmak Anatomisi ve Çoklu Karakter İyileştirmeleri
+
+**Sorun 1:** El ve parmaklar bozuk çıkıyor (en yaygın AI hatası)  
+**Sorun 2:** Çoklu karakterde göz rengi seçilenden farklı çıkıyor (karakter özellikleri karışıyor)
+
+**Çözüm:**
+
+#### 1. El/Parmak Anatomisi İyileştirmeleri (AI Research Based)
+- ✅ `getAnatomicalCorrectnessDirectives()` - Detaylı el/parmak direktifleri:
+  - Her elin tam 5 parmağı (başparmak, işaret, orta, yüzük, serçe)
+  - Parmakların avuca doğru bağlanması, eklem ve boğumlar görünür
+  - Başparmak pozisyonu (karşıt, elin yan tarafında)
+  - Parmakların doğal bükülmesi (parmak başına 3 segment, başparmak 2)
+  - El dokusu (eklemler, tırnaklar dahil)
+  - Doğal el pozları (rahat tutuş, yumuşak eğriler, anatomik olarak mümkün)
+  - Bilek bağlantısı, doğal bilek açısı
+- ✅ `ANATOMICAL_NEGATIVE` - 15+ yeni el/parmak negative prompt:
+  - mutant/malformed/twisted fingers, bent at wrong angle
+  - fingers without fingernails, missing/extra knuckles
+  - thumb variations (wrong side, missing, two thumbs, wrong position)
+  - fingers growing from wrist, merged with palm, webbed fingers
+  - impossible finger directions, twisted backwards
+  - specific wrong counts (4 fingers no thumb, 6 fingers, hand without palm)
+
+#### 2. Çoklu Karakter Referans Eşleştirme
+- ✅ `buildMultipleCharactersPrompt()` - Her karakter için açık referans eşleştirme:
+  - Her karaktere numara: "CHARACTER 1 (Reference Image 1)", "CHARACTER 2 (Reference Image 2)"
+  - Üst kısımda CRITICAL INSTRUCTION: Referans görsel eşleştirme direktifleri
+  - Her karakterin bireysel özelliklerine dikkat: göz rengi, saç rengi, yaş
+  - Child karakterler için özel vurgu: "(IMPORTANT: This character has X eyes, NOT the same eye color as Character 1)"
+  - "Do NOT mix features between characters" direktifi
+
+**Kaynak:** Web research - AI image generation hands/anatomy best practices 2026
+
+**Etki:** Yüksek - En kritik kalite sorunları (el hatası, karakter karışıklığı)
+
+**Dosya Değişiklikleri:**
+- ✅ `lib/prompts/image/v1.0.0/negative.ts` (v1.0.1) - El/parmak anatomisi
+- ✅ `lib/prompts/image/v1.0.0/character.ts` (v1.0.3) - Çoklu karakter eşleştirme
+- ✅ `app/api/books/route.ts` - FormData image[] format düzeltmesi (16 Ocak 2026)
+
+**API Değişikliği (16 Ocak 2026):**
+- **Sorun:** `/v1/images/edits` çağrısında `image` parametresi duplicate hatası veriyordu
+- **Çözüm:** FormData'da `image` → `image[]` formatına geçildi (array syntax)
+- **Etki:** Çoklu referans görsel desteği artık çalışıyor ✅
+
+### v1.0.2 (16 Ocak 2026) - Çoklu Referans Görsel Desteği
+
+**Sorun:** Çoklu karakterli kapakta yalnızca 1. karakter referans görseli kullanılıyordu.
+
+**Çözüm:**
+- ✅ `/v1/images/edits` çağrısına birden fazla referans görsel gönderimi eklendi (image[] array)
+- ✅ Çoklu karakter prompt'unda Child karakter açıklaması eklendi
+- ✅ Kapakta tüm karakterlerin referans görselleri kullanılabiliyor
 
 ### v1.0.1 (15 Ocak 2026) - Illustration Style İyileştirmesi
 
@@ -172,7 +227,7 @@
 
 | Template | Version | Status | Release Date |
 |----------|---------|--------|--------------|
-| Image Generation | v1.0.0 | ✅ Active | 15 Ocak 2026 |
+| Image Generation | v1.0.2 | ✅ Active | 16 Ocak 2026 |
 | Story Generation | v1.0.0 | ✅ Active | 15 Ocak 2026 |
 
 ---

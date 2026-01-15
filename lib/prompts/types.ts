@@ -33,6 +33,17 @@ export interface StoryGenerationInput {
   hairColor?: string
   eyeColor?: string
   specialFeatures?: string[]
+  // NEW: Multiple characters support
+  characters?: Array<{
+    id: string
+    name: string // Ana karakter için Step 1'den, diğerleri için tip adı
+    type: {
+      group: string
+      value: string
+      displayName: string
+    }
+    characterId?: string // API'den gelen karakter ID'si
+  }>
 }
 
 export interface StoryGenerationOutput {

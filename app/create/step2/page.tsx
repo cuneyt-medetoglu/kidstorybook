@@ -21,17 +21,81 @@ import { useRouter } from "next/navigation"
 import { useState, useCallback, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 
-type CharacterType = "Child" | "Dog" | "Cat" | "Rabbit" | "Teddy Bear" | "Other"
+// Character Type System (Group-based)
+type CharacterGroup = "Child" | "Pets" | "Family Members" | "Other"
+
+// Options for Child character details (same as Step 1)
+const hairColorOptions = [
+  { value: "light-blonde", label: "Light Blonde" },
+  { value: "blonde", label: "Blonde" },
+  { value: "dark-blonde", label: "Dark Blonde" },
+  { value: "black", label: "Black" },
+  { value: "brown", label: "Brown" },
+  { value: "red", label: "Red" },
+]
+
+const eyeColorOptions = [
+  { value: "blue", label: "Blue" },
+  { value: "green", label: "Green" },
+  { value: "brown", label: "Brown" },
+  { value: "black", label: "Black" },
+  { value: "hazel", label: "Hazel" },
+]
+
+const specialFeaturesOptions = [
+  { value: "glasses", label: "Glasses" },
+  { value: "freckles", label: "Freckles" },
+  { value: "dimples", label: "Dimples" },
+  { value: "braces", label: "Braces" },
+  { value: "curly-hair", label: "Curly Hair" },
+  { value: "long-hair", label: "Long Hair" },
+]
+
+type CharacterTypeInfo = {
+  group: CharacterGroup
+  value: string // "Dog", "Mom", "Custom Text", etc.
+  displayName: string // "Dog", "Mom", "My Uncle", etc.
+}
 
 type Character = {
   id: string
-  type: CharacterType
+  characterType: CharacterTypeInfo
+  name?: string // Optional name for non-child characters
+  // Child-specific details (only for Child characters)
+  age?: number
+  gender?: "boy" | "girl"
+  hairColor?: string
+  eyeColor?: string
+  specialFeatures?: string[]
   uploadedFile: File | null
   previewUrl: string | null
   uploadError: string | null
   isDragging: boolean
 }
+
+// Character Options Configuration
+const CHARACTER_OPTIONS = {
+  Child: {
+    label: "Child",
+    value: "Child",
+  },
+  Pets: {
+    label: "Pets",
+    options: ["Dog", "Cat", "Rabbit", "Bird", "Other Pet"],
+  },
+  FamilyMembers: {
+    label: "Family Members",
+    options: ["Mom", "Dad", "Grandma", "Grandpa", "Sister", "Brother", "Other Family"],
+  },
+  Other: {
+    label: "Other",
+    hasInput: true,
+  },
+} as const
 
 export default function Step2Page() {
   const router = useRouter()
@@ -40,7 +104,11 @@ export default function Step2Page() {
   const [characters, setCharacters] = useState<Character[]>([
     {
       id: "1",
-      type: "Child",
+      characterType: {
+        group: "Child",
+        value: "Child",
+        displayName: "Child",
+      },
       uploadedFile: null,
       previewUrl: null,
       uploadError: null,
@@ -48,13 +116,61 @@ export default function Step2Page() {
     },
   ])
 
-  // Load Step 1 data from localStorage
+  // Load Step 1 data from localStorage + Migration logic
   useEffect(() => {
     const saved = localStorage.getItem("kidstorybook_wizard")
     if (saved) {
       try {
         const data = JSON.parse(saved)
         setStep1Data(data.step1)
+
+        // Migration: Old format (characterPhoto) → New format (characters array)
+        if (data.step2?.characterPhoto && !data.step2?.characters) {
+          console.log("[Step 2] Migrating old characterPhoto to characters array")
+
+          // Convert old format to new format
+          data.step2.characters = [
+            {
+              id: "1",
+              characterType: {
+                group: "Child",
+                value: "Child",
+                displayName: "Child",
+              },
+              photo: data.step2.characterPhoto,
+              characterId: localStorage.getItem("kidstorybook_character_id") || null,
+            },
+          ]
+
+          // Remove old field
+          delete data.step2.characterPhoto
+
+          // Save migrated data
+          localStorage.setItem("kidstorybook_wizard", JSON.stringify(data))
+          console.log("[Step 2] Migration completed")
+        }
+
+        // Load characters from localStorage
+        if (data.step2?.characters && Array.isArray(data.step2.characters)) {
+          setCharacters(
+            data.step2.characters.map((char: any) => ({
+              id: char.id,
+              characterType: char.characterType,
+              name: char.name || undefined, // Load optional name or required name for Child
+              // NEW: Load Child-specific details if available
+              age: char.age,
+              gender: char.gender,
+              hairColor: char.hairColor,
+              eyeColor: char.eyeColor,
+              specialFeatures: char.specialFeatures || [],
+              uploadedFile: null, // File objects cannot be stored in localStorage
+              previewUrl: char.photo?.url || null,
+              uploadError: null,
+              isDragging: false,
+            })),
+          )
+          console.log("[Step 2] Loaded", data.step2.characters.length, "character(s) from localStorage")
+        }
       } catch (error) {
         console.error("Error parsing wizard data:", error)
       }
@@ -114,37 +230,102 @@ export default function Step2Page() {
         const dataUrl = reader.result as string
         const photoBase64 = dataUrl.split(",")[1] // Extract base64 part
 
-        // Save to localStorage
+        // Get current character info
+        const currentCharacter = characters.find((char) => char.id === characterId)
+        if (!currentCharacter) {
+          console.error("[Step 2] Character not found:", characterId)
+          return
+        }
+
+        // Save to localStorage (NEW: characters array)
         const saved = localStorage.getItem("kidstorybook_wizard")
         const wizardData = saved ? JSON.parse(saved) : {}
         
-        wizardData.step2 = {
-          ...wizardData.step2,
-          characterPhoto: {
+        // Initialize step2.characters if not exists
+        if (!wizardData.step2) wizardData.step2 = {}
+        if (!wizardData.step2.characters) wizardData.step2.characters = []
+
+        // Find this character in the array
+        const charIndex = wizardData.step2.characters.findIndex((c: any) => c.id === characterId)
+        
+        // Prepare character data
+        const characterData: any = {
+          id: characterId,
+          characterType: currentCharacter.characterType,
+          name: currentCharacter.name || undefined, // Optional name (for non-Child) or required name (for Child)
+          photo: {
             url: dataUrl,
             filename: file.name,
             size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
           },
+          characterId: null, // Will be filled after API call
         }
-        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
-        console.log("[Step 2] Saved photo to localStorage:", { characterPhoto: wizardData.step2.characterPhoto })
 
-        // Create character in database (simple, no AI Analysis)
+        // NEW: Include Child-specific details if this is a Child character
+        if (currentCharacter.characterType.group === "Child") {
+          characterData.age = currentCharacter.age
+          characterData.gender = currentCharacter.gender
+          characterData.hairColor = currentCharacter.hairColor
+          characterData.eyeColor = currentCharacter.eyeColor
+          characterData.specialFeatures = currentCharacter.specialFeatures || []
+        }
+
+        // Update or add character
+        if (charIndex >= 0) {
+          wizardData.step2.characters[charIndex] = {
+            ...wizardData.step2.characters[charIndex],
+            ...characterData,
+          }
+        } else {
+          wizardData.step2.characters.push(characterData)
+        }
+
+        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+        console.log("[Step 2] Saved photo to localStorage (character array):", characterData)
+
+        // Create character in database (each character gets its own API call)
         if (step1Data) {
           try {
+            // Determine character name and details based on type
+            let characterName: string
+            let characterAge: number
+            let characterGender: string
+            let characterHairColor: string
+            let characterEyeColor: string
+            let characterSpecialFeatures: string[]
+
+            // NEW: For Child characters, use their own details
+            if (currentCharacter.characterType.group === "Child") {
+              characterName = currentCharacter.name || "Child" // Required name for Child
+              characterAge = currentCharacter.age || step1Data.age || 5
+              characterGender = currentCharacter.gender || step1Data.gender?.toLowerCase() || "girl"
+              characterHairColor = currentCharacter.hairColor || step1Data.hairColor || "brown"
+              characterEyeColor = currentCharacter.eyeColor || step1Data.eyeColor || "brown"
+              characterSpecialFeatures = currentCharacter.specialFeatures || step1Data.specialFeatures || []
+            } else {
+              // For non-Child characters, use type or displayName, and fallback to Step 1 data
+              characterName = currentCharacter.characterType.displayName || currentCharacter.characterType.value || step1Data.name
+              characterAge = step1Data.age || 5 // For pets/family, this might not make sense, but API requires it
+              characterGender = step1Data.gender?.toLowerCase() || "girl" // For pets, this is approximated
+              characterHairColor = step1Data.hairColor || "brown"
+              characterEyeColor = step1Data.eyeColor || "brown"
+              characterSpecialFeatures = step1Data.specialFeatures || []
+            }
+
             const createCharResponse = await fetch("/api/characters", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                name: step1Data.name,
-                age: step1Data.age?.toString() || "5",
-                gender: step1Data.gender?.toLowerCase() || "girl",
-                hairColor: step1Data.hairColor || "brown",
-                eyeColor: step1Data.eyeColor || "brown",
-                specialFeatures: step1Data.specialFeatures || [],
+                name: characterName,
+                age: characterAge.toString(),
+                gender: characterGender,
+                hairColor: characterHairColor,
+                eyeColor: characterEyeColor,
+                specialFeatures: characterSpecialFeatures,
                 photoBase64: photoBase64, // Photo as base64 (without data URL prefix)
+                characterType: currentCharacter.characterType, // Include character type info
               }),
             })
 
@@ -154,14 +335,32 @@ export default function Step2Page() {
               throw new Error(createCharResult.error || "Failed to create character")
             }
 
-            // Save character ID to localStorage
+            // Save character ID to localStorage (in characters array)
             const createdCharacterId = createCharResult.character?.id
             if (createdCharacterId) {
-              localStorage.setItem("kidstorybook_character_id", createdCharacterId)
-              console.log("[Step 2] Character created with ID:", createdCharacterId)
+              // Update characterId in the array
+              const savedAgain = localStorage.getItem("kidstorybook_wizard")
+              const wizardDataAgain = savedAgain ? JSON.parse(savedAgain) : {}
+              const charIndexAgain = wizardDataAgain.step2.characters.findIndex((c: any) => c.id === characterId)
+              if (charIndexAgain >= 0) {
+                wizardDataAgain.step2.characters[charIndexAgain].characterId = createdCharacterId
+                localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardDataAgain))
+              }
+
+              // Keep old localStorage key for backward compatibility (first character only)
+              if (characterId === "1" || characters.length === 1) {
+                localStorage.setItem("kidstorybook_character_id", createdCharacterId)
+              }
+
+              console.log("[Step 2] Character created:", {
+                id: createdCharacterId,
+                name: characterName,
+                type: currentCharacter.characterType,
+              })
+              
               toast({
                 title: "Character Created!",
-                description: `Character "${step1Data.name}" has been created successfully.`,
+                description: `${currentCharacter.characterType.displayName} has been created successfully.`,
               })
             }
           } catch (error) {
@@ -234,13 +433,30 @@ export default function Step2Page() {
       return updated
     })
 
-    // Remove from localStorage
+    // Remove from localStorage (NEW: characters array)
     const saved = localStorage.getItem("kidstorybook_wizard")
     if (saved) {
       try {
         const wizardData = JSON.parse(saved)
-        delete wizardData.step2?.characterPhoto
-        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+        
+        if (wizardData.step2?.characters && Array.isArray(wizardData.step2.characters)) {
+          // Find and remove photo data for this character
+          const charIndex = wizardData.step2.characters.findIndex((c: any) => c.id === characterId)
+          if (charIndex >= 0) {
+            // Remove photo and characterId, but keep the entry
+            delete wizardData.step2.characters[charIndex].photo
+            delete wizardData.step2.characters[charIndex].characterId
+            
+            localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+            console.log("[Step 2] Removed photo from character:", characterId)
+          }
+        }
+
+        // Backward compatibility: Remove old characterPhoto if exists
+        if (wizardData.step2?.characterPhoto) {
+          delete wizardData.step2.characterPhoto
+          localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+        }
       } catch (error) {
         console.error("Error updating localStorage:", error)
       }
@@ -252,7 +468,12 @@ export default function Step2Page() {
 
     const newCharacter: Character = {
       id: Date.now().toString(),
-      type: "Child",
+      characterType: {
+        group: "Child",
+        value: "Child",
+        displayName: "Child",
+      },
+      name: undefined, // NEW: Optional name
       uploadedFile: null,
       previewUrl: null,
       uploadError: null,
@@ -260,6 +481,75 @@ export default function Step2Page() {
     }
 
     setCharacters((prev) => [...prev, newCharacter])
+  }
+
+  // Handle character name change
+  const handleCharacterNameChange = (characterId: string, name: string) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id === characterId) {
+          return {
+            ...char,
+            name: name.trim(),
+            characterType: {
+              ...char.characterType,
+              displayName: name.trim() || char.characterType.value, // Update displayName with name or fallback to value
+            },
+          }
+        }
+        return char
+      }),
+    )
+  }
+
+  // Handle Child-specific details change
+  const handleChildDetailsChange = (
+    characterId: string,
+    field: "name" | "age" | "gender" | "hairColor" | "eyeColor" | "specialFeatures",
+    value: string | number | string[],
+  ) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id === characterId && char.characterType.group === "Child") {
+          const updated = {
+            ...char,
+            [field]: value,
+          }
+          // Update displayName if name changes
+          if (field === "name") {
+            updated.characterType = {
+              ...char.characterType,
+              displayName: (value as string).trim() || "Child",
+            }
+          }
+
+          // NEW: Also update localStorage immediately for Child details
+          const saved = localStorage.getItem("kidstorybook_wizard")
+          if (saved) {
+            try {
+              const wizardData = JSON.parse(saved)
+              if (wizardData.step2?.characters && Array.isArray(wizardData.step2.characters)) {
+                const charIndex = wizardData.step2.characters.findIndex((c: any) => c.id === characterId)
+                if (charIndex >= 0) {
+                  wizardData.step2.characters[charIndex] = {
+                    ...wizardData.step2.characters[charIndex],
+                    [field]: value,
+                    characterType: updated.characterType, // Include updated characterType if name changed
+                  }
+                  localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+                  console.log("[Step 2] Updated Child details in localStorage:", field, value)
+                }
+              }
+            } catch (error) {
+              console.error("[Step 2] Error updating localStorage:", error)
+            }
+          }
+
+          return updated
+        }
+        return char
+      }),
+    )
   }
 
   const handleRemoveCharacter = (characterId: string) => {
@@ -279,8 +569,91 @@ export default function Step2Page() {
     })
   }
 
-  const handleCharacterTypeChange = (characterId: string, type: CharacterType) => {
-    setCharacters((prev) => prev.map((char) => (char.id === characterId ? { ...char, type } : char)))
+  // Handle character group selection (Child, Pets, Family Members, Other)
+  const handleCharacterGroupChange = (characterId: string, group: CharacterGroup) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id === characterId) {
+          // Reset to default value based on group
+          if (group === "Child") {
+            return {
+              ...char,
+              characterType: {
+                group: "Child",
+                value: "Child",
+                displayName: "Child",
+              },
+            }
+          } else if (group === "Pets") {
+            return {
+              ...char,
+              characterType: {
+                group: "Pets",
+                value: "Dog", // Default pet
+                displayName: "Dog",
+              },
+            }
+          } else if (group === "Family Members") {
+            return {
+              ...char,
+              characterType: {
+                group: "Family Members",
+                value: "Mom", // Default family member
+                displayName: "Mom",
+              },
+            }
+          } else {
+            // Other
+            return {
+              ...char,
+              characterType: {
+                group: "Other",
+                value: "",
+                displayName: "",
+              },
+            }
+          }
+        }
+        return char
+      }),
+    )
+  }
+
+  // Handle character value selection (Dog, Cat, Mom, Dad, etc.)
+  const handleCharacterValueChange = (characterId: string, value: string) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id === characterId) {
+          return {
+            ...char,
+            characterType: {
+              ...char.characterType,
+              value: value,
+              displayName: value, // Default: same as value
+            },
+          }
+        }
+        return char
+      }),
+    )
+  }
+
+  // Handle custom input (for Other Pet, Other Family, Other)
+  const handleCharacterDisplayNameChange = (characterId: string, displayName: string) => {
+    setCharacters((prev) =>
+      prev.map((char) => {
+        if (char.id === characterId) {
+          return {
+            ...char,
+            characterType: {
+              ...char.characterType,
+              displayName: displayName,
+            },
+          }
+        }
+        return char
+      }),
+    )
   }
 
   const formatFileSize = (bytes: number): string => {
@@ -289,16 +662,18 @@ export default function Step2Page() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB"
   }
 
-  const getUploadLabel = (type: CharacterType): string => {
-    const labels: Record<CharacterType, string> = {
-      Child: "Upload Child Photo",
-      Dog: "Upload Dog Photo",
-      Cat: "Upload Cat Photo",
-      Rabbit: "Upload Rabbit Photo",
-      "Teddy Bear": "Upload Teddy Bear Photo",
-      Other: "Upload Character Photo",
+  const getUploadLabel = (characterType: CharacterTypeInfo): string => {
+    if (characterType.group === "Child") {
+      return "Upload Child Photo"
+    } else if (characterType.group === "Pets") {
+      return `Upload ${characterType.displayName} Photo`
+    } else if (characterType.group === "Family Members") {
+      return `Upload ${characterType.displayName} Photo`
+    } else {
+      return characterType.displayName 
+        ? `Upload ${characterType.displayName} Photo` 
+        : "Upload Character Photo"
     }
-    return labels[type]
   }
 
   const floatingVariants = {
@@ -404,35 +779,340 @@ export default function Step2Page() {
                     transition={{ duration: 0.3, delay: index * 0.1 }}
                     className="rounded-xl border-2 border-purple-200 bg-gradient-to-br from-white to-purple-50/50 p-6 shadow-lg dark:border-purple-700 dark:from-slate-800 dark:to-purple-900/20"
                   >
-                    <div className="mb-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+                    <div className="mb-4 space-y-3">
+                      {/* Header: Character Number + Remove Button */}
+                      <div className="flex items-center justify-between">
                         <span className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-bold text-white">
                           Character {index + 1}
                         </span>
-                        <Select value={character.type} onValueChange={(value) => handleCharacterTypeChange(character.id, value as CharacterType)}>
-                          <SelectTrigger className="w-[140px] border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                        {characters.length > 1 && (
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleRemoveCharacter(character.id)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-all hover:bg-red-600"
+                            aria-label="Remove character"
+                          >
+                            <X className="h-4 w-4" />
+                          </motion.button>
+                        )}
+                      </div>
+
+                      {/* Main Group Selection */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                          Character Type
+                        </label>
+                        <Select 
+                          value={character.characterType.group} 
+                          onValueChange={(value) => handleCharacterGroupChange(character.id, value as CharacterGroup)}
+                        >
+                          <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Child">Child</SelectItem>
-                            <SelectItem value="Dog">Dog</SelectItem>
-                            <SelectItem value="Cat">Cat</SelectItem>
-                            <SelectItem value="Rabbit">Rabbit</SelectItem>
-                            <SelectItem value="Teddy Bear">Teddy Bear</SelectItem>
+                            <SelectItem value="Pets">Pets</SelectItem>
+                            <SelectItem value="Family Members">Family Members</SelectItem>
                             <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      {characters.length > 1 && (
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleRemoveCharacter(character.id)}
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-all hover:bg-red-600"
-                          aria-label="Remove character"
-                        >
-                          <X className="h-4 w-4" />
-                        </motion.button>
+
+                      {/* Conditional: Pets Dropdown */}
+                      {character.characterType.group === "Pets" && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                            Select Pet
+                          </label>
+                          <Select 
+                            value={character.characterType.value} 
+                            onValueChange={(value) => handleCharacterValueChange(character.id, value)}
+                          >
+                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CHARACTER_OPTIONS.Pets.options.map((pet) => (
+                                <SelectItem key={pet} value={pet}>
+                                  {pet}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Conditional: Family Members Dropdown */}
+                      {character.characterType.group === "Family Members" && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                            Select Family Member
+                          </label>
+                          <Select 
+                            value={character.characterType.value} 
+                            onValueChange={(value) => handleCharacterValueChange(character.id, value)}
+                          >
+                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CHARACTER_OPTIONS.FamilyMembers.options.map((member) => (
+                                <SelectItem key={member} value={member}>
+                                  {member}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Conditional: Custom Input (Other Pet, Other Family, Other) */}
+                      {(character.characterType.value === "Other Pet" || 
+                        character.characterType.value === "Other Family" || 
+                        character.characterType.group === "Other") && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                            {character.characterType.value === "Other Pet" 
+                              ? "Pet Type" 
+                              : character.characterType.value === "Other Family" 
+                              ? "Family Member Type" 
+                              : "Character Type"}
+                          </label>
+                          <Input
+                            type="text"
+                            placeholder={
+                              character.characterType.value === "Other Pet" 
+                                ? "e.g., Hamster, Turtle" 
+                                : character.characterType.value === "Other Family" 
+                                ? "e.g., Uncle, Cousin" 
+                                : "e.g., Robot, Alien"
+                            }
+                            value={character.characterType.displayName}
+                            onChange={(e) => handleCharacterDisplayNameChange(character.id, e.target.value)}
+                            className="border-purple-300 dark:border-purple-600"
+                          />
+                        </div>
+                      )}
+
+                      {/* Character 1 from Step 1: Read-only display + Photo upload only */}
+                      {character.characterType.group === "Child" && index === 0 && step1Data && (
+                        <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50/50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
+                              Child Details (from Step 1)
+                            </h3>
+                            <Link
+                              href="/create/step1"
+                              className="text-xs font-medium text-blue-600 underline underline-offset-2 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                            >
+                              Edit
+                            </Link>
+                          </div>
+                          
+                          {/* Read-only information from Step 1 */}
+                          <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                              <span className="font-medium text-gray-700 dark:text-slate-300">Name:</span>{" "}
+                              <span className="text-gray-900 dark:text-slate-50">{step1Data.name || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700 dark:text-slate-300">Age:</span>{" "}
+                              <span className="text-gray-900 dark:text-slate-50">{step1Data.age || "—"} years old</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700 dark:text-slate-300">Gender:</span>{" "}
+                              <span className="text-gray-900 dark:text-slate-50 capitalize">{step1Data.gender || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700 dark:text-slate-300">Hair:</span>{" "}
+                              <span className="text-gray-900 dark:text-slate-50 capitalize">{step1Data.hairColor || "—"}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-gray-700 dark:text-slate-300">Eye:</span>{" "}
+                              <span className="text-gray-900 dark:text-slate-50 capitalize">{step1Data.eyeColor || "—"}</span>
+                            </div>
+                            {step1Data.specialFeatures && step1Data.specialFeatures.length > 0 && (
+                              <div className="col-span-2">
+                                <span className="font-medium text-gray-700 dark:text-slate-300">Features:</span>{" "}
+                                <span className="text-gray-900 dark:text-slate-50">
+                                  {step1Data.specialFeatures.join(", ")}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="mt-2 rounded-md bg-blue-100/50 p-2 text-xs text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                            💡 To edit these details, go back to Step 1
+                          </div>
+                        </div>
+                      )}
+
+                      {/* NEW: Detailed Form for Additional Child Characters (2, 3) */}
+                      {character.characterType.group === "Child" && (index > 0 || !step1Data) && (
+                        <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
+                            Child Details
+                          </h3>
+                          
+                          {/* Name */}
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                              Name <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                              type="text"
+                              placeholder="e.g., Arya, Aras"
+                              value={character.name || ""}
+                              onChange={(e) => handleChildDetailsChange(character.id, "name", e.target.value)}
+                              className="border-purple-300 dark:border-purple-600"
+                              required
+                            />
+                          </div>
+
+                          {/* Age & Gender */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                Age <span className="text-red-500">*</span>
+                              </Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="12"
+                                placeholder="e.g., 5"
+                                value={character.age || ""}
+                                onChange={(e) => handleChildDetailsChange(character.id, "age", parseInt(e.target.value) || 0)}
+                                className="border-purple-300 dark:border-purple-600"
+                                required
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                Gender <span className="text-red-500">*</span>
+                              </Label>
+                              <Select
+                                value={character.gender || ""}
+                                onValueChange={(value) => handleChildDetailsChange(character.id, "gender", value as "boy" | "girl")}
+                              >
+                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                  <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="boy">Boy</SelectItem>
+                                  <SelectItem value="girl">Girl</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Hair & Eye Color */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                Hair Color <span className="text-red-500">*</span>
+                              </Label>
+                              <Select
+                                value={character.hairColor || ""}
+                                onValueChange={(value) => handleChildDetailsChange(character.id, "hairColor", value)}
+                              >
+                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                  <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {hairColorOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                Eye Color <span className="text-red-500">*</span>
+                              </Label>
+                              <Select
+                                value={character.eyeColor || ""}
+                                onValueChange={(value) => handleChildDetailsChange(character.id, "eyeColor", value)}
+                              >
+                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                  <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {eyeColorOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Special Features */}
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                              Special Features (optional)
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {specialFeaturesOptions.map((option) => (
+                                <div key={option.value} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`feature-${character.id}-${option.value}`}
+                                    checked={character.specialFeatures?.includes(option.value) || false}
+                                    onCheckedChange={(checked) => {
+                                      const currentFeatures = character.specialFeatures || []
+                                      const updatedFeatures = checked
+                                        ? [...currentFeatures, option.value]
+                                        : currentFeatures.filter((f) => f !== option.value)
+                                      handleChildDetailsChange(character.id, "specialFeatures", updatedFeatures)
+                                    }}
+                                  />
+                                  <Label
+                                    htmlFor={`feature-${character.id}-${option.value}`}
+                                    className="text-xs font-normal text-gray-700 dark:text-slate-300 cursor-pointer"
+                                  >
+                                    {option.label}
+                                  </Label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Optional Name Input (for all non-Child characters) */}
+                      {character.characterType.group !== "Child" && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                            {character.characterType.group === "Pets" 
+                              ? "Pet Name (optional)" 
+                              : character.characterType.group === "Family Members" 
+                              ? "Name (optional)" 
+                              : "Name (optional)"}
+                          </label>
+                          <Input
+                            type="text"
+                            placeholder={
+                              character.characterType.group === "Pets" 
+                                ? "e.g., Buddy, Max, Luna" 
+                                : character.characterType.group === "Family Members" 
+                                ? "e.g., Sarah, John" 
+                                : "e.g., Custom name"
+                            }
+                            value={character.name || ""}
+                            onChange={(e) => handleCharacterNameChange(character.id, e.target.value)}
+                            className="border-purple-300 dark:border-purple-600"
+                          />
+                          <p className="text-xs text-gray-500 dark:text-slate-400">
+                            {character.characterType.group === "Pets" 
+                              ? "Give your pet a name, or leave empty to use 'Dog', 'Cat', etc." 
+                              : character.characterType.group === "Family Members" 
+                              ? "Give a name, or leave empty to use 'Mom', 'Grandma', etc." 
+                              : "Optional custom name for this character"}
+                          </p>
+                        </div>
                       )}
                     </div>
 
@@ -476,7 +1156,7 @@ export default function Step2Page() {
                             <Upload className="h-8 w-8" />
                           </motion.div>
                           <p className="mb-1 text-sm font-semibold text-gray-700 dark:text-slate-300">
-                            {getUploadLabel(character.type)}
+                            {getUploadLabel(character.characterType)}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-slate-400">
                             Drag and drop or click to browse
@@ -497,7 +1177,7 @@ export default function Step2Page() {
                           <div className="relative overflow-hidden rounded-lg shadow-xl">
                             <img
                               src={character.previewUrl || ""}
-                              alt={`${character.type} preview`}
+                              alt={`${character.characterType.displayName} preview`}
                               className="h-auto w-full object-cover"
                             />
 

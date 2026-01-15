@@ -324,6 +324,37 @@ CREATE OR REPLACE FUNCTION function_name() ...;
 - **Arrays:** `{plural}_ids` or `used_in_{plural}` (e.g., `used_in_books`)
 - **JSONB:** `{name}_data` or `{name}_metadata` (e.g., `story_data`, `generation_metadata`)
 
+### Multi-Character Storage Strategy (25 Ocak 2026)
+
+**Karar:** Metadata JSON yaklaşımı seçildi (Junction table yerine)
+
+**Neden:**
+- Hızlı implementasyon (migration gerektirmez)
+- Mevcut `books.character_id` ana karakter için kullanılıyor
+- Ek karakterler `books.generation_metadata` içinde saklanıyor
+- Backward compatible (eski kitaplar etkilenmedi)
+
+**Yapı:**
+```json
+{
+  "generation_metadata": {
+    "characterIds": ["uuid-1", "uuid-2", "uuid-3"],
+    "additionalCharacters": [
+      { "group": "Pets", "value": "Dog", "displayName": "Dog" },
+      { "group": "Family Members", "value": "Grandma", "displayName": "Grandma" }
+    ],
+    // ... diğer metadata
+  }
+}
+```
+
+**Gelecek İyileştirmeler:**
+- Junction table (`book_characters`) eklenebilir (query optimization için)
+- Character type field (`characters.character_type` JSONB) eklenebilir
+- Migration: Mevcut `generation_metadata` → junction table
+
+**Not:** Şu anki yapı MVP için yeterli. İleride junction table'a geçilebilir.
+
 ### Index Naming Conventions
 - **Format:** `idx_{table}_{column(s)}`
 - **Conditional:** `idx_{table}_{condition}` (e.g., `idx_books_favorites`)

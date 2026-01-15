@@ -44,6 +44,8 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     hairColor,
     eyeColor,
     specialFeatures,
+    // NEW: Multiple characters support
+    characters,
   } = input
 
   // Get age-appropriate rules
@@ -52,7 +54,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
   const themeConfig = getThemeConfig(theme)
 
   // Build character description (use Step 1 data if available, otherwise use analysis)
-  const characterDesc = buildCharacterDescription(
+  let characterDesc = buildCharacterDescription(
     characterName,
     characterAge,
     characterGender,
@@ -60,11 +62,37 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     { hairColor, eyeColor, specialFeatures } // Step 1 data
   )
 
+  // Add additional characters if present
+  if (characters && characters.length > 1) {
+    characterDesc += `\n\nADDITIONAL CHARACTERS:\n`
+    
+    characters.slice(1).forEach((char, index) => {
+      characterDesc += `\n${index + 2}. ${char.type.displayName} (${char.type.group})`
+      
+      if (char.type.group === "Pets") {
+        characterDesc += ` - A friendly ${char.type.value.toLowerCase()}`
+        if (char.type.displayName !== char.type.value) {
+          characterDesc += ` (${char.type.displayName})`
+        }
+      } else if (char.type.group === "Family Members") {
+        characterDesc += ` - ${characterName}'s ${char.type.value.toLowerCase()}`
+        if (char.type.displayName !== char.type.value) {
+          characterDesc += ` (${char.type.displayName})`
+        }
+      } else {
+        // Other
+        characterDesc += ` - ${char.name || char.type.displayName}`
+      }
+    })
+    
+    characterDesc += `\n\n**IMPORTANT:** All ${characters.length} characters should appear in the story. The main character is ${characterName}.`
+  }
+
   // Main prompt
   const prompt = `
 You are a professional children's book author. Create a magical, age-appropriate story.
 
-# CHARACTER
+# CHARACTER${characters && characters.length > 1 ? 'S' : ''}
 ${characterDesc}
 
 # STORY REQUIREMENTS
@@ -108,10 +136,10 @@ ${characterDesc}
 - Reading Time: ${getReadingTime(ageGroup)} minutes per page
 
 # STORY STRUCTURE
-1. Opening: Introduce ${characterName} and the setting (1 page)
-2. Adventure Begins: ${characterName} discovers something interesting (2-3 pages)
+1. Opening: Introduce ${characterName}${characters && characters.length > 1 ? ` and ${characters.length - 1} other character(s)` : ''} and the setting (1 page)
+2. Adventure Begins: ${characterName} discovers something interesting${characters && characters.length > 1 ? ' (with companions)' : ''} (2-3 pages)
 3. Challenge: A small, age-appropriate problem to solve (2-3 pages)
-4. Resolution: ${characterName} overcomes the challenge with creativity/kindness/courage (1-2 pages)
+4. Resolution: ${characterName} overcomes the challenge with creativity/kindness/courage${characters && characters.length > 1 ? ', with help from companions' : ''} (1-2 pages)
 5. Happy Ending: Return home with a valuable lesson learned (1 page)
 
 # THEME-SPECIFIC ELEMENTS

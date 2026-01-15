@@ -172,4 +172,42 @@ Agent:
 
 ---
 
+## 🆕 Yeni Özellik: Multi-Karakter Sistemi (25 Ocak 2026)
+
+### Karakter Gruplama ve Çoklu Karakter Desteği
+
+**Güncelleme Tarihi:** 25 Ocak 2026  
+**Durum:** ✅ Production'da Aktif
+
+**Ne Değişti:**
+- Karakter seçim sistemi grup-based yapıya geçti (Child, Pets, Family Members, Other)
+- Birden fazla karakter desteği eklendi (max 3)
+- localStorage yapısı characters array'ine çevrildi
+- Story ve image generation birden fazla karakter destekliyor
+
+**Neden:**
+- Kullanıcı deneyimi iyileştirmesi (pets ve family members kategorileri)
+- Daha zengin hikayeler (çocuk + köpek + büyükanne gibi kombinasyonlar)
+- Daha anlamlı gruplama (düz liste yerine kategorik)
+
+**Alternatifler:**
+- Düz liste (eski sistem) - ❌ Kullanıcı deneyimi zayıf
+- Sınırsız karakter - ❌ Image generation karmaşıklaşır
+- Sadece tek karakter - ❌ Hikaye çeşitliliği az
+
+**Karar:** 
+- Grup-based sistem seçildi (daha iyi UX)
+- Maksimum 3 karakter (image generation limitleri nedeniyle)
+- Backward compatibility sağlandı (eski sistem hala çalışıyor)
+
+**Teknik Detaylar:**
+- Frontend: Conditional UI (dropdown + text input)
+- localStorage: Migration logic (eski → yeni format)
+- Backend: characterIds array support
+- AI: Story ve image prompt'larında birden fazla karakter
+
+**Implementasyon:** `docs/implementation/FAZ2_4_KARAKTER_GRUPLAMA_IMPLEMENTATION.md`
+
+---
+
 **Not:** Her mimari karar önemlidir ve kaydedilmelidir. Gelecekte "Neden böyle yaptık?" sorusunun cevabı docs/ARCHITECTURE.md'de olmalı.

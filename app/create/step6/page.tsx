@@ -69,6 +69,27 @@ export default function Step6Page() {
   }
 
   // Get actual data from wizardData (localStorage)
+  // NEW: Support both old characterPhoto and new characters array
+  const getCharactersData = () => {
+    if (wizardData?.step2?.characters && Array.isArray(wizardData.step2.characters)) {
+      // New format: characters array
+      return wizardData.step2.characters
+    } else if (wizardData?.step2?.characterPhoto) {
+      // Old format: single characterPhoto (backward compatibility)
+      return [
+        {
+          id: "1",
+          characterType: { group: "Child", value: "Child", displayName: "Child" },
+          photo: wizardData.step2.characterPhoto,
+          characterId: localStorage.getItem("kidstorybook_character_id") || null,
+        },
+      ]
+    }
+    return []
+  }
+
+  const charactersData = getCharactersData()
+
   const formData = {
     character: {
       name: wizardData?.step1?.name || "Child",
@@ -78,11 +99,13 @@ export default function Step6Page() {
       eyeColor: wizardData?.step1?.eyeColor || "Brown",
       specialFeatures: wizardData?.step1?.specialFeatures || [],
     },
+    // NEW: Multiple characters support
+    characters: charactersData,
     photo: {
-      uploaded: !!wizardData?.step2?.characterPhoto,
-      filename: wizardData?.step2?.characterPhoto?.filename || "",
-      size: wizardData?.step2?.characterPhoto?.size || "",
-      url: wizardData?.step2?.characterPhoto?.url || "",
+      uploaded: charactersData.length > 0 && !!charactersData[0]?.photo,
+      filename: charactersData[0]?.photo?.filename || "",
+      size: charactersData[0]?.photo?.size || "",
+      url: charactersData[0]?.photo?.url || "",
       analysis: wizardData?.step2?.characterAnalysis || {},
     },
     theme: wizardData?.step3?.theme
@@ -247,7 +270,7 @@ export default function Step6Page() {
 
             {/* Summary Sections */}
             <div className="space-y-6">
-              {/* 1. Character Information Summary */}
+              {/* 1. Character Information Summary (Multi-Character) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -257,7 +280,9 @@ export default function Step6Page() {
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <User className="h-6 w-6 text-purple-500" />
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Character Information</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
+                        Character{formData.characters.length > 1 ? 's' : ''} Information
+                      </h2>
                     </div>
                     <Link
                       href="/create/step1"
@@ -267,33 +292,117 @@ export default function Step6Page() {
                       Edit
                     </Link>
                   </div>
-                  <div className="space-y-2 text-base text-gray-700 dark:text-slate-300">
-                    <p>
-                      <span className="font-semibold">Name:</span> {formData.character.name}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Age:</span> {formData.character.age} years old
-                    </p>
-                    <p>
-                      <span className="font-semibold">Gender:</span> {formData.character.gender}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Hair Color:</span> {formData.character.hairColor}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Eye Color:</span> {formData.character.eyeColor}
-                    </p>
-                    {formData.character.specialFeatures.length > 0 && (
-                      <p>
-                        <span className="font-semibold">Special Features:</span>{" "}
-                        {formData.character.specialFeatures.join(", ")}
-                      </p>
+
+                  {/* Characters List */}
+                  <div className="space-y-4">
+                    {formData.characters.map((char: any, index: number) => {
+                      const isMainCharacter = index === 0 || char.characterType?.group === "Child"
+                      // NEW: For Child characters, use name from char.name (from Step 2) or Step 1
+                      // For other characters, use char.name or displayName
+                      let characterName: string
+                      if (char.characterType?.group === "Child") {
+                        characterName = char.name || formData.character.name || "Child"
+                      } else {
+                        characterName = char.name || char.characterType?.displayName || "Character"
+                      }
+                      const characterType = char.characterType?.group || "Child"
+
+                      return (
+                        <div
+                          key={char.id || index}
+                          className={`rounded-lg border-2 p-4 ${
+                            isMainCharacter
+                              ? "border-blue-300 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-900/20"
+                              : characterType === "Pets"
+                              ? "border-green-300 bg-green-50/50 dark:border-green-700 dark:bg-green-900/20"
+                              : characterType === "Family Members"
+                              ? "border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-900/20"
+                              : "border-purple-300 bg-purple-50/50 dark:border-purple-700 dark:bg-purple-900/20"
+                          }`}
+                        >
+                          <div className="flex items-start gap-4">
+                            {/* Character Photo */}
+                            {char.photo?.url && (
+                              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg shadow-md">
+                                <Image
+                                  src={char.photo.url}
+                                  alt={`${characterName} photo`}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                            )}
+
+                            {/* Character Info */}
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold text-gray-900 dark:text-slate-50">
+                                  {isMainCharacter ? "🔵 " : characterType === "Pets" ? "🟢 " : characterType === "Family Members" ? "🟡 " : "🟣 "}
+                                  Character {index + 1}: {characterName}
+                                </span>
+                                {isMainCharacter && (
+                                  <span className="rounded-full bg-blue-500 px-2 py-0.5 text-xs font-semibold text-white">
+                                    Main
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Main character (Child) - Show all details */}
+                              {isMainCharacter && char.characterType?.group === "Child" ? (
+                                <div className="mt-2 space-y-1 text-sm text-gray-700 dark:text-slate-300">
+                                  <p>
+                                    <span className="font-semibold">Age:</span>{" "}
+                                    {char.age || formData.character.age} years old
+                                  </p>
+                                  <p>
+                                    <span className="font-semibold">Gender:</span>{" "}
+                                    {char.gender || formData.character.gender}
+                                  </p>
+                                  <p>
+                                    <span className="font-semibold">Hair Color:</span>{" "}
+                                    {char.hairColor || formData.character.hairColor}
+                                  </p>
+                                  <p>
+                                    <span className="font-semibold">Eye Color:</span>{" "}
+                                    {char.eyeColor || formData.character.eyeColor}
+                                  </p>
+                                  {(char.specialFeatures?.length > 0 ||
+                                    formData.character.specialFeatures.length > 0) && (
+                                    <p>
+                                      <span className="font-semibold">Special Features:</span>{" "}
+                                      {(char.specialFeatures ||
+                                        formData.character.specialFeatures || []).join(", ")}
+                                    </p>
+                                  )}
+                                </div>
+                              ) : (
+                                // Additional characters - Show only type and name
+                                <div className="mt-2 space-y-1 text-sm text-gray-700 dark:text-slate-300">
+                                  <p>
+                                    <span className="font-semibold">Type:</span>{" "}
+                                    {char.characterType?.value || "Unknown"}
+                                  </p>
+                                  <p className="text-xs text-gray-500 dark:text-slate-400">
+                                    {char.characterType?.group || "Other"}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {/* Empty state */}
+                    {formData.characters.length === 0 && (
+                      <p className="italic text-gray-500 dark:text-slate-500">No characters added</p>
                     )}
                   </div>
                 </div>
               </motion.div>
 
-              {/* 2. Character Photos (supports multi-character) */}
+              {/* 2. Character Photos (Multi-Character Support) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -303,7 +412,9 @@ export default function Step6Page() {
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <ImageIcon className="h-6 w-6 text-purple-500" />
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Character Photos</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
+                        Character Photo{formData.characters.length > 1 ? 's' : ''}
+                      </h2>
                     </div>
                     <Link
                       href="/create/step2"
@@ -314,54 +425,46 @@ export default function Step6Page() {
                     </Link>
                   </div>
 
-                  {wizardData?.step2?.characterPhoto?.url ? (
-                    <div className="space-y-4">
-                      <div className="flex flex-col items-center">
-                        <div className="relative h-64 w-64 overflow-hidden rounded-lg shadow-lg">
-                          <Image
-                            src={wizardData.step2.characterPhoto.url}
-                            alt="Character reference photo"
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                        <p className="mt-3 text-sm text-gray-600 dark:text-slate-400">
-                          {wizardData.step2.characterPhoto.filename} ({wizardData.step2.characterPhoto.size})
-                        </p>
-                      </div>
+                  {formData.characters.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                      {formData.characters.map((char: any, index: number) => {
+                        const characterName = char.name || char.characterType?.displayName || "Character"
+                        const isMainCharacter = index === 0 || char.characterType?.group === "Child"
 
-                      {wizardData?.step2?.characterAnalysis && (
-                        <div>
-                          <p className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-300">
-                            AI Analysis Results:
-                          </p>
-                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                            {Object.entries(wizardData.step2.characterAnalysis).map(([key, value], index) => (
-                              <motion.div
-                                key={key}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 0.6 + index * 0.05, duration: 0.3 }}
-                                className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-2 text-center text-sm font-medium text-white shadow"
-                              >
-                                <div className="text-xs opacity-90">
-                                  {key
-                                    .replace(/([A-Z])/g, " $1")
-                                    .trim()
-                                    .split(" ")
-                                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                                    .join(" ")}
+                        return (
+                          <div key={char.id || index} className="flex flex-col items-center">
+                            <div className="relative h-48 w-full overflow-hidden rounded-lg shadow-lg">
+                              {char.photo?.url ? (
+                                <Image
+                                  src={char.photo.url}
+                                  alt={`${characterName} photo`}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              ) : (
+                                <div className="flex h-full items-center justify-center bg-gray-100 dark:bg-slate-700">
+                                  <ImageIcon className="h-12 w-12 text-gray-400 dark:text-slate-500" />
                                 </div>
-                                <div className="font-bold">{value as string}</div>
-                              </motion.div>
-                            ))}
+                              )}
+                            </div>
+                            <div className="mt-2 text-center">
+                              <p className="text-sm font-semibold text-gray-900 dark:text-slate-50">
+                                {characterName}
+                                {isMainCharacter && <span className="ml-1 text-xs text-blue-500">(Main)</span>}
+                              </p>
+                              {char.photo?.filename && (
+                                <p className="mt-1 text-xs text-gray-500 dark:text-slate-400">
+                                  {char.photo.filename}
+                                </p>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )
+                      })}
                     </div>
                   ) : (
-                    <p className="italic text-gray-500 dark:text-slate-500">No photo uploaded</p>
+                    <p className="italic text-gray-500 dark:text-slate-500">No photos uploaded</p>
                   )}
                 </div>
               </motion.div>
@@ -716,8 +819,20 @@ export default function Step6Page() {
                           const illustrationStyle = wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-")
                           const customRequests = wizardData?.step5?.customRequests || formData.customRequests
 
+                          // NEW: Get all character IDs from localStorage
+                          let characterIds: string[] = []
+                          if (wizardData?.step2?.characters && Array.isArray(wizardData.step2.characters)) {
+                            characterIds = wizardData.step2.characters
+                              .filter((char: any) => char.characterId)
+                              .map((char: any) => char.characterId)
+                          } else if (characterId) {
+                            // Backward compatibility: single character
+                            characterIds = [characterId]
+                          }
+
                           const requestBody = {
-                            characterId: characterId,
+                            characterIds: characterIds, // NEW: Multiple characters
+                            characterId: characterIds[0], // Backward compatibility (optional)
                             theme: theme,
                             illustrationStyle: illustrationStyle,
                             customRequests: customRequests || undefined,
@@ -725,6 +840,7 @@ export default function Step6Page() {
                           }
 
                           console.log("[Step 6] DEBUG: Testing story generation with:", requestBody)
+                          console.log("[Step 6] DEBUG: Character IDs:", characterIds)
 
                           const response = await fetch("/api/books", {
                             method: "POST",
@@ -988,8 +1104,20 @@ export default function Step6Page() {
                         const themeId = wizardData?.step3?.theme?.id || wizardData?.step3?.theme || formData.theme.name.toLowerCase().replace(/\s+/g, "-")
                         const illustrationStyleId = wizardData?.step4?.illustrationStyle?.id || wizardData?.step4?.illustrationStyle || formData.illustrationStyle.name.toLowerCase().replace(/\s+/g, "-")
                         
+                        // NEW: Get all character IDs from localStorage
+                        let characterIds: string[] = []
+                        if (wizardData?.step2?.characters && Array.isArray(wizardData.step2.characters)) {
+                          characterIds = wizardData.step2.characters
+                            .filter((char: any) => char.characterId)
+                            .map((char: any) => char.characterId)
+                        } else if (characterId) {
+                          // Backward compatibility: single character
+                          characterIds = [characterId]
+                        }
+
                         const requestBody = {
-                          characterId: characterId,
+                          characterIds: characterIds, // NEW: Multiple characters
+                          characterId: characterIds[0], // Backward compatibility (optional)
                           theme: themeId,
                           illustrationStyle: illustrationStyleId,
                           customRequests: wizardData?.step5?.customRequests || formData.customRequests || undefined,
@@ -1000,6 +1128,7 @@ export default function Step6Page() {
                         }
 
                         console.log("[Step 6] Creating book with data:", requestBody)
+                        console.log("[Step 6] Character IDs:", characterIds, `(${characterIds.length} character(s))`)
 
                         // Call API to create book
                         const response = await fetch("/api/books", {

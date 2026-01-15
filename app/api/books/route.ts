@@ -12,7 +12,7 @@ import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
-import { buildCharacterPrompt, buildDetailedCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/v1.0.0/character'
 import { generateFullPagePrompt } from '@/lib/prompts/image/v1.0.0/scene'
 import OpenAI from 'openai'
 
@@ -28,7 +28,8 @@ function normalizeThemeKey(theme: string): string {
 }
 
 export interface CreateBookRequest {
-  characterId: string
+  characterId?: string // Backward compatibility: single character (optional)
+  characterIds?: string[] // NEW: Multiple characters support (optional)
   theme: string
   illustrationStyle: string
   customRequests?: string
@@ -75,7 +76,8 @@ export async function POST(request: NextRequest) {
     // Parse & Validate Request
     const body: CreateBookRequest = await request.json()
     const {
-      characterId,
+      characterId, // Backward compatibility
+      characterIds, // NEW: Multiple characters
       theme,
       illustrationStyle,
       customRequests,
@@ -91,23 +93,51 @@ export async function POST(request: NextRequest) {
 
     const themeKey = normalizeThemeKey(theme)
 
-    if (!characterId || !themeKey || !illustrationStyle) {
+    if (!themeKey || !illustrationStyle) {
       return CommonErrors.badRequest(
-        'characterId, theme, and illustrationStyle are required'
+        'theme and illustrationStyle are required'
       )
     }
 
-    // Get Character (using authenticated supabase client)
-    const { data: character, error: charError } = await getCharacterById(supabase, characterId)
-
-    if (charError || !character) {
-      return CommonErrors.notFound('Character')
+    // Get Characters (NEW: Support both single and multiple characters)
+    let characters: any[] = []
+    
+    if (characterIds && characterIds.length > 0) {
+      // NEW: Multiple characters
+      for (const charId of characterIds) {
+        const { data: char, error: charError } = await getCharacterById(supabase, charId)
+        
+        if (charError || !char) {
+          return CommonErrors.notFound(`Character ${charId}`)
+        }
+        
+        // Verify ownership
+        if (char.user_id !== user.id) {
+          return CommonErrors.forbidden('You do not own this character')
+        }
+        
+        characters.push(char)
+      }
+    } else if (characterId) {
+      // Backward compatibility: Single character
+      const { data: char, error: charError } = await getCharacterById(supabase, characterId)
+      
+      if (charError || !char) {
+        return CommonErrors.notFound('Character')
+      }
+      
+      // Verify ownership
+      if (char.user_id !== user.id) {
+        return CommonErrors.forbidden('You do not own this character')
+      }
+      
+      characters.push(char)
+    } else {
+      return CommonErrors.badRequest('characterId or characterIds is required')
     }
 
-    // Verify ownership
-    if (character.user_id !== user.id) {
-      return CommonErrors.forbidden('You do not own this character')
-    }
+    // Main character (first character)
+    const character = characters[0]
 
     // ====================================================================
     // DETERMINE MODE: Cover Only or Full Book
@@ -136,7 +166,7 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] ℹ️  Note: customRequests will be used in story generation prompt (not as title)')
       
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
-        character_id: characterId,
+        character_id: character.id, // Main character ID (backward compatibility)
         title: bookTitle,
         theme: themeKey,
         illustration_style: illustrationStyle,
@@ -155,6 +185,13 @@ export async function POST(request: NextRequest) {
           tokensUsed: 0, // No story generation
           generationTime: 0,
           mode: 'cover-only',
+          // NEW: Multiple characters support
+          characterIds: characters.map(c => c.id),
+          additionalCharacters: characters.slice(1).map(c => c.character_type || {
+            group: "Child",
+            value: "Child",
+            displayName: c.name,
+          }),
         },
       })
 
@@ -172,7 +209,7 @@ export async function POST(request: NextRequest) {
     else {
       console.log('[Create Book] 📖 Starting story generation...')
 
-      // Generate Story Prompt
+      // Generate Story Prompt (NEW: Multiple characters support)
       const storyPrompt = generateStoryPrompt({
         characterName: character.name,
         characterAge: character.age,
@@ -187,6 +224,17 @@ export async function POST(request: NextRequest) {
           confidence: character.analysis_confidence || 0.8,
         },
         language,
+        // NEW: Multiple characters support
+        characters: characters.map((char, index) => ({
+          id: char.id,
+          name: char.name,
+          type: char.character_type || {
+            group: "Child",
+            value: "Child",
+            displayName: char.name,
+          },
+          characterId: char.id,
+        })),
       })
 
       console.log(`[Create Book] 🤖 Calling OpenAI for story generation (model: ${storyModel})`)
@@ -313,7 +361,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
 
       // Create Book in Database
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
-        character_id: characterId,
+        character_id: character.id, // Main character ID (backward compatibility)
         title: storyData.title,
         theme,
         illustration_style: illustrationStyle,
@@ -332,6 +380,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           tokensUsed: completion.usage?.total_tokens || 0,
           generationTime: Date.now() - startTime,
           mode: 'full-book',
+          // NEW: Multiple characters support
+          characterIds: characters.map(c => c.id),
+          additionalCharacters: characters.slice(1).map(c => c.character_type || {
+            group: "Child",
+            value: "Child",
+            displayName: c.name,
+          }),
         },
       })
 
@@ -365,8 +420,25 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         console.log('[Create Book] ✅ Using customRequests in cover scene:', customRequests)
       }
 
-      // Build character prompt
-      const characterPrompt = buildCharacterPrompt(character.description)
+      // Build character prompt (NEW: Multiple characters support)
+      const additionalCharacters = characters.slice(1).map((char) => ({
+        type: char.character_type || {
+          group: "Child",
+          value: "Child",
+          displayName: char.name,
+        },
+        description: char.description,
+      }))
+
+      // NEW: Use buildMultipleCharactersPrompt if there are additional characters
+      const characterPrompt = additionalCharacters.length > 0
+        ? buildMultipleCharactersPrompt(character.description, additionalCharacters)
+        : buildCharacterPrompt(character.description)
+      
+      if (additionalCharacters.length > 0) {
+        console.log('[Create Book] 👥 Multiple characters detected:', additionalCharacters.length + 1, 'total')
+        console.log('[Create Book] 📝 Character prompt includes:', additionalCharacters.map(c => c.type.displayName).join(', '))
+      }
       
       // Determine age group (default for cover only mode)
       const ageGroup = isCoverOnlyMode ? 'preschool' : (storyData?.metadata?.ageGroup || 'preschool')
@@ -381,16 +453,20 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               themeKey === 'space' ? 'inspiring' :
               themeKey === 'sports' ? 'exciting' :
               'happy',
-        characterAction: 'standing prominently in the center, looking at the viewer with a sense of wonder and adventure',
-        focusPoint: 'character' as const, // Cover should focus on character
+        characterAction: characters.length > 1 
+          ? `standing together prominently, looking at the viewer with a sense of wonder and adventure`
+          : `standing prominently in the center, looking at the viewer with a sense of wonder and adventure`,
+        focusPoint: 'character' as const, // Cover should focus on character(s)
       }
       
       // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
+      // NEW: Pass additionalCharactersCount for group composition
       const textPrompt = generateFullPagePrompt(
         characterPrompt,
         coverSceneInput,
         illustrationStyle,
-        ageGroup
+        ageGroup,
+        additionalCharacters.length // NEW: Additional characters count
       )
 
       console.log('[Create Book] 🖼️  Calling GPT-image API for cover generation...')
@@ -418,96 +494,111 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         throw new Error('OPENAI_API_KEY is not configured')
       }
 
-      const referenceImageUrl = character.reference_photo_url || null
+      const referenceImageUrls = characters
+        .map((char) => char.reference_photo_url)
+        .filter((url): url is string => Boolean(url))
       let coverImageUrl: string | null = null
       let coverImageB64: string | null = null
       let coverImageOutputFormat: string | null = null
-      let referenceImageBlobCreated = false
-      let referenceImageBlobSizeBytes: number | null = null
+      let referenceImageBlobCount = 0
+      let referenceImageBlobTotalBytes = 0
       let editsApiSuccess = false // Track if edits API was successful
 
-      console.log('[Create Book] 📸 Reference image URL:', referenceImageUrl ? 'Provided ✅' : 'Not provided ❌')
-      if (referenceImageUrl) {
-        console.log('[Create Book] 📸 Reference image URL length:', referenceImageUrl.length, 'chars')
-        console.log('[Create Book] 📸 Reference image URL preview:', referenceImageUrl.substring(0, 100) + '...')
+      console.log('[Create Book] 📸 Reference images:', referenceImageUrls.length > 0 ? `Provided ✅ (${referenceImageUrls.length})` : 'Not provided ❌')
+      if (referenceImageUrls.length > 0) {
+        referenceImageUrls.forEach((url, index) => {
+          console.log(`[Create Book] 📸 Reference image ${index + 1} URL length:`, url.length, 'chars')
+          console.log(`[Create Book] 📸 Reference image ${index + 1} URL preview:`, url.substring(0, 100) + '...')
+        })
         console.log('[Create Book] 🔍 Reference image will be used for /v1/images/edits API (multimodal input)')
       } else {
         console.log('[Create Book] ⚠️  No reference image - will use /v1/images/generations (text-only)')
       }
 
       // Use /v1/images/edits if reference image available, otherwise /v1/images/generations
-      if (referenceImageUrl) {
+      if (referenceImageUrls.length > 0) {
         console.log('[Create Book] 🔧 Attempting to use /v1/images/edits (with reference image)')
         console.log('[Create Book] 📋 Model:', imageModel)
         console.log('[Create Book] 📏 Size:', imageSize)
         console.log('[Create Book] 📝 Prompt will be included: Yes ✅')
         console.log('[Create Book] 📏 Prompt length:', textPrompt.length, 'characters')
         
-        // Convert reference image URL to Blob (support both data URL and HTTP URL)
-        // Reference image format: Blob (binary data) sent as multipart/form-data
-        let imageBlob: Blob | null = null
-        const imageProcessingStartTime = Date.now()
+        // Convert reference image URLs to Blobs (support both data URL and HTTP URL)
+        // Reference images format: Blob (binary data) sent as multipart/form-data
+        const imageBlobs: Array<{ blob: Blob; filename: string }> = []
         
-        try {
-          if (referenceImageUrl.startsWith('data:')) {
-            console.log('[Create Book] 🔄 Processing data URL reference image...')
-            // Data URL: extract base64 data
-            const base64Data = referenceImageUrl.split(',')[1]
-            const binaryData = Buffer.from(base64Data, 'base64')
-            imageBlob = new Blob([binaryData], { type: 'image/png' })
-            referenceImageBlobCreated = true
-            referenceImageBlobSizeBytes = imageBlob.size
-            console.log('[Create Book] ✅ Data URL converted to Blob, size:', imageBlob.size, 'bytes')
-          } else {
-            // HTTP URL: download the image
-            console.log('[Create Book] 📥 Downloading reference image from URL...')
-            console.log('[Create Book]   URL length:', referenceImageUrl.length, 'chars')
-            console.log('[Create Book]   URL preview:', referenceImageUrl.substring(0, 80) + '...')
-            const downloadStartTime = Date.now()
-            const imageResponse = await fetch(referenceImageUrl)
-            const downloadTime = Date.now() - downloadStartTime
-            console.log('[Create Book] ⏱️  Download took:', downloadTime, 'ms')
-            
-            if (!imageResponse.ok) {
-              throw new Error(`Failed to download reference image: ${imageResponse.status} ${imageResponse.statusText}`)
+        for (let i = 0; i < referenceImageUrls.length; i += 1) {
+          const referenceImageUrl = referenceImageUrls[i]
+          const imageProcessingStartTime = Date.now()
+          
+          try {
+            if (referenceImageUrl.startsWith('data:')) {
+              console.log('[Create Book] 🔄 Processing data URL reference image...')
+              // Data URL: extract base64 data
+              const base64Data = referenceImageUrl.split(',')[1]
+              const binaryData = Buffer.from(base64Data, 'base64')
+              const imageBlob = new Blob([binaryData], { type: 'image/png' })
+              imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
+              referenceImageBlobCount += 1
+              referenceImageBlobTotalBytes += imageBlob.size
+              console.log('[Create Book] ✅ Data URL converted to Blob, size:', imageBlob.size, 'bytes')
+            } else {
+              // HTTP URL: download the image
+              console.log('[Create Book] 📥 Downloading reference image from URL...')
+              console.log('[Create Book]   URL length:', referenceImageUrl.length, 'chars')
+              console.log('[Create Book]   URL preview:', referenceImageUrl.substring(0, 80) + '...')
+              const downloadStartTime = Date.now()
+              const imageResponse = await fetch(referenceImageUrl)
+              const downloadTime = Date.now() - downloadStartTime
+              console.log('[Create Book] ⏱️  Download took:', downloadTime, 'ms')
+              
+              if (!imageResponse.ok) {
+                throw new Error(`Failed to download reference image: ${imageResponse.status} ${imageResponse.statusText}`)
+              }
+              
+              const imageBuffer = await imageResponse.arrayBuffer()
+              const imageBlob = new Blob([imageBuffer], { type: 'image/png' })
+              imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
+              referenceImageBlobCount += 1
+              referenceImageBlobTotalBytes += imageBlob.size
+              const processingTime = Date.now() - imageProcessingStartTime
+              console.log('[Create Book] ✅ Reference image downloaded successfully')
+              console.log('[Create Book] 📊 Image blob size:', imageBlob.size, 'bytes')
+              console.log('[Create Book] ⏱️  Total processing time:', processingTime, 'ms')
             }
-            
-            const imageBuffer = await imageResponse.arrayBuffer()
-            imageBlob = new Blob([imageBuffer], { type: 'image/png' })
-            referenceImageBlobCreated = true
-            referenceImageBlobSizeBytes = imageBlob.size
+          } catch (imageError) {
             const processingTime = Date.now() - imageProcessingStartTime
-            console.log('[Create Book] ✅ Reference image downloaded successfully')
-            console.log('[Create Book] 📊 Image blob size:', imageBlob.size, 'bytes')
-            console.log('[Create Book] ⏱️  Total processing time:', processingTime, 'ms')
+            console.error('[Create Book] ❌ Error processing reference image:', imageError)
+            console.error('[Create Book] ⏱️  Processing failed after:', processingTime, 'ms')
           }
-        } catch (imageError) {
-          const processingTime = Date.now() - imageProcessingStartTime
-          console.error('[Create Book] ❌ Error processing reference image:', imageError)
-          console.error('[Create Book] ⏱️  Processing failed after:', processingTime, 'ms')
-          // Fall back to /v1/images/generations if reference image fails
-          console.log('[Create Book] ⚠️  Falling back to /v1/images/generations (reference image processing failed)')
-          imageBlob = null
         }
 
-        // Only use /v1/images/edits if we have a valid image blob
-        if (imageBlob) {
+        if (imageBlobs.length === 0) {
+          console.log('[Create Book] ⚠️  No valid reference images processed - falling back to /v1/images/generations')
+        }
+
+        // Only use /v1/images/edits if we have at least one valid image blob
+        if (imageBlobs.length > 0) {
           console.log('[Create Book] 📦 Preparing FormData for /v1/images/edits API call...')
           const formData = new FormData()
           formData.append('model', imageModel)
           formData.append('prompt', textPrompt)
           formData.append('size', imageSize)
           formData.append('quality', imageQuality)
-          formData.append('image', imageBlob, 'reference.png')
+          // Append images as array (image[] format) to support multiple reference images
+          imageBlobs.forEach(({ blob, filename }) => {
+            formData.append('image[]', blob, filename)
+          })
           
           console.log('[Create Book] 📤 FormData prepared:')
           console.log('[Create Book]   - Model:', imageModel)
           console.log('[Create Book]   - Size:', imageSize)
           console.log('[Create Book]   - Quality:', imageQuality)
-          console.log('[Create Book]   - Image blob size:', imageBlob.size, 'bytes')
+          console.log('[Create Book]   - Image blobs:', imageBlobs.length)
+          console.log('[Create Book]   - Total image bytes:', referenceImageBlobTotalBytes, 'bytes')
           console.log('[Create Book]   - Image format: Blob (multipart/form-data)')
           console.log('[Create Book]   - Prompt included: Yes ✅')
-          console.log('[Create Book]   - Reference image included: Yes ✅ (as Blob)')
+          console.log('[Create Book]   - Reference images included: Yes ✅ (as Blobs)')
 
           const editsApiStartTime = Date.now()
           console.log('[Create Book] 🚀 Calling /v1/images/edits API...')
@@ -548,7 +639,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               coverImageUrl = null
             } else {
               console.log('[Create Book] ✅ Edits API call successful, parsing response...')
-            const editsResult = await editsResponse.json()
+              const editsResult = await editsResponse.json()
               console.log('[Create Book] 📦 Response structure:', {
                 hasData: !!editsResult.data,
                 dataLength: editsResult.data?.length || 0,
@@ -744,7 +835,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         console.error('[Create Book]   - Reference image URL:', referenceImageUrl ? 'Provided' : 'Not provided')
         console.error('[Create Book]   - Reference image blob created:', referenceImageBlobCreated ? 'Yes' : 'No')
         console.error('[Create Book]   - Reference image blob size:', referenceImageBlobSizeBytes ?? 'N/A')
-        console.error('[Create Book]   - Edits API attempted:', referenceImageUrl ? 'Yes' : 'No')
+        console.error('[Create Book]   - Edits API attempted:', referenceImageUrls.length > 0 ? 'Yes' : 'No')
         console.error('[Create Book]   - Generations API called:', 'Yes')
         console.error('[Create Book]   - Final coverImageUrl:', coverImageUrl ? 'Yes' : 'No')
         console.error('[Create Book]   - Final coverImageB64:', coverImageB64 ? 'Yes' : 'No')
@@ -755,8 +846,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       console.log('[Create Book] 🖼️  Cover image field:', coverImageUrl ? 'url ✅' : 'b64_json ✅')
       if (editsApiSuccess) {
         console.log('[Create Book] ✅✅✅ SUCCESS: Reference image was used via /v1/images/edits API ✅✅✅')
-      } else if (referenceImageUrl) {
-        console.log('[Create Book] ⚠️  WARNING: Reference image was provided but edits API was not used')
+      } else if (referenceImageUrls.length > 0) {
+        console.log('[Create Book] ⚠️  WARNING: Reference image(s) were provided but edits API was not used')
       } else {
         console.log('[Create Book] ℹ️  INFO: No reference image provided - used text-only generation')
       }
@@ -851,7 +942,24 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const totalPages = pages.length
         const referenceImageUrl = character.reference_photo_url || null
         const characterPrompt = buildCharacterPrompt(character.description)
+        
+        // NEW: Additional characters for image generation
+        const additionalCharacters = characters.slice(1).map((char) => ({
+          type: char.character_type || {
+            group: "Child",
+            value: "Child",
+            displayName: char.name,
+          },
+          description: char.description,
+        }))
+        const additionalCharactersCount = additionalCharacters.length
+        
         const generatedImages: any[] = []
+        
+        console.log(`[Create Book] 👥 Total characters: ${characters.length} (1 main + ${additionalCharactersCount} additional)`)
+        if (additionalCharactersCount > 0) {
+          console.log(`[Create Book] 📝 Additional characters:`, additionalCharacters.map(c => c.type.displayName).join(', '))
+        }
 
         // Process pages in batches of 4 (Tier 1: 4 IPM = 4 images per 90 seconds)
         const BATCH_SIZE = 4
@@ -911,17 +1019,21 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           sceneDescriptionLength: sceneDescription.length,
         })
 
-        // Generate full page prompt with correct parameters
+        // Generate full page prompt with correct parameters (NEW: Multiple characters)
         const fullPrompt = generateFullPagePrompt(
           characterPrompt,
           sceneInput,
           illustrationStyle,
-          ageGroup
+          ageGroup,
+          additionalCharactersCount // NEW: Pass additional characters count
         )
 
         console.log(`[Create Book] 📝 Page ${pageNumber} prompt (first 200 chars):`, fullPrompt.substring(0, 200) + '...')
         console.log(`[Create Book] 📏 Page ${pageNumber} prompt length:`, fullPrompt.length, 'characters')
         console.log(`[Create Book] 🎨 Page ${pageNumber} illustration style in prompt:`, illustrationStyle)
+        if (additionalCharactersCount > 0) {
+          console.log(`[Create Book] 👥 Page ${pageNumber} includes ${additionalCharactersCount + 1} characters`)
+        }
         
         // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
         const hasClothingDirective = fullPrompt.toLowerCase().includes('clothing') || 

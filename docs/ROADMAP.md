@@ -35,7 +35,7 @@
   - ✅ Faz 2.5: E-book Viewer (100%)
   - ✅ Faz 2.6: Kullanıcı Dashboard (100%)
 - **Faz 3:** Backend ve AI Entegrasyonu tamamlandı (100%) ✅
-  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026), ✅ Bug fix'ler: Reference image handling, theme sports mapping, storage sanitization (16 Ocak 2026)
+  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026), ✅ Bug fix'ler: Reference image handling, theme sports mapping, storage sanitization (16 Ocak 2026), ✅ Kalite iyileştirmeleri: El/parmak anatomisi direktifleri, çoklu karakter referans eşleştirme, FormData image[] format düzeltmesi (16 Ocak 2026)
   - ✅ Faz 3.6: PDF Generation (100%) ✅
   - ✅ Faz 3.7: Webhook'lar → Faz 4'e taşındı ✅ (15 Ocak 2026)
 - **🎉 MVP Durumu:** Kitap oluşturma, görüntüleme ve PDF indirme tamamen çalışıyor! (11 Ocak 2026)
@@ -185,14 +185,25 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] Format kontrolü (JPG, PNG)
   - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
   - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
-  - [ ] **Multi-karakter desteği (3 karaktere kadar)** - 🆕 **MVP'ye eklendi (4 Ocak 2026)**
-    - [ ] "Add Character" butonu (maksimum 3 karakter)
-    - [ ] Her karakter için ayrı upload alanı
-    - [ ] Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
-    - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel)
-    - [ ] Her karakter için ayrı AI analiz
-    - [ ] Karakter silme butonu
-    - [ ] Ücretsiz özellik (MVP'de dahil)
+  - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)**
+    - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Other)
+    - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input
+    - [x] Pets grubu: Dog, Cat, Rabbit, Bird, Other Pet (custom input)
+    - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Other Family (custom input)
+    - [x] Other: Custom text input
+    - [x] "Add Character" butonu (maksimum 3 karakter)
+    - [x] Her karakter için ayrı upload alanı
+    - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel) - ⏸️ Ertelendi
+    - [x] Karakter silme butonu
+    - [x] localStorage: characters array (characterPhoto → characters)
+    - [x] Her karakter için ayrı API çağrısı (/api/characters)
+    - [x] Story generation: Birden fazla karakter desteği
+    - [x] Image generation: Ana karakter reference + diğerleri text prompt
+    - [x] Books API: characterIds array desteği (backward compatible)
+    - [x] Step 6: Çoklu karakter gönderme
+    - [x] Geriye dönük uyumluluk (eski characterPhoto formatı destekleniyor)
+    - [x] Ücretsiz özellik (MVP'de dahil)
+    - [x] **İmplementasyon Takip:** `docs/implementation/FAZ2_4_KARAKTER_GRUPLAMA_IMPLEMENTATION.md`
   - [ ] **Mevcut karakter seçimi (Character Library entegrasyonu)** - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
     - [ ] Step 2'de kullanıcının karakterleri varsa karakter seçimi bölümü göster
     - [ ] "Select Character" section (karakter listesi grid/cards)

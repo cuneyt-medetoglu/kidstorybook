@@ -576,33 +576,47 @@ export function generateFullPagePrompt(
   characterPrompt: string,
   sceneInput: SceneInput,
   illustrationStyle: string,
-  ageGroup: string
+  ageGroup: string,
+  additionalCharactersCount: number = 0 // NEW: Number of additional characters
 ): string {
   // Build scene prompt (hybrid: cinematic + descriptive)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
-  
+
   // Get environment for layered composition
   const environment = getEnvironmentDescription(sceneInput.theme, sceneInput.sceneDescription)
-  
+
   // Build layered composition (FOREGROUND/MIDGROUND/BACKGROUND)
   const layeredComp = generateLayeredComposition(sceneInput, sceneInput.characterAction, environment)
-  
+
   // Add age-appropriate rules
   const ageRules = getAgeAppropriateSceneRules(ageGroup)
-  
+
   // Start building prompt parts
   const promptParts: string[] = []
-  
+
   // Add layered composition at the beginning for emphasis
   promptParts.push(layeredComp)
   promptParts.push(scenePrompt)
   promptParts.push(ageRules.join(', '))
   
+  // Multiple characters note (NEW)
+  if (additionalCharactersCount > 0) {
+    const totalCharacters = additionalCharactersCount + 1
+    promptParts.push(`${totalCharacters} characters in the scene: main character and ${additionalCharactersCount} companion(s)`)
+    promptParts.push(`all ${totalCharacters} characters should be visible and clearly identifiable`)
+    promptParts.push('group composition, balanced arrangement of characters')
+  }
+  
   // Special instructions for Page 1 (Book Cover)
   if (sceneInput.pageNumber === 1) {
     promptParts.push('BOOK COVER ILLUSTRATION (NOT a book mockup, NOT a 3D book object, NOT a book on a shelf)')
     promptParts.push('FLAT, STANDALONE ILLUSTRATION that can be used as a book cover')
-    promptParts.push('main character prominently featured in center or foreground')
+    
+    if (additionalCharactersCount > 0) {
+      promptParts.push(`all ${additionalCharactersCount + 1} characters prominently featured`)
+    } else {
+      promptParts.push('main character prominently featured in center or foreground')
+    }
     promptParts.push('visually striking, colorful, and appealing to children')
     promptParts.push('professional and print-ready')
     promptParts.push('NO TEXT, NO WRITING, NO LETTERS, NO WORDS in the image - text will be added separately as a separate layer')

@@ -16,8 +16,8 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.0',
-  releaseDate: new Date('2026-01-10'),
+  version: '1.0.3',
+  releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -25,6 +25,10 @@ export const VERSION: PromptVersion = {
     'Master character concept',
     'Multi-book consistency',
     'Detailed feature extraction',
+    'Added child descriptions for multi-character prompts',
+    'Support multiple reference images for cover edits',
+    'Enhanced multi-character prompt with reference image matching (16 Ocak 2026)',
+    'Individual eye color preservation for each character (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -207,14 +211,116 @@ export function buildCharacterPrompt(character: CharacterDescription): string {
 }
 
 /**
+ * Build prompt for multiple characters
+ * Main character (with reference image) + additional characters (text description only)
+ * ENHANCED: 16 Ocak 2026 - Referans görsel eşleştirme iyileştirmesi
+ */
+export function buildMultipleCharactersPrompt(
+  mainCharacter: CharacterDescription,
+  additionalCharacters?: Array<{
+    type: { group: string; value: string; displayName: string }
+    description?: CharacterDescription
+  }>
+): string {
+  const parts: string[] = []
+
+  // CRITICAL: Multiple Reference Images Instruction (NEW: 16 Ocak 2026)
+  parts.push(`CRITICAL INSTRUCTION FOR MULTIPLE CHARACTERS WITH REFERENCE IMAGES:`)
+  parts.push(`You are provided with ${additionalCharacters ? additionalCharacters.length + 1 : 1} reference image(s).`)
+  parts.push(`Each reference image corresponds to one character below, in order (image 1 → character 1, image 2 → character 2, etc.).`)
+  parts.push(`You MUST match each character's text description with its corresponding reference image.`)
+  parts.push(`Pay close attention to EACH character's eye color, hair color, age, and unique features as specified.`)
+  parts.push(`Do NOT mix features between characters - each character must maintain their individual characteristics.`)
+  parts.push(`\n`)
+
+  // Main character (reference image 1 available)
+  parts.push(`CHARACTER 1 (MAIN - Reference Image 1):`)
+  parts.push(buildCharacterPrompt(mainCharacter))
+
+  // Additional characters (reference images 2, 3, ... available)
+  if (additionalCharacters && additionalCharacters.length > 0) {
+    parts.push(`\n`)
+    
+    additionalCharacters.forEach((char, index) => {
+      const charParts: string[] = []
+      const charNumber = index + 2
+      
+      // Add reference image indicator
+      charParts.push(`CHARACTER ${charNumber} (Reference Image ${charNumber}):`)
+      
+      if (char.type.group === "Child") {
+        // NEW: Child character description (detailed, like main character but without reference image)
+        if (char.description) {
+          // Use full character description for Child
+          charParts.push(buildCharacterPrompt(char.description))
+          // CRITICAL: Emphasize individual eye color for this character
+          charParts.push(`(IMPORTANT: This character has ${char.description.eyeColor} eyes, NOT the same eye color as Character 1)`)
+        } else {
+          // Fallback if no description available
+          charParts.push(`a child named ${char.type.displayName || 'child'}`)
+        }
+      } else if (char.type.group === "Pets") {
+        // Pet description
+        charParts.push(`a ${char.type.value.toLowerCase()}`)
+        
+        if (char.description) {
+          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} fur`)
+          if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+          charParts.push(`friendly and playful expression`)
+        } else {
+          charParts.push(`friendly and cute appearance`)
+        }
+      } else if (char.type.group === "Family Members") {
+        // Family member description
+        charParts.push(`${char.type.value.toLowerCase()}`)
+        
+        if (char.description) {
+          if (char.description.age) charParts.push(`${char.description.age} years old`)
+          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
+          if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+          charParts.push(`warm and caring expression`)
+        } else {
+          // Default descriptions
+          if (char.type.value === "Mom" || char.type.value === "Dad") {
+            charParts.push(`adult, warm and loving`)
+          } else if (char.type.value === "Grandma" || char.type.value === "Grandpa") {
+            charParts.push(`elderly, kind and gentle`)
+          } else {
+            charParts.push(`family member, friendly`)
+          }
+        }
+      } else {
+        // Other
+        charParts.push(`${char.type.displayName}`)
+        if (char.description) {
+          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
+          if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+        }
+      }
+      
+      parts.push(charParts.join(' '))
+    })
+  }
+
+  return parts.join('\n')
+}
+
+/**
  * Enhanced character prompt with style consistency
  */
 export function buildDetailedCharacterPrompt(
   character: CharacterDescription,
   illustrationStyle: string,
-  scene?: string
+  scene?: string,
+  additionalCharacters?: Array<{
+    type: { group: string; value: string; displayName: string }
+    description?: CharacterDescription
+  }>
 ): string {
-  const baseCharacter = buildCharacterPrompt(character)
+  // Build character prompt (single or multiple)
+  const baseCharacter = additionalCharacters && additionalCharacters.length > 0
+    ? buildMultipleCharactersPrompt(character, additionalCharacters)
+    : buildCharacterPrompt(character)
   
   let prompt = `${illustrationStyle} illustration of ${baseCharacter}`
   
@@ -224,6 +330,11 @@ export function buildDetailedCharacterPrompt(
 
   // Add consistency keywords
   prompt += `, consistent character design, same character as previous pages`
+  
+  // Additional characters note
+  if (additionalCharacters && additionalCharacters.length > 0) {
+    prompt += `, all ${additionalCharacters.length + 1} characters visible in the scene`
+  }
   
   // Style-specific enhancements
   if (illustrationStyle.includes('watercolor')) {

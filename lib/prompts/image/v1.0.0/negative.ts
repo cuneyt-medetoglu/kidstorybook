@@ -8,8 +8,8 @@ import type { PromptVersion } from '../../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.0',
-  releaseDate: new Date('2026-01-10'),
+  version: '1.0.1',
+  releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -19,6 +19,8 @@ export const VERSION: PromptVersion = {
     'Added facial skin quality controls - blemishes, moles, marks (15 Ocak 2026)',
     'Added logical/pose error prevention - body rotation, orientation consistency (15 Ocak 2026)',
     'Enhanced anatomical correctness directives with skin quality and pose consistency (15 Ocak 2026)',
+    'Enhanced hand/finger anatomy directives with detailed instructions (16 Ocak 2026)',
+    'Added comprehensive hand/finger negative prompts from AI research (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -267,15 +269,24 @@ export const THEME_NEGATIVE: Record<string, string[]> = {
 /**
  * Comprehensive anatomical negative prompts
  * Critical for preventing common AI errors (extra fingers, wrong limb count, etc.)
+ * ENHANCED: 16 Ocak 2026 - El/Parmak negative prompt'ları genişletildi (AI research)
  */
 export const ANATOMICAL_NEGATIVE = [
-  // Hand/Finger Errors (CRITICAL - most common AI mistake)
+  // Hand/Finger Errors (CRITICAL - most common AI mistake) (ENHANCED: 16 Ocak 2026)
   'extra fingers', 'more than 5 fingers', '6 fingers', '7 fingers', '8 fingers', '9 fingers', '10 fingers',
   'missing fingers', 'less than 5 fingers', '4 fingers', '3 fingers', '2 fingers', '1 finger',
   'deformed fingers', 'wrong finger count', 'incorrect number of fingers',
   'fingers fused together', 'fingers missing joints', 'fingers without knuckles',
   'fingers too long', 'fingers too short', 'weird fingers', 'alien fingers',
   'floating fingers', 'disconnected fingers', 'finger growing from wrong place',
+  // NEW (16 Ocak 2026): Additional hand/finger negative prompts from research
+  'mutant hands', 'malformed fingers', 'twisted fingers', 'bent fingers at wrong angle',
+  'fingers with no bones', 'rubber fingers', 'noodle fingers', 'shapeless fingers',
+  'fingers without fingernails', 'missing knuckles', 'extra knuckles', 'wrong number of knuckles',
+  'thumb on wrong side', 'thumb missing', 'two thumbs', 'thumb in wrong position',
+  'fingers growing from wrist', 'fingers merged with palm', 'webbed fingers',
+  'fingers pointing in impossible directions', 'fingers twisted backwards',
+  'hand with 4 fingers and no thumb', 'hand with 6 fingers', 'hand without palm',
   
   // Hand/Arm Errors
   'extra hands', 'three hands', 'four hands', 'multiple hands', 'too many hands',
@@ -408,17 +419,28 @@ export function getNegativePrompt(
 /**
  * Get anatomical correctness directives for POSITIVE prompt
  * These are instructions to add to the positive prompt, not negative
+ * ENHANCED: 16 Ocak 2026 - El/Parmak detayları eklendi (AI research)
  */
 export function getAnatomicalCorrectnessDirectives(): string {
   return [
     'ANATOMICAL CORRECTNESS (CRITICAL):',
-    'character must have exactly 5 fingers on each hand (no more, no less)',
+    // HANDS & FINGERS (ENHANCED: Web research best practices)
+    'each hand must have exactly 5 fingers visible (thumb, index, middle, ring, pinky)',
+    'fingers must be properly attached to palm with visible knuckles and joints',
+    'thumbs must be correctly positioned (opposable, on side of hand)',
+    'fingers must bend naturally at knuckle joints (3 segments per finger, 2 per thumb)',
+    'hands must have natural skin texture with visible knuckles, fingernails included',
+    'hands in natural poses (relaxed grip, gentle curves, anatomically possible positions)',
+    'wrists properly connected to arms, natural wrist angle',
+    'no extra fingers, no missing fingers, no fused fingers, no floating fingers',
+    'fingers must not grow from wrong places or have impossible angles',
+    // GENERAL ANATOMY
     'character must have exactly 2 hands, 2 arms, 2 feet, 2 legs',
     'all body parts must be anatomically correct and properly proportioned',
-    'hands, feet, and limbs must be in natural, possible positions',
+    'limbs must be in natural, possible positions',
     'face features must be symmetrical and correctly placed',
     'proper human anatomy, realistic body structure',
-    'correct finger count, correct limb count, correct facial features',
+    'correct limb count, correct facial features',
     'clean, clear skin without blemishes, marks, moles, or spots on face',
     'body orientation and pose must be logically consistent',
     'character\'s body direction must match movement direction',
