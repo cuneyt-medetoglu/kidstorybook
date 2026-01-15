@@ -92,17 +92,23 @@ export function generateScenePrompt(
   // 8. MOOD AND ATMOSPHERE
   parts.push(getMoodDescription(scene.mood))
 
-  // 9. COMPOSITION RULES
+  // 9. STYLE-SPECIFIC DIRECTIVES (NEW: Illustration Style İyileştirmesi)
+  const styleDirectives = getStyleSpecificDirectives(illustrationStyle)
+  if (styleDirectives) {
+    parts.push(styleDirectives)
+  }
+
+  // 10. COMPOSITION RULES
   const composition = getCompositionRules(scene.focusPoint, scene.pageNumber)
   parts.push(composition)
 
-  // 10. QUALITY AND CONSISTENCY
+  // 11. QUALITY AND CONSISTENCY
   parts.push('professional children\'s book illustration')
   parts.push('high quality, print-ready')
   parts.push('detailed but age-appropriate')
   parts.push('warm and inviting atmosphere')
   
-  // 11. CHARACTER CONSISTENCY EMPHASIS
+  // 12. CHARACTER CONSISTENCY EMPHASIS
   parts.push('character must match reference photo exactly, same features on every page')
 
   return parts.join(', ')
@@ -528,6 +534,41 @@ export function generateLayeredComposition(
 }
 
 // ============================================================================
+// Style-Specific Directives (NEW: Illustration Style İyileştirmesi)
+// ============================================================================
+
+/**
+ * Get style-specific technical directives for each illustration style
+ * These are detailed technical instructions that help GPT-image-1.5 understand
+ * and apply the specific visual characteristics of each style
+ */
+export function getStyleSpecificDirectives(illustrationStyle: string): string {
+  const normalizedStyle = illustrationStyle.toLowerCase().replace(/[-\s]/g, '_')
+  
+  const directives: Record<string, string> = {
+    '3d_animation': 'STYLE-SPECIFIC DIRECTIVES FOR 3D ANIMATION (PIXAR STYLE): Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), rounded shapes, exaggerated features, vibrant saturated colors, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality and visual style',
+    
+    'geometric': 'STYLE-SPECIFIC DIRECTIVES FOR GEOMETRIC: Simplified geometric shapes (circles, squares, triangles), flat colors with no gradients, sharp distinct edges, minimal detail, modern stylized, grid-based alignment, clean lines, illustration style',
+    
+    'watercolor': 'STYLE-SPECIFIC DIRECTIVES FOR WATERCOLOR: Transparent watercolor technique, visible soft brushstrokes, colors blend and bleed at edges, paper texture visible through paint, luminous glowing finish, wet-on-wet color mixing, soft flowing edges, warm inviting atmosphere',
+    
+    'block_world': 'STYLE-SPECIFIC DIRECTIVES FOR BLOCK WORLD: Pixelated/blocky aesthetic, visible blocks/cubes, Minecraft-like construction, characters and environment built from geometric blocks, sharp edges, limited color palette, isometric or orthographic perspective',
+    
+    'collage': 'STYLE-SPECIFIC DIRECTIVES FOR COLLAGE: Cut-out pieces with visible rough edges, distinct layers with varied textures, torn edges showing paper texture, mixed media feel, visible shadows between layers, vibrant colors, handcrafted appearance',
+    
+    'clay_animation': 'STYLE-SPECIFIC DIRECTIVES FOR CLAY ANIMATION: Clay-like appearance, visible fingerprints and tool marks, soft organic texture, matte finish, slightly lumpy surfaces, hand-molded look, soft rounded shadows, stop-motion aesthetic',
+    
+    'kawaii': 'STYLE-SPECIFIC DIRECTIVES FOR KAWAII: Character must have oversized head (1:2 or 1:3 head-to-body ratio), large sparkling eyes with star highlights, tiny dot-like nose, small mouth, soft rounded cheeks, pastel color palette (baby pink, sky blue, mint green, lavender), blush marks on cheeks, decorative hearts/stars/sparkles, exaggerated cuteness',
+    
+    'comic_book': 'STYLE-SPECIFIC DIRECTIVES FOR COMIC BOOK: Bold thick black outlines around all elements, flat color fills with no gradients, dramatic angular shadows with sharp edges, high contrast between light and dark, halftone dot texture for shadows, simplified graphic style, dynamic poses',
+    
+    'sticker_art': 'STYLE-SPECIFIC DIRECTIVES FOR STICKER ART: Clean bold uniform lines, bright highly saturated colors, glossy graphic look with specular highlights, white border effect (like real sticker), simple cell shading, flat fills with minimal gradients, polished graphic appearance',
+  }
+  
+  return directives[normalizedStyle] || ''
+}
+
+// ============================================================================
 // Full Page Image Prompt (ENHANCED: 15 Ocak 2026)
 // ============================================================================
 
@@ -565,6 +606,13 @@ export function generateFullPagePrompt(
     promptParts.push('visually striking, colorful, and appealing to children')
     promptParts.push('professional and print-ready')
     promptParts.push('NO TEXT, NO WRITING, NO LETTERS, NO WORDS in the image - text will be added separately as a separate layer')
+  }
+  
+  // STYLE-SPECIFIC DIRECTIVES (NEW: Illustration Style İyileştirmesi - Güçlü Vurgu)
+  const styleDirectives = getStyleSpecificDirectives(illustrationStyle)
+  if (styleDirectives) {
+    // Stil direktiflerini ortada tekrar vurgula (zaten generateScenePrompt içinde var ama burada da ekle)
+    promptParts.push(styleDirectives)
   }
   
   // 3D Animation style special notes
@@ -610,5 +658,6 @@ export default {
   generateScenePrompt,
   generateFullPagePrompt,
   getAgeAppropriateSceneRules,
+  getStyleSpecificDirectives,
 }
 

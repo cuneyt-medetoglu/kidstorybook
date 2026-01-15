@@ -115,15 +115,99 @@ export const AGE_SPECIFIC_NEGATIVE: Record<string, string[]> = {
 }
 
 // ============================================================================
-// Style-Specific Negative Prompts
+// Style-Specific Negative Prompts (UPDATED: Illustration Style İyileştirmesi)
 // ============================================================================
 
 export const STYLE_NEGATIVE: Record<string, string[]> = {
-  watercolor: [
-    'harsh lines', 'digital looking', 'plastic',
-    'overly saturated', 'neon colors',
+  // 3D Animation (Pixar Style)
+  '3d_animation': [
+    'photorealistic', 'realistic photography', '2D flat illustration',
+    'hand-drawn sketch', 'watercolor', 'comic book style',
+    'realistic textures', 'photographic quality',
+  ],
+  '3d': [
+    'photorealistic', 'realistic photography', '2D flat illustration',
+    'hand-drawn sketch', 'watercolor', 'comic book style',
+    'realistic textures', 'photographic quality',
   ],
   
+  // Geometric
+  'geometric': [
+    'organic shapes', 'curved edges', 'gradients', 'detailed textures',
+    'realistic shading', 'watercolor', 'soft edges', 'rounded forms',
+    'natural shapes', 'complex details',
+  ],
+  
+  // Watercolor
+  'watercolor': [
+    'opaque colors', 'sharp edges', 'digital looking', 'harsh lines',
+    'gouache style', 'matte finish', 'solid color blocks',
+    'no transparency', 'flat colors',
+  ],
+  
+  // Block World
+  'block_world': [
+    'smooth surfaces', 'organic shapes', 'realistic textures', 'gradients',
+    'detailed shading', 'curved edges', 'natural forms', 'soft edges',
+    'watercolor', 'photorealistic',
+  ],
+  'block-world': [
+    'smooth surfaces', 'organic shapes', 'realistic textures', 'gradients',
+    'detailed shading', 'curved edges', 'natural forms', 'soft edges',
+    'watercolor', 'photorealistic',
+  ],
+  
+  // Collage
+  'collage': [
+    'smooth edges', 'digital illustration', 'flat design', 'no layers',
+    'seamless blending', 'perfect edges', 'clean cutouts',
+    'no texture', 'uniform appearance',
+  ],
+  
+  // Clay Animation
+  'clay_animation': [
+    'smooth surfaces', 'digital looking', 'sharp edges', 'realistic textures',
+    'glossy finish', 'perfect surfaces', 'no imperfections',
+    'clean appearance', 'photorealistic',
+  ],
+  'clay-animation': [
+    'smooth surfaces', 'digital looking', 'sharp edges', 'realistic textures',
+    'glossy finish', 'perfect surfaces', 'no imperfections',
+    'clean appearance', 'photorealistic',
+  ],
+  
+  // Kawaii
+  'kawaii': [
+    'realistic proportions', 'small eyes', 'harsh shadows', 'dark colors',
+    'angular shapes', 'anime style', 'realistic features',
+    'normal head size', 'serious expression',
+  ],
+  
+  // Comic Book
+  'comic_book': [
+    'soft gradients', 'subtle shadows', 'realistic shading', 'photographic style',
+    'watercolor', 'smooth edges', 'detailed textures',
+    'realistic proportions', 'soft lighting',
+  ],
+  'comic-book': [
+    'soft gradients', 'subtle shadows', 'realistic shading', 'photographic style',
+    'watercolor', 'smooth edges', 'detailed textures',
+    'realistic proportions', 'soft lighting',
+  ],
+  
+  // Sticker Art
+  'sticker_art': [
+    'soft edges', 'watercolor', 'realistic shading', 'matte finish',
+    'organic shapes', 'textured surfaces', 'hand-drawn look',
+    'rough edges', 'natural appearance',
+  ],
+  'sticker-art': [
+    'soft edges', 'watercolor', 'realistic shading', 'matte finish',
+    'organic shapes', 'textured surfaces', 'hand-drawn look',
+    'rough edges', 'natural appearance',
+  ],
+  
+  // Legacy support (deprecated styles - kept for backward compatibility)
   digital: [
     'overly realistic', 'photographic',
     'artificial', 'computer generated look',

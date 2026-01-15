@@ -364,7 +364,85 @@ interface ABTestConfig {
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026  
+## 🎨 Illustration Style Yönetimi (NEW: Illustration Style İyileştirmesi)
+
+### Stil Seçimi Stratejisi
+
+**Temel Prensip:** Yakın stilleri kaldır, en farklı ve ayırt edilebilir olanları tut.
+
+**Mevcut Stiller (9 adet):**
+1. **3D Animation (Pixar Style)** - Pixar stili (Toy Story, Finding Nemo, Inside Out)
+2. **Geometric** - Keskin kenarlar, flat colors, modern
+3. **Watercolor** - Transparent, soft brushstrokes, warm inviting
+4. **Comic Book** - Bold outlines, dramatic shadows, high contrast
+5. **Block World** - Minecraft-like, pixelated, blocky
+6. **Clay Animation** - Textured, hand-molded, stop-motion aesthetic
+7. **Kawaii** - Oversized heads, sparkling eyes, pastel colors
+8. **Collage** - Cut-out pieces, layers, handcrafted
+9. **Sticker Art** - Glossy, clean lines, bright colors
+
+**Kaldırılan Stiller (Yakın Olanlar):**
+- `gouache` → Watercolor'a çok yakın (ikisi de suluboya benzeri)
+- `soft_anime` → Kawaii'ye çok yakın (ikisi de büyük gözler, sevimli)
+- `picture_book` → Watercolor'a yakın (özellikleri Watercolor'a eklendi)
+
+### Stil-Specific Prompt Best Practices
+
+#### 1. Detaylı Stil Açıklamaları
+Her stil için `lib/prompts/image/v1.0.0/style-descriptions.ts` dosyasında:
+- Teknik özellikler (transparent/opaque, flat/gradient, etc.)
+- Görsel karakteristikler (rounded/sharp edges, textures, etc.)
+- Referans örnekler (Pixar için: Toy Story, Finding Nemo, etc.)
+- Renk paleti (pastel/vibrant/saturated, etc.)
+
+#### 2. Stil-Specific Direktifler
+`getStyleSpecificDirectives()` fonksiyonu ile her stil için özel teknik direktifler:
+- Prompt'un başında stil açıklaması
+- Prompt'un ortasında stil-specific direktifler (güçlü vurgu)
+- Negative prompt'larda stil-specific kaçınılacaklar
+
+#### 3. Prompt Vurgusu
+- Stil açıklaması prompt'un **başında** (mevcut)
+- Stil-specific direktifler prompt'un **ortasında** (yeni - güçlü vurgu)
+- Negative prompt'larda stil-specific kaçınılacaklar
+
+#### 4. Örnek: Pixar Style Vurgusu
+```
+"3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), 
+cartoonish and stylized (NOT photorealistic), vibrant saturated colors, rounded shapes, 
+exaggerated features, soft shadows, realistic textures, children's animated movie aesthetic, 
+Pixar animation quality"
+```
+
+### Stil İyileştirme Workflow
+
+1. **Kullanıcı Feedback'i:** "Stiller birbirine benziyor"
+2. **Analiz:** Hangi stiller yakın? Hangi stiller ayırt edilemiyor?
+3. **Araştırma:** Her stil için teknik özellikler ve görsel karakteristikler araştır
+4. **Prompt İyileştirme:**
+   - Stil açıklamalarını genişlet
+   - Stil-specific direktifler ekle
+   - Negative prompt'ları güçlendir
+5. **Test:** Farklı stiller için görsel üret ve karşılaştır
+6. **Dokümantasyon:** Değişiklikleri CHANGELOG.md'ye ekle
+
+### Stil Sayısı Optimizasyonu
+
+**Kural:** 8-10 stil ideal. Daha fazlası karışıklık yaratır, daha azı seçenekleri kısıtlar.
+
+**Kaldırma Kriterleri:**
+- İki stil birbirine %80+ benziyorsa → Birini kaldır
+- Kullanıcılar iki stili ayırt edemiyorsa → Birini kaldır
+- Bir stil çok nadir kullanılıyorsa → Kaldırılabilir (analiz gerekli)
+
+**Eklenme Kriterleri:**
+- Yeni stil mevcut stillerden belirgin şekilde farklıysa
+- Kullanıcı talebi varsa ve teknik olarak uygulanabilirse
+- GPT-image-1.5 modeli stili destekliyorsa
+
+---
+
+**Son Güncelleme:** 15 Ocak 2026 (Illustration Style İyileştirmesi eklendi)  
 **Oluşturan:** @project-manager agent
 
 **Not:** Bu agent'ı kullanmak için: `@prompt-manager [sorun veya istediğin]`

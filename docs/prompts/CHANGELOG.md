@@ -1,12 +1,52 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.0  
-**Son Güncelleme:** 15 Ocak 2026
+**Doküman Versiyonu:** 2.1  
+**Son Güncelleme:** 15 Ocak 2026 (Illustration Style İyileştirmesi)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.1 (15 Ocak 2026) - Illustration Style İyileştirmesi
+
+**Sorun:** Farklı illustration style'lar seçilse bile görseller birbirine çok benziyordu. Kullanıcılar stil farklarını göremiyordu.
+
+**Çözüm:**
+- ✅ Yakın stiller kaldırıldı (12 stil → 9 stil)
+  - `gouache` kaldırıldı (Watercolor'a çok yakın)
+  - `soft_anime` kaldırıldı (Kawaii'ye çok yakın)
+  - `picture_book` kaldırıldı (Watercolor'a yakın, özellikleri Watercolor'a eklendi)
+- ✅ 3D Animation → "3D Animation (Pixar Style)" olarak vurgulandı
+- ✅ Her stil için detaylı teknik özellikler eklendi
+- ✅ Stil-specific direktifler eklendi (`getStyleSpecificDirectives()`)
+- ✅ Prompt'larda stil vurgusu güçlendirildi (başta ve ortada)
+- ✅ Stil-specific negative prompt'lar eklendi
+
+**Kalan 9 Stil:**
+1. **3D Animation (Pixar Style)** - Pixar stili (Toy Story, Finding Nemo, Inside Out)
+2. **Geometric** - Keskin kenarlar, flat colors, modern
+3. **Watercolor** - Transparent, soft brushstrokes, warm inviting
+4. **Comic Book** - Bold outlines, dramatic shadows, high contrast
+5. **Block World** - Minecraft-like, pixelated, blocky
+6. **Clay Animation** - Textured, hand-molded, stop-motion aesthetic
+7. **Kawaii** - Oversized heads, sparkling eyes, pastel colors
+8. **Collage** - Cut-out pieces, layers, handcrafted
+9. **Sticker Art** - Glossy, clean lines, bright colors
+
+**Dosya Değişiklikleri:**
+- ✅ `app/create/step4/page.tsx` - Kaldırılan stiller çıkarıldı, 3D Animation Pixar Style olarak güncellendi
+- ✅ `lib/prompts/image/v1.0.0/style-descriptions.ts` - Detaylı stil açıklamaları eklendi (9 stil)
+- ✅ `lib/prompts/image/v1.0.0/scene.ts` - `getStyleSpecificDirectives()` fonksiyonu eklendi, prompt fonksiyonları güncellendi
+- ✅ `lib/prompts/image/v1.0.0/negative.ts` - Stil-specific negative prompt'lar eklendi (9 stil)
+- ✅ `.cursor/rules/prompt-manager.mdc` - Illustration Style yönetimi bölümü eklendi
+
+**Beklenen Sonuçlar:**
+- Her stil belirgin şekilde ayırt edilebilir olacak
+- GPT-image-1.5 modeli stil direktiflerini daha iyi anlayacak
+- Kullanıcılar farklı stiller seçtiğinde belirgin farklar görecek
+
+---
 
 ### v1.0.0 (15 Ocak 2026) - Yeni Versionlama Yapısı
 
