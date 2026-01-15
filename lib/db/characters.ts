@@ -52,6 +52,10 @@ export interface CreateCharacterInput {
 export interface UpdateCharacterInput {
   name?: string
   age?: number
+  gender?: 'boy' | 'girl' | 'other'
+  hair_color?: string
+  eye_color?: string
+  features?: string[]
   description?: CharacterDescription
   is_default?: boolean
 }
@@ -340,3 +344,26 @@ export async function getBooksByCharacter(characterId: string): Promise<{
   }
 }
 
+/**
+ * Update character's last_used_at timestamp
+ * Call this when a book is created with this character
+ */
+export async function updateCharacterLastUsed(
+  supabase: SupabaseClient,
+  characterId: string
+): Promise<{ success: boolean; error: Error | null }> {
+  try {
+    const { error } = await supabase
+      .from('characters')
+      .update({ last_used_at: new Date().toISOString() })
+      .eq('id', characterId)
+
+    if (error) throw error
+
+    console.log('[Character] Updated last_used_at for character:', characterId)
+    return { success: true, error: null }
+  } catch (error) {
+    console.error('[Character] Error updating last_used_at:', error)
+    return { success: false, error: error as Error }
+  }
+}

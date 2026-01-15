@@ -19,9 +19,15 @@ docs/
 │   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi (gelecek)
 │   └── ...
 │
-├── checklists/                 # Kontrol listeleri
-│   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi
+├── checklists/                 # Kontrol listeleri (aktif)
 │   └── ...
+│
+├── archive/                    # Arşivlenmiş dosyalar
+│   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi (arşiv)
+│   ├── FAZ1_TEST_CHECKLIST.md  # Faz 1 test checklist (arşiv)
+│   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu (arşiv)
+│   ├── FAZ1_3_FINAL_REPORT.md  # Faz 1.3 final raporu (arşiv)
+│   └── FAZ1_TEST_REPORT.md     # Faz 1 test raporu (arşiv)
 │
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
@@ -34,11 +40,11 @@ docs/
 │   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   └── ...
 │
-├── reports/                    # Raporlar
-│   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu
+├── reports/                    # Raporlar (aktif)
 │   ├── GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md # GPT-image API hata analizi
 │   ├── CURRENT_STATUS_ANALYSIS.md # Mevcut durum analizi ve eksikler listesi
 │   ├── MISSING_IMPLEMENTATIONS_ANALYSIS.md # Eksik implementasyonlar analizi (MVP için kritik)
+│   ├── IMAGE_QUALITY_ANALYSIS.md # Görsel kalite analizi
 │   └── ...
 │
 ├── strategies/                 # Strateji dokümanları
@@ -61,19 +67,12 @@ docs/
 │   ├── AI_TOOLS_COMPARISON.md   # AI tool karşılaştırması (test sonuçları)
 │   └── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı
 │
-├── planning/                    # Planlama dokümanları
-│   ├── FEATURE_NOTES.md         # Özellik notları
-│   ├── POC_PLAN.md              # POC planı
-│   ├── PROJECT_PLAN.md          # Proje planı
-│   └── QUESTIONS_AND_DECISIONS.md
-│
 ├── prompts/                     # AI prompt template'leri
-│   ├── PROMPT_STORY.md          # Hikaye prompt template
-│   ├── PROMPT_IMAGE.md          # Görsel prompt template
-│   ├── PROMPT_FINAL.md          # Final birleştirilmiş prompt
-│   ├── V0_HEADER_PROMPT.md      # v0.app Header component prompt
-│   ├── V0_MOBILE_MENU_PROMPT.md # v0.app Mobile Menu prompt
-│   ├── V0_COLOR_UPDATE_PROMPT.md # v0.app Renk güncelleme prompt
+│   ├── IMAGE_PROMPT_TEMPLATE_v1.0.0.md # Görsel üretimi prompt template (v1.0.0)
+│   ├── STORY_PROMPT_TEMPLATE_v1.0.0.md  # Hikaye üretimi prompt template (v1.0.0)
+│   ├── CHANGELOG.md             # Prompt versiyon geçmişi ve değişiklikler
+│   ├── VERSION_SYNC_GUIDE.md    # Version sync ve takip sistemi rehberi
+│   ├── VERSION_STATUS.md        # Mevcut prompt versiyon durumu
 │   └── ...
 │
 └── technical/                   # Teknik dokümanlar
