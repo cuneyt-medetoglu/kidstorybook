@@ -326,10 +326,23 @@ export default function Step4Page() {
                           : "border-gray-200 bg-white hover:shadow-lg dark:border-slate-700 dark:bg-slate-800"
                       }`}
                     >
-                      {/* Preview Image Area */}
-                      <div className="relative aspect-video overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
-                        {/* Placeholder image with gradient */}
-                        <div className={`h-full w-full ${style.iconBgColor} opacity-20`} />
+                      {/* Preview Image Area - 1024x1536 (2:3 aspect ratio) */}
+                      <div className="relative aspect-[2/3] overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
+                        {/* Style Example Image */}
+                        <img
+                          src={`/illustration-styles/${style.id}.jpg`}
+                          alt={`${style.title} style example`}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            // Fallback to gradient if image not found
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                            const fallback = target.nextElementSibling as HTMLElement
+                            if (fallback) fallback.style.display = 'block'
+                          }}
+                        />
+                        {/* Fallback gradient (shown if image fails to load) */}
+                        <div className={`hidden h-full w-full ${style.iconBgColor} opacity-20`} />
 
                         {/* Icon Badge - top right */}
                         <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
