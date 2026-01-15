@@ -30,13 +30,13 @@ const formSchema = z.object({
   illustrationStyle: z.enum(
     [
       "3d_animation",
-      "geometric",
-      "watercolor",
-      "block_world",
-      "collage",
-      "clay_animation",
-      "kawaii",
       "comic_book",
+      "geometric",
+      "kawaii",
+      "watercolor",
+      "clay_animation",
+      "collage",
+      "block_world",
       "sticker_art",
     ],
     {
@@ -70,6 +70,16 @@ const illustrationStyles: IllustrationStyle[] = [
     iconBgColor: "bg-gradient-to-br from-orange-500 to-amber-500",
   },
   {
+    id: "comic_book",
+    Icon: Zap,
+    title: "Comic Book",
+    description: "Bold lines, relatively flat colors, strong dramatic shadows, comic book style illustration",
+    gradientFrom: "from-red-600",
+    gradientTo: "to-orange-600",
+    borderColor: "border-red-600",
+    iconBgColor: "bg-gradient-to-br from-red-600 to-orange-600",
+  },
+  {
     id: "geometric",
     Icon: Hexagon,
     title: "Geometric",
@@ -78,6 +88,16 @@ const illustrationStyles: IllustrationStyle[] = [
     gradientTo: "to-cyan-500",
     borderColor: "border-blue-500",
     iconBgColor: "bg-gradient-to-br from-blue-500 to-cyan-500",
+  },
+  {
+    id: "kawaii",
+    Icon: Heart,
+    title: "Kawaii",
+    description: "Exaggerated cuteness, large sparkling eyes, simplified round features, bright cheerful colors",
+    gradientFrom: "from-pink-400",
+    gradientTo: "to-rose-400",
+    borderColor: "border-pink-400",
+    iconBgColor: "bg-gradient-to-br from-pink-400 to-rose-400",
   },
   {
     id: "watercolor",
@@ -90,15 +110,14 @@ const illustrationStyles: IllustrationStyle[] = [
     iconBgColor: "bg-gradient-to-br from-purple-500 to-pink-500",
   },
   {
-    id: "block_world",
-    Icon: Grid3x3,
-    title: "Block World",
-    description:
-      "Pixelated or blocky aesthetic, Minecraft-like, characters and environment constructed from visible blocks",
-    gradientFrom: "from-green-500",
-    gradientTo: "to-emerald-500",
-    borderColor: "border-green-500",
-    iconBgColor: "bg-gradient-to-br from-green-500 to-emerald-500",
+    id: "clay_animation",
+    Icon: Circle,
+    title: "Clay Animation",
+    description: "Clay appearance, textured, slightly rough, hand-crafted look, soft rounded shadows",
+    gradientFrom: "from-amber-600",
+    gradientTo: "to-orange-600",
+    borderColor: "border-amber-600",
+    iconBgColor: "bg-gradient-to-br from-amber-600 to-orange-600",
   },
   {
     id: "collage",
@@ -112,34 +131,15 @@ const illustrationStyles: IllustrationStyle[] = [
     iconBgColor: "bg-gradient-to-br from-indigo-500 to-violet-500",
   },
   {
-    id: "clay_animation",
-    Icon: Circle,
-    title: "Clay Animation",
-    description: "Clay appearance, textured, slightly rough, hand-crafted look, soft rounded shadows",
-    gradientFrom: "from-amber-600",
-    gradientTo: "to-orange-600",
-    borderColor: "border-amber-600",
-    iconBgColor: "bg-gradient-to-br from-amber-600 to-orange-600",
-  },
-  {
-    id: "kawaii",
-    Icon: Heart,
-    title: "Kawaii",
-    description: "Exaggerated cuteness, large sparkling eyes, simplified round features, bright cheerful colors",
-    gradientFrom: "from-pink-400",
-    gradientTo: "to-rose-400",
-    borderColor: "border-pink-400",
-    iconBgColor: "bg-gradient-to-br from-pink-400 to-rose-400",
-  },
-  {
-    id: "comic_book",
-    Icon: Zap,
-    title: "Comic Book",
-    description: "Bold lines, relatively flat colors, strong dramatic shadows, comic book style illustration",
-    gradientFrom: "from-red-600",
-    gradientTo: "to-orange-600",
-    borderColor: "border-red-600",
-    iconBgColor: "bg-gradient-to-br from-red-600 to-orange-600",
+    id: "block_world",
+    Icon: Grid3x3,
+    title: "Block World",
+    description:
+      "Pixelated or blocky aesthetic, Minecraft-like, characters and environment constructed from visible blocks",
+    gradientFrom: "from-green-500",
+    gradientTo: "to-emerald-500",
+    borderColor: "border-green-500",
+    iconBgColor: "bg-gradient-to-br from-green-500 to-emerald-500",
   },
   {
     id: "sticker_art",
@@ -304,7 +304,6 @@ export default function Step4Page() {
 
               <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3">
                 {illustrationStyles.map((style, index) => {
-                  const Icon = style.Icon
                   const isSelected = selectedStyle === style.id
 
                   return (
@@ -343,13 +342,6 @@ export default function Step4Page() {
                         />
                         {/* Fallback gradient (shown if image fails to load) */}
                         <div className={`hidden h-full w-full ${style.iconBgColor} opacity-20`} />
-
-                        {/* Icon Badge - top right */}
-                        <div className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm dark:bg-slate-800/80">
-                          <Icon
-                            className={`h-4 w-4 ${isSelected ? style.borderColor.replace("border", "text") : "text-gray-600 dark:text-slate-400"}`}
-                          />
-                        </div>
 
                         {/* Selected checkmark badge - top left */}
                         {isSelected && (

@@ -9,7 +9,7 @@
 
 **Aktif Bölüm:** Faz 2.7 - Statik Sayfalar (veya Faz 3 - Backend)  
 **Son Tamamlanan:** Faz 2.6 - Kullanıcı Dashboard ✅ (10 Ocak 2026 - Test Edildi ✅)  
-**Son Güncelleme:** 10 Ocak 2026
+**Son Güncelleme:** 25 Ocak 2026
 
 **Test Durumu:** ✅ Dashboard ve Profile Settings sayfaları test edildi ve çalışıyor.
 
@@ -1086,23 +1086,31 @@
 - ✅ Progress indicator (Step 4 of 6, 66.67% progress bar)
 - ✅ Form title: "Choose Illustration Style"
 - ✅ **Illustration Style Selection Section:**
-  - 12 illustration style cards (grid layout: 3 columns desktop, 2 tablet/mobile)
-  - Styles: 3D Animation, Geometric, Watercolor, Gouache, Picture-Book, Block World, Soft Anime, Collage, Clay Animation, Kawaii, Comic Book, Sticker Art
+  - 9 illustration style cards (grid layout: 3 columns desktop, 2 tablet/mobile)
+  - Styles: 3D Animation (Pixar Style), Comic Book, Geometric, Kawaii, Watercolor, Clay Animation, Collage, Block World, Sticker Art
+  - **Sıralama (3x3 grid):**
+    - Row 1: 3D Animation, Comic Book, Geometric
+    - Row 2: Kawaii, Watercolor, Clay Animation
+    - Row 3: Collage, Block World, Sticker Art
   - Each style has unique gradient color and icon
   - Card design:
-    - Preview image area (aspect-video, gradient placeholder with style-specific color)
-    - Icon badge (top-right corner, semi-transparent background)
+    - Preview image area (aspect-[2/3] for 1024x1536 images, real images from `/illustration-styles/` folder)
     - Selected checkmark badge (top-left corner, white circle with check icon)
     - Title and description (line-clamp-3 for consistent height)
     - Hover overlay (gradient overlay on image)
+  - **UI İyileştirmeleri (Güncelleme):**
+    - ✅ Icon badge kaldırıldı (sağ üstteki icon'lar kaldırıldı)
+    - ✅ Aspect ratio 2:3 olarak ayarlandı (1024x1536 görseller için)
+    - ✅ Gerçek görseller eklendi (`public/illustration-styles/{styleId}.jpg`)
+    - ✅ Fallback gradient placeholder (görsel yüklenemezse)
   - Selected state: Gradient border (3px, style-specific color), shadow-2xl, checkmark badge
   - Unselected state: Gray border (2px), white/slate-800 background
   - Hover: scale(1.05), shadow increase
   - Tap: scale(0.98)
-  - Stagger animation (delay: index * 0.05s - faster due to 12 items)
+  - Stagger animation (delay: index * 0.05s)
 - ✅ **Form Validation:**
   - React Hook Form + Zod validation
-  - Illustration Style: Required, enum validation (12 options: 3d_animation, geometric, watercolor, gouache, picture_book, block_world, soft_anime, collage, clay_animation, kawaii, comic_book, sticker_art)
+  - Illustration Style: Required, enum validation (9 options: 3d_animation, comic_book, geometric, kawaii, watercolor, clay_animation, collage, block_world, sticker_art)
   - Error messages below section
   - Real-time validation on selection
 - ✅ **Navigation:**
@@ -1117,13 +1125,21 @@
 - Component: `app/create/step4/page.tsx`
 - Dependencies: `framer-motion`, `react-hook-form`, `@hookform/resolvers`, `zod`, `lucide-react`
 - State management: `useState` for selectedStyle, `useForm` for form handling
-- Form validation: Zod schema with enum types (12 styles)
-- Illustration style options: 12 styles with unique gradients, icons, and descriptions
-- Preview images: Placeholder gradients (MVP için, Faz 3'te gerçek görseller eklenebilir)
-- Icons: `Box`, `Hexagon`, `Palette`, `Paintbrush`, `BookOpen`, `Grid3x3`, `Sparkles`, `Layers`, `Circle`, `Heart`, `Zap`, `StickyNote`, `ArrowRight`, `ArrowLeft`, `Brush`
+- Form validation: Zod schema with enum types (9 styles)
+- Illustration style options: 9 styles with unique gradients, icons, and descriptions
+- Preview images: Real images from `/illustration-styles/` folder (generated via `scripts/generate-style-examples.ts`)
+- Image format: 1024x1536 (2:3 aspect ratio, portrait)
+- Icons: `Box`, `Hexagon`, `Palette`, `BookOpen`, `Grid3x3`, `Sparkles`, `Layers`, `Circle`, `Heart`, `Zap`, `StickyNote`, `ArrowRight`, `ArrowLeft`, `Brush`
 - Layout: Centered form, max-width 6xl
 - Animations: Framer Motion (fade-in, slide-in, scale, stagger, floating, checkmark scale)
-- Accessibility: Keyboard navigation, focus states, image alt text (placeholder için)
+- Accessibility: Keyboard navigation, focus states, image alt text
+
+**Güncelleme (25 Ocak 2026):**
+- ✅ Icon badge'ler kaldırıldı (sağ üstteki icon'lar kaldırıldı)
+- ✅ Aspect ratio 2:3 olarak ayarlandı (1024x1536 görseller için `aspect-[2/3]`)
+- ✅ Sıralama güncellendi: 3D Animation, Comic Book, Geometric, Kawaii, Watercolor, Clay Animation, Collage, Block World, Sticker Art
+- ✅ Gerçek görseller eklendi (`public/illustration-styles/{styleId}.jpg`)
+- ✅ Fallback gradient placeholder (görsel yüklenemezse)
 - ✅ `app/create/step3/page.tsx` oluşturuldu
 - ✅ Link'ler düzeltildi (`/create-book/step-2` → `/create/step2`, `/create-book/step-4` → `/create/step4`)
 - ✅ Lint kontrolü: Hata yok
