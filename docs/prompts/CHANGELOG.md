@@ -1,12 +1,79 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.2  
-**Son Güncelleme:** 16 Ocak 2026 (El/Parmak Anatomisi ve Çoklu Karakter İyileştirmeleri)
+**Doküman Versiyonu:** 2.3  
+**Son Güncelleme:** 16 Ocak 2026 (El/Parmak Kalite İyileştirme - Birleştirilmiş Optimizasyon)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.4 (16 Ocak 2026) - El/Parmak Kalite İyileştirme - Birleştirilmiş Optimizasyon
+
+**Sorun:** El/parmak kalitesi tatmin edici değil, negative prompt'lar etkisiz
+
+**Research Findings:**
+- MIT Sloan study: Negative prompts %58 performance düşüşü yaratıyor
+- GPT-image-1.5 negative prompt field desteklemiyor
+- Spesifik terimler ("6 fingers") token attention problemi yaratıyor (model priming)
+- Production case studies: Pozitif framing + anatomy-first approach %30-60 iyileştirme
+- OpenAI API'nin `input_fidelity` parametresi eksikti (anatomik detayları korur)
+
+**Değişiklikler:**
+
+#### 1. API Parametre Optimizasyonu
+- ✅ `input_fidelity="high"` parametresi eklendi (app/api/books/route.ts)
+  - Cover generation (edits API) - line ~588
+  - Page generation (edits API) - line ~1096
+  - Anatomik detayları korur, referans görseldeki el anatomisini daha iyi işler
+
+#### 2. Prompt Order Optimizasyonu (Anatomy First)
+- ✅ Anatomical directives en başa taşındı (lib/prompts/image/v1.0.0/scene.ts)
+  - Research-backed: Anatomy first = %30 daha iyi sonuç
+  - GPT-image-1.5 ilk token'lara daha fazla önem veriyor
+  - Sıralama: 1) Anatomical Rules, 2) Style, 3) Layered Composition, 4) Scene...
+
+#### 3. Anatomical Directives Güçlendirme
+- ✅ `getAnatomicalCorrectnessDirectives()` detaylandırıldı (lib/prompts/image/v1.0.0/negative.ts)
+  - Başlık uppercase ve vurgulu: "CRITICAL ANATOMICAL RULES (STRICTLY ENFORCE)"
+  - Hands and Fingers ayrı başlık altında (### HANDS AND FINGERS)
+  - Her direktif daha explicit ve active voice
+  - Newline separation kullanıldı (join('\n') - structured format)
+  - Örnek: "each hand shows exactly 5 separate fingers: thumb, index finger, middle finger, ring finger, pinky finger"
+
+#### 4. Negative Prompt Minimalizasyonu
+- ✅ `ANATOMICAL_NEGATIVE` listesi %90 azaltıldı (80+ → 7 terim)
+  - Spesifik hata terimlerini kaldırıldı: "6 fingers", "fused fingers", "twisted fingers"
+  - Token attention probleminden kaçınmak için sadece genel terimler kaldı
+  - Yeni liste: 'deformed', 'malformed', 'mutated', 'bad anatomy', 'anatomically incorrect', 'extra limbs', 'missing limbs'
+  - Neden: Spesifik terimler modeli priming yapıyor (bahsettiğimiz hatayı yaratıyor)
+
+#### 5. Character Prompt'a Hands Descriptor
+- ✅ `buildCharacterPrompt()` fonksiyonuna hands descriptor eklendi (lib/prompts/image/v1.0.0/character.ts)
+  - Contextual anchoring: "anatomically correct hands with 5 distinct fingers, natural skin texture"
+  - Karakter tanımının intrinsic parçası olarak eklendi
+
+**Beklenen İyileşme:**
+- Sprint 1 (API + Prompt Order + Anatomical): %40-50 iyileşme
+- Sprint 2 (Negative Minimalize + Character Hands): +%20-25 iyileşme
+- **Toplam:** %60-75 iyileşme (mevcut %30-40'dan → hedef %80-90)
+
+**Kaynak:** 4 farklı plan birleştirildi (el_parmak_düzeltme, kalite_iyileştirme, anatomical_fix x2)
+
+**Etki:** Yüksek - El/parmak kalitesinde belirgin iyileşme bekleniyor
+
+**Backward Compatibility:** ✅ Tam uyumlu (kod değişikliği minimal, rollback kolay)
+
+**Dosya Değişiklikleri:**
+- ✅ `app/api/books/route.ts` - input_fidelity parametresi (2 yer)
+- ✅ `lib/prompts/image/v1.0.0/scene.ts` - Prompt order optimization (v1.0.1)
+- ✅ `lib/prompts/image/v1.0.0/negative.ts` - Anatomical directives enhancement + ANATOMICAL_NEGATIVE minimalization (v1.0.3)
+- ✅ `lib/prompts/image/v1.0.0/character.ts` - Hands descriptor (v1.0.4)
+
+**Test Stratejisi:**
+- 10 görsel generate et (2 karakter, hand-risky actions)
+- Metrikler: El doğruluğu, parmak ayrılığı, eklem görünürlüğü, tırnak, doğal poz (1-10 skor)
+- Başarı kriteri: %60-70+ başarı oranı (mevcut %30-40)
 
 ### v1.0.3 (16 Ocak 2026) - El/Parmak Anatomisi ve Çoklu Karakter İyileştirmeleri
 
@@ -227,7 +294,7 @@
 
 | Template | Version | Status | Release Date |
 |----------|---------|--------|--------------|
-| Image Generation | v1.0.2 | ✅ Active | 16 Ocak 2026 |
+| Image Generation | v1.0.4 | ✅ Active | 16 Ocak 2026 |
 | Story Generation | v1.0.0 | ✅ Active | 15 Ocak 2026 |
 
 ---

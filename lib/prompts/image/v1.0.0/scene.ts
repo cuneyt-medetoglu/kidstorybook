@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives } from './negative'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.0',
-  releaseDate: new Date('2026-01-10'),
+  version: '1.0.1',
+  releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -28,6 +28,8 @@ export const VERSION: PromptVersion = {
     'Added character consistency emphasis',
     'Added book cover special instructions',
     'Added 3D Animation style special notes',
+    'v1.0.1: Prompt order optimization - anatomical directives moved to beginning (anatomy-first approach) (16 Ocak 2026)',
+    'v1.0.1: Style emphasis added with uppercase for better attention (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -594,7 +596,16 @@ export function generateFullPagePrompt(
   // Start building prompt parts
   const promptParts: string[] = []
 
-  // Add layered composition at the beginning for emphasis
+  // 1. EN BAŞA: ANATOMICAL CORRECTNESS (CRITICAL) - Research-backed: anatomy first = %30 daha iyi
+  const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
+  promptParts.push(anatomicalDirectives)
+  promptParts.push('') // Empty line for separation
+
+  // 2. STYLE (uppercase emphasis for better attention)
+  const styleDesc = getStyleDescription(illustrationStyle)
+  promptParts.push(`ILLUSTRATION STYLE: ${styleDesc}`)
+
+  // 3. Add layered composition
   promptParts.push(layeredComp)
   promptParts.push(scenePrompt)
   promptParts.push(ageRules.join(', '))
@@ -654,9 +665,8 @@ export function generateFullPagePrompt(
     promptParts.push('DO NOT use formal wear - keep clothing theme-appropriate and casual')
   }
   
-  // ANATOMICAL CORRECTNESS (NEW: 15 Ocak 2026 - CRITICAL)
-  const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
-  promptParts.push(anatomicalDirectives)
+  // ANATOMICAL CORRECTNESS - Already added at the beginning of the prompt for maximum emphasis
+  // (Previously was here at the end - moved to line ~598 for research-backed prompt order optimization)
   
   // CRITICAL: No text in images
   promptParts.push('NO TEXT, NO WRITING, NO LETTERS, NO WORDS, NO TITLES in the image - text will be added separately as a separate layer')

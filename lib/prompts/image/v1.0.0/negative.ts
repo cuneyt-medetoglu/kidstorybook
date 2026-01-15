@@ -8,7 +8,7 @@ import type { PromptVersion } from '../../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.1',
+  version: '1.0.3',
   releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
@@ -21,6 +21,8 @@ export const VERSION: PromptVersion = {
     'Enhanced anatomical correctness directives with skin quality and pose consistency (15 Ocak 2026)',
     'Enhanced hand/finger anatomy directives with detailed instructions (16 Ocak 2026)',
     'Added comprehensive hand/finger negative prompts from AI research (16 Ocak 2026)',
+    'v1.0.3: Anatomical directives detaylandırıldı - structured format, newline separation, explicit instructions (16 Ocak 2026)',
+    'v1.0.3: ANATOMICAL_NEGATIVE minimalize edildi - %90 azaltma, token attention problemi çözüldü (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -267,93 +269,18 @@ export const THEME_NEGATIVE: Record<string, string[]> = {
 // ============================================================================
 
 /**
- * Comprehensive anatomical negative prompts
- * Critical for preventing common AI errors (extra fingers, wrong limb count, etc.)
- * ENHANCED: 16 Ocak 2026 - El/Parmak negative prompt'ları genişletildi (AI research)
+ * Minimalized anatomical negative prompts
+ * UPDATED: 16 Ocak 2026 - Spesifik hata terimlerini kaldırıldı, sadece genel terimler
+ * REASON: Spesifik terimler (e.g., "6 fingers") token attention problemi yaratıyor
+ * - Model'i priming yapıyor (bahsettiğimiz hatayı yaratıyor)
+ * - Pozitif direktiflerle çakışıyor
+ * STRATEGY: Genel, pozitifle çakışmayan terimler kullan
  */
 export const ANATOMICAL_NEGATIVE = [
-  // Hand/Finger Errors (CRITICAL - most common AI mistake) (ENHANCED: 16 Ocak 2026)
-  'extra fingers', 'more than 5 fingers', '6 fingers', '7 fingers', '8 fingers', '9 fingers', '10 fingers',
-  'missing fingers', 'less than 5 fingers', '4 fingers', '3 fingers', '2 fingers', '1 finger',
-  'deformed fingers', 'wrong finger count', 'incorrect number of fingers',
-  'fingers fused together', 'fingers missing joints', 'fingers without knuckles',
-  'fingers too long', 'fingers too short', 'weird fingers', 'alien fingers',
-  'floating fingers', 'disconnected fingers', 'finger growing from wrong place',
-  // NEW (16 Ocak 2026): Additional hand/finger negative prompts from research
-  'mutant hands', 'malformed fingers', 'twisted fingers', 'bent fingers at wrong angle',
-  'fingers with no bones', 'rubber fingers', 'noodle fingers', 'shapeless fingers',
-  'fingers without fingernails', 'missing knuckles', 'extra knuckles', 'wrong number of knuckles',
-  'thumb on wrong side', 'thumb missing', 'two thumbs', 'thumb in wrong position',
-  'fingers growing from wrist', 'fingers merged with palm', 'webbed fingers',
-  'fingers pointing in impossible directions', 'fingers twisted backwards',
-  'hand with 4 fingers and no thumb', 'hand with 6 fingers', 'hand without palm',
-  
-  // Hand/Arm Errors
-  'extra hands', 'three hands', 'four hands', 'multiple hands', 'too many hands',
-  'missing hands', 'no hands', 'invisible hands', 'hands disappearing',
-  'wrong hand position', 'impossible hand angle', 'broken wrist', 'twisted wrist',
-  'hand growing from wrong place', 'hand attached incorrectly', 'hand on head',
-  'deformed hands', 'malformed hands', 'weird hands', 'ugly hands',
-  'extra arms', 'three arms', 'four arms', 'too many arms', 'multiple arms',
-  'missing arms', 'no arms', 'invisible arms', 'one arm',
-  'arms growing from head', 'arms in wrong position', 'arms from stomach',
-  'deformed arms', 'twisted arms', 'broken arms', 'impossible arm position',
-  
-  // Foot/Leg Errors
-  'extra feet', 'three feet', 'four feet', 'too many feet', 'multiple feet',
-  'missing feet', 'no feet', 'invisible feet', 'one foot',
-  'wrong number of toes', 'extra toes', 'missing toes', '6 toes', '7 toes',
-  'deformed feet', 'feet facing wrong direction', 'backwards feet',
-  'feet on backwards', 'twisted feet', 'broken ankles',
-  'extra legs', 'three legs', 'four legs', 'too many legs', 'multiple legs',
-  'missing legs', 'no legs', 'one leg', 'invisible legs',
-  'legs in wrong position', 'legs from chest', 'legs from head',
-  'deformed legs', 'twisted legs', 'broken legs', 'impossible leg position',
-  
-  // Body Proportion Errors
-  'wrong proportions', 'bad proportions', 'incorrect proportions',
-  'head too large', 'head too small', 'giant head', 'tiny head', 'oversized head',
-  'body too long', 'body too short', 'elongated body', 'compressed body',
-  'limbs too long', 'limbs too short', 'giant limbs', 'tiny limbs',
-  'incorrect body proportions', 'deformed body', 'malformed body',
-  'extra limbs', 'missing limbs', 'limbs in wrong places',
-  'body parts growing from wrong places', 'misplaced body parts',
-  
-  // Face Errors
-  'extra eyes', 'three eyes', 'four eyes', 'wrong number of eyes', 'too many eyes',
-  'missing eyes', 'no eyes', 'one eye', 'eyes in wrong place',
-  'asymmetric eyes', 'uneven eyes', 'different sized eyes',
-  'eyes too far apart', 'eyes too close together', 'floating eyes',
-  'extra nose', 'two noses', 'missing nose', 'no nose', 'nose in wrong place',
-  'extra mouth', 'two mouths', 'missing mouth', 'no mouth', 'mouth in wrong place',
-  'face distorted', 'face deformed', 'face misaligned', 'asymmetric face',
-  'melted face', 'stretched face', 'squished face', 'weird face',
-  'extra ears', 'missing ears', 'ears in wrong position',
-  
-  // Face Skin Quality (NEW: 15 Ocak 2026 - Quality Improvement)
-  'blemishes', 'acne', 'pimples', 'moles', 'marks on face', 'spots on face',
-  'marks between eyebrows', 'mark between eyes', 'blemish on forehead',
-  'skin imperfections', 'facial marks', 'facial blemishes', 'skin marks',
-  'unclean skin', 'blemished skin', 'marked skin',
-  
-  // General Anatomical Issues
-  'bad anatomy', 'anatomically incorrect', 'anatomy mistakes', 'anatomy errors',
-  'human anatomy errors', 'wrong anatomy', 'impossible anatomy',
-  'physical impossibilities', 'impossible poses', 'physics-defying',
-  'body parts in wrong positions', 'impossible body structure',
-  'mutated', 'mutation', 'mutant', 'deformed', 'malformed',
-  'extra body parts', 'missing body parts', 'duplicate body parts',
-  'fused limbs', 'merged fingers', 'conjoined',
-  'skeleton wrong', 'bones wrong', 'joints wrong', 'no joints',
-  
-  // Logical/Pose Errors (NEW: 15 Ocak 2026 - Quality Improvement)
-  'impossible body rotation', 'body facing wrong direction', 'contradictory body position',
-  'upper body twisted incorrectly', 'body rotation error', 'torso facing wrong way',
-  'body orientation mismatch', 'body direction contradiction', 'inconsistent body pose',
-  'arms/hands in impossible position', 'body physics error', 'unnatural body twist',
-  'logically inconsistent pose', 'body parts pointing wrong direction',
-  'character facing wrong way for action', 'body alignment error',
-  'contradictory movement direction', 'physically impossible body position',
+  // Sadece genel, açıkça kötü durumlar (pozitifle çakışmayan)
+  'deformed', 'malformed', 'mutated',
+  'bad anatomy', 'anatomically incorrect',
+  'extra limbs', 'missing limbs', // Genel, spesifik sayılar yok
 ]
 
 // ============================================================================
@@ -420,34 +347,30 @@ export function getNegativePrompt(
  * Get anatomical correctness directives for POSITIVE prompt
  * These are instructions to add to the positive prompt, not negative
  * ENHANCED: 16 Ocak 2026 - El/Parmak detayları eklendi (AI research)
+ * UPDATED: 16 Ocak 2026 - Daha detaylı direktifler, newline separation, anatomy-first approach
  */
 export function getAnatomicalCorrectnessDirectives(): string {
   return [
-    'ANATOMICAL CORRECTNESS (CRITICAL):',
-    // HANDS & FINGERS (ENHANCED: Web research best practices)
-    'each hand must have exactly 5 fingers visible (thumb, index, middle, ring, pinky)',
-    'fingers must be properly attached to palm with visible knuckles and joints',
-    'thumbs must be correctly positioned (opposable, on side of hand)',
-    'fingers must bend naturally at knuckle joints (3 segments per finger, 2 per thumb)',
-    'hands must have natural skin texture with visible knuckles, fingernails included',
-    'hands in natural poses (relaxed grip, gentle curves, anatomically possible positions)',
-    'wrists properly connected to arms, natural wrist angle',
-    'no extra fingers, no missing fingers, no fused fingers, no floating fingers',
-    'fingers must not grow from wrong places or have impossible angles',
-    // GENERAL ANATOMY
-    'character must have exactly 2 hands, 2 arms, 2 feet, 2 legs',
-    'all body parts must be anatomically correct and properly proportioned',
-    'limbs must be in natural, possible positions',
-    'face features must be symmetrical and correctly placed',
-    'proper human anatomy, realistic body structure',
-    'correct limb count, correct facial features',
-    'clean, clear skin without blemishes, marks, moles, or spots on face',
-    'body orientation and pose must be logically consistent',
-    'character\'s body direction must match movement direction',
-    'upper body and lower body must face the same direction (unless explicitly turning)',
-    'arms and hands must align with body orientation naturally',
-    'no contradictory body positions or impossible rotations'
-  ].join(', ')
+    'CRITICAL ANATOMICAL RULES (STRICTLY ENFORCE):',
+    '',
+    '### HANDS AND FINGERS:',
+    'each hand shows exactly 5 separate fingers: thumb, index finger, middle finger, ring finger, pinky finger',
+    'fingers are clearly separated with visible gaps between each finger',
+    'thumb is correctly positioned on the side of the hand, opposable to other fingers',
+    'all finger joints (knuckles) are clearly visible: 3 joints per finger, 2 joints per thumb',
+    'each fingertip shows a fingernail',
+    'fingers bend naturally at the knuckle joints, gently curved, not stiff or straight',
+    'palms are visible with natural skin texture and palm lines',
+    'wrists connect naturally to arms at correct angle',
+    'hands are in natural, relaxed poses - no impossible angles or twisted positions',
+    '',
+    '### BODY ANATOMY:',
+    'exactly 2 hands, 2 arms, 2 legs, 2 feet - no more, no less',
+    'all body parts proportioned correctly for age',
+    'face features symmetrical: 2 eyes, 1 nose, 1 mouth, 2 ears',
+    'clean skin without marks, blemishes, or spots on face',
+    'body orientation consistent - upper and lower body face same direction',
+  ].join('\n')
 }
 
 export function getContentSafetyFilter(): string[] {

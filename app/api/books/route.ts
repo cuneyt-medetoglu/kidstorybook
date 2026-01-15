@@ -585,6 +585,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           formData.append('prompt', textPrompt)
           formData.append('size', imageSize)
           formData.append('quality', imageQuality)
+          formData.append('input_fidelity', 'high') // Anatomik detayları koru
           // Append images as array (image[] format) to support multiple reference images
           imageBlobs.forEach(({ blob, filename }) => {
             formData.append('image[]', blob, filename)
@@ -1093,6 +1094,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             formData.append('prompt', fullPrompt)
             formData.append('size', imageSize)
             formData.append('quality', imageQuality)
+            formData.append('input_fidelity', 'high') // Anatomik detayları koru
             formData.append('image', imageBlob, 'reference.png')
 
             const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
