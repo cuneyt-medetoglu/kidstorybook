@@ -182,11 +182,15 @@ export function buildCharacterPrompt(character: CharacterDescription): string {
   parts.push(`with ${character.faceShape} face shape`)
   parts.push(`${character.skinTone} skin`)
   
-  // Eye color with special handling for hazel (NEW: 16 Ocak 2026)
+  // Eye color with special handling for hazel and blue (NEW: 16 Ocak 2026)
   // Hazel is often misinterpreted as pure green, so we add clarification
-  const eyeColorDesc = character.eyeColor?.toLowerCase() === 'hazel'
-    ? 'hazel (brown-green mix, not pure green)'
-    : character.eyeColor
+  // Blue is sometimes misinterpreted as brown, so we add strong emphasis
+  let eyeColorDesc = character.eyeColor
+  if (character.eyeColor?.toLowerCase() === 'hazel') {
+    eyeColorDesc = 'hazel (brown-green mix, not pure green)'
+  } else if (character.eyeColor?.toLowerCase() === 'blue') {
+    eyeColorDesc = 'bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)'
+  }
   parts.push(`${eyeColorDesc} ${character.eyeShape} eyes`)
   
   // Hair - VERY DETAILED
@@ -286,31 +290,84 @@ export function buildMultipleCharactersPrompt(
           charParts.push(`friendly and cute appearance`)
         }
       } else if (char.type.group === "Family Members") {
-        // Family member description - ENHANCED with name and detailed appearance
+        // Family member description - ENHANCED with name and detailed appearance (NEW: 16 Ocak 2026)
         const charName = char.type.displayName || char.type.value
         charParts.push(`${charName} (${char.type.value.toLowerCase()})`)
         
         if (char.description) {
-          if (char.description.age) charParts.push(`${char.description.age} years old`)
-          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
+          // CRITICAL: Age and adult physical features (NEW: 16 Ocak 2026)
+          if (char.description.age) {
+            charParts.push(`${char.description.age} years old`)
+            // Strong emphasis: This is an ADULT, NOT a child
+            if (char.description.age >= 18) {
+              charParts.push(`(CRITICAL: This is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height)`)
+              charParts.push(`(CRITICAL: Adult physical characteristics: mature face, adult body proportions, NOT childlike features)`)
+            } else if (char.description.age >= 13) {
+              charParts.push(`(CRITICAL: This is a TEENAGER/ADOLESCENT, NOT a child - must have teenager body proportions, NOT childlike features)`)
+            }
+          } else {
+            // Fallback: If no age, assume adult for Mom/Dad
+            if (char.type.value === "Mom" || char.type.value === "Dad") {
+              charParts.push(`(CRITICAL: This is an ADULT ${char.type.value.toLowerCase()}, NOT a child - must have adult body proportions, adult facial features)`)
+            }
+          }
+          
+          // Hair details - ENHANCED (NEW: 16 Ocak 2026)
+          if (char.description.hairColor) {
+            const hairDetails = [
+              char.description.hairColor,
+              char.description.hairLength,
+              char.description.hairStyle,
+              char.description.hairTexture,
+            ].filter(Boolean)
+            
+            if (hairDetails.length > 0) {
+              charParts.push(`with ${hairDetails.join(' ')} hair`)
+            } else {
+              charParts.push(`with ${char.description.hairColor} hair`)
+            }
+            
+            // CRITICAL: Emphasize hair style details match reference photo
+            if (char.description.hairStyle || char.description.hairLength) {
+              charParts.push(`(CRITICAL: Hair style and length must match reference photo EXACTLY - ${char.description.hairLength || 'length'} ${char.description.hairStyle || 'style'})`)
+            }
+          }
+          
           if (char.description.eyeColor) {
-            charParts.push(`${char.description.eyeColor} eyes`)
+            // Eye color with special handling for blue (NEW: 16 Ocak 2026)
+            let eyeColorDesc = char.description.eyeColor
+            if (char.description.eyeColor?.toLowerCase() === 'blue') {
+              eyeColorDesc = 'bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)'
+            } else if (char.description.eyeColor?.toLowerCase() === 'hazel') {
+              eyeColorDesc = 'hazel (brown-green mix, not pure green)'
+            }
+            charParts.push(`${eyeColorDesc} eyes`)
             // CRITICAL: Emphasize individual eye color
             charParts.push(`(IMPORTANT: This character has ${char.description.eyeColor} eyes, NOT the same eye color as Character 1)`)
           }
+          
           // Add special features for family members
           if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
             charParts.push(char.description.uniqueFeatures.join(', '))
           }
+          
+          // Physical features emphasis (NEW: 16 Ocak 2026)
+          if (char.description.age && char.description.age >= 18) {
+            charParts.push(`adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions)`)
+          }
+          
           charParts.push(`warm and caring expression`)
         } else {
-          // Enhanced fallback descriptions
+          // Enhanced fallback descriptions with adult emphasis (NEW: 16 Ocak 2026)
           if (char.type.value === "Mom" || char.type.value === "Dad") {
             charParts.push(`adult ${char.type.value.toLowerCase()}, warm and loving expression`)
+            charParts.push(`(CRITICAL: This is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height)`)
           } else if (char.type.value === "Grandma" || char.type.value === "Grandpa") {
             charParts.push(`elderly ${char.type.value.toLowerCase()}, kind and gentle expression`)
+            charParts.push(`(CRITICAL: This is an ELDERLY ADULT, NOT a child - must have elderly features, adult body proportions)`)
           } else {
             charParts.push(`family member, friendly expression`)
+            charParts.push(`(CRITICAL: This is an ADULT family member, NOT a child - must have adult body proportions)`)
           }
         }
         

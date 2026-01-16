@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Story Generation Prompts**
 
-**Version:** 1.0.1  
+**Version:** 1.0.2  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 16 Ocak 2026 (Multiple Characters Support)  
+**Last Update:** 16 Ocak 2026 (Scene Diversity & Visual Variety Improvements)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements

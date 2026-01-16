@@ -10,8 +10,8 @@ export const STYLE_DESCRIPTIONS: Record<string, string> = {
   '3d_animation': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), vibrant saturated colors, rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
   '3d': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), vibrant saturated colors, rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
   
-  // Geometric - Simplified geometric shapes, flat colors, sharp edges
-  'geometric': 'Geometric - Simplified geometric shapes (circles, squares, triangles), flat colors with no gradients, sharp distinct edges, minimal detail, modern stylized, grid-based alignment (8px grid), clean lines, illustration style',
+  // Geometric - Flat design, minimalist, angular shapes, vector art style
+  'geometric': 'Geometric - Flat design style, minimalist geometric shapes (circles, squares, triangles, polygons), angular sharp edges, flat colors with NO gradients, NO shadows, NO depth, vector art aesthetic, clean lines, modern stylized, grid-based alignment, geometric abstraction, low-poly style elements, illustration',
   
   // Watercolor - Transparent watercolor technique with warm inviting atmosphere
   'watercolor': 'Watercolor - Transparent watercolor technique, visible soft brushstrokes, colors blend and bleed at edges, paper texture visible through paint, luminous glowing finish, wet-on-wet color mixing, soft flowing edges, warm inviting atmosphere, hand-painted illustration feel',

@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Image Generation Prompts**
 
-**Version:** 1.0.6  
+**Version:** 1.0.7  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 16 Ocak 2026 (Cover-as-Reference for Character Consistency)  
+**Last Update:** 16 Ocak 2026 (Cover Generation & Additional Characters Fixes)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -93,7 +93,9 @@ Cover kalitesi **EXTREMELY IMPORTANT** çünkü:
 **Cover için özel gereksinimler:**
 - TÜM karakterler (main + additional) cover'da görünmeli
 - Her karakter referans fotoğrafına EXACTLY benzemeli
-- Saç rengi, uzunluğu, stili, göz rengi, yüz özellikleri, ten rengi PRECISELY match etmeli
+- Saç rengi, uzunluğu, stili, dokusu, göz rengi, yüz özellikleri, ten rengi PRECISELY match etmeli
+- **CRITICAL (NEW: v1.0.7):** Adult karakterler (Mom, Dad, etc.) için ADULT body proportions, ADULT facial features, ADULT height - NOT childlike features
+- **CRITICAL (NEW: v1.0.7):** Age-appropriate physical characteristics - children look like children, adults look like adults
 - Professional, print-ready, high-quality illustration
 - Balanced group composition (çoklu karakter için)
 
@@ -187,11 +189,13 @@ Create an illustration for each page:
      * Do NOT mix features between characters - each character must maintain their individual characteristics.
    
    - **Additional Characters:** Each additional character must maintain their unique appearance:
-     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_2_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_2_TYPE])
-     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_3_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_3_TYPE])
+     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_2_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_2_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
+     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_3_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_3_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
      * **For Pets:** [PET_NAME] (a [PET_TYPE]) - [FUR_COLOR] fur, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - friendly and playful expression
      * **CRITICAL:** Each character must maintain their individual characteristics. Do NOT mix features between characters.
      * **CRITICAL:** Match each character's text description with its corresponding reference image (image 1 → character 1, image 2 → character 2, etc.)
+     * **CRITICAL (NEW: v1.0.7):** Hair style, length, and texture details are now included for better consistency
+     * **CRITICAL (NEW: v1.0.7):** Adult characters (Mom, Dad, etc.) must have ADULT body proportions, ADULT facial features, ADULT height - NOT childlike features
    [END IF]
 
 2. **Illustration Style:**

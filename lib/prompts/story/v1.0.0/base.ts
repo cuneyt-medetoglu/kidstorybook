@@ -159,12 +159,50 @@ ${characterDesc}
 - Complexity: ${getComplexityLevel(ageGroup)}
 - Reading Time: ${getReadingTime(ageGroup)} minutes per page
 
-# STORY STRUCTURE
-1. Opening: Introduce ${characterName}${characters && characters.length > 1 ? ` and ${characters.length - 1} other character(s)` : ''} and the setting (1 page)
-2. Adventure Begins: ${characterName} discovers something interesting${characters && characters.length > 1 ? ' (with companions)' : ''} (2-3 pages)
-3. Challenge: A small, age-appropriate problem to solve (2-3 pages)
-4. Resolution: ${characterName} overcomes the challenge with creativity/kindness/courage${characters && characters.length > 1 ? ', with help from companions' : ''} (1-2 pages)
-5. Happy Ending: Return home with a valuable lesson learned (1 page)
+# STORY STRUCTURE - DETAILED PAGE-BY-PAGE REQUIREMENTS (NEW: 16 Ocak 2026)
+
+**CRITICAL:** Each page MUST have a UNIQUE, DISTINCT scene. NO REPEATING SCENES or SIMILAR COMPOSITIONS.
+
+## Page-by-Page Structure:
+
+**Page 1 (Cover):**
+- Professional book cover illustration
+- Main character prominently featured with ${characters && characters.length > 1 ? 'all companions' : 'theme elements'}
+- Visually striking, colorful, professional
+- Different from all subsequent pages (unique composition)
+
+**Page 2 (Introduction):**
+- Introduction scene - DIFFERENT location/setting from cover
+- DIFFERENT time of day or weather from cover
+- DIFFERENT composition (e.g., wide shot if cover is close-up)
+- Introduce ${characterName} and setting
+
+**Pages 3-5 (Adventure Begins):**
+Each page MUST have DIFFERENT scenes:
+- **Page 3 (Discovery):** New location, different perspective (e.g., close-up if previous was wide), ${characterName} discovers something interesting
+- **Page 4 (Action):** Different location, different composition (e.g., dynamic angle), active exploration or action scene
+- **Page 5 (Exploration):** Different location, different time of day (e.g., afternoon if previous was morning), deeper exploration
+
+**Pages 6-8 (Challenge & Problem-Solving):**
+Each page MUST have DIFFERENT scenes:
+- **Page 6 (Problem):** Different location, different mood, introduce age-appropriate challenge
+- **Page 7 (Attempt):** Different location, different perspective, ${characterName} attempts to solve the problem
+- **Page 8 (Solution):** Different location, different composition, creative solution emerges
+
+**Pages 9-10 (Resolution & Ending):**
+Each page MUST have DIFFERENT scenes:
+- **Page 9 (Resolution):** Different location, different time of day (e.g., evening), problem resolved with valuable lesson
+- **Page 10 (Happy Ending):** Different location, different composition (e.g., wide shot with ${characters && characters.length > 1 ? 'all characters' : 'full scene'}), return home or celebration
+
+**LOCATION VARIETY REQUIREMENT:**
+- Each page should be in a DIFFERENT location OR show a DIFFERENT part of the same location
+- Example progression: home → forest entrance → deep forest → clearing → mountain → cave → river → summit → returning home → home (celebration)
+- DO NOT repeat the same location on consecutive pages
+
+**TIME PROGRESSION REQUIREMENT:**
+- Vary time of day across pages to show story progression
+- Example progression: morning → late morning → noon → afternoon → late afternoon → evening → sunset → dusk → night or next morning
+- DO NOT use the same time of day for multiple consecutive pages
 
 # THEME-SPECIFIC ELEMENTS
 Setting: ${themeConfig.setting}
@@ -174,6 +212,53 @@ Educational Focus: ${getEducationalFocus(ageGroup, theme)}
 Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
 
 CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle || 'age-appropriate casual clothing'} throughout the story. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding"). Clothing must be appropriate for the theme and setting (e.g., camping → outdoor/casual clothes, NOT formal wear).
+
+# CRITICAL - VISUAL DIVERSITY REQUIREMENTS (MANDATORY - NEW: 16 Ocak 2026)
+
+**EACH PAGE MUST HAVE A UNIQUE, DISTINCT SCENE - NO REPEATING SCENES:**
+
+## 1. Location Variety (MANDATORY):
+- Each page should be in a DIFFERENT location or show a DIFFERENT part of the same location
+- Examples: Page 2 (home), Page 3 (forest entrance), Page 4 (deep forest), Page 5 (clearing), Page 6 (mountain), Page 7 (cave), Page 8 (river), Page 9 (summit), Page 10 (returning home)
+- **DO NOT repeat the same location on consecutive pages**
+
+## 2. Time of Day Variety (MANDATORY):
+- Vary time of day across pages to show story progression
+- Examples: Page 2 (morning), Page 3 (late morning), Page 4 (noon), Page 5 (afternoon), Page 6 (late afternoon), Page 7 (evening), Page 8 (sunset), Page 9 (dusk), Page 10 (night or next morning)
+- **DO NOT use the same time of day for multiple consecutive pages**
+
+## 3. Weather/Atmosphere Variety:
+- Vary weather or atmospheric conditions when appropriate for the story
+- Examples: sunny → partly cloudy → windy → sunny → cloudy → light rain → clearing → beautiful weather
+- Use weather changes to enhance mood and story progression
+
+## 4. Perspective/Camera Angle Variety (MANDATORY):
+- Vary camera angles and perspectives for visual interest
+- Options: wide shot, medium shot, close-up, bird's eye view, low angle, high angle, eye level
+- Examples: Page 2 (wide shot), Page 3 (medium shot), Page 4 (close-up), Page 5 (bird's eye view), Page 6 (low angle)
+- **DO NOT use the same perspective for multiple consecutive pages**
+
+## 5. Composition Variety (MANDATORY):
+- Vary composition and framing for visual diversity
+- Options: character centered, character left (environment right), character right (action left), balanced, diagonal, symmetrical, group composition
+- Examples: Page 2 (character centered), Page 3 (character left), Page 4 (diagonal composition), Page 5 (balanced)
+- **DO NOT repeat the same composition for multiple consecutive pages**
+
+## 6. Action/Mood Variety (MANDATORY):
+- Vary character actions and emotional tones across pages
+- Examples: calm introduction → excited discovery → active exploration → curious investigation → determined problem-solving → creative thinking → joyful solution → proud resolution → happy celebration
+- **DO NOT repeat the same action/mood for multiple consecutive pages**
+
+## CRITICAL CHECKLIST FOR EACH PAGE:
+Before finalizing each page's imagePrompt, verify ALL of these:
+- ✓ Location is DIFFERENT from previous page (or different part of same location)
+- ✓ Time of day is DIFFERENT from previous page (or clearly progressing)
+- ✓ Weather/atmosphere is DIFFERENT from previous page (or clearly changing) - if appropriate
+- ✓ Perspective/camera angle is DIFFERENT from previous page
+- ✓ Composition is DIFFERENT from previous page
+- ✓ Action/mood is DIFFERENT from previous page
+- ✓ Scene description is DETAILED (at least 150-200 characters, NOT just 70-80)
+- ✓ Image prompt is DETAILED (at least 200+ characters with specific visual elements)
 
 # WRITING STYLE REQUIREMENTS (CRITICAL - NEW: 15 Ocak 2026)
 
@@ -239,8 +324,26 @@ Return a valid JSON object with this exact structure:
     {
       "pageNumber": 1,
       "text": "Page text (CRITICAL: Must be ${getWordCount(ageGroup)} words - this is the AVERAGE, write detailed text with dialogue and descriptions)",
-      "imagePrompt": "Detailed ${illustrationStyle} illustration prompt with character consistency",
-      "sceneDescription": "What's happening in this scene"
+      "imagePrompt": "DETAILED ${illustrationStyle} illustration prompt (MUST be 200+ characters) with:
+        - SPECIFIC location description (e.g., 'in a sunny forest clearing with tall oak trees, wildflowers, and a babbling brook')
+        - SPECIFIC time of day (e.g., 'late afternoon with golden sunlight filtering through leaves')
+        - SPECIFIC weather/atmosphere (e.g., 'partly cloudy sky with gentle breeze')
+        - SPECIFIC perspective/camera angle (e.g., 'medium shot from eye level, character in foreground')
+        - SPECIFIC composition (e.g., 'character on left side, environment on right, balanced framing')
+        - SPECIFIC character action and pose (e.g., 'character kneeling, examining something on the ground with curious expression')
+        - SPECIFIC environmental details (e.g., 'fallen leaves, mushrooms, small insects, dappled sunlight')
+        - Character consistency (same character as previous pages)
+        - Theme elements (${theme})
+        - Mood: ${themeConfig.mood}
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages - different location, different time, different composition, different perspective",
+      "sceneDescription": "DETAILED scene description (MUST be 150+ characters) including:
+        - SPECIFIC location (where exactly is this happening? e.g., 'deep in the enchanted forest, near a sparkling stream')
+        - SPECIFIC time of day (morning/late morning/noon/afternoon/late afternoon/evening/sunset/dusk/night)
+        - SPECIFIC weather/atmosphere (sunny/partly cloudy/cloudy/windy/light rain/snowy - if appropriate)
+        - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
+        - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
+        - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages"
     }
     // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
   ],

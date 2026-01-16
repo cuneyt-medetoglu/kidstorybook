@@ -1,12 +1,176 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.5  
-**Son Güncelleme:** 16 Ocak 2026 (Cover-as-Reference for Character Consistency)
+**Doküman Versiyonu:** 2.9  
+**Son Güncelleme:** 16 Ocak 2026 (Hand-Holding Ban for Anatomical Correctness)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.10 (16 Ocak 2026) - Hand-Holding Ban for Anatomical Correctness
+
+**Sorun:**
+- El ele tutuşmalar anatomik problemler yaratıyor (parmak hataları, el deformasyonları)
+- Karakterler el ele tutuşurken eller birbirine karışıyor, parmak sayıları yanlış oluyor
+- El ele tutuşma durumunda AI modeli elleri doğru render edemiyor
+
+**Çözüm:**
+
+#### 1. Anatomical Correctness Directives Güncellemesi (`lib/prompts/image/v1.0.0/negative.ts`)
+- ✅ **El ele tutuşma yasağı eklendi:** "CRITICAL: Characters must NOT hold hands - hands must be separate and independent"
+- ✅ **Detaylı yasak direktifleri:**
+  - "CRITICAL: NO hand-holding, NO holding hands together, NO hands clasped together"
+  - "CRITICAL: Each character's hands must be clearly visible and separate from other characters' hands"
+  - "CRITICAL: Hands should be in individual poses - one hand can be raised, one can be at side, but NOT holding another character's hand"
+
+#### 2. Negative Prompts Güncellemesi
+- ✅ **ANATOMICAL_NEGATIVE'a eklendi:** "holding hands", "hand in hand", "hands clasped together", "hands together", "interlocked hands", "hands joined", "hand-holding"
+- ✅ **Negative prompt'larda yasak:** El ele tutuşma terimleri negative prompt'lara eklendi
+
+**Beklenen İyileşme:**
+- ✅ El ele tutuşma durumları oluşmayacak
+- ✅ Eller her zaman ayrı ve bağımsız olacak
+- ✅ Parmak hataları azalacak (el ele tutuşma kaynaklı)
+- ✅ Anatomik doğruluk artacak
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/negative.ts` - Anatomical correctness directives ve negative prompts güncellendi
+
+---
+
+### v1.0.9 (16 Ocak 2026) - Retry Mechanism & Error Handling Improvements
+
+**Sorun:**
+- Page 3 için `/v1/images/edits` API çağrısı 502 Bad Gateway hatası verdi
+- Sistem direkt fallback'e geçti (`/v1/images/generations`)
+- Generations API reference image'ları desteklemiyor
+- Sonuç: Tamamen alakasız görsel üretildi (karakterler ve cover reference olmadan)
+- Geçici hatalar (502, 503, 504, 429) için retry mekanizması yoktu
+
+**Çözüm:**
+
+#### 1. Retry Wrapper Fonksiyonları (`app/api/books/route.ts`)
+- ✅ **`retryWithBackoff()`:** Generic retry wrapper (max 3 retry, exponential backoff: 1s, 2s, 4s)
+- ✅ **`retryFetch()`:** Fetch çağrıları için özel retry wrapper
+- ✅ **Hata kategorileri:**
+  - **Retryable (geçici):** 502 (Bad Gateway), 503 (Service Unavailable), 504 (Gateway Timeout), 429 (Too Many Requests)
+  - **Permanent (kalıcı):** 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 500 (Internal Server Error)
+- ✅ **Exponential backoff:** 1s → 2s → 4s bekleme süreleri
+
+#### 2. Edits API Retry Mekanizması
+- ✅ **Cover generation:** Retry mekanizması eklendi (max 3 retry)
+- ✅ **Page generation:** Retry mekanizması eklendi (max 3 retry)
+- ✅ **Detaylı logging:** Her retry attempt loglanıyor (status, error type, retry count)
+
+#### 3. Fallback Stratejisi Değiştirildi
+- ✅ **Önceki:** Edits API başarısız olursa direkt `/v1/images/generations`'a geçiyordu
+- ✅ **Yeni:** Retry'lar başarısız olursa hata fırlatılıyor, fallback'e geçilmiyor
+- ✅ **Neden:** Generations API reference image'ları desteklemiyor → karakter tutarlılığı kayboluyor
+- ✅ **Sonuç:** Kullanıcı kitap oluşturmayı tekrar deneyebilir (reference image'lar korunur)
+
+#### 4. Hata Yönetimi İyileştirmeleri
+- ✅ **Hata kategorileri:** Geçici vs kalıcı hatalar ayrı işleniyor
+- ✅ **Detaylı error messages:** Kullanıcıya anlaşılır hata mesajları
+- ✅ **Logging:** Her hata tipi ve retry attempt detaylı loglanıyor
+
+**Beklenen İyileşme:**
+- ✅ Geçici hatalar (502, 503, 504, 429) otomatik retry ile çözülecek
+- ✅ Reference image'lar korunacak (fallback'e geçilmeyecek)
+- ✅ Alakasız görseller oluşmayacak
+- ✅ Kullanıcı deneyimi iyileşecek (hata durumunda tekrar deneme seçeneği)
+
+**Etkilenen Dosyalar:**
+- `app/api/books/route.ts` - Retry wrapper fonksiyonları, edits API retry mekanizması, fallback stratejisi değişikliği
+
+---
+
+### v1.0.8 (16 Ocak 2026) - Scene Diversity & Visual Variety Improvements
+
+**Sorun:**
+- Kapak ve sayfa görselleri neredeyse aynı sahneyi gösteriyordu
+- Scene descriptions çok kısa (70-80 karakter) ve generic
+- Her sayfa için farklı sahne detayları yoktu
+- Visual diversity yetersizdi (perspektif, kompozisyon, zaman, lokasyon)
+
+**Çözüm:**
+
+#### 1. Story Generation Prompt Güncellemeleri (`lib/prompts/story/v1.0.0/base.ts`)
+- ✅ **Story Structure Detaylandırıldı:** Her sayfa için özel gereksinimler eklendi (Page 1: Cover, Page 2: Introduction, Pages 3-5: Adventure, vb.)
+- ✅ **Visual Diversity Directives:** Location, time of day, weather, perspective, composition variety gereksinimleri eklendi
+- ✅ **Image Prompt Requirements Güçlendirildi:** 200+ karakter, detaylı sahne açıklamaları (location, time, weather, perspective, composition, character action, environmental details)
+- ✅ **Scene Description Requirements Güçlendirildi:** 150+ karakter, detaylı açıklamalar (location, time, weather, character action, environmental details, emotional tone)
+- ✅ **Critical Checklist:** Her sayfa için diversity checklist eklendi (location, time, perspective, composition, action/mood farklı olmalı)
+
+#### 2. Image Generation Scene Diversity Logic (`lib/prompts/image/v1.0.0/scene.ts`)
+- ✅ **Scene Diversity Analysis:** `analyzeSceneDiversity()` fonksiyonu - scene description ve story text'ten location, time, weather, perspective, composition çıkarıyor
+- ✅ **Perspective Variety Logic:** `getPerspectiveForPage()` - Her sayfa için farklı perspektif (wide, medium, close-up, bird-eye, low-angle, high-angle, eye-level)
+- ✅ **Composition Variety Logic:** `getCompositionForPage()` - Her sayfa için farklı kompozisyon (centered, left, right, balanced, diagonal, symmetrical, group)
+- ✅ **Time/Location Extraction:** `extractSceneElements()` - Story text'ten zaman, lokasyon, hava durumu çıkarıyor (Türkçe/İngilizce destekli)
+- ✅ **Scene Diversity Directives:** `getSceneDiversityDirectives()` - Önceki sahneye göre farklılık direktifleri oluşturuyor
+
+#### 3. generateFullPagePrompt() Fonksiyonu Güncellemesi
+- ✅ **previousScenes Parametresi:** Scene diversity tracking için yeni parametre eklendi
+- ✅ **Scene Diversity Prompt Bölümü:** Önceki sahneye göre farklılık direktifleri prompt'a ekleniyor
+- ✅ **Automatic Diversity Enforcement:** Her sayfa için otomatik olarak farklı perspektif, kompozisyon, lokasyon, zaman kullanılıyor
+
+#### 4. API Integration (`app/api/books/route.ts`)
+- ✅ **Scene Diversity Tracking:** Her sayfa için scene analysis yapılıyor ve saklanıyor
+- ✅ **Previous Scenes Passing:** `generateFullPagePrompt()` çağrısına önceki sahneler gönderiliyor
+- ✅ **Detailed Logging:** Her sayfa için scene analysis loglanıyor (location, time, weather, perspective, composition)
+
+**Beklenen İyileşme:**
+- ✅ Her sayfa için farklı, zengin ve detaylı sahneler
+- ✅ Scene descriptions 150-200+ karakter (önceki 70-80'den iyileştirme)
+- ✅ Image prompts 200+ karakter (önceki generic prompt'lardan iyileştirme)
+- ✅ Farklı perspektifler, kompozisyonlar, zaman dilimleri
+- ✅ Visual diversity %80-90+ farklılık (önceki %30-40'tan iyileştirme)
+- ✅ Story progression görsel olarak net
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - Story structure, visual diversity directives, image/scene prompt requirements
+- `lib/prompts/image/v1.0.0/scene.ts` - Scene diversity analysis, perspective/composition variety logic, diversity directives
+- `app/api/books/route.ts` - Scene diversity tracking, previous scenes passing
+
+---
+
+### v1.0.7 (16 Ocak 2026) - Cover Generation & Additional Characters Fixes
+
+**Sorun:**
+- Cover generation'da `isCover=true` parametresi kullanılmıyordu, bu yüzden cover-specific prompt'lar aktif değildi
+- Family Members (ek karakterler) için saç stili detayları (hairStyle, hairLength, hairTexture) eksikti
+- Adult karakterler (Mom, Dad) bazen çocuk gibi gösteriliyordu - yaş/fiziksel özellikler yeterince vurgulanmıyordu
+
+**Çözüm:**
+
+#### 1. Cover Generation Fix (`app/api/books/route.ts`)
+- ✅ **`isCover=true` parametresi eklendi:** Cover generation'da `generateFullPagePrompt()` çağrısına `isCover=true` parametresi eklendi
+- ✅ **Cover-specific prompt'lar aktif:** Artık cover generation'da özel cover quality prompt'ları kullanılıyor
+
+#### 2. Family Members Saç Stili Detayları (`lib/prompts/image/v1.0.0/character.ts`)
+- ✅ **Saç detayları eklendi:** `hairStyle`, `hairLength`, `hairTexture` bilgileri prompt'a eklendi
+- ✅ **Saç stili vurgusu:** "Hair style and length must match reference photo EXACTLY" vurgusu eklendi
+- ✅ **Detaylı saç açıklaması:** Saç rengi, uzunluk, stil ve dokusu birlikte kullanılıyor
+
+#### 3. Yaş/Fiziksel Özellikler Vurgusu (`lib/prompts/image/v1.0.0/character.ts`)
+- ✅ **Adult vurgusu:** 18+ yaş için "This is an ADULT, NOT a child" vurgusu eklendi
+- ✅ **Fiziksel özellikler:** "Adult body proportions, adult facial features, adult height" vurgusu eklendi
+- ✅ **Teenager vurgusu:** 13-17 yaş için "This is a TEENAGER/ADOLESCENT, NOT a child" vurgusu eklendi
+- ✅ **Fallback vurgusu:** Mom/Dad için yaş yoksa bile "This is an ADULT" vurgusu eklendi
+- ✅ **Cover prompt'larına eklendi:** Cover generation'da da adult vurgusu eklendi (`lib/prompts/image/v1.0.0/scene.ts`)
+
+**Beklenen İyileşme:**
+- ✅ Cover generation'da cover-specific prompt'lar aktif olacak
+- ✅ Adult karakterler (Mom, Dad) artık çocuk gibi gösterilmeyecek
+- ✅ Family Members'ın saç stilleri daha detaylı ve tutarlı olacak
+- ✅ Cover kalitesi artacak (çünkü cover-specific prompt'lar aktif)
+
+**Etkilenen Dosyalar:**
+- `app/api/books/route.ts` - Cover generation'da `isCover=true` parametresi eklendi
+- `lib/prompts/image/v1.0.0/character.ts` - Family Members için saç stili detayları ve yaş vurgusu eklendi
+- `lib/prompts/image/v1.0.0/scene.ts` - Cover prompt'larına adult vurgusu eklendi
+
+---
 
 ### v1.0.6 (16 Ocak 2026) - Cover-as-Reference for Character Consistency
 

@@ -13,7 +13,7 @@ import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/book
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt } from '@/lib/prompts/image/v1.0.0/scene'
+import { generateFullPagePrompt, analyzeSceneDiversity, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -25,6 +25,130 @@ function normalizeThemeKey(theme: string): string {
   if (!t) return t
   if (t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities') return 'sports'
   return t
+}
+
+// ============================================================================
+// Retry Mechanism for API Calls (NEW: 16 Ocak 2026)
+// ============================================================================
+
+/**
+ * Check if error is retryable (temporary error)
+ */
+function isRetryableError(status: number): boolean {
+  // Retryable errors: 502 (Bad Gateway), 503 (Service Unavailable), 504 (Gateway Timeout), 429 (Too Many Requests)
+  return status === 502 || status === 503 || status === 504 || status === 429
+}
+
+/**
+ * Check if error is permanent (should not retry)
+ */
+function isPermanentError(status: number): boolean {
+  // Permanent errors: 400 (Bad Request), 401 (Unauthorized), 403 (Forbidden), 500 (Internal Server Error)
+  return status === 400 || status === 401 || status === 403 || status === 500
+}
+
+/**
+ * Retry wrapper for API calls with exponential backoff
+ * @param fn - Function to retry
+ * @param maxRetries - Maximum number of retries (default: 3)
+ * @param context - Context for logging (e.g., "Page 3", "Cover")
+ * @returns Response from successful call
+ * @throws Error if all retries fail
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  context: string = 'API call'
+): Promise<T> {
+  let lastError: Error | null = null
+  let lastStatus: number | null = null
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await fn()
+      if (attempt > 1) {
+        console.log(`[Retry] ✅ ${context} succeeded on attempt ${attempt}/${maxRetries}`)
+      }
+      return result
+    } catch (error: any) {
+      lastError = error
+      
+      // Extract status code from error
+      const status = error.status || error.response?.status || null
+      lastStatus = status
+      
+      if (status && isPermanentError(status)) {
+        // Permanent error - don't retry
+        console.error(`[Retry] ❌ ${context} failed with permanent error (${status}) - not retrying`)
+        throw error
+      }
+      
+      if (status && !isRetryableError(status)) {
+        // Unknown error status - don't retry
+        console.error(`[Retry] ❌ ${context} failed with unknown error (${status}) - not retrying`)
+        throw error
+      }
+      
+      if (attempt < maxRetries) {
+        // Calculate exponential backoff: 1s, 2s, 4s
+        const backoffMs = Math.pow(2, attempt - 1) * 1000
+        console.warn(`[Retry] ⚠️  ${context} failed (attempt ${attempt}/${maxRetries}, status: ${status || 'unknown'}) - retrying in ${backoffMs}ms...`)
+        await new Promise(resolve => setTimeout(resolve, backoffMs))
+      } else {
+        // All retries exhausted
+        console.error(`[Retry] ❌ ${context} failed after ${maxRetries} attempts (last status: ${lastStatus || 'unknown'})`)
+        throw error
+      }
+    }
+  }
+  
+  // This should never be reached, but TypeScript needs it
+  throw lastError || new Error(`${context} failed after ${maxRetries} attempts`)
+}
+
+/**
+ * Retry wrapper specifically for fetch calls
+ */
+async function retryFetch(
+  url: string,
+  options: RequestInit,
+  maxRetries: number = 3,
+  context: string = 'API call'
+): Promise<Response> {
+  return retryWithBackoff(async () => {
+    const response = await fetch(url, options)
+    
+    if (!response.ok) {
+      const status = response.status
+      
+      if (isPermanentError(status)) {
+        // Permanent error - throw immediately
+        const errorText = await response.text()
+        const error = new Error(`API call failed with permanent error: ${status} - ${errorText}`) as any
+        error.status = status
+        error.response = response
+        throw error
+      }
+      
+      if (isRetryableError(status)) {
+        // Retryable error - throw to trigger retry
+        const errorText = await response.text()
+        const error = new Error(`API call failed with retryable error: ${status} - ${errorText}`) as any
+        error.status = status
+        error.response = response
+        throw error
+      }
+      
+      // Unknown error - throw
+      const errorText = await response.text()
+      const error = new Error(`API call failed: ${status} - ${errorText}`) as any
+      error.status = status
+      error.response = response
+      throw error
+    }
+    
+    return response
+  }, maxRetries, context)
 }
 
 export interface CreateBookRequest {
@@ -464,12 +588,15 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       
       // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
       // NEW: Pass additionalCharactersCount for group composition
+      // FIXED (16 Ocak 2026): Add isCover=true parameter for cover-specific prompts
       const textPrompt = generateFullPagePrompt(
         characterPrompt,
         coverSceneInput,
         illustrationStyle,
         ageGroup,
-        additionalCharacters.length // NEW: Additional characters count
+        additionalCharacters.length, // NEW: Additional characters count
+        true, // isCover: true (CRITICAL: Cover quality is essential)
+        false // useCoverReference: false (no cover yet - this IS the cover)
       )
 
       console.log('[Create Book] 🖼️  Calling GPT-image API for cover generation...')
@@ -609,39 +736,52 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           console.log('[Create Book] ⏱️  API call started at:', new Date().toISOString())
           
           try {
-            const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${apiKey}`,
-              },
-              body: formData,
-            })
+            // NEW: Retry mechanism for cover edits API (16 Ocak 2026)
+            // Retry on temporary errors (502, 503, 504, 429) - max 3 attempts with exponential backoff
+            let editsResponse: Response
+            try {
+              editsResponse = await retryFetch(
+                'https://api.openai.com/v1/images/edits',
+                {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                  },
+                  body: formData,
+                },
+                3, // max 3 retries
+                'Cover edits API'
+              )
+            } catch (error: any) {
+              // Retry exhausted or permanent error
+              const errorStatus = error.status || 'unknown'
+              const errorText = error.message || 'Unknown error'
+              console.error('[Create Book] ❌ Cover edits API failed after retries:', {
+                status: errorStatus,
+                error: errorText,
+                isRetryable: errorStatus ? isRetryableError(errorStatus) : false,
+                isPermanent: errorStatus ? isPermanentError(errorStatus) : false
+              })
+              
+              // CRITICAL: Do NOT fallback to generations API - reference images would be lost!
+              // Instead, throw error so user can retry the book generation
+              throw new Error(
+                `Cover image generation failed after retries. ` +
+                `Status: ${errorStatus}. ` +
+                `This is a ${isPermanentError(errorStatus) ? 'permanent' : 'temporary'} error. ` +
+                `Please try creating the book again. ` +
+                `Reference images (character photos) are required for character consistency.`
+              )
+            }
 
+            // Success - parse response
             const editsApiTime = Date.now() - editsApiStartTime
             console.log('[Create Book] ⏱️  API call completed in:', editsApiTime, 'ms')
             console.log('[Create Book] 📊 Response status:', editsResponse.status, editsResponse.statusText)
             // Avoid logging full headers to keep logs clean (some infra adds verbose headers)
             console.log('[Create Book] 📊 Response content-type:', editsResponse.headers.get('content-type') || 'unknown')
 
-            if (!editsResponse.ok) {
-              const errorText = await editsResponse.text()
-              console.error('[Create Book] ❌ GPT-image edits API error:')
-              console.error('[Create Book]   Status:', editsResponse.status)
-              console.error('[Create Book]   Status Text:', editsResponse.statusText)
-              console.error('[Create Book]   Error Response:', errorText)
-              
-              // Try to parse error JSON for better logging
-              try {
-                const errorJson = JSON.parse(errorText)
-                console.error('[Create Book]   Parsed Error:', JSON.stringify(errorJson, null, 2))
-              } catch {
-                console.error('[Create Book]   Raw Error Text:', errorText)
-              }
-              
-              // Fall back to /v1/images/generations
-              console.log('[Create Book] ⚠️  Falling back to /v1/images/generations (edits API failed)')
-              coverImageUrl = null
-            } else {
+            if (editsResponse.ok) {
               console.log('[Create Book] ✅ Edits API call successful, parsing response...')
               const editsResult = await editsResponse.json()
               console.log('[Create Book] 📦 Response structure:', {
@@ -680,15 +820,23 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               }
             }
           } catch (editsError) {
+            // This catch block should only handle unexpected errors (not retryable/permanent errors)
+            // Retryable/permanent errors are already handled in retryFetch
             const editsApiTime = Date.now() - editsApiStartTime
-            console.error('[Create Book] ❌ Exception during /v1/images/edits API call:')
+            console.error('[Create Book] ❌ Unexpected exception during /v1/images/edits API call:')
             console.error('[Create Book]   Error:', editsError)
             console.error('[Create Book]   Error type:', editsError instanceof Error ? editsError.constructor.name : typeof editsError)
             console.error('[Create Book]   Error message:', editsError instanceof Error ? editsError.message : String(editsError))
             console.error('[Create Book]   Error stack:', editsError instanceof Error ? editsError.stack : 'N/A')
             console.error('[Create Book] ⏱️  API call failed after:', editsApiTime, 'ms')
-            console.log('[Create Book] ⚠️  Falling back to /v1/images/generations (edits API exception)')
-            coverImageUrl = null
+            
+            // CRITICAL: Do NOT fallback to generations API - reference images would be lost!
+            // Instead, re-throw error so user can retry the book generation
+            throw new Error(
+              `Cover image generation failed with unexpected error. ` +
+              `Please try creating the book again. ` +
+              `Reference images (character photos) are required for character consistency.`
+            )
           }
         } else {
           console.log('[Create Book] ⚠️  No valid image blob, skipping /v1/images/edits')
@@ -696,8 +844,14 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
 
         // Fall back to /v1/images/generations ONLY if edits failed AND no image blob
         // CRITICAL: If edits API returned b64_json (even without URL), it was SUCCESSFUL - do NOT fallback!
-        if (!coverImageUrl && !coverImageB64 && !editsApiSuccess) {
-          console.log('[Create Book] 🔄 Falling back to /v1/images/generations (edits API failed or no reference image)')
+        // REMOVED: Fallback to /v1/images/generations for cover (16 Ocak 2026)
+        // Reason: Generations API doesn't support reference images, which would result in
+        // completely unrelated cover image (no character consistency).
+        // Instead, if edits API fails after retries, we throw an error so user can retry.
+        
+        // Only use generations API if NO reference images are available (shouldn't happen in normal flow)
+        if (!coverImageUrl && !coverImageB64 && !editsApiSuccess && referenceImageUrls.length === 0) {
+          console.warn('[Create Book] ⚠️  No reference images available, using /v1/images/generations (this should not happen in normal flow)')
           console.log('[Create Book] ⚠️  WARNING: Reference image was NOT used - using text-only generation')
           console.log('[Create Book] 📋 Model:', imageModel)
           console.log('[Create Book] 📏 Size:', imageSize)
@@ -998,6 +1152,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         
         const generatedImages: any[] = []
         
+        // NEW: Scene diversity tracking (16 Ocak 2026)
+        const sceneDiversityAnalysis: SceneDiversityAnalysis[] = []
+        
         console.log(`[Create Book] 👥 Total characters: ${characters.length} (1 main + ${additionalCharactersCount} additional)`)
         if (additionalCharactersCount > 0) {
           console.log(`[Create Book] 📝 Additional characters:`, additionalCharacters.map(c => c.type.displayName).join(', '))
@@ -1063,8 +1220,33 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
 
         // Generate full page prompt with correct parameters (NEW: Multiple characters, Cover reference)
         // Note: coverImageUrl is already defined above (line ~951, outside the loop)
-        const isCoverPage = pageNumber === 1
-        const useCoverReference = !isCoverPage && coverImageUrl !== null
+        // FIXED (16 Ocak 2026): Page 1 is NOT cover - cover is generated separately
+        // All pages (1-10) should use cover as reference if available
+        const isCoverPage = false // Page 1 is NOT cover - cover is generated separately before pages
+        const useCoverReference = coverImageUrl !== null // Use cover reference for ALL pages if available
+        
+        console.log(`[Create Book] Page ${pageNumber} - Cover reference:`, {
+          isCoverPage,
+          useCoverReference,
+          coverImageUrl: coverImageUrl ? 'Available ✅' : 'Not available ❌'
+        })
+        
+        // NEW: Analyze scene diversity (16 Ocak 2026)
+        const currentSceneAnalysis = analyzeSceneDiversity(
+          sceneDescription,
+          page.text || '',
+          pageNumber,
+          sceneDiversityAnalysis
+        )
+        sceneDiversityAnalysis.push(currentSceneAnalysis)
+        
+        console.log(`[Create Book] 🎬 Page ${pageNumber} scene analysis:`, {
+          location: currentSceneAnalysis.location,
+          timeOfDay: currentSceneAnalysis.timeOfDay,
+          weather: currentSceneAnalysis.weather,
+          perspective: currentSceneAnalysis.perspective,
+          composition: currentSceneAnalysis.composition
+        })
         
         const fullPrompt = generateFullPagePrompt(
           characterPrompt,
@@ -1072,8 +1254,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           illustrationStyle,
           ageGroup,
           additionalCharactersCount, // NEW: Pass additional characters count
-          isCoverPage, // isCover: true for page 1 (cover), false for others
-          useCoverReference // useCoverReference: true for pages 2+ if cover exists
+          isCoverPage, // isCover: false for all pages (cover is generated separately)
+          useCoverReference, // useCoverReference: true for ALL pages (1-10) if cover exists
+          sceneDiversityAnalysis.slice(0, -1) // Pass previous scenes (exclude current)
         )
 
         console.log(`[Create Book] 📝 Page ${pageNumber} prompt (first 200 chars):`, fullPrompt.substring(0, 200) + '...')
@@ -1208,49 +1391,77 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               console.log(`[Create Book] Page ${pageNumber} -   - 🎨 COVER REFERENCE ACTIVE: Cover image will be used for character consistency`)
             }
 
-            const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${apiKey}`,
-              },
-              body: formData,
-            })
-
-            if (!editsResponse.ok) {
-              const errorText = await editsResponse.text()
-              console.error(`[Create Book] Page ${pageNumber} image generation failed:`, errorText)
-              // Fall back to /v1/images/generations (will be handled below)
-              pageImageUrl = null
-              pageImageB64 = null
-            } else {
-              const editsApiTime = Date.now() - pageImageStartTime
-              console.log(`[Create Book] ⏱️  Page ${pageNumber} edits API call completed in:`, editsApiTime, 'ms')
-              console.log(`[Create Book] 📊 Page ${pageNumber} edits response status:`, editsResponse.status, editsResponse.statusText)
-              
-              const editsResult = await editsResponse.json()
-              console.log(`[Create Book] 📦 Page ${pageNumber} edits response structure:`, {
-                hasData: !!editsResult.data,
-                dataLength: editsResult.data?.length || 0,
-                dataType: Array.isArray(editsResult.data) ? 'array' : typeof editsResult.data,
+            // NEW: Retry mechanism for edits API (16 Ocak 2026)
+            // Retry on temporary errors (502, 503, 504, 429) - max 3 attempts with exponential backoff
+            let editsResponse: Response
+            try {
+              editsResponse = await retryFetch(
+                'https://api.openai.com/v1/images/edits',
+                {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                  },
+                  body: formData,
+                },
+                3, // max 3 retries
+                `Page ${pageNumber} edits API`
+              )
+            } catch (error: any) {
+              // Retry exhausted or permanent error
+              const errorStatus = error.status || 'unknown'
+              const errorText = error.message || 'Unknown error'
+              console.error(`[Create Book] ❌ Page ${pageNumber} edits API failed after retries:`, {
+                status: errorStatus,
+                error: errorText,
+                isRetryable: errorStatus ? isRetryableError(errorStatus) : false,
+                isPermanent: errorStatus ? isPermanentError(errorStatus) : false
               })
               
-              pageImageUrl = editsResult.data[0]?.url || null
-              pageImageB64 = editsResult.data[0]?.b64_json || null
-              pageImageOutputFormat = editsResult.output_format || null
-              
-              console.log(`[Create Book] ✅ Page ${pageNumber} edits response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
-              if (pageImageUrl) {
-                console.log(`[Create Book] 🖼️  Page ${pageNumber} image URL received (length:`, pageImageUrl.length, 'chars)')
-              }
-              if (pageImageB64) {
-                console.log(`[Create Book] 🧩 Page ${pageNumber} image b64 received (length:`, pageImageB64.length, 'chars)')
-              }
+              // CRITICAL: Do NOT fallback to generations API - reference images would be lost!
+              // Instead, throw error so user can retry the book generation
+              throw new Error(
+                `Page ${pageNumber} image generation failed after retries. ` +
+                `Status: ${errorStatus}. ` +
+                `This is a ${isPermanentError(errorStatus) ? 'permanent' : 'temporary'} error. ` +
+                `Please try creating the book again. ` +
+                `Reference images (character photos + cover) are required for character consistency.`
+              )
+            }
+
+            // Success - parse response
+            const editsApiTime = Date.now() - pageImageStartTime
+            console.log(`[Create Book] ⏱️  Page ${pageNumber} edits API call completed in:`, editsApiTime, 'ms')
+            console.log(`[Create Book] 📊 Page ${pageNumber} edits response status:`, editsResponse.status, editsResponse.statusText)
+            
+            const editsResult = await editsResponse.json()
+            console.log(`[Create Book] 📦 Page ${pageNumber} edits response structure:`, {
+              hasData: !!editsResult.data,
+              dataLength: editsResult.data?.length || 0,
+              dataType: Array.isArray(editsResult.data) ? 'array' : typeof editsResult.data,
+            })
+            
+            pageImageUrl = editsResult.data[0]?.url || null
+            pageImageB64 = editsResult.data[0]?.b64_json || null
+            pageImageOutputFormat = editsResult.output_format || null
+            
+            console.log(`[Create Book] ✅ Page ${pageNumber} edits response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
+            if (pageImageUrl) {
+              console.log(`[Create Book] 🖼️  Page ${pageNumber} image URL received (length:`, pageImageUrl.length, 'chars)')
+            }
+            if (pageImageB64) {
+              console.log(`[Create Book] 🧩 Page ${pageNumber} image b64 received (length:`, pageImageB64.length, 'chars)')
             }
           }
 
-          // Fall back to /v1/images/generations if edits failed or no image blob
-          if (!pageImageUrl && !pageImageB64) {
-            console.log(`[Create Book] 🔄 Page ${pageNumber} - Falling back to /v1/images/generations (edits failed or no valid reference images)`)
+          // REMOVED: Fallback to /v1/images/generations (16 Ocak 2026)
+          // Reason: Generations API doesn't support reference images, which would result in
+          // completely unrelated images (no character consistency).
+          // Instead, if edits API fails after retries, we throw an error so user can retry.
+          
+          // Only use generations API if NO reference images are available (shouldn't happen in normal flow)
+          if (!pageImageUrl && !pageImageB64 && referenceImageUrls.length === 0) {
+            console.warn(`[Create Book] ⚠️  Page ${pageNumber} - No reference images available, using /v1/images/generations (this should not happen in normal flow)`)
             console.log(`[Create Book] 📋 Page ${pageNumber} - Model:`, imageModel)
             console.log(`[Create Book] 📏 Page ${pageNumber} - Size:`, imageSize)
             console.log(`[Create Book] 🎨 Page ${pageNumber} - Quality:`, imageQuality)

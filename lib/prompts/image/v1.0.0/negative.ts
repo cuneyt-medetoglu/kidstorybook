@@ -8,7 +8,7 @@ import type { PromptVersion } from '../../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.3',
+  version: '1.0.4',
   releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
@@ -23,6 +23,7 @@ export const VERSION: PromptVersion = {
     'Added comprehensive hand/finger negative prompts from AI research (16 Ocak 2026)',
     'v1.0.3: Anatomical directives detaylandırıldı - structured format, newline separation, explicit instructions (16 Ocak 2026)',
     'v1.0.3: ANATOMICAL_NEGATIVE minimalize edildi - %90 azaltma, token attention problemi çözüldü (16 Ocak 2026)',
+    'v1.0.4: El ele tutuşma yasağı eklendi - hands must be separate, NO hand-holding (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -281,6 +282,9 @@ export const ANATOMICAL_NEGATIVE = [
   'deformed', 'malformed', 'mutated',
   'bad anatomy', 'anatomically incorrect',
   'extra limbs', 'missing limbs', // Genel, spesifik sayılar yok
+  // NEW: El ele tutuşma yasağı (16 Ocak 2026)
+  'holding hands', 'hand in hand', 'hands clasped together', 'hands together',
+  'interlocked hands', 'hands joined', 'hand-holding',
 ]
 
 // ============================================================================
@@ -363,6 +367,10 @@ export function getAnatomicalCorrectnessDirectives(): string {
     'palms are visible with natural skin texture and palm lines',
     'wrists connect naturally to arms at correct angle',
     'hands are in natural, relaxed poses - no impossible angles or twisted positions',
+    'CRITICAL: Characters must NOT hold hands - hands must be separate and independent',
+    'CRITICAL: NO hand-holding, NO holding hands together, NO hands clasped together',
+    'CRITICAL: Each character\'s hands must be clearly visible and separate from other characters\' hands',
+    'CRITICAL: Hands should be in individual poses - one hand can be raised, one can be at side, but NOT holding another character\'s hand',
     '',
     '### BODY ANATOMY:',
     'exactly 2 hands, 2 arms, 2 legs, 2 feet - no more, no less',

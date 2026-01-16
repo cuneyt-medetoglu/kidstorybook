@@ -440,6 +440,43 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - `lib/prompts/image/v1.0.0/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
     - `app/api/books/route.ts`: Cover image page generation'da referans olarak kullanılıyor (pages 2+)
     - Log'lar: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri eklendi
+- [x] **3.5.11** Karakter Tutarlılığı İyileştirmeleri - Part 2 (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.12** Cover Generation ve Additional Characters İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Cover generation'da `isCover=true` parametresi eklendi
+  - [x] Family Members için saç stili detayları eklendi (hairStyle, hairLength, hairTexture)
+  - [x] Yaş/fiziksel özellikler vurgusu güçlendirildi (adult vurgusu, NOT a child)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG, IMAGE_PROMPT_TEMPLATE)
+  - [x] Page 1'de cover reference kullanımı: `isCoverPage` mantığı düzeltildi, tüm sayfalarda (1-10) cover reference kullanılıyor
+- [x] **3.5.13** Sahne Çeşitliliği ve Görsel Varyasyon İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.14** Retry Mekanizması ve Hata Yönetimi İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.15** El Ele Tutuşma Yasağı (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Anatomical correctness directives'a el ele tutuşma yasağı eklendi
+  - [x] Negative prompts'a el ele tutuşma terimleri eklendi
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.10, ANATOMICAL_ISSUES_GUIDE v1.0.1)
+  - [x] Retry wrapper fonksiyonları eklendi (max 3 retry, exponential backoff)
+  - [x] Hata kategorileri (geçici vs kalıcı)
+  - [x] Edits API retry mekanizması (cover + page generation)
+  - [x] Fallback stratejisi değiştirildi (retry başarısız olursa hata fırlat, fallback'e geçme)
+  - [x] Detaylı logging (retry attempts, error types)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.9)
+  - [x] Story generation prompt'unda detaylı page-by-page structure (her sayfa için özel gereksinimler)
+  - [x] Visual diversity directives (location, time, weather, perspective, composition variety)
+  - [x] Image prompt requirements güçlendirildi (200+ karakter, detaylı sahne açıklamaları)
+  - [x] Scene description requirements güçlendirildi (150+ karakter, detaylı açıklamalar)
+  - [x] Scene diversity analysis fonksiyonları (`analyzeSceneDiversity`, `extractSceneElements`)
+  - [x] Perspective variety logic (`getPerspectiveForPage` - 7 farklı perspektif)
+  - [x] Composition variety logic (`getCompositionForPage` - 7 farklı kompozisyon)
+  - [x] Time/location extraction (Türkçe/İngilizce destekli)
+  - [x] `generateFullPagePrompt()` fonksiyonuna scene diversity tracking eklendi
+  - [x] API integration: Scene diversity tracking ve previous scenes passing
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.8, STORY_PROMPT_TEMPLATE v1.0.2)
+  - [x] Göz rengi (blue) prompt iyileştirmesi: "bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)" vurgusu
+  - [x] Geometric stil açıklaması güçlendirildi: "flat design", "minimalist", "angular", "vector art", "geometric abstraction", "low-poly" terimleri eklendi
+  - **Detaylar:**
+    - `app/api/books/route.ts`: Page 1'de de cover reference kullanılıyor (isCoverPage mantığı düzeltildi)
+    - `lib/prompts/image/v1.0.0/character.ts`: Blue göz rengi için özel vurgu eklendi (main character + family members)
+    - `lib/prompts/image/v1.0.0/style-descriptions.ts`: Geometric stil açıklaması güçlendirildi
+    - `lib/prompts/image/v1.0.0/scene.ts`: Geometric stil direktifleri güçlendirildi
 - [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
 - [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
   - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça

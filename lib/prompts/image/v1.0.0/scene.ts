@@ -49,6 +49,17 @@ export interface SceneInput {
   focusPoint: 'character' | 'environment' | 'balanced'
 }
 
+// NEW: Scene Diversity Analysis (16 Ocak 2026)
+export interface SceneDiversityAnalysis {
+  location: string
+  timeOfDay: 'morning' | 'late-morning' | 'noon' | 'afternoon' | 'late-afternoon' | 'evening' | 'sunset' | 'dusk' | 'night' | 'unknown'
+  weather: 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'snowy' | 'windy' | 'unknown'
+  perspective: 'wide' | 'medium' | 'close-up' | 'bird-eye' | 'low-angle' | 'high-angle' | 'eye-level' | 'unknown'
+  composition: 'centered' | 'left' | 'right' | 'balanced' | 'diagonal' | 'symmetrical' | 'group' | 'unknown'
+  mood: string
+  action: string
+}
+
 /**
  * HYBRID PROMPT GENERATION (NEW: 15 Ocak 2026)
  * Combines cinematic and descriptive elements for high-quality illustrations
@@ -550,7 +561,7 @@ export function getStyleSpecificDirectives(illustrationStyle: string): string {
   const directives: Record<string, string> = {
     '3d_animation': 'STYLE-SPECIFIC DIRECTIVES FOR 3D ANIMATION (PIXAR STYLE): Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), rounded shapes, exaggerated features, vibrant saturated colors, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality and visual style',
     
-    'geometric': 'STYLE-SPECIFIC DIRECTIVES FOR GEOMETRIC: Simplified geometric shapes (circles, squares, triangles), flat colors with no gradients, sharp distinct edges, minimal detail, modern stylized, grid-based alignment, clean lines, illustration style',
+    'geometric': 'STYLE-SPECIFIC DIRECTIVES FOR GEOMETRIC: Flat design style, minimalist geometric shapes (circles, squares, triangles, polygons, hexagons), angular sharp edges, flat colors with NO gradients, NO shadows, NO depth, NO 3D effects, vector art aesthetic, clean lines, modern stylized, grid-based alignment, geometric abstraction, low-poly style elements, flat illustration, geometric patterns, sharp corners, precise shapes',
     
     'watercolor': 'STYLE-SPECIFIC DIRECTIVES FOR WATERCOLOR: Transparent watercolor technique, visible soft brushstrokes, colors blend and bleed at edges, paper texture visible through paint, luminous glowing finish, wet-on-wet color mixing, soft flowing edges, warm inviting atmosphere',
     
@@ -581,7 +592,8 @@ export function generateFullPagePrompt(
   ageGroup: string,
   additionalCharactersCount: number = 0, // NEW: Number of additional characters
   isCover: boolean = false, // NEW: Cover generation için (CRITICAL quality)
-  useCoverReference: boolean = false // NEW: Pages 2-10 için cover reference
+  useCoverReference: boolean = false, // NEW: Pages 2-10 için cover reference
+  previousScenes?: SceneDiversityAnalysis[] // NEW: For diversity tracking (16 Ocak 2026)
 ): string {
   // Build scene prompt (hybrid: cinematic + descriptive)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
@@ -636,6 +648,8 @@ export function generateFullPagePrompt(
     promptParts.push('- Facial features must match reference photo EXACTLY')
     promptParts.push('- Skin tone must match reference photo EXACTLY')
     promptParts.push('- Body proportions must match reference photo EXACTLY')
+    promptParts.push('- CRITICAL: Adult characters (Mom, Dad, etc.) must have ADULT body proportions, ADULT facial features, ADULT height - NOT childlike features')
+    promptParts.push('- CRITICAL: Age-appropriate physical characteristics - children look like children, adults look like adults')
     promptParts.push('')
     promptParts.push('COVER COMPOSITION:')
     if (additionalCharactersCount > 0) {
@@ -702,6 +716,16 @@ export function generateFullPagePrompt(
   promptParts.push('character should look like a stylized illustration that captures the child\'s features but in the chosen illustration style')
   promptParts.push('clearly an illustration, not a photograph')
   
+  // SCENE DIVERSITY REQUIREMENTS (NEW: 16 Ocak 2026)
+  if (!isCover && previousScenes && previousScenes.length > 0) {
+    const lastScene = previousScenes[previousScenes.length - 1]
+    const diversityDirectives = getSceneDiversityDirectives(lastScene)
+    if (diversityDirectives) {
+      promptParts.push('')
+      promptParts.push(diversityDirectives)
+    }
+  }
+  
   // CLOTHING CONSISTENCY & THEME APPROPRIATENESS (ENHANCED: 15 Ocak 2026, 16 Ocak 2026)
   const themeClothingStyle = getThemeAppropriateClothing(sceneInput.theme)
   if (isCover) {
@@ -744,11 +768,209 @@ export function generateFullPagePrompt(
   return fullPrompt
 }
 
+// ============================================================================
+// Scene Diversity Analysis Functions (NEW: 16 Ocak 2026)
+// ============================================================================
+
+/**
+ * Extract time of day, location, and weather from scene description
+ */
+export function extractSceneElements(
+  sceneDescription: string,
+  storyText?: string
+): { timeOfDay?: string; location?: string; weather?: string } {
+  const combined = `${sceneDescription} ${storyText || ''}`.toLowerCase()
+  
+  // Extract time of day
+  let timeOfDay: string | undefined
+  if (combined.includes('morning') || combined.includes('sabah')) {
+    timeOfDay = combined.includes('late morning') || combined.includes('geç sabah') ? 'late-morning' : 'morning'
+  } else if (combined.includes('noon') || combined.includes('öğle')) {
+    timeOfDay = 'noon'
+  } else if (combined.includes('afternoon') || combined.includes('öğleden sonra')) {
+    timeOfDay = combined.includes('late afternoon') || combined.includes('geç öğleden sonra') ? 'late-afternoon' : 'afternoon'
+  } else if (combined.includes('evening') || combined.includes('akşam')) {
+    timeOfDay = 'evening'
+  } else if (combined.includes('sunset') || combined.includes('gün batımı')) {
+    timeOfDay = 'sunset'
+  } else if (combined.includes('dusk') || combined.includes('alacakaranlık')) {
+    timeOfDay = 'dusk'
+  } else if (combined.includes('night') || combined.includes('gece')) {
+    timeOfDay = 'night'
+  }
+  
+  // Extract location keywords
+  let location: string | undefined
+  const locationKeywords = [
+    'home', 'ev', 'house', 'forest', 'orman', 'park', 'mountain', 'dağ', 
+    'beach', 'sahil', 'plaj', 'cave', 'mağara', 'river', 'nehir', 'lake', 
+    'göl', 'garden', 'bahçe', 'school', 'okul', 'playground', 'oyun alanı',
+    'clearing', 'açıklık', 'path', 'yol', 'trail', 'patika', 'summit', 'zirve'
+  ]
+  
+  for (const keyword of locationKeywords) {
+    if (combined.includes(keyword)) {
+      location = keyword
+      break
+    }
+  }
+  
+  // Extract weather
+  let weather: string | undefined
+  if (combined.includes('sunny') || combined.includes('güneşli')) {
+    weather = 'sunny'
+  } else if (combined.includes('partly cloudy') || combined.includes('parçalı bulutlu')) {
+    weather = 'partly-cloudy'
+  } else if (combined.includes('cloudy') || combined.includes('bulutlu')) {
+    weather = 'cloudy'
+  } else if (combined.includes('rainy') || combined.includes('yağmurlu') || combined.includes('rain') || combined.includes('yağmur')) {
+    weather = 'rainy'
+  } else if (combined.includes('snowy') || combined.includes('karlı') || combined.includes('snow') || combined.includes('kar')) {
+    weather = 'snowy'
+  } else if (combined.includes('windy') || combined.includes('rüzgarlı')) {
+    weather = 'windy'
+  }
+  
+  return { timeOfDay, location, weather }
+}
+
+/**
+ * Analyze scene for diversity tracking
+ */
+export function analyzeSceneDiversity(
+  sceneDescription: string,
+  storyText: string,
+  pageNumber: number,
+  previousScenes: SceneDiversityAnalysis[]
+): SceneDiversityAnalysis {
+  const extracted = extractSceneElements(sceneDescription, storyText)
+  
+  // Determine perspective based on page number and previous scenes
+  const perspective = getPerspectiveForPage(
+    pageNumber,
+    previousScenes.map(s => s.perspective)
+  )
+  
+  // Determine composition based on page number and previous scenes
+  const composition = getCompositionForPage(
+    pageNumber,
+    previousScenes.map(s => s.composition)
+  )
+  
+  return {
+    location: extracted.location || 'unknown',
+    timeOfDay: (extracted.timeOfDay as any) || 'unknown',
+    weather: (extracted.weather as any) || 'unknown',
+    perspective,
+    composition,
+    mood: sceneDescription.toLowerCase().includes('happy') ? 'happy' : 
+          sceneDescription.toLowerCase().includes('excited') ? 'excited' : 
+          sceneDescription.toLowerCase().includes('curious') ? 'curious' : 
+          'neutral',
+    action: storyText.substring(0, 100), // First 100 chars as action summary
+  }
+}
+
+/**
+ * Get appropriate perspective for page, ensuring variety
+ */
+export function getPerspectiveForPage(
+  pageNumber: number,
+  previousPerspectives: string[]
+): SceneDiversityAnalysis['perspective'] {
+  const perspectives: SceneDiversityAnalysis['perspective'][] = [
+    'wide', 'medium', 'close-up', 'bird-eye', 'low-angle', 'high-angle', 'eye-level'
+  ]
+  
+  // Get last perspective
+  const lastPerspective = previousPerspectives[previousPerspectives.length - 1]
+  
+  // Filter out last perspective to ensure variety
+  const availablePerspectives = perspectives.filter(p => p !== lastPerspective)
+  
+  // Rotate through perspectives based on page number
+  const index = (pageNumber - 1) % availablePerspectives.length
+  return availablePerspectives[index]
+}
+
+/**
+ * Get appropriate composition for page, ensuring variety
+ */
+export function getCompositionForPage(
+  pageNumber: number,
+  previousCompositions: string[]
+): SceneDiversityAnalysis['composition'] {
+  const compositions: SceneDiversityAnalysis['composition'][] = [
+    'centered', 'left', 'right', 'balanced', 'diagonal', 'symmetrical', 'group'
+  ]
+  
+  // Get last composition
+  const lastComposition = previousCompositions[previousCompositions.length - 1]
+  
+  // Filter out last composition to ensure variety
+  const availableCompositions = compositions.filter(c => c !== lastComposition)
+  
+  // Rotate through compositions based on page number
+  const index = (pageNumber - 1) % availableCompositions.length
+  return availableCompositions[index]
+}
+
+/**
+ * Generate scene diversity prompt directives
+ */
+export function getSceneDiversityDirectives(
+  previousScene?: SceneDiversityAnalysis
+): string {
+  if (!previousScene) return ''
+  
+  const directives: string[] = []
+  
+  directives.push('CRITICAL - SCENE DIVERSITY REQUIREMENTS:')
+  directives.push('This scene MUST be VISUALLY DISTINCT from previous page:')
+  
+  if (previousScene.location && previousScene.location !== 'unknown') {
+    directives.push(`- Location: MUST be DIFFERENT from previous page (previous: ${previousScene.location})`)
+  }
+  
+  if (previousScene.timeOfDay && previousScene.timeOfDay !== 'unknown') {
+    directives.push(`- Time of day: MUST be DIFFERENT or PROGRESSING from previous page (previous: ${previousScene.timeOfDay})`)
+  }
+  
+  if (previousScene.weather && previousScene.weather !== 'unknown') {
+    directives.push(`- Weather: MUST be DIFFERENT or CHANGING from previous page (previous: ${previousScene.weather})`)
+  }
+  
+  if (previousScene.perspective && previousScene.perspective !== 'unknown') {
+    directives.push(`- Perspective: MUST be DIFFERENT from previous page (previous: ${previousScene.perspective})`)
+  }
+  
+  if (previousScene.composition && previousScene.composition !== 'unknown') {
+    directives.push(`- Composition: MUST be DIFFERENT from previous page (previous: ${previousScene.composition})`)
+  }
+  
+  directives.push('')
+  directives.push('ENSURE VISUAL VARIETY:')
+  directives.push('- Use different camera angles (wide shot, close-up, bird-eye, low-angle, etc.)')
+  directives.push('- Use different compositions (character left, right, centered, balanced, etc.)')
+  directives.push('- Show different parts of the environment or different locations')
+  directives.push('- Vary time of day to show story progression')
+  directives.push('- Vary weather/atmosphere when appropriate')
+  directives.push('- Show different character actions and poses')
+  
+  return directives.join('\n')
+}
+
 export default {
   VERSION,
   generateScenePrompt,
   generateFullPagePrompt,
   getAgeAppropriateSceneRules,
   getStyleSpecificDirectives,
+  // NEW: Scene diversity functions
+  extractSceneElements,
+  analyzeSceneDiversity,
+  getPerspectiveForPage,
+  getCompositionForPage,
+  getSceneDiversityDirectives,
 }
 
