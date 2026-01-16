@@ -181,7 +181,13 @@ export function buildCharacterPrompt(character: CharacterDescription): string {
   // Face
   parts.push(`with ${character.faceShape} face shape`)
   parts.push(`${character.skinTone} skin`)
-  parts.push(`${character.eyeColor} ${character.eyeShape} eyes`)
+  
+  // Eye color with special handling for hazel (NEW: 16 Ocak 2026)
+  // Hazel is often misinterpreted as pure green, so we add clarification
+  const eyeColorDesc = character.eyeColor?.toLowerCase() === 'hazel'
+    ? 'hazel (brown-green mix, not pure green)'
+    : character.eyeColor
+  parts.push(`${eyeColorDesc} ${character.eyeShape} eyes`)
   
   // Hair - VERY DETAILED
   const hairDesc = [
@@ -530,15 +536,98 @@ CONSISTENCY REQUIREMENTS:
   return consistencyNote
 }
 
+// ============================================================================
+// Cover-as-Reference Consistency Prompts (NEW: 16 Ocak 2026)
+// ============================================================================
+
+/**
+ * Generate consistency prompt when using cover as reference
+ * This emphasizes matching the cover character exactly for ALL characters
+ */
+export function getCoverReferenceConsistencyPrompt(
+  totalCharacters: number = 1,
+  additionalCharactersCount: number = 0
+): string {
+  const parts = [
+    'CRITICAL COVER REFERENCE CONSISTENCY:',
+    `- Reference images 1-${totalCharacters}: Original photos (user uploaded)`,
+    `- Reference image ${totalCharacters + 1}: Cover illustration (previously generated)`,
+    '',
+    'ALL CHARACTERS MUST MATCH COVER IMAGE EXACTLY:',
+    '- Main character: Match reference image (cover) exactly',
+  ]
+  
+  if (additionalCharactersCount > 0) {
+    parts.push(`- Additional characters (${additionalCharactersCount}): Each must match their appearance in cover image exactly`)
+  }
+  
+  parts.push(
+    '',
+    'FOR EACH CHARACTER, match these features from cover:',
+    '- Same hair color, style, length, and texture as in cover',
+    '- Same eye color and facial features as in cover',
+    '- Same skin tone as in cover',
+    '- Same body proportions as in cover',
+    '- Only clothing and pose can vary - ALL other features must be identical',
+    '',
+    'CRITICAL: Cover image shows ALL characters - use it as reference for ALL characters in this page'
+  )
+  
+  return parts.join('\n')
+}
+
+/**
+ * Generate cover quality emphasis prompt
+ * Used when generating the cover itself
+ */
+export function getCoverQualityEmphasisPrompt(
+  totalCharacters: number = 1,
+  additionalCharactersCount: number = 0
+): string {
+  const parts = [
+    'CRITICAL COVER QUALITY REQUIREMENTS:',
+    'This cover will be used as reference for ALL subsequent pages (pages 2-10)',
+    'Cover quality is EXTREMELY IMPORTANT - it determines character consistency across entire book',
+    '',
+    `COVER MUST INCLUDE ALL ${totalCharacters} CHARACTER(S):`,
+    '- Main character: Prominently featured, matching reference photo EXACTLY',
+  ]
+  
+  if (additionalCharactersCount > 0) {
+    parts.push(`- Additional characters (${additionalCharactersCount}): Each prominently featured, matching their reference photos EXACTLY`)
+  }
+  
+  parts.push(
+    '',
+    'FOR EACH CHARACTER IN COVER:',
+    '- Hair color, style, length, and texture must match reference photo PRECISELY',
+    '- Eye color must match reference photo EXACTLY',
+    '- Facial features must match reference photo EXACTLY',
+    '- Skin tone must match reference photo EXACTLY',
+    '- Body proportions must match reference photo EXACTLY',
+    '',
+    'Cover composition:',
+    '- All characters visible and clearly identifiable',
+    '- Balanced group composition',
+    '- Professional, print-ready, high-quality illustration',
+    '- This cover image will be the reference for ALL pages 2-10'
+  )
+  
+  return parts.join('\n')
+}
+
 export default {
   VERSION,
   generateCharacterAnalysisPrompt,
   buildCharacterPrompt,
   buildDetailedCharacterPrompt,
+  buildMultipleCharactersPrompt,
   CONSISTENCY_KEYWORDS,
   MULTI_BOOK_STRATEGY,
   formatCharacterForStorage,
   getCharacterForBookGeneration,
   generateSubsequentBookPrompt,
+  getCoverReferenceConsistencyPrompt,
+  getCoverQualityEmphasisPrompt,
 }
 

@@ -579,7 +579,9 @@ export function generateFullPagePrompt(
   sceneInput: SceneInput,
   illustrationStyle: string,
   ageGroup: string,
-  additionalCharactersCount: number = 0 // NEW: Number of additional characters
+  additionalCharactersCount: number = 0, // NEW: Number of additional characters
+  isCover: boolean = false, // NEW: Cover generation için (CRITICAL quality)
+  useCoverReference: boolean = false // NEW: Pages 2-10 için cover reference
 ): string {
   // Build scene prompt (hybrid: cinematic + descriptive)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
@@ -618,8 +620,58 @@ export function generateFullPagePrompt(
     promptParts.push('group composition, balanced arrangement of characters')
   }
   
-  // Special instructions for Page 1 (Book Cover)
-  if (sceneInput.pageNumber === 1) {
+  // ============================================================================
+  // COVER GENERATION - CRITICAL QUALITY REQUIREMENTS
+  // ============================================================================
+  if (isCover) {
+    promptParts.push('') // Empty line for emphasis
+    promptParts.push('CRITICAL COVER QUALITY REQUIREMENTS:')
+    promptParts.push('This cover will be used as reference for ALL subsequent pages (pages 2-10)')
+    promptParts.push('Cover quality is EXTREMELY IMPORTANT - it determines character consistency across entire book')
+    promptParts.push('')
+    promptParts.push('ALL CHARACTERS MUST BE PROMINENTLY FEATURED IN COVER:')
+    promptParts.push('Each character must match their reference photo EXACTLY:')
+    promptParts.push('- Hair color, style, length, and texture must match reference photo PRECISELY')
+    promptParts.push('- Eye color must match reference photo EXACTLY')
+    promptParts.push('- Facial features must match reference photo EXACTLY')
+    promptParts.push('- Skin tone must match reference photo EXACTLY')
+    promptParts.push('- Body proportions must match reference photo EXACTLY')
+    promptParts.push('')
+    promptParts.push('COVER COMPOSITION:')
+    if (additionalCharactersCount > 0) {
+      promptParts.push(`ALL ${additionalCharactersCount + 1} characters must be visible and prominently featured`)
+      promptParts.push('Group composition with balanced arrangement of all characters')
+      promptParts.push('Each character must be clearly identifiable and match their reference photo')
+    } else {
+      promptParts.push('Main character must be prominently featured and clearly identifiable')
+    }
+    promptParts.push('Professional, print-ready, high-quality illustration')
+    promptParts.push('This cover image will be the reference for ALL pages 2-10')
+    promptParts.push('')
+  }
+  
+  // ============================================================================
+  // COVER REFERENCE CONSISTENCY (Pages 2-10)
+  // ============================================================================
+  if (useCoverReference) {
+    promptParts.push('') // Empty line for emphasis
+    promptParts.push('CRITICAL COVER REFERENCE CONSISTENCY:')
+    promptParts.push('ALL characters must look EXACTLY like in cover image (last reference image)')
+    promptParts.push('The cover image shows how ALL characters should appear throughout the book')
+    promptParts.push('')
+    promptParts.push('Match ALL features from cover for EACH character:')
+    promptParts.push('- Main character: Match cover image exactly (hair style, length, color, eye color, facial features, skin tone)')
+    if (additionalCharactersCount > 0) {
+      promptParts.push(`- Additional characters (${additionalCharactersCount}): Each must match their appearance in cover image exactly`)
+    }
+    promptParts.push('- Only clothing and pose can change - ALL character features MUST stay identical to cover')
+    promptParts.push('')
+    promptParts.push('CRITICAL: Cover image shows ALL characters - use it as primary reference for character consistency')
+    promptParts.push('')
+  }
+  
+  // Special instructions for Page 1 (Book Cover) - Legacy support
+  if (sceneInput.pageNumber === 1 && !isCover) {
     promptParts.push('BOOK COVER ILLUSTRATION (NOT a book mockup, NOT a 3D book object, NOT a book on a shelf)')
     promptParts.push('FLAT, STANDALONE ILLUSTRATION that can be used as a book cover')
     
@@ -650,15 +702,30 @@ export function generateFullPagePrompt(
   promptParts.push('character should look like a stylized illustration that captures the child\'s features but in the chosen illustration style')
   promptParts.push('clearly an illustration, not a photograph')
   
-  // CLOTHING CONSISTENCY & THEME APPROPRIATENESS (ENHANCED: 15 Ocak 2026)
+  // CLOTHING CONSISTENCY & THEME APPROPRIATENESS (ENHANCED: 15 Ocak 2026, 16 Ocak 2026)
   const themeClothingStyle = getThemeAppropriateClothing(sceneInput.theme)
-  if (sceneInput.pageNumber === 1) {
-    // First page: Use theme-appropriate clothing
+  if (isCover) {
+    // Cover: Use theme-appropriate clothing - THIS WILL BE USED AS REFERENCE FOR ALL PAGES
+    promptParts.push(`CHARACTER CLOTHING (COVER - CRITICAL): Character must wear ${themeClothingStyle} - appropriate for ${sceneInput.theme} theme`)
+    promptParts.push('CRITICAL: The clothing shown in this cover will be used as reference for ALL subsequent pages (pages 2-10)')
+    promptParts.push('CRITICAL: Maintain exact same outfit (colors, style, details) throughout the entire book')
+    promptParts.push('DO NOT use formal wear (suits, ties, dress shoes, formal dresses) unless explicitly required by story')
+    promptParts.push('Clothing must match the theme and setting (e.g., camping → casual outdoor clothes, sports → sportswear)')
+  } else if (useCoverReference) {
+    // Pages 2-10: Use EXACT SAME clothing as cover (cover reference shows the clothing)
+    promptParts.push(`CHARACTER CLOTHING CONSISTENCY (CRITICAL): Character must wear the EXACT SAME clothing as shown in cover image (last reference image)`)
+    promptParts.push('CRITICAL: Match cover clothing EXACTLY - same colors, same style, same details')
+    promptParts.push('CRITICAL: Cover image shows the clothing that must be used throughout the entire book')
+    promptParts.push('ONLY change clothing if story text EXPLICITLY mentions a change (e.g., "changed into pajamas", "put on jacket")')
+    promptParts.push('If story does NOT mention clothing change, use EXACT SAME outfit as cover')
+    promptParts.push('DO NOT use formal wear - keep clothing theme-appropriate and casual')
+  } else if (sceneInput.pageNumber === 1) {
+    // First page (legacy - not cover): Use theme-appropriate clothing
     promptParts.push(`CHARACTER CLOTHING: Character must wear ${themeClothingStyle} - appropriate for ${sceneInput.theme} theme`)
     promptParts.push('DO NOT use formal wear (suits, ties, dress shoes, formal dresses) unless explicitly required by story')
     promptParts.push('Clothing must match the theme and setting (e.g., camping → casual outdoor clothes, sports → sportswear)')
   } else {
-    // Subsequent pages: Maintain consistency AND theme-appropriateness
+    // Subsequent pages (legacy - no cover reference): Maintain consistency AND theme-appropriateness
     promptParts.push(`CHARACTER CLOTHING CONSISTENCY: Character must wear the SAME clothing as previous pages, maintaining ${themeClothingStyle}`)
     promptParts.push('Only change clothing if story specifically mentions it (e.g., "changed into pajamas", "put on jacket")')
     promptParts.push('Maintain exact same outfit (colors, style, details) throughout story unless explicitly changed in narrative')

@@ -1,6 +1,7 @@
 # 🎨 Character Consistency Strategy
 
 **Created:** 10 Ocak 2026  
+**Last Update:** 16 Ocak 2026 (Cover-as-Reference Approach)  
 **Status:** ✅ Active  
 **Owner:** @prompt-manager
 
@@ -8,6 +9,7 @@
 
 ## 🎯 Problem Statement
 
+### Problem 1: Kitaplar Arası Tutarsızlık (Multi-Book Consistency)
 Kullanıcı bir çocuğun fotoğrafını yükleyip birden fazla kitap oluşturduğunda:
 - ❌ Her kitapta farklı karakter görünümü (tutarsızlık)
 - ❌ Her seferinde yeni analiz (maliyet)
@@ -15,9 +17,17 @@ Kullanıcı bir çocuğun fotoğrafını yükleyip birden fazla kitap oluşturdu
 
 **Hedef:** Aynı karakterin tüm kitaplarda tutarlı görünmesi.
 
+### Problem 2: Sayfa Arası Tutarsızlık (Within-Book Consistency) - NEW
+Aynı kitap içinde sayfa sayfa karakter tutarsızlığı:
+- ❌ Her sayfa için referans fotoğraf gönderiliyor, ama GPT-image-1.5 her seferinde fotoğrafı yeniden yorumluyor
+- ❌ Sonuç: Karakterler birbirine yakın ama %100 aynı değil (%60-70 tutarlılık)
+- ❌ Kullanıcıların en büyük şikayeti: "Karakterler her sayfada biraz farklı görünüyor"
+
+**Hedef:** Aynı kitap içinde tüm sayfalarda %80-90+ karakter tutarlılığı.
+
 ---
 
-## 🔑 Core Concept: Master Character
+## 🔑 Solution 1: Master Character (Multi-Book Consistency)
 
 ### 1. Fotoğraf Yükleme (İlk Kez)
 ```
@@ -40,7 +50,7 @@ Uses Master Character
       ↓
 Generates story with character
       ↓
-Generates images (DALL-E 3) with Master Character description
+Generates images (GPT-image-1.5) with Master Character description
       ↓
 Character looks same in all pages
 ```
@@ -57,6 +67,76 @@ Generates images with EXTRA consistency emphasis
       ↓
 Character looks EXACTLY like in Book 1
 ```
+
+**Sonuç:** Aynı karakter, farklı hikayeler, tutarlı görünüm.
+
+---
+
+## 🔑 Solution 2: Cover-as-Reference (Within-Book Consistency) - NEW
+
+### Problem
+- Her sayfa için referans fotoğraf gönderiliyor
+- GPT-image-1.5 her seferinde fotoğrafı yeniden yorumluyor
+- Sonuç: %60-70 tutarlılık (yetersiz)
+
+### Çözüm
+Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal fotoğraflar hem de cover görseli referans olarak kullanılıyor.
+
+### Workflow
+
+#### Page 1 (Cover) Generation
+```
+User uploads photo(s)
+      ↓
+Generate Page 1 (Cover) with ALL character photos
+      ↓
+CRITICAL: Cover must include ALL characters
+CRITICAL: Each character must match their photo EXACTLY
+CRITICAL: Cover quality is EXTREMELY IMPORTANT
+      ↓
+Save cover image URL
+```
+
+#### Pages 2-10 Generation
+```
+For each page (2-10):
+      ↓
+Reference Images: [original photos + cover image]
+      ↓
+Prompt: "ALL characters must look EXACTLY like in cover image"
+      ↓
+Generate page with cover reference
+      ↓
+Result: %80-90+ consistency
+```
+
+### Beklenen İyileşme
+
+| Metrik | Öncesi | Sonrası (Beklenen) |
+|--------|--------|-------------------|
+| Karakter Tutarlılığı | %60-70 | %80-90 |
+| Saç Uzunluğu/Stili | %50-60 | %85-95 |
+| Göz Rengi | %70-80 | %90-95 |
+| Yüz Özellikleri | %60-70 | %80-90 |
+
+### Maliyet
+- ✅ Ekstra maliyet: 0 TL (Cover zaten oluşturuluyor)
+- ✅ API Call sayısı: Aynı (10 sayfa için 10 call)
+- ✅ Multiple reference image: GPT-image-1.5 destekliyor, ekstra ücret yok
+
+### Cover Kalitesi - KRİTİK ÖNEM
+
+Cover kalitesi **EXTREMELY IMPORTANT** çünkü:
+1. Tüm sayfalarda (2-10) referans olarak kullanılacak
+2. Cover'daki karakter görünümü tüm kitap boyunca devam edecek
+3. Cover'da hata varsa, tüm sayfalarda tekrar edecek
+
+**Cover için özel gereksinimler:**
+- TÜM karakterler (main + additional) cover'da görünmeli
+- Her karakter referans fotoğrafına EXACTLY benzemeli
+- Saç rengi, uzunluğu, stili, göz rengi, yüz özellikleri, ten rengi PRECISELY match etmeli
+- Professional, print-ready, high-quality illustration
+- Balanced group composition (çoklu karakter için)
 
 ---
 

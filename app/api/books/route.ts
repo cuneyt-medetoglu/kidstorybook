@@ -404,6 +404,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
     // ====================================================================
     // STEP 2: GENERATE COVER IMAGE
     // ====================================================================
+    // Store cover image URL for page generation (NEW: 16 Ocak 2026)
+    let generatedCoverImageUrl: string | null = null
+    
     try {
       // Update status to 'generating'
       await updateBook(supabase, book.id, { status: 'generating' })
@@ -899,6 +902,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       const storageCoverUrl = publicUrlData?.publicUrl
 
       console.log('[Create Book] ✅ Cover uploaded to Supabase Storage')
+      
+      // Store cover URL for page generation (NEW: 16 Ocak 2026)
+      generatedCoverImageUrl = storageCoverUrl
+      console.log('[Create Book] 📸 Cover image URL stored for page generation:', generatedCoverImageUrl ? 'Yes ✅' : 'No ❌')
+      if (generatedCoverImageUrl) {
+        console.log('[Create Book] 📸 Cover image URL length:', generatedCoverImageUrl.length, 'chars')
+      }
 
       // Update book with cover image URL
       // Update book with cover image URL
@@ -943,15 +953,34 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const totalPages = pages.length
         
         // NEW: Get ALL characters' reference images (not just main character)
-        const referenceImageUrls = characters
+        const characterReferenceImageUrls = characters
           .map((char) => char.reference_photo_url)
           .filter((url): url is string => Boolean(url))
         
-        console.log(`[Create Book] 📸 Page images - Reference images: ${referenceImageUrls.length > 0 ? `Provided ✅ (${referenceImageUrls.length})` : 'Not provided ❌'}`)
-        if (referenceImageUrls.length > 0) {
-          referenceImageUrls.forEach((url, index) => {
+        // NEW: Get cover image URL if available (for pages 2+)
+        // Use generatedCoverImageUrl first (from cover generation), fallback to book.cover_image_url
+        const coverImageUrl = generatedCoverImageUrl || book.cover_image_url || null
+        
+        console.log(`[Create Book] 📸 Page images - Character reference images: ${characterReferenceImageUrls.length > 0 ? `Provided ✅ (${characterReferenceImageUrls.length})` : 'Not provided ❌'}`)
+        if (characterReferenceImageUrls.length > 0) {
+          characterReferenceImageUrls.forEach((url, index) => {
             console.log(`[Create Book] 📸 Page images - Reference image ${index + 1} URL length:`, url.length, 'chars')
           })
+        }
+        console.log(`[Create Book] 📸 Page images - Cover image source:`, {
+          fromGeneratedVariable: generatedCoverImageUrl ? 'Yes ✅' : 'No',
+          fromDatabase: book.cover_image_url ? 'Yes' : 'No',
+          final: coverImageUrl ? 'Available ✅ (will be used for pages 2+)' : 'Not available ❌'
+        })
+        if (coverImageUrl) {
+          console.log(`[Create Book] 📸 Page images - Cover image URL length:`, coverImageUrl.length, 'chars')
+          if (generatedCoverImageUrl) {
+            console.log(`[Create Book] 📸 Page images - ✅ Using cover URL from generation (not database)`)
+          } else if (book.cover_image_url) {
+            console.log(`[Create Book] 📸 Page images - ⚠️  Using cover URL from database (fallback)`)
+          }
+        } else {
+          console.log(`[Create Book] 📸 Page images - ❌ Cover image not available - pages will use only character photos`)
         }
         
         const characterPrompt = buildCharacterPrompt(character.description)
@@ -1032,13 +1061,19 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           sceneDescriptionLength: sceneDescription.length,
         })
 
-        // Generate full page prompt with correct parameters (NEW: Multiple characters)
+        // Generate full page prompt with correct parameters (NEW: Multiple characters, Cover reference)
+        // Note: coverImageUrl is already defined above (line ~951, outside the loop)
+        const isCoverPage = pageNumber === 1
+        const useCoverReference = !isCoverPage && coverImageUrl !== null
+        
         const fullPrompt = generateFullPagePrompt(
           characterPrompt,
           sceneInput,
           illustrationStyle,
           ageGroup,
-          additionalCharactersCount // NEW: Pass additional characters count
+          additionalCharactersCount, // NEW: Pass additional characters count
+          isCoverPage, // isCover: true for page 1 (cover), false for others
+          useCoverReference // useCoverReference: true for pages 2+ if cover exists
         )
 
         console.log(`[Create Book] 📝 Page ${pageNumber} prompt (first 200 chars):`, fullPrompt.substring(0, 200) + '...')
@@ -1075,7 +1110,20 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
 
         // Use /v1/images/edits if reference images available, otherwise /v1/images/generations
-        // NEW: Support multiple reference images (like cover generation)
+        // NEW: Support multiple reference images (character photos + cover image for pages 2+)
+        // For page 1: Only character reference photos
+        // For pages 2+: Character reference photos + Cover image
+        // Note: isCoverPage and useCoverReference are already defined above (line ~1045)
+        const referenceImageUrls = useCoverReference
+          ? [...characterReferenceImageUrls, coverImageUrl]
+          : characterReferenceImageUrls
+        
+        console.log(`[Create Book] Page ${pageNumber} - Reference images:`, {
+          characterPhotos: characterReferenceImageUrls.length,
+          coverImage: useCoverReference ? 'Yes ✅' : 'No',
+          totalReferences: referenceImageUrls.length
+        })
+        
         if (referenceImageUrls.length > 0) {
           // Convert reference image URLs to Blobs (support both data URL and HTTP URL)
           // Reference images format: Blob (binary data) sent as multipart/form-data
@@ -1083,37 +1131,42 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           
           for (let i = 0; i < referenceImageUrls.length; i += 1) {
             const referenceImageUrl = referenceImageUrls[i]
+            const isCoverRef = useCoverReference && i === referenceImageUrls.length - 1
+            const imageLabel = isCoverRef ? 'cover' : `character_${i + 1}`
             const imageProcessingStartTime = Date.now()
             
             try {
               if (referenceImageUrl.startsWith('data:')) {
-                console.log(`[Create Book] Page ${pageNumber} - 🔄 Processing data URL reference image ${i + 1}...`)
+                console.log(`[Create Book] Page ${pageNumber} - 🔄 Processing data URL ${imageLabel}...`)
                 // Data URL: extract base64 data
                 const base64Data = referenceImageUrl.split(',')[1]
                 const binaryData = Buffer.from(base64Data, 'base64')
                 const imageBlob = new Blob([binaryData], { type: 'image/png' })
-                imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
-                console.log(`[Create Book] Page ${pageNumber} - ✅ Data URL ${i + 1} converted to Blob, size:`, imageBlob.size, 'bytes')
+                imageBlobs.push({ blob: imageBlob, filename: `${imageLabel}.png` })
+                console.log(`[Create Book] Page ${pageNumber} - ✅ Data URL ${imageLabel} converted to Blob, size:`, imageBlob.size, 'bytes')
               } else {
                 // HTTP URL: download the image
-                console.log(`[Create Book] Page ${pageNumber} - 📥 Downloading reference image ${i + 1} from URL...`)
+                console.log(`[Create Book] Page ${pageNumber} - 📥 Downloading ${imageLabel} from URL...`)
                 console.log(`[Create Book] Page ${pageNumber} -   URL length:`, referenceImageUrl.length, 'chars')
+                if (isCoverRef) {
+                  console.log(`[Create Book] Page ${pageNumber} -   🎨 This is COVER IMAGE (will be used as reference for character consistency)`)
+                }
                 const downloadStartTime = Date.now()
                 const imageResponse = await fetch(referenceImageUrl)
                 const downloadTime = Date.now() - downloadStartTime
-                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Download ${i + 1} took:`, downloadTime, 'ms')
+                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Download ${imageLabel} took:`, downloadTime, 'ms')
                 
                 if (!imageResponse.ok) {
-                  throw new Error(`Failed to download reference image ${i + 1}: ${imageResponse.status} ${imageResponse.statusText}`)
+                  throw new Error(`Failed to download ${imageLabel}: ${imageResponse.status} ${imageResponse.statusText}`)
                 }
                 
                 const imageBuffer = await imageResponse.arrayBuffer()
                 const imageBlob = new Blob([imageBuffer], { type: 'image/png' })
-                imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
+                imageBlobs.push({ blob: imageBlob, filename: `${imageLabel}.png` })
                 const processingTime = Date.now() - imageProcessingStartTime
-                console.log(`[Create Book] Page ${pageNumber} - ✅ Reference image ${i + 1} downloaded successfully`)
-                console.log(`[Create Book] Page ${pageNumber} - 📊 Image blob ${i + 1} size:`, imageBlob.size, 'bytes')
-                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Total processing time ${i + 1}:`, processingTime, 'ms')
+                console.log(`[Create Book] Page ${pageNumber} - ✅ ${imageLabel} downloaded successfully`)
+                console.log(`[Create Book] Page ${pageNumber} - 📊 Image blob ${imageLabel} size:`, imageBlob.size, 'bytes')
+                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Total processing time ${imageLabel}:`, processingTime, 'ms')
               }
             } catch (imageError) {
               const processingTime = Date.now() - imageProcessingStartTime
@@ -1146,9 +1199,14 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             console.log(`[Create Book] Page ${pageNumber} -   - Size:`, imageSize)
             console.log(`[Create Book] Page ${pageNumber} -   - Quality:`, imageQuality)
             console.log(`[Create Book] Page ${pageNumber} -   - Image blobs:`, imageBlobs.length)
+            console.log(`[Create Book] Page ${pageNumber} -   - Character photos:`, characterReferenceImageUrls.length)
+            console.log(`[Create Book] Page ${pageNumber} -   - Cover image:`, useCoverReference ? 'Yes ✅ (for consistency)' : 'No')
             console.log(`[Create Book] Page ${pageNumber} -   - Image format: Blob (multipart/form-data)`)
             console.log(`[Create Book] Page ${pageNumber} -   - Prompt included: Yes ✅`)
             console.log(`[Create Book] Page ${pageNumber} -   - Reference images included: Yes ✅ (${imageBlobs.length} as Blobs)`)
+            if (useCoverReference) {
+              console.log(`[Create Book] Page ${pageNumber} -   - 🎨 COVER REFERENCE ACTIVE: Cover image will be used for character consistency`)
+            }
 
             const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
               method: 'POST',

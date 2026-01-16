@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Image Generation Prompts**
 
-**Version:** 1.0.5  
+**Version:** 1.0.6  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 16 Ocak 2026 (Multiple Reference Images, Enhanced Character Descriptions)  
+**Last Update:** 16 Ocak 2026 (Cover-as-Reference for Character Consistency)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -23,6 +23,12 @@ Bu template, **gpt-image-1.5** (default) / **1024x1536** (portrait) / **quality:
 
 **Kritik Hedef:** Yüklenen çocuk fotoğrafındaki çocuğa mümkün olduğunca benzeyen karakterler üretmek.
 
+**NEW (16 Ocak 2026): Cover-as-Reference Yaklaşımı**
+- Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal fotoğraflar hem de cover görseli referans olarak kullanılıyor
+- Cover kalitesi KRİTİK - tüm sayfalarda referans olarak kullanılacak
+- Cover'da TÜM karakterler (main + additional) görünmeli
+- Hedef: %80-90+ karakter tutarlılığı (önceki %60-70'den iyileştirme)
+
 ---
 
 ## 🎯 Core Principles
@@ -32,6 +38,64 @@ Bu template, **gpt-image-1.5** (default) / **1024x1536** (portrait) / **quality:
 3. **Stil Tutarlılığı:** Tüm görseller aynı illustration style'da olmalı
 4. **Yaş Uygunluğu:** Age-appropriate scenes ve content
 5. **Kalite:** Print-ready, professional children's book illustrations
+6. **Cover-as-Reference (NEW):** Cover tüm sayfalarda referans olarak kullanılır
+
+---
+
+## 🎯 Cover-as-Reference Yaklaşımı (NEW: 16 Ocak 2026)
+
+### Sorun
+- Her sayfa için referans fotoğraf gönderiliyor, ama GPT-image-1.5 her seferinde fotoğrafı yeniden yorumluyor
+- Sonuç: Karakterler birbirine yakın ama %100 aynı değil (%60-70 tutarlılık)
+
+### Çözüm
+Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal fotoğraflar hem de cover görseli referans olarak kullanılıyor.
+
+### Workflow
+
+#### Page 1 (Cover) Generation
+```
+Reference Images: [photo1.jpg, photo2.jpg, ...] (All character photos)
+Prompt: 
+- CRITICAL COVER QUALITY REQUIREMENTS
+- This cover will be used as reference for ALL subsequent pages
+- ALL characters must be prominently featured
+- Each character must match their reference photo EXACTLY
+- Professional, print-ready, high-quality illustration
+```
+
+#### Pages 2-10 Generation
+```
+Reference Images: [photo1.jpg, photo2.jpg, ..., cover.png] (Photos + Cover)
+Prompt:
+- CRITICAL COVER REFERENCE CONSISTENCY
+- ALL characters must look EXACTLY like in cover image
+- Match ALL features from cover (hair, eyes, face, skin tone)
+- Only clothing and pose can change
+```
+
+### Beklenen İyileşme
+
+| Metrik | Öncesi | Sonrası (Beklenen) |
+|--------|--------|-------------------|
+| Karakter Tutarlılığı | %60-70 | %80-90 |
+| Saç Uzunluğu/Stili | %50-60 | %85-95 |
+| Göz Rengi | %70-80 | %90-95 |
+| Yüz Özellikleri | %60-70 | %80-90 |
+
+### Cover Kalitesi - KRİTİK ÖNEM
+
+Cover kalitesi **EXTREMELY IMPORTANT** çünkü:
+1. Tüm sayfalarda (2-10) referans olarak kullanılacak
+2. Cover'daki karakter görünümü tüm kitap boyunca devam edecek
+3. Cover'da hata varsa, tüm sayfalarda tekrar edecek
+
+**Cover için özel gereksinimler:**
+- TÜM karakterler (main + additional) cover'da görünmeli
+- Her karakter referans fotoğrafına EXACTLY benzemeli
+- Saç rengi, uzunluğu, stili, göz rengi, yüz özellikleri, ten rengi PRECISELY match etmeli
+- Professional, print-ready, high-quality illustration
+- Balanced group composition (çoklu karakter için)
 
 ---
 

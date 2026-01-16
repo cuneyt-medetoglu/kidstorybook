@@ -430,6 +430,16 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026)
 
 ### 3.5 AI Entegrasyonu ✅
+- [x] **3.5.10** Karakter Tutarlılığı İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Göz rengi (hazel) prompt iyileştirmesi: "hazel (brown-green mix, not pure green)" açıklaması
+  - [x] Elbise tutarlılığı: Cover'daki elbiseler sayfalarda da aynı olmalı - prompt vurgusu
+  - [x] /api/books route'unda cover image'ı page generation'da referans olarak kullan
+  - [x] Log iyileştirmeleri: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri
+  - **Detaylar:**
+    - `lib/prompts/image/v1.0.0/character.ts`: Hazel göz rengi için açıklama eklendi
+    - `lib/prompts/image/v1.0.0/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
+    - `app/api/books/route.ts`: Cover image page generation'da referans olarak kullanılıyor (pages 2+)
+    - Log'lar: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri eklendi
 - [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
 - [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
   - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça

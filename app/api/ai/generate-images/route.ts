@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ====================================================================
-    // 4. PREPARE IMAGE GENERATION
+    // 4. PREPARE IMAGE GENERATION - GET ALL CHARACTERS
     // ====================================================================
     const pages = book.story_data.pages
     const totalPages = pages.length
@@ -105,13 +105,26 @@ export async function POST(request: NextRequest) {
       return errorResponse(`Invalid endPage: ${actualEndPage}. Must be between ${startPage} and ${totalPages}`, 400)
     }
 
+    // Get ALL characters for this book (main + additional)
+    const characterIds = book.story_data?.metadata?.characterIds || [book.character_id]
+    const characters = await Promise.all(
+      characterIds.map(async (charId: string) => {
+        const { data } = await getCharacterById(supabase, charId)
+        return data
+      })
+    )
+    const validCharacters = characters.filter(Boolean)
+    
     console.log(`[Image Generation] Starting generation for book ${bookId}`)
     console.log(`[Image Generation] Pages: ${startPage}-${actualEndPage} of ${totalPages}`)
     console.log(`[Image Generation] Model: ${model} | Size: ${size} | Quality: ${quality}`)
-    console.log(`[Image Generation] Character: ${character.name} (${character.id})`)
+    console.log(`[Image Generation] Characters: ${validCharacters.length} (main: ${character.name})`)
+    if (validCharacters.length > 1) {
+      console.log(`[Image Generation] Additional characters:`, validCharacters.slice(1).map(c => c.name).join(', '))
+    }
 
     // ====================================================================
-    // 5. GENERATE IMAGES FOR EACH PAGE
+    // 5. GENERATE IMAGES FOR EACH PAGE (COVER-AS-REFERENCE APPROACH)
     // ====================================================================
     const generatedImages: Array<{
       pageNumber: number
@@ -125,19 +138,198 @@ export async function POST(request: NextRequest) {
       throw new Error('OPENAI_API_KEY is not configured')
     }
 
-    // Get reference photo URL if available
-    const referenceImageUrl = character.reference_photo_url || null
+    // Get ALL character reference photos
+    const allCharacterReferences = validCharacters
+      .map((char) => char.reference_photo_url)
+      .filter((url): url is string => Boolean(url))
+
+    console.log(`[Image Generation] Total reference images: ${allCharacterReferences.length}`)
 
     // Build character prompt once (used for all pages)
-    const characterPrompt = buildCharacterPrompt(character.description)
+    const additionalCharacters = validCharacters.slice(1).map((char) => ({
+      type: char.character_type || {
+        group: "Child",
+        value: "Child",
+        displayName: char.name,
+      },
+      description: char.description,
+    }))
+    
+    const characterPrompt = additionalCharacters.length > 0
+      ? require('@/lib/prompts/image/v1.0.0/character').buildMultipleCharactersPrompt(character.description, additionalCharacters)
+      : buildCharacterPrompt(character.description)
     
     // Get age group from book metadata or default
     const ageGroup = book.story_data?.metadata?.ageGroup || book.age_group || 'preschool'
     
     // Get theme key from book
     const themeKey = book.theme || 'adventure'
+    
+    // Cover image URL (will be set after Page 1 generation)
+    let coverImageUrl: string | null = null
 
-    for (let i = startPage - 1; i < actualEndPage; i++) {
+    // ====================================================================
+    // STEP 1: GENERATE COVER (PAGE 1) FIRST
+    // ====================================================================
+    if (startPage === 1 && actualEndPage >= 1) {
+      const coverPage = pages[0]
+      const coverPageNumber = 1
+      
+      console.log(`[Image Generation] ======================================`)
+      console.log(`[Image Generation] STEP 1: Generating COVER (Page 1) FIRST`)
+      console.log(`[Image Generation] ======================================`)
+      console.log(`[Image Generation] Cover will be used as reference for Pages 2-${totalPages}`)
+      console.log(`[Image Generation] ALL ${validCharacters.length} character(s) MUST appear in cover`)
+      
+      const illustrationStyle = book.illustration_style
+      const coverSceneDescription = coverPage.imagePrompt || coverPage.sceneDescription || coverPage.text
+      const coverCharacterAction = validCharacters.length > 1
+        ? `all ${validCharacters.length} characters standing together prominently, looking at the viewer with a sense of wonder and adventure`
+        : coverPage.text || coverSceneDescription
+      
+      const coverMood = themeKey === 'adventure' ? 'exciting' :
+                        themeKey === 'fantasy' ? 'mysterious' :
+                        themeKey === 'space' ? 'inspiring' :
+                        themeKey === 'sports' ? 'exciting' :
+                        'happy'
+      
+      const coverSceneInput = {
+        pageNumber: coverPageNumber,
+        sceneDescription: coverSceneDescription,
+        theme: themeKey,
+        mood: coverMood,
+        characterAction: coverCharacterAction,
+        focusPoint: 'character' as const,
+      }
+
+      // Generate cover prompt with isCover=true flag
+      const coverPrompt = generateFullPagePrompt(
+        characterPrompt,
+        coverSceneInput,
+        illustrationStyle,
+        ageGroup,
+        additionalCharacters.length,
+        true, // isCover = true (CRITICAL: Cover quality is essential)
+        false // useCoverReference = false (no cover yet)
+      )
+
+      console.log(`[Image Generation] Cover prompt length:`, coverPrompt.length)
+      console.log(`[Image Generation] Cover prompt preview:`, coverPrompt.substring(0, 300) + '...')
+      
+      // Build FormData for cover (only original reference photos)
+      const coverFormData = new FormData()
+      coverFormData.append('model', model)
+      coverFormData.append('prompt', coverPrompt)
+      coverFormData.append('size', size)
+      coverFormData.append('quality', quality)
+      
+      // Add ALL character reference images to cover
+      console.log(`[Image Generation] Adding ${allCharacterReferences.length} reference images to cover`)
+      for (let idx = 0; idx < allCharacterReferences.length; idx++) {
+        const imgUrl = allCharacterReferences[idx]
+        
+        if (imgUrl.startsWith('data:')) {
+          const base64Data = imgUrl.split(',')[1]
+          const mimeType = imgUrl.split(';')[0].split(':')[1]
+          const binaryStr = atob(base64Data)
+          const len = binaryStr.length
+          const bytes = new Uint8Array(len)
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryStr.charCodeAt(i)
+          }
+          const blob = new Blob([bytes], { type: mimeType })
+          coverFormData.append('image[]', blob, `reference_${idx}.png`)
+        } else {
+          const imageRes = await fetch(imgUrl)
+          const imageBlob = await imageRes.blob()
+          coverFormData.append('image[]', imageBlob, `reference_${idx}.png`)
+        }
+      }
+      
+      // Generate cover
+      const coverApiResponse = await fetch('https://api.openai.com/v1/images/edits', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: coverFormData,
+      })
+
+      if (!coverApiResponse.ok) {
+        const errorText = await coverApiResponse.text()
+        console.error(`[Image Generation] Cover generation failed:`, coverApiResponse.status, errorText)
+        throw new Error(`Cover generation failed: ${coverApiResponse.status} - ${errorText}`)
+      }
+
+      const coverApiResult = await coverApiResponse.json()
+      const coverTempUrl = coverApiResult.data?.[0]?.url
+
+      if (!coverTempUrl) {
+        throw new Error('No cover image URL found in GPT-image API response')
+      }
+
+      console.log(`[Image Generation] ✅ Cover generated successfully`)
+      
+      // Upload cover to Supabase Storage
+      const coverImageBuffer = await fetch(coverTempUrl).then((res) => res.arrayBuffer())
+      const coverFileName = `cover_${Date.now()}.png`
+      const coverFilePath = `${user.id}/books/${bookId}/${coverFileName}`
+
+      const { error: coverUploadError } = await supabase.storage
+        .from('book-images')
+        .upload(coverFilePath, coverImageBuffer, {
+          contentType: 'image/png',
+          upsert: false,
+        })
+
+      if (coverUploadError) {
+        console.error(`[Image Generation] Cover upload failed:`, coverUploadError)
+        throw new Error(`Failed to upload cover: ${coverUploadError.message}`)
+      }
+
+      const { data: coverPublicUrlData } = supabase.storage
+        .from('book-images')
+        .getPublicUrl(coverFilePath)
+
+      coverImageUrl = coverPublicUrlData?.publicUrl || coverTempUrl
+
+      console.log(`[Image Generation] ✅ Cover uploaded to storage:`, coverImageUrl)
+      
+      generatedImages.push({
+        pageNumber: coverPageNumber,
+        imageUrl: coverImageUrl,
+        storagePath: coverFilePath,
+        prompt: coverPrompt,
+      })
+
+      imagesGenerated++
+
+      // Update cover page in database
+      const updatedPagesAfterCover = [...pages]
+      updatedPagesAfterCover[0] = {
+        ...updatedPagesAfterCover[0],
+        imageUrl: coverImageUrl,
+      }
+
+      await updateBook(supabase, bookId, {
+        story_data: {
+          ...book.story_data,
+          pages: updatedPagesAfterCover,
+        },
+      })
+      
+      console.log(`[Image Generation] ======================================`)
+      console.log(`[Image Generation] Cover generation COMPLETE`)
+      console.log(`[Image Generation] Cover URL will be used as reference for remaining pages`)
+      console.log(`[Image Generation] ======================================`)
+    }
+
+    // ====================================================================
+    // STEP 2: GENERATE PAGES 2-10 (WITH COVER AS REFERENCE)
+    // ====================================================================
+    const pagesToGenerate = startPage === 1 ? 2 : startPage
+    
+    for (let i = pagesToGenerate - 1; i < actualEndPage; i++) {
       const page = pages[i]
       const pageNumber = page.pageNumber
 
@@ -150,11 +342,9 @@ export async function POST(request: NextRequest) {
       // Extract character action from page text
       const characterAction = page.text || sceneDescription
       
-      // Determine focus point (first page = character focus, last page = balanced, others = balanced)
+      // Determine focus point
       const focusPoint: 'character' | 'environment' | 'balanced' = 
-        pageNumber === 1 ? 'character' : 
-        pageNumber === totalPages ? 'balanced' : 
-        'balanced'
+        pageNumber === totalPages ? 'balanced' : 'balanced'
       
       // Determine mood from theme or use default
       const mood = themeKey === 'adventure' ? 'exciting' :
@@ -173,57 +363,45 @@ export async function POST(request: NextRequest) {
         focusPoint,
       }
 
-      // Generate full page prompt with correct parameters
+      // Generate full page prompt with useCoverReference=true
       const fullPrompt = generateFullPagePrompt(
         characterPrompt,
         sceneInput,
         illustrationStyle,
-        ageGroup
+        ageGroup,
+        additionalCharacters.length,
+        false, // isCover = false
+        true // useCoverReference = true (use cover as reference)
       )
 
       console.log(`[Image Generation] Page ${pageNumber} prompt:`, fullPrompt.substring(0, 200) + '...')
 
-      // Build input array for /v1/responses endpoint (must be items with allowed types)
-      const messageContent: any[] = [
-        {
-          type: 'input_text',
-          text: fullPrompt,
-        },
-      ]
-
-      // Add reference image if available
-      // image_url must be a direct string (URL), not an object!
-      if (referenceImageUrl) {
-        messageContent.push({
-          type: 'input_image',
-          image_url: referenceImageUrl, // ✅ Direkt string (URL), object değil!
-        })
-      }
-
-      const inputItems: any[] = [
-        {
-          type: 'message',
-          role: 'user',
-          content: messageContent,
-        },
-      ]
-
-      // Call GPT-image API using /v1/images/edits endpoint
-      // This endpoint supports text prompt + reference image (multimodal)
-      
+      // Build FormData with ALL reference images + Cover image
       const formData = new FormData()
       formData.append('model', model)
       formData.append('prompt', fullPrompt)
       formData.append('size', size)
       formData.append('quality', quality)
       
-      // Add reference image if available
-      if (referenceImageUrl) {
-        // Check if it's a data URL (base64)
-        if (referenceImageUrl.startsWith('data:')) {
+      // Combine: Original character photos + Cover image
+      const referenceImages = coverImageUrl 
+        ? [...allCharacterReferences, coverImageUrl]
+        : allCharacterReferences
+      
+      console.log(`[Image Generation] Page ${pageNumber} references:`, {
+        originalPhotos: allCharacterReferences.length,
+        coverImage: coverImageUrl ? 'Yes' : 'No',
+        totalReferences: referenceImages.length
+      })
+      
+      // Add ALL reference images (original photos + cover)
+      for (let idx = 0; idx < referenceImages.length; idx++) {
+        const imgUrl = referenceImages[idx]
+        
+        if (imgUrl.startsWith('data:')) {
           // Convert base64 to Blob
-          const base64Data = referenceImageUrl.split(',')[1]
-          const mimeType = referenceImageUrl.split(';')[0].split(':')[1]
+          const base64Data = imgUrl.split(',')[1]
+          const mimeType = imgUrl.split(';')[0].split(':')[1]
           const binaryStr = atob(base64Data)
           const len = binaryStr.length
           const bytes = new Uint8Array(len)
@@ -231,90 +409,12 @@ export async function POST(request: NextRequest) {
             bytes[i] = binaryStr.charCodeAt(i)
           }
           const blob = new Blob([bytes], { type: mimeType })
-          formData.append('image', blob, 'reference.png')
+          formData.append('image[]', blob, `reference_${idx}.png`)
         } else {
-          // Fetch image from URL and append as Blob
-          const imageRes = await fetch(referenceImageUrl)
+          // Fetch image from URL
+          const imageRes = await fetch(imgUrl)
           const imageBlob = await imageRes.blob()
-          formData.append('image', imageBlob, 'reference.png')
-        }
-      } else {
-        // Fallback to generations if no reference image
-        // (Same logic as generate-cover)
-        if (!referenceImageUrl) {
-          console.log(`[Image Generation] No reference image for page ${pageNumber}, switching to /v1/images/generations`)
-          const genResponse = await fetch('https://api.openai.com/v1/images/generations', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              model,
-              prompt: fullPrompt,
-              n: 1,
-              size,
-              quality,
-              // NOTE: response_format is NOT supported for GPT-image models
-              // Response always returns URL format by default
-            })
-          })
-          
-          if (!genResponse.ok) {
-             const errorText = await genResponse.text()
-             throw new Error(`GPT-image Generation API error: ${genResponse.status} - ${errorText}`)
-          }
-          
-          const genResult = await genResponse.json()
-          const imageUrl = genResult.data[0].url
-          
-          // Use this imageUrl for the rest of the flow...
-          // We need to jump to image processing logic below
-          
-          // ... (Common image processing logic: download, upload, etc.)
-          console.log(`[Image Generation] Page ${pageNumber} image generated:`, imageUrl)
-
-          // Download and upload to Supabase Storage
-          const imageBuffer = await fetch(imageUrl).then((res) => res.arrayBuffer())
-          const fileName = `page_${pageNumber}_${Date.now()}.png`
-          const filePath = `${user.id}/books/${bookId}/${fileName}`
-
-          const { error: uploadError } = await supabase.storage
-            .from('book-images')
-            .upload(filePath, imageBuffer, {
-              contentType: 'image/png',
-              upsert: false,
-            })
-
-          if (uploadError) {
-            console.error(`[Image Generation] Storage upload error for page ${pageNumber}:`, uploadError)
-            // Continue with next page, but log error
-            generatedImages.push({
-              pageNumber,
-              imageUrl: imageUrl, // Use temporary URL
-              storagePath: 'upload_failed',
-              prompt: fullPrompt,
-              revisedPrompt: genResult.data[0].revised_prompt,
-            })
-            continue // Next page
-          }
-
-          const { data: publicUrlData } = supabase.storage
-            .from('book-images')
-            .getPublicUrl(filePath)
-
-          const storageImageUrl = publicUrlData?.publicUrl || imageUrl
-
-          generatedImages.push({
-            pageNumber,
-            imageUrl: storageImageUrl,
-            storagePath: filePath,
-            prompt: fullPrompt,
-            revisedPrompt: genResult.data[0].revised_prompt,
-          })
-          imagesGenerated++
-          totalCost += 0.04 // Placeholder cost
-          continue // Skip the rest of the loop for this page
+          formData.append('image[]', imageBlob, `reference_${idx}.png`)
         }
       }
 
