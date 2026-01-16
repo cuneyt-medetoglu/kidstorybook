@@ -2,8 +2,9 @@
 
 **KidStoryBook Platform - Image Generation Prompts**
 
-**Version:** 1.0.1  
-**Release Date:** 15 Ocak 2026 (Illustration Style İyileştirmesi)  
+**Version:** 1.0.5  
+**Release Date:** 15 Ocak 2026  
+**Last Update:** 16 Ocak 2026 (Multiple Reference Images, Enhanced Character Descriptions)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -114,9 +115,17 @@ Create an illustration for each page:
    - **Pay special attention to hair length - this is a common mistake. If the photo shows short hair, the illustration must show short hair. If long, show long.**
 
    [IF MULTIPLE CHARACTERS EXIST]
+   - **CRITICAL INSTRUCTION FOR MULTIPLE CHARACTERS WITH REFERENCE IMAGES:**
+     * You are provided with [TOTAL_CHARACTER_COUNT] reference image(s).
+     * Each reference image corresponds to one character below, in order (image 1 → character 1, image 2 → character 2, etc.).
+     * You MUST match each character's text description with its corresponding reference image.
+     * Pay close attention to EACH character's eye color, hair color, age, and unique features as specified.
+     * Do NOT mix features between characters - each character must maintain their individual characteristics.
+   
    - **Additional Characters:** Each additional character must maintain their unique appearance:
-     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1)
-     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1)
+     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_2_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_2_TYPE])
+     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_3_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_3_TYPE])
+     * **For Pets:** [PET_NAME] (a [PET_TYPE]) - [FUR_COLOR] fur, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - friendly and playful expression
      * **CRITICAL:** Each character must maintain their individual characteristics. Do NOT mix features between characters.
      * **CRITICAL:** Match each character's text description with its corresponding reference image (image 1 → character 1, image 2 → character 2, etc.)
    [END IF]
@@ -331,6 +340,15 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 - ✅ **Anatomical correctness directives** - Positive prompts for proper anatomy (5 fingers, 2 hands, etc.)
 - 🎯 **Goal:** Match quality of Magical Children's Book examples
 
+### v1.0.5 (16 Ocak 2026 - Multiple Reference Images & Enhanced Character Descriptions)
+- ✅ **Multiple Reference Images Support** - All characters' reference images sent to API (image[] format)
+- ✅ **CRITICAL INSTRUCTION for Multiple Characters** - Reference image matching directives
+- ✅ **Enhanced Family Member Descriptions** - Age, hair color, eye color, special features included
+- ✅ **Individual Character Emphasis** - Eye color preservation, specific person not generic
+- ✅ **Character Name Usage** - Explicit character names (Zeynep, Cüneyt) instead of generic terms
+- ✅ **Enhanced Fallback Descriptions** - Better descriptions when character.description is null
+- 🎯 **Goal:** All characters in pages match their reference images (not just cover)
+
 ---
 
 ## 🎬 Cinematic Quality Enhancements (NEW: 15 Ocak 2026)
@@ -422,7 +440,7 @@ ANATOMICAL CORRECTNESS (CRITICAL):
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026  
+**Son Güncelleme:** 16 Ocak 2026  
 **Yöneten:** @prompt-manager agent  
 **Not:** Bu template sürekli geliştirilmektedir. Feedback'lere göre güncellenecektir.
 

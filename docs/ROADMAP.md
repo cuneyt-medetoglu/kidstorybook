@@ -35,7 +35,7 @@
   - ✅ Faz 2.5: E-book Viewer (100%)
   - ✅ Faz 2.6: Kullanıcı Dashboard (100%)
 - **Faz 3:** Backend ve AI Entegrasyonu tamamlandı (100%) ✅
-  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026), ✅ Bug fix'ler: Reference image handling, theme sports mapping, storage sanitization (16 Ocak 2026), ✅ Kalite iyileştirmeleri: El/parmak anatomisi direktifleri, çoklu karakter referans eşleştirme, FormData image[] format düzeltmesi (16 Ocak 2026)
+  - ✅ Faz 3.5: AI Entegrasyonu (100%) ✅ Organization verification onaylandı, ✅ Cover/page images entegrasyonu tamamlandı, ✅ Kitap oluşturma ve görüntüleme tamamen çalışıyor (11 Ocak 2026), ✅ Bug fix'ler: Reference image handling, theme sports mapping, storage sanitization (16 Ocak 2026), ✅ Kalite iyileştirmeleri: El/parmak anatomisi direktifleri, çoklu karakter referans eşleştirme, FormData image[] format düzeltmesi (16 Ocak 2026), ✅ Sayfa görselleri için multiple reference images desteği, localStorage kaydetme düzeltmesi, Step 6 karakter bilgileri gösterimi (16 Ocak 2026)
   - ✅ Faz 3.6: PDF Generation (100%) ✅
   - ✅ Faz 3.7: Webhook'lar → Faz 4'e taşındı ✅ (15 Ocak 2026)
 - **🎉 MVP Durumu:** Kitap oluşturma, görüntüleme ve PDF indirme tamamen çalışıyor! (11 Ocak 2026)
@@ -450,6 +450,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅
   - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
   - [x] Reference image support (master character photo)
+  - [x] **Multiple reference images support** (cover + pages için tüm karakterlerin reference image'ları) ✅ (16 Ocak 2026)
   - [x] Master Character description kullanarak tutarlı görsel üret
   - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
   - [x] Size selection (1024x1024, 1024x1792, 1792x1024)

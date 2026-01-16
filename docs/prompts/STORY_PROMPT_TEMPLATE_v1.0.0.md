@@ -2,8 +2,9 @@
 
 **KidStoryBook Platform - Story Generation Prompts**
 
-**Version:** 1.0.0  
+**Version:** 1.0.1  
 **Release Date:** 15 Ocak 2026  
+**Last Update:** 16 Ocak 2026 (Multiple Characters Support)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -268,6 +269,14 @@ The story should focus on nature, animals, and the environment. Include educatio
 - ✅ Çok dilli destek (story text için)
 - ✅ Detaylı görsel prompt'ları her sayfa için
 
+### v1.0.1 (16 Ocak 2026 - Multiple Characters Support)
+- ✅ **Enhanced Additional Characters Section** - Detailed appearance descriptions (age, hair color, eye color, features)
+- ✅ **Character Name Usage Directive** - Explicit instruction to use character names (Zeynep, Cüneyt) instead of generic terms like "friends" or "companions"
+- ✅ **Pets Support** - Fur color, eye color, special features for pets
+- ✅ **Family Members Support** - Age, hair color, eye color, special features for family members
+- ✅ **Other Characters Support** - Hair color, eye color, special features for other character types
+- 🎯 **Goal:** Story uses specific character names and detailed descriptions, not generic terms
+
 ---
 
 ## 🔗 Related Documents
@@ -302,7 +311,7 @@ The story should focus on nature, animals, and the environment. Include educatio
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026  
+**Son Güncelleme:** 16 Ocak 2026  
 **Yöneten:** @prompt-manager agent  
 **Not:** Bu template sürekli geliştirilmektedir. Feedback'lere göre güncellenecektir.
 

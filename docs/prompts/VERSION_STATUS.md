@@ -1,6 +1,6 @@
 # 📊 Prompt Version Sync Status
 
-**Son Kontrol:** 15 Ocak 2026  
+**Son Kontrol:** 16 Ocak 2026  
 **Sorumlu:** @project-manager
 
 ---
@@ -9,19 +9,29 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.0.0 | v1.0.0 | ✅ Synced | 2026-01-10 | 2026-01-10 |
-| Image | v1.0.0 | v1.0.0 | ✅ Synced | 2026-01-15 | 2026-01-15 |
+| Story | v1.0.1 | v1.0.1 | ✅ Synced | 2026-01-16 | 2026-01-16 |
+| Image | v1.0.5 | v1.0.5 | ✅ Synced | 2026-01-16 | 2026-01-16 |
 
 ---
 
 ## 📝 Son Değişiklikler
 
-### Image Prompts (v1.0.0) - 15 Ocak 2026
-- ✅ Facial skin quality controls eklendi (blemishes, moles, marks)
-- ✅ Logical/pose error prevention eklendi (body rotation, orientation)
-- ✅ Anatomical correctness directives güçlendirildi
+### Story Prompts (v1.0.1) - 16 Ocak 2026
+- ✅ Multiple characters support with detailed appearance descriptions
+- ✅ Character name usage emphasized (not generic terms)
+- ✅ Age, hair color, eye color, special features for all character types
 
-**Kod:** `lib/prompts/image/v1.0.0/negative.ts`  
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`  
+**Dokümantasyon:** `STORY_PROMPT_TEMPLATE_v1.0.0.md`  
+**Changelog:** `CHANGELOG.md`
+
+### Image Prompts (v1.0.5) - 16 Ocak 2026
+- ✅ Multiple reference images support (all characters' reference images sent)
+- ✅ CRITICAL INSTRUCTION for multiple characters with reference images
+- ✅ Enhanced family member descriptions (age, hair, eye color, features)
+- ✅ Individual character emphasis (eye color preservation, specific person not generic)
+
+**Kod:** `lib/prompts/image/v1.0.0/character.ts`  
 **Dokümantasyon:** `IMAGE_PROMPT_TEMPLATE_v1.0.0.md`  
 **Changelog:** `CHANGELOG.md`
 
