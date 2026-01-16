@@ -679,18 +679,84 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.5.5** Error tracking (Sentry)
 
 ### 5.7 PDF Tasarım İyileştirmesi
-- [ ] **5.7.1** Profesyonel PDF template tasarımı
-  - [ ] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
-  - [ ] Sayfa layout iyileştirmesi (görsel + metin düzeni)
-  - [ ] Font seçimi (çocuk dostu, okunabilir)
-  - [ ] Renk şeması ve tema uyumu
-  - [ ] Sayfa numaraları ve footer tasarımı
-  - [ ] Görsel kalitesi optimizasyonu
+- [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)
+  - [x] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
+  - [x] Sayfa layout iyileştirmesi (görsel + metin düzeni) - A4 landscape, double-page spread
+  - [x] Font seçimi (çocuk dostu, okunabilir) - 16pt font, 1.6 line height
+  - [x] Renk şeması ve tema uyumu - Pastel arka plan deseni (CSS pattern)
+  - [x] Sayfa numaraları ve footer tasarımı - Sadece metin sayfalarına
+  - [x] Görsel kalitesi optimizasyonu - 1024x1536 aspect ratio korunuyor
+  - [x] **Puppeteer + HTML/CSS yaklaşımına geçiş** ✅ (17 Ocak 2026)
+    - [x] jsPDF yerine Puppeteer kullanımı (daha iyi kalite)
+    - [x] HTML/CSS template sistemi (profesyonel layout)
+    - [x] Double-page spread layout (A4 landscape)
+    - [x] Alternatif görsel-metin pattern
+    - **Not:** jsPDF yaklaşımından vazgeçildi, Puppeteer ile HTML/CSS template kullanılıyor
 - [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme)
 - [ ] **5.7.3** PDF customization seçenekleri (opsiyonel)
   - [ ] Farklı sayfa boyutları (A4, Letter, Square)
   - [ ] Farklı layout seçenekleri
-- **Not:** Temel PDF generation çalışıyor, tasarım iyileştirmesi sonraki fazda yapılacak (11 Ocak 2026)
+- [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri
+  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik)
+  - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında)
+  - [ ] Tema bazlı desenler (deniz, orman, uzay vb.)
+- [ ] **5.7.5** PDF boyut optimizasyonu (gelecek iyileştirme) (17 Ocak 2026)
+  - [ ] Daha agresif compression teknikleri (SLOW mode vs MEDIUM)
+  - [ ] Görsel boyutlarını daha da küçültme (70-75% seviyesine)
+  - [ ] PDF boyut hedefi: 5-6 MB altı (10 sayfalık kitap için)
+  - [ ] Kalite vs boyut dengesi testleri
+  - **Not:** Şu an `pdfs` bucket (50 MB limit) kullanılıyor, optimizasyon opsiyonel
+- **Not:** Temel PDF generation çalışıyor ✅ (11 Ocak 2026), Tasarım iyileştirmesi tamamlandı ✅ (17 Ocak 2026), Bucket `pdfs` (50 MB) olarak güncellendi ✅ (17 Ocak 2026), Puppeteer + HTML/CSS yaklaşımına geçildi ✅ (17 Ocak 2026)
+  - **Teknoloji:** Puppeteer + HTML/CSS Template (jsPDF'den geçildi)
+  - **Format:** A4 landscape, double-page spread (kitap formatı)
+  - **Layout:** Alternatif görsel-metin düzeni (spread bazlı değişir)
+  - **Görseller:** 1024x1536 portrait, aspect ratio korunuyor
+  - **Arka Plan:** CSS ile pastel noktalı desen
+  - **Sayfa Numaraları:** Sadece metin sayfalarında görünür
+  - **Font:** 16pt, 1.6 line height (çocuk dostu)
+- **🚨 BİLİNEN SORUN (25 Ocak 2026):** PDF Layout Bug - Eksik Sayfalar ve Son Sayfa Text Problemi
+  - **Tarih:** 25 Ocak 2026
+  - **Durum:** 🔴 Kritik Bug (Açık)
+  - **Öncelik:** 🔴 Yüksek
+  - **Açıklama:**
+    - **Problem 1: Eksik Sayfalar**
+      - 5 story page'li kitap → sadece 3 spread oluşuyor
+      - Bazı sayfalar PDF'de hiç görünmüyor
+      - Beklenen: 5 story page → 5 spread (her story page = 1 spread)
+      - Gerçekleşen: 5 story page → 3 spread (yanlış algoritma)
+    - **Problem 2: Son Sayfada Text Yok**
+      - Son story page'in text'i PDF'de görünmüyor
+      - Görsel görünüyor ama text kısmı boş/eksik
+    - **Kök Neden:**
+      - `prepareSpreads()` fonksiyonu yanlış mantık kullanıyor
+      - Mevcut kod: Her spread'de hem image hem text gösteriyor (aynı page'den)
+      - Ama spread alternasyonu yanlış uygulanmış
+      - Story page sayısı ile spread sayısı uyuşmuyor
+    - **Mevcut Kod Analizi:**
+      - `lib/pdf/generator.ts` → `prepareSpreads()` fonksiyonu (satır 211-243)
+      - `for (let i = 0; i < pages.length; i += 1)` → Her page için 1 spread oluşturuyor (DOĞRU)
+      - Ama spread layout'unda sorun var: Her spread'de aynı page'den hem image hem text gösteriliyor
+      - Alternatif pattern mantığı yanlış çalışıyor
+    - **Beklenen Davranış:**
+      - Her story page bir spread oluşturmalı (1 story page = 1 spread)
+      - Spread'de: Sol = Image, Sağ = Text (veya alternatif: Sol = Text, Sağ = Image)
+      - Her spread aynı story page'den gelmeli (aynı page'den hem image hem text)
+      - Alternatif pattern: Spread 0 = [Image | Text], Spread 1 = [Text | Image], Spread 2 = [Image | Text], ...
+    - **Test Senaryosu:**
+      - Kitap: 5 story page
+      - Beklenen PDF: 1 cover + 5 spread = 6 sayfa
+      - Gerçekleşen PDF: 1 cover + 3 spread = 4 sayfa (2 sayfa eksik)
+    - **Çözüm Gereksinimleri:**
+      - `prepareSpreads()` mantığı tamamen yeniden yazılmalı
+      - Her story page için 1 spread garantisi
+      - Alternatif pattern doğru uygulanmalı (spread index'e göre)
+      - Son sayfanın text'i mutlaka render edilmeli
+    - **İlgili Dosyalar:**
+      - `lib/pdf/generator.ts` (satır 198-243: `prepareSpreads()` fonksiyonu)
+      - `lib/pdf/templates/book-styles.css` (stil doğru, layout mantığı sorunlu)
+      - Terminal log: `[PDF] Spread 0 (i=0): page1=image, page2=text, isEvenSpread=true`
+    - **Not:** Bu bug PDF generation'ın temel işlevselliğini etkiliyor. Düzeltilmeden production'a geçilemez.
+    - **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
 
 ### 5.6 Lansman Hazırlıkları
 - [ ] **5.6.1** Örnek kitaplar oluştur (demo)
@@ -889,6 +955,19 @@ Requirements:
 ---
 
 ## 📝 Notlar ve Fikirler
+
+### 🚨 PDF Generation Bug - Eksik Sayfalar ve Son Sayfa Text Problemi (25 Ocak 2026)
+- **Kategori:** Faz 5.7 - PDF Tasarım İyileştirmesi
+- **Durum:** 🔴 Kritik Bug (Açık)
+- **Öncelik:** 🔴 Yüksek
+- **Tarih:** 25 Ocak 2026
+- **Açıklama:** PDF generation'da layout bug var. 5 story page'li kitap sadece 3 spread oluşturuyor, bazı sayfalar eksik ve son sayfanın text'i görünmüyor.
+- **Detaylar:** Faz 5.7 bölümünde "BİLİNEN SORUN" altında detaylı dokümante edildi.
+- **İlgili Dosyalar:**
+  - `lib/pdf/generator.ts` → `prepareSpreads()` fonksiyonu (layout mantığı yanlış)
+  - Terminal log'lar: Spread sayısı ile page sayısı uyuşmuyor
+- **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
+- **Not:** Bu bug PDF generation'ın temel işlevselliğini etkiliyor. Düzeltilmeden production'a geçilemez.
 
 ### PDF Tasarım İyileştirmesi (11 Ocak 2026)
 - **Kategori:** Faz 5.7 - Polish ve Lansman

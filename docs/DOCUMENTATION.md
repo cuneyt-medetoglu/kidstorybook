@@ -38,6 +38,7 @@ docs/
 │   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
 │   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
 │   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
+│   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
 │   └── ...
 │
 ├── reports/                    # Raporlar (aktif)

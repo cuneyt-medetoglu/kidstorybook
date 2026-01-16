@@ -53,7 +53,11 @@ export async function POST(
     }
 
     // Check if PDF already exists (cache)
-    if (book.pdf_url && book.pdf_path) {
+    // Allow bypass with ?force=true query parameter
+    const { searchParams } = new URL(request.url)
+    const forceRegenerate = searchParams.get('force') === 'true'
+    
+    if (!forceRegenerate && book.pdf_url && book.pdf_path) {
       console.log('[PDF Generation] PDF already exists, returning cached URL')
       return successResponse(
         {
@@ -66,6 +70,10 @@ export async function POST(
           generationTime: 0,
         }
       )
+    }
+    
+    if (forceRegenerate) {
+      console.log('[PDF Generation] Force regenerate requested, ignoring cache')
     }
 
     // ====================================================================
@@ -110,9 +118,11 @@ export async function POST(
     const filePath = `${user.id}/books/${bookId}/${fileName}`
 
     console.log('[PDF Generation] Uploading PDF to Supabase Storage:', filePath)
+    console.log('[PDF Generation] - PDF Size:', (pdfBuffer.length / 1024 / 1024).toFixed(2), 'MB')
 
+    // Use 'pdfs' bucket (50 MB limit) instead of 'book-images' (10 MB limit)
     const { error: uploadError } = await supabase.storage
-      .from('book-images')
+      .from('pdfs')
       .upload(filePath, pdfBuffer, {
         contentType: 'application/pdf',
         upsert: false,
@@ -125,7 +135,7 @@ export async function POST(
 
     // Get public URL
     const { data: publicUrlData } = supabase.storage
-      .from('book-images')
+      .from('pdfs')
       .getPublicUrl(filePath)
 
     const pdfUrl = publicUrlData?.publicUrl

@@ -1,0 +1,200 @@
+/* PDF Page Settings - A4 Landscape */
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Comic Sans MS', 'Comic Neue', 'Trebuchet MS', sans-serif;
+  background: #fefefe;
+  color: #1a1a1a;
+}
+
+/* Page Container */
+.page {
+  width: 297mm;
+  height: 210mm;
+  page-break-after: always;
+  position: relative;
+  overflow: hidden;
+}
+
+.page:last-child {
+  page-break-after: auto;
+}
+
+/* Cover Page */
+.cover-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fffef8 0%, #fff5e5 100%);
+}
+
+.cover-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20mm;
+  position: relative;
+}
+
+.cover-image {
+  max-width: 100%;
+  max-height: 75%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15mm;
+}
+
+.cover-content {
+  text-align: center;
+}
+
+.cover-title {
+  font-size: 32pt;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 8mm;
+  line-height: 1.3;
+}
+
+.cover-metadata {
+  font-size: 12pt;
+  color: #666;
+  font-weight: normal;
+}
+
+/* Spread Page (Double-page) */
+.spread-page {
+  background: #fffef8;
+  position: relative;
+}
+
+.spread-page::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fffef8;
+  background-image: 
+    radial-gradient(circle at 20mm 20mm, rgba(255, 200, 200, 0.2) 2px, transparent 2px),
+    radial-gradient(circle at 60mm 60mm, rgba(200, 220, 255, 0.2) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 40mm 80mm, rgba(255, 230, 200, 0.2) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80mm 40mm, rgba(220, 255, 200, 0.2) 1.5px, transparent 1.5px);
+  background-size: 50mm 50mm;
+  background-position: 0 0, 25mm 25mm, 12.5mm 40mm, 40mm 12.5mm;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.spread-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: relative;
+  z-index: 1;
+}
+
+/* Half Page (Left or Right) */
+.half-page {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  padding: 10mm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image Page */
+.image-page {
+  background: transparent;
+}
+
+.page-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Text Page */
+.text-page {
+  background: transparent;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10mm;
+}
+
+.text-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.page-text {
+  font-family: 'Comic Sans MS', 'Comic Neue', 'Trebuchet MS', sans-serif;
+  font-size: 18pt;
+  line-height: 1.8;
+  color: #1a1a1a;
+  text-align: center;
+  flex: 1;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 15mm;
+  width: 100%;
+  max-width: 100%;
+}
+
+.page-text p {
+  margin: 0 0 1em 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 5mm;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10pt;
+  color: #999;
+  font-weight: normal;
+}
+
+/* Center Divider (optional, for debugging) */
+.spread-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(200, 200, 200, 0.2);
+  z-index: 10;
+  display: none; /* Hidden by default, can enable for debugging */
+}

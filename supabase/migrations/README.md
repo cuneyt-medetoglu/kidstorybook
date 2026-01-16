@@ -101,6 +101,12 @@ SELECT name FROM storage.buckets;
 - ✅ Storage policies
 - ✅ Helper function: cleanup_orphaned_book_images
 
+### 010 - PDFs Bucket RLS Policy
+- ✅ pdfs bucket RLS policies (public read, authenticated write)
+- ✅ User folder-based access control
+- ✅ Created: 2026-01-17
+- **Purpose:** Allow PDF uploads to pdfs bucket (50 MB limit)
+
 ---
 
 **Project Reference:** `fapkpidgcqmtmhxgzdom`  

@@ -1,10 +1,13 @@
 /**
  * PDF Generation Helper
  * 
- * Generates PDF files from book data using jsPDF
+ * Generates PDF files from book data using Puppeteer + HTML/CSS
+ * Format: A4 Landscape with double-page spreads (storybook style)
  */
 
-import { jsPDF } from 'jspdf'
+import puppeteer from 'puppeteer'
+import fs from 'fs'
+import path from 'path'
 
 // ============================================================================
 // Types
@@ -26,108 +29,217 @@ export interface PDFOptions {
   illustrationStyle?: string
 }
 
+interface SpreadData {
+  left: {
+    type: 'image' | 'text'
+    data: PageData | null
+  }
+  right: {
+    type: 'image' | 'text'
+    data: PageData | null
+  }
+}
+
 // ============================================================================
 // Constants
 // ============================================================================
 
-const PAGE_WIDTH = 210 // A4 width in mm
-const PAGE_HEIGHT = 297 // A4 height in mm
-const MARGIN = 15 // Margin in mm
-const CONTENT_WIDTH = PAGE_WIDTH - (MARGIN * 2) // 180mm
-const IMAGE_HEIGHT = 140 // Image height in mm (60% of content area)
-const TEXT_HEIGHT = PAGE_HEIGHT - MARGIN - IMAGE_HEIGHT - MARGIN - 40 // Text area height
-const TITLE_FONT_SIZE = 24
-const TEXT_FONT_SIZE = 12
+const PAGE_WIDTH = 297 // A4 landscape width in mm
+const PAGE_HEIGHT = 210 // A4 landscape height in mm
+const MARGIN = 10 // Margin in mm
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
 
 /**
- * Convert ArrayBuffer to base64
- * Uses Node.js Buffer for efficient conversion (works in Next.js API routes)
+ * Escape HTML special characters
  */
-function convertArrayBufferToBase64(arrayBuffer: ArrayBuffer, contentType: string = 'image/png'): string {
-  // Use Buffer for efficient conversion (Node.js environment)
-  // This avoids "Maximum call stack size exceeded" error with large images
-  const buffer = Buffer.from(arrayBuffer)
-  const base64 = buffer.toString('base64')
-  return `data:${contentType};base64,${base64}`
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  }
+  return text.replace(/[&<>"']/g, (m) => map[m])
 }
 
 /**
- * Download image from URL and convert to base64
+ * Convert text to HTML paragraphs (preserve line breaks)
  */
-async function downloadImageAsBase64(imageUrl: string): Promise<string> {
-  try {
-    const response = await fetch(imageUrl)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch image: ${response.statusText}`)
+function formatText(text: string): string {
+  if (!text) return ''
+  const escaped = escapeHtml(text)
+  // Split by line breaks and wrap in paragraphs
+  return escaped
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => `<p>${line.trim()}</p>`)
+    .join('\n')
+}
+
+/**
+ * Generate HTML for cover page
+ */
+function generateCoverHTML(options: PDFOptions): string {
+  const coverImage = options.coverImageUrl
+    ? `<img src="${escapeHtml(options.coverImageUrl)}" alt="Cover" class="cover-image" />`
+    : ''
+
+  const metadata = [options.theme, options.illustrationStyle]
+    .filter(Boolean)
+    .map((item) => `<span>${escapeHtml(item!)}</span>`)
+    .join(' <span class="separator">•</span> ')
+
+  return `
+    <div class="page cover-page">
+      <div class="cover-container">
+        ${coverImage}
+        <div class="cover-content">
+          <h1 class="cover-title">${escapeHtml(options.title)}</h1>
+          ${metadata ? `<p class="cover-metadata">${metadata}</p>` : ''}
+        </div>
+      </div>
+    </div>
+  `
+}
+
+/**
+ * Generate HTML for a spread (double-page)
+ */
+function generateSpreadHTML(spread: SpreadData): string {
+  // Left page
+  let leftHTML = '<div class="half-page"></div>'
+  if (spread.left.data) {
+    if (spread.left.type === 'image' && spread.left.data.imageUrl) {
+      leftHTML = `
+        <div class="half-page image-page">
+          <img src="${escapeHtml(spread.left.data.imageUrl)}" alt="Page ${spread.left.data.pageNumber}" class="page-image" />
+        </div>
+      `
+    } else if (spread.left.type === 'text') {
+      leftHTML = `
+        <div class="half-page text-page">
+          <div class="text-content">
+            <div class="page-text">${formatText(spread.left.data.text)}</div>
+            <span class="page-number">${spread.left.data.pageNumber}</span>
+          </div>
+        </div>
+      `
     }
-    
-    const arrayBuffer = await response.arrayBuffer()
-    const contentType = response.headers.get('content-type') || 'image/png'
-    
-    return convertArrayBufferToBase64(arrayBuffer, contentType)
-  } catch (error) {
-    console.error('[PDF Generator] Error downloading image:', error)
-    throw error
   }
+
+  // Right page
+  let rightHTML = '<div class="half-page"></div>'
+  if (spread.right.data) {
+    if (spread.right.type === 'image' && spread.right.data.imageUrl) {
+      rightHTML = `
+        <div class="half-page image-page">
+          <img src="${escapeHtml(spread.right.data.imageUrl)}" alt="Page ${spread.right.data.pageNumber}" class="page-image" />
+        </div>
+      `
+    } else if (spread.right.type === 'text') {
+      rightHTML = `
+        <div class="half-page text-page">
+          <div class="text-content">
+            <div class="page-text">${formatText(spread.right.data.text)}</div>
+            <span class="page-number">${spread.right.data.pageNumber}</span>
+          </div>
+        </div>
+      `
+    }
+  }
+
+  return `
+    <div class="page spread-page">
+      <div class="spread-container">
+        ${leftHTML}
+        ${rightHTML}
+      </div>
+    </div>
+  `
 }
 
 /**
- * Add image to PDF with proper sizing
+ * Generate complete HTML document
  */
-async function addImageToPDF(
-  doc: jsPDF,
-  imageUrl: string,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-): Promise<void> {
-  try {
-    const base64Image = await downloadImageAsBase64(imageUrl)
-    doc.addImage(base64Image, 'PNG', x, y, width, height, undefined, 'FAST')
-  } catch (error) {
-    console.error('[PDF Generator] Error adding image to PDF:', error)
-    // Add placeholder rectangle if image fails
-    doc.setFillColor(240, 240, 240)
-    doc.rect(x, y, width, height, 'F')
-    doc.setTextColor(150, 150, 150)
-    doc.setFontSize(10)
-    doc.text('Image unavailable', x + width / 2, y + height / 2, {
-      align: 'center',
-      baseline: 'middle',
-    })
-  }
+function generateHTML(options: PDFOptions, spreads: SpreadData[]): string {
+  const cssPath = path.join(process.cwd(), 'lib', 'pdf', 'templates', 'book-styles.css')
+  const css = fs.readFileSync(cssPath, 'utf-8')
+
+  const coverHTML = generateCoverHTML(options)
+  const spreadsHTML = spreads.map(generateSpreadHTML).join('\n')
+
+  return `
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(options.title)}</title>
+  <style>
+    ${css}
+  </style>
+</head>
+<body>
+  ${coverHTML}
+  ${spreadsHTML}
+</body>
+</html>
+  `.trim()
 }
 
 /**
- * Wrap text to fit within width
+ * Prepare spreads data from pages
+ * 
+ * SIMPLE PATTERN: Each page alternates Image-Text-Image-Text...
+ * - Page index 0, 2, 4... (even): Show Image
+ * - Page index 1, 3, 5... (odd): Show Text
+ * 
+ * LAYOUT: Alternates every spread
+ * - Spread 0: [Image (page 0) | Text (page 1)]
+ * - Spread 1: [Text (page 2) | Image (page 3)] - Layout swaps
+ * - Spread 2: [Image (page 4) | Text (page 5)]
+ * 
+ * Example with 3 pages:
+ * - Page 0 (index 0): Image → Spread 0, Left
+ * - Page 1 (index 1): Text → Spread 0, Right
+ * - Page 2 (index 2): Image → Spread 1, Right (alternate layout)
  */
-function wrapText(doc: jsPDF, text: string, maxWidth: number): string[] {
-  const words = text.split(' ')
-  const lines: string[] = []
-  let currentLine = ''
+function prepareSpreads(pages: PageData[]): SpreadData[] {
+  const spreads: SpreadData[] = []
 
-  for (const word of words) {
-    const testLine = currentLine ? `${currentLine} ${word}` : word
-    const testWidth = doc.getTextWidth(testLine)
+  for (let i = 0; i < pages.length; i += 1) {
+    const page = pages[i]
+    if (!page) continue
 
-    if (testWidth > maxWidth && currentLine) {
-      lines.push(currentLine)
-      currentLine = word
+    const isEvenSpread = i % 2 === 0
+    const hasImage = Boolean(page.imageUrl)
+
+    const imageSide = isEvenSpread ? 'left' : 'right'
+    const textSide = isEvenSpread ? 'right' : 'left'
+
+    const spread: SpreadData = {
+      left: { type: 'text', data: null },
+      right: { type: 'text', data: null },
+    }
+
+    // Same story page produces two facing pages (image + text)
+    if (hasImage) {
+      spread[imageSide] = { type: 'image', data: page }
     } else {
-      currentLine = testLine
+      // Fallback if image is missing
+      spread[imageSide] = { type: 'text', data: page }
     }
+
+    spread[textSide] = { type: 'text', data: page }
+
+    spreads.push(spread)
   }
 
-  if (currentLine) {
-    lines.push(currentLine)
-  }
-
-  return lines
+  return spreads
 }
 
 // ============================================================================
@@ -135,145 +247,44 @@ function wrapText(doc: jsPDF, text: string, maxWidth: number): string[] {
 // ============================================================================
 
 /**
- * Generate PDF from book data
+ * Generate PDF from book data using Puppeteer
  */
 export async function generateBookPDF(options: PDFOptions): Promise<Buffer> {
-  const doc = new jsPDF({
-    orientation: 'portrait',
-    unit: 'mm',
-    format: 'a4',
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
 
-  // ========================================================================
-  // Cover Page
-  // ========================================================================
-  if (options.coverImageBuffer || options.coverImageUrl) {
-    try {
-      const coverImage = options.coverImageBuffer
-        ? `data:image/png;base64,${Buffer.from(options.coverImageBuffer).toString('base64')}`
-        : await downloadImageAsBase64(options.coverImageUrl!)
+  try {
+    const page = await browser.newPage()
 
-      // Add cover image (full page or top portion)
-      const coverImageHeight = PAGE_HEIGHT * 0.7 // 70% of page height
-      const coverImageWidth = CONTENT_WIDTH
-      const coverImageX = MARGIN
-      const coverImageY = MARGIN
+    // Prepare spreads data
+    const spreads = prepareSpreads(options.pages || [])
 
-      doc.addImage(coverImage, 'PNG', coverImageX, coverImageY, coverImageWidth, coverImageHeight, undefined, 'FAST')
+    // Generate HTML
+    const html = generateHTML(options, spreads)
 
-      // Add title below cover image
-      doc.setFontSize(TITLE_FONT_SIZE)
-      doc.setTextColor(0, 0, 0)
-      doc.setFont('helvetica', 'bold')
-      
-      const titleY = coverImageY + coverImageHeight + 20
-      const titleLines = wrapText(doc, options.title, CONTENT_WIDTH)
-      let currentTitleY = titleY
-      
-      for (const line of titleLines) {
-        doc.text(line, PAGE_WIDTH / 2, currentTitleY, {
-          align: 'center',
-        })
-        currentTitleY += 10
-      }
-
-      // Add metadata (theme, style) if provided
-      if (options.theme || options.illustrationStyle) {
-        doc.setFontSize(10)
-        doc.setFont('helvetica', 'normal')
-        doc.setTextColor(100, 100, 100)
-        const metadata = [
-          options.theme && `Theme: ${options.theme}`,
-          options.illustrationStyle && `Style: ${options.illustrationStyle}`,
-        ]
-          .filter(Boolean)
-          .join(' • ')
-        
-        doc.text(metadata, PAGE_WIDTH / 2, currentTitleY + 10, {
-          align: 'center',
-        })
-      }
-    } catch (error) {
-      console.error('[PDF Generator] Error adding cover page:', error)
-      // Add title only if cover fails
-      doc.setFontSize(TITLE_FONT_SIZE)
-      doc.setFont('helvetica', 'bold')
-      doc.text(options.title, PAGE_WIDTH / 2, PAGE_HEIGHT / 2, {
-        align: 'center',
-      })
-    }
-  } else {
-    // No cover image - add title only
-    doc.setFontSize(TITLE_FONT_SIZE)
-    doc.setFont('helvetica', 'bold')
-    doc.text(options.title, PAGE_WIDTH / 2, PAGE_HEIGHT / 2, {
-      align: 'center',
+    // Set content and wait for images to load
+    await page.setContent(html, {
+      waitUntil: 'networkidle0',
     })
+
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      landscape: true,
+      printBackground: true,
+      margin: {
+        top: '0mm',
+        right: '0mm',
+        bottom: '0mm',
+        left: '0mm',
+      },
+      preferCSSPageSize: true,
+    })
+
+    return Buffer.from(pdfBuffer)
+  } finally {
+    await browser.close()
   }
-
-  // ========================================================================
-  // Content Pages
-  // ========================================================================
-  for (const page of options.pages) {
-    doc.addPage()
-
-    let currentY = MARGIN
-
-    // Add page image (if available)
-    if (page.imageUrl) {
-      try {
-        await addImageToPDF(
-          doc,
-          page.imageUrl,
-          MARGIN,
-          currentY,
-          CONTENT_WIDTH,
-          IMAGE_HEIGHT
-        )
-        currentY += IMAGE_HEIGHT + 10
-      } catch (error) {
-        console.error(`[PDF Generator] Error adding image for page ${page.pageNumber}:`, error)
-        currentY += 10 // Skip image space if error
-      }
-    }
-
-    // Add page text
-    doc.setFontSize(TEXT_FONT_SIZE)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(0, 0, 0)
-
-    const textLines = wrapText(doc, page.text, CONTENT_WIDTH)
-    const lineHeight = 7
-    const maxLines = Math.floor(TEXT_HEIGHT / lineHeight)
-
-    for (let i = 0; i < Math.min(textLines.length, maxLines); i++) {
-      doc.text(textLines[i], MARGIN, currentY)
-      currentY += lineHeight
-
-      // Check if we need a new page for text
-      if (currentY > PAGE_HEIGHT - MARGIN - 20 && i < textLines.length - 1) {
-        doc.addPage()
-        currentY = MARGIN
-      }
-    }
-
-    // Add page number
-    doc.setFontSize(10)
-    doc.setTextColor(150, 150, 150)
-    doc.text(
-      `Page ${page.pageNumber}`,
-      PAGE_WIDTH / 2,
-      PAGE_HEIGHT - 10,
-      {
-        align: 'center',
-      }
-    )
-  }
-
-  // ========================================================================
-  // Return PDF as Buffer
-  // ========================================================================
-  const pdfArray = doc.output('arraybuffer')
-  return Buffer.from(pdfArray)
 }
-
