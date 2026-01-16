@@ -16,7 +16,7 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.4',
+  version: '1.0.5',
   releaseDate: new Date('2026-01-16'),
   status: 'active',
   changelog: [
@@ -30,6 +30,7 @@ export const VERSION: PromptVersion = {
     'Enhanced multi-character prompt with reference image matching (16 Ocak 2026)',
     'Individual eye color preservation for each character (16 Ocak 2026)',
     'v1.0.4: Hands descriptor added to buildCharacterPrompt - contextual anchoring for anatomical accuracy (16 Ocak 2026)',
+    'v1.0.5: Enhanced family member descriptions with character names, detailed appearance (hair/eye color, age, features), and critical individual character emphasis (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -270,35 +271,55 @@ export function buildMultipleCharactersPrompt(
         if (char.description) {
           if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} fur`)
           if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+          // Add special features for pets
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            charParts.push(char.description.uniqueFeatures.join(', '))
+          }
           charParts.push(`friendly and playful expression`)
         } else {
           charParts.push(`friendly and cute appearance`)
         }
       } else if (char.type.group === "Family Members") {
-        // Family member description
-        charParts.push(`${char.type.value.toLowerCase()}`)
+        // Family member description - ENHANCED with name and detailed appearance
+        const charName = char.type.displayName || char.type.value
+        charParts.push(`${charName} (${char.type.value.toLowerCase()})`)
         
         if (char.description) {
           if (char.description.age) charParts.push(`${char.description.age} years old`)
           if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
-          if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+          if (char.description.eyeColor) {
+            charParts.push(`${char.description.eyeColor} eyes`)
+            // CRITICAL: Emphasize individual eye color
+            charParts.push(`(IMPORTANT: This character has ${char.description.eyeColor} eyes, NOT the same eye color as Character 1)`)
+          }
+          // Add special features for family members
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            charParts.push(char.description.uniqueFeatures.join(', '))
+          }
           charParts.push(`warm and caring expression`)
         } else {
-          // Default descriptions
+          // Enhanced fallback descriptions
           if (char.type.value === "Mom" || char.type.value === "Dad") {
-            charParts.push(`adult, warm and loving`)
+            charParts.push(`adult ${char.type.value.toLowerCase()}, warm and loving expression`)
           } else if (char.type.value === "Grandma" || char.type.value === "Grandpa") {
-            charParts.push(`elderly, kind and gentle`)
+            charParts.push(`elderly ${char.type.value.toLowerCase()}, kind and gentle expression`)
           } else {
-            charParts.push(`family member, friendly`)
+            charParts.push(`family member, friendly expression`)
           }
         }
+        
+        // CRITICAL: Emphasize this is a specific person, not generic
+        charParts.push(`(IMPORTANT: This is ${charName}, a specific person with unique appearance, NOT a generic ${char.type.value.toLowerCase()})`)
       } else {
         // Other
         charParts.push(`${char.type.displayName}`)
         if (char.description) {
           if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
           if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
+          // Add special features for other characters
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            charParts.push(char.description.uniqueFeatures.join(', '))
+          }
         }
       }
       

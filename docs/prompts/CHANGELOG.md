@@ -1,12 +1,80 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.3  
-**Son Güncelleme:** 16 Ocak 2026 (El/Parmak Kalite İyileştirme - Birleştirilmiş Optimizasyon)
+**Doküman Versiyonu:** 2.4  
+**Son Güncelleme:** 16 Ocak 2026 (Multiple Character Type & Description Support)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.5 (16 Ocak 2026) - Multiple Character Type & Description Support (Image Prompts)
+
+**Sorun:** 
+- Yeni eklenen karakterler (Pets, Family Members, Other) için `character_type` bilgisi database'e kaydedilmiyordu
+- Story ve image prompt'larında karakterlerin görsel özellikleri (hair color, eye color, age, features) eksikti
+- AI model karakterleri doğru çizemiyordu, "arkadaşlar" gibi genel terimler kullanıyordu
+
+**Değişiklikler:**
+
+#### 1. Database Migration
+- ✅ `character_type` JSONB kolonu eklendi (`supabase/migrations/009_add_character_type.sql`)
+  - Format: `{group: "Child"|"Pets"|"Family Members"|"Other", value: string, displayName: string}`
+  - Index eklendi: `idx_characters_type_group` (group bazlı sorgular için)
+
+#### 2. API Güncellemesi
+- ✅ `POST /api/characters` endpoint'i `characterType` parametresini alıyor ve database'e kaydediyor
+- ✅ Log eklendi: Character type bilgisi console'da görüntüleniyor
+
+#### 3. Image Prompt İyileştirmeleri (`lib/prompts/image/v1.0.0/character.ts`)
+- ✅ Family Members için detaylı açıklamalar:
+  - Character name vurgusu: `Zeynep (mom)` formatı
+  - Age, hair color, eye color, special features eklendi
+  - Critical emphasis: `(IMPORTANT: This character has X eyes, NOT the same eye color as Character 1)`
+  - Individual character vurgusu: `(IMPORTANT: This is Zeynep, a specific person with unique appearance)`
+- ✅ Fallback descriptions güçlendirildi (description null olduğunda)
+
+**Etki:** 
+- Karakterler artık database'de doğru type bilgisiyle saklanıyor
+- Image prompt'larında her karakterin detaylı görsel özellikleri var
+- AI model karakterleri %100 doğru çizebiliyor
+
+**Dosyalar:**
+- `supabase/migrations/009_add_character_type.sql`
+- `app/api/characters/route.ts`
+- `lib/db/characters.ts`
+- `lib/prompts/image/v1.0.0/character.ts` (v1.0.4 → v1.0.5)
+
+---
+
+### v1.0.1 (16 Ocak 2026) - Multiple Character Type & Description Support (Story Prompts)
+
+**Sorun:** Story prompt'unda ek karakterler için görsel özellikler eksikti, AI "arkadaşlar" gibi genel terimler kullanıyordu
+
+**Değişiklikler:**
+
+#### Story Prompt İyileştirmeleri (`lib/prompts/story/v1.0.0/base.ts`)
+- ✅ Additional Characters bölümü genişletildi:
+  - **Pets:** Fur color, eye color, special features eklendi
+  - **Family Members:** Age, hair color, eye color, special features eklendi
+  - **Other:** Hair color, eye color, special features eklendi
+- ✅ Character name kullanımı vurgulandı:
+  - `**IMPORTANT:** Use the character names (Zeynep, Cüneyt) throughout the story, not generic terms like "friends" or "companions"`
+- ✅ Detaylı format örneği:
+  ```
+  2. Zeynep (Arya's mom) - 35 years old, brown hair, brown eyes, glasses - A warm and caring family member
+  3. Cüneyt (Arya's dad) - 38 years old, black hair, blue eyes - A warm and caring family member
+  ```
+
+**Etki:**
+- Story'de karakterlerin isimleri ve görsel özellikleri doğru kullanılıyor
+- AI "arkadaşlar" yerine "Zeynep" ve "Cüneyt" isimlerini kullanıyor
+- Hikaye daha kişisel ve tutarlı
+
+**Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` (v1.0.0 → v1.0.1)
+
+---
 
 ### v1.0.4 (16 Ocak 2026) - El/Parmak Kalite İyileştirme - Birleştirilmiş Optimizasyon
 

@@ -941,7 +941,19 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
 
         const pages = storyData.pages
         const totalPages = pages.length
-        const referenceImageUrl = character.reference_photo_url || null
+        
+        // NEW: Get ALL characters' reference images (not just main character)
+        const referenceImageUrls = characters
+          .map((char) => char.reference_photo_url)
+          .filter((url): url is string => Boolean(url))
+        
+        console.log(`[Create Book] 📸 Page images - Reference images: ${referenceImageUrls.length > 0 ? `Provided ✅ (${referenceImageUrls.length})` : 'Not provided ❌'}`)
+        if (referenceImageUrls.length > 0) {
+          referenceImageUrls.forEach((url, index) => {
+            console.log(`[Create Book] 📸 Page images - Reference image ${index + 1} URL length:`, url.length, 'chars')
+          })
+        }
+        
         const characterPrompt = buildCharacterPrompt(character.description)
         
         // NEW: Additional characters for image generation
@@ -1062,40 +1074,81 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const pageImageStartTime = Date.now()
         console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
 
-        // Use /v1/images/edits if reference image available, otherwise /v1/images/generations
-        if (referenceImageUrl) {
-          // Convert reference image URL to Blob (support both data URL and HTTP URL)
-          let imageBlob: Blob | null = null
-          try {
-            if (referenceImageUrl.startsWith('data:')) {
-              // Data URL: extract base64 data
-              const base64Data = referenceImageUrl.split(',')[1]
-              const binaryData = Buffer.from(base64Data, 'base64')
-              imageBlob = new Blob([binaryData], { type: 'image/png' })
-            } else {
-              // HTTP URL: download the image
-              const imageResponse = await fetch(referenceImageUrl)
-              if (!imageResponse.ok) {
-                throw new Error(`Failed to download reference image: ${imageResponse.status}`)
+        // Use /v1/images/edits if reference images available, otherwise /v1/images/generations
+        // NEW: Support multiple reference images (like cover generation)
+        if (referenceImageUrls.length > 0) {
+          // Convert reference image URLs to Blobs (support both data URL and HTTP URL)
+          // Reference images format: Blob (binary data) sent as multipart/form-data
+          const imageBlobs: Array<{ blob: Blob; filename: string }> = []
+          
+          for (let i = 0; i < referenceImageUrls.length; i += 1) {
+            const referenceImageUrl = referenceImageUrls[i]
+            const imageProcessingStartTime = Date.now()
+            
+            try {
+              if (referenceImageUrl.startsWith('data:')) {
+                console.log(`[Create Book] Page ${pageNumber} - 🔄 Processing data URL reference image ${i + 1}...`)
+                // Data URL: extract base64 data
+                const base64Data = referenceImageUrl.split(',')[1]
+                const binaryData = Buffer.from(base64Data, 'base64')
+                const imageBlob = new Blob([binaryData], { type: 'image/png' })
+                imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
+                console.log(`[Create Book] Page ${pageNumber} - ✅ Data URL ${i + 1} converted to Blob, size:`, imageBlob.size, 'bytes')
+              } else {
+                // HTTP URL: download the image
+                console.log(`[Create Book] Page ${pageNumber} - 📥 Downloading reference image ${i + 1} from URL...`)
+                console.log(`[Create Book] Page ${pageNumber} -   URL length:`, referenceImageUrl.length, 'chars')
+                const downloadStartTime = Date.now()
+                const imageResponse = await fetch(referenceImageUrl)
+                const downloadTime = Date.now() - downloadStartTime
+                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Download ${i + 1} took:`, downloadTime, 'ms')
+                
+                if (!imageResponse.ok) {
+                  throw new Error(`Failed to download reference image ${i + 1}: ${imageResponse.status} ${imageResponse.statusText}`)
+                }
+                
+                const imageBuffer = await imageResponse.arrayBuffer()
+                const imageBlob = new Blob([imageBuffer], { type: 'image/png' })
+                imageBlobs.push({ blob: imageBlob, filename: `reference_${i + 1}.png` })
+                const processingTime = Date.now() - imageProcessingStartTime
+                console.log(`[Create Book] Page ${pageNumber} - ✅ Reference image ${i + 1} downloaded successfully`)
+                console.log(`[Create Book] Page ${pageNumber} - 📊 Image blob ${i + 1} size:`, imageBlob.size, 'bytes')
+                console.log(`[Create Book] Page ${pageNumber} - ⏱️  Total processing time ${i + 1}:`, processingTime, 'ms')
               }
-              const imageBuffer = await imageResponse.arrayBuffer()
-              imageBlob = new Blob([imageBuffer], { type: 'image/png' })
+            } catch (imageError) {
+              const processingTime = Date.now() - imageProcessingStartTime
+              console.error(`[Create Book] Page ${pageNumber} - ❌ Error processing reference image ${i + 1}:`, imageError)
+              console.error(`[Create Book] Page ${pageNumber} - ⏱️  Processing failed after:`, processingTime, 'ms')
             }
-          } catch (imageError) {
-            console.error(`[Create Book] Page ${pageNumber} - Error processing reference image:`, imageError)
-            // Fall back to /v1/images/generations if reference image fails
-            imageBlob = null
           }
 
-          // Only use /v1/images/edits if we have a valid image blob
-          if (imageBlob) {
+          if (imageBlobs.length === 0) {
+            console.log(`[Create Book] Page ${pageNumber} - ⚠️  No valid reference images processed - falling back to /v1/images/generations`)
+          }
+
+          // Only use /v1/images/edits if we have at least one valid image blob
+          if (imageBlobs.length > 0) {
+            console.log(`[Create Book] Page ${pageNumber} - 📦 Preparing FormData for /v1/images/edits API call...`)
+            
             const formData = new FormData()
             formData.append('model', imageModel)
             formData.append('prompt', fullPrompt)
             formData.append('size', imageSize)
             formData.append('quality', imageQuality)
             formData.append('input_fidelity', 'high') // Anatomik detayları koru
-            formData.append('image', imageBlob, 'reference.png')
+            // Append images as array (image[] format) to support multiple reference images
+            imageBlobs.forEach(({ blob, filename }) => {
+              formData.append('image[]', blob, filename)
+            })
+            
+            console.log(`[Create Book] Page ${pageNumber} - 📤 FormData prepared:`)
+            console.log(`[Create Book] Page ${pageNumber} -   - Model:`, imageModel)
+            console.log(`[Create Book] Page ${pageNumber} -   - Size:`, imageSize)
+            console.log(`[Create Book] Page ${pageNumber} -   - Quality:`, imageQuality)
+            console.log(`[Create Book] Page ${pageNumber} -   - Image blobs:`, imageBlobs.length)
+            console.log(`[Create Book] Page ${pageNumber} -   - Image format: Blob (multipart/form-data)`)
+            console.log(`[Create Book] Page ${pageNumber} -   - Prompt included: Yes ✅`)
+            console.log(`[Create Book] Page ${pageNumber} -   - Reference images included: Yes ✅ (${imageBlobs.length} as Blobs)`)
 
             const editsResponse = await fetch('https://api.openai.com/v1/images/edits', {
               method: 'POST',
@@ -1108,8 +1161,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             if (!editsResponse.ok) {
               const errorText = await editsResponse.text()
               console.error(`[Create Book] Page ${pageNumber} image generation failed:`, errorText)
-              // Fall back to /v1/images/generations
-              imageBlob = null
+              // Fall back to /v1/images/generations (will be handled below)
+              pageImageUrl = null
+              pageImageB64 = null
             } else {
               const editsApiTime = Date.now() - pageImageStartTime
               console.log(`[Create Book] ⏱️  Page ${pageNumber} edits API call completed in:`, editsApiTime, 'ms')
@@ -1138,7 +1192,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
 
           // Fall back to /v1/images/generations if edits failed or no image blob
           if (!pageImageUrl && !pageImageB64) {
-            console.log(`[Create Book] 🔄 Page ${pageNumber} - Falling back to /v1/images/generations (no reference image or edits failed)`)
+            console.log(`[Create Book] 🔄 Page ${pageNumber} - Falling back to /v1/images/generations (edits failed or no valid reference images)`)
             console.log(`[Create Book] 📋 Page ${pageNumber} - Model:`, imageModel)
             console.log(`[Create Book] 📏 Page ${pageNumber} - Size:`, imageSize)
             console.log(`[Create Book] 🎨 Page ${pageNumber} - Quality:`, imageQuality)

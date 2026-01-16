@@ -261,20 +261,36 @@ export default function Step2Page() {
           characterId: null, // Will be filled after API call
         }
 
-        // NEW: Include Child-specific details if this is a Child character
+        // NEW: Include appearance details for ALL character types
         if (currentCharacter.characterType.group === "Child") {
+          // Child-specific details
           characterData.age = currentCharacter.age
           characterData.gender = currentCharacter.gender
           characterData.hairColor = currentCharacter.hairColor
           characterData.eyeColor = currentCharacter.eyeColor
           characterData.specialFeatures = currentCharacter.specialFeatures || []
+        } else {
+          // Non-Child characters (Pets, Family Members, Other) - appearance details
+          characterData.hairColor = currentCharacter.hairColor
+          characterData.eyeColor = currentCharacter.eyeColor
+          characterData.specialFeatures = currentCharacter.specialFeatures || []
+          // Age and gender are optional for non-Child characters
+          if (currentCharacter.age) characterData.age = currentCharacter.age
+          if (currentCharacter.gender) characterData.gender = currentCharacter.gender
         }
 
         // Update or add character
         if (charIndex >= 0) {
+          // Preserve existing character data (hairColor, eyeColor, specialFeatures, etc.)
           wizardData.step2.characters[charIndex] = {
             ...wizardData.step2.characters[charIndex],
             ...characterData,
+            // Preserve appearance details if they exist
+            hairColor: characterData.hairColor || wizardData.step2.characters[charIndex].hairColor,
+            eyeColor: characterData.eyeColor || wizardData.step2.characters[charIndex].eyeColor,
+            specialFeatures: characterData.specialFeatures || wizardData.step2.characters[charIndex].specialFeatures || [],
+            age: characterData.age || wizardData.step2.characters[charIndex].age,
+            gender: characterData.gender || wizardData.step2.characters[charIndex].gender,
           }
         } else {
           wizardData.step2.characters.push(characterData)
@@ -294,22 +310,31 @@ export default function Step2Page() {
             let characterEyeColor: string
             let characterSpecialFeatures: string[]
 
-            // NEW: For Child characters, use their own details
+            // NEW: For Child characters, use their own details or fallback to Step 1
             if (currentCharacter.characterType.group === "Child") {
-              characterName = currentCharacter.name || "Child" // Required name for Child
+              characterName = currentCharacter.name || step1Data.name || "Child"
               characterAge = currentCharacter.age || step1Data.age || 5
               characterGender = currentCharacter.gender || step1Data.gender?.toLowerCase() || "girl"
               characterHairColor = currentCharacter.hairColor || step1Data.hairColor || "brown"
               characterEyeColor = currentCharacter.eyeColor || step1Data.eyeColor || "brown"
               characterSpecialFeatures = currentCharacter.specialFeatures || step1Data.specialFeatures || []
             } else {
-              // For non-Child characters, use type or displayName, and fallback to Step 1 data
-              characterName = currentCharacter.characterType.displayName || currentCharacter.characterType.value || step1Data.name
-              characterAge = step1Data.age || 5 // For pets/family, this might not make sense, but API requires it
-              characterGender = step1Data.gender?.toLowerCase() || "girl" // For pets, this is approximated
-              characterHairColor = step1Data.hairColor || "brown"
-              characterEyeColor = step1Data.eyeColor || "brown"
-              characterSpecialFeatures = step1Data.specialFeatures || []
+              // NEW: For non-Child characters, use THEIR OWN form data (not Step 1 data)
+              characterName = currentCharacter.characterType.displayName || currentCharacter.characterType.value
+              characterAge = currentCharacter.age || 5 // Default age for non-child characters
+              characterGender = currentCharacter.gender || step1Data.gender?.toLowerCase() || "other"
+              // CRITICAL: Use character's own appearance data (from form), NOT Step 1 data
+              characterHairColor = currentCharacter.hairColor || "brown" // Required from form
+              characterEyeColor = currentCharacter.eyeColor || "brown" // Required from form
+              characterSpecialFeatures = currentCharacter.specialFeatures || [] // Optional from form
+              
+              console.log(`[Step 2] Non-Child character appearance:`, {
+                name: characterName,
+                type: currentCharacter.characterType,
+                hairColor: characterHairColor,
+                eyeColor: characterEyeColor,
+                specialFeatures: characterSpecialFeatures,
+              })
             }
 
             const createCharResponse = await fetch("/api/characters", {
@@ -502,7 +527,7 @@ export default function Step2Page() {
     )
   }
 
-  // Handle Child-specific details change
+  // Handle character appearance details change (for all character types)
   const handleChildDetailsChange = (
     characterId: string,
     field: "name" | "age" | "gender" | "hairColor" | "eyeColor" | "specialFeatures",
@@ -510,7 +535,7 @@ export default function Step2Page() {
   ) => {
     setCharacters((prev) =>
       prev.map((char) => {
-        if (char.id === characterId && char.characterType.group === "Child") {
+        if (char.id === characterId) {
           const updated = {
             ...char,
             [field]: value,
@@ -519,11 +544,11 @@ export default function Step2Page() {
           if (field === "name") {
             updated.characterType = {
               ...char.characterType,
-              displayName: (value as string).trim() || "Child",
+              displayName: (value as string).trim() || char.characterType.value,
             }
           }
 
-          // NEW: Also update localStorage immediately for Child details
+          // NEW: Also update localStorage immediately for character details
           const saved = localStorage.getItem("kidstorybook_wizard")
           if (saved) {
             try {
@@ -537,7 +562,7 @@ export default function Step2Page() {
                     characterType: updated.characterType, // Include updated characterType if name changed
                   }
                   localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
-                  console.log("[Step 2] Updated Child details in localStorage:", field, value)
+                  console.log("[Step 2] Updated character details in localStorage:", field, value)
                 }
               }
             } catch (error) {
@@ -1112,6 +1137,102 @@ export default function Step2Page() {
                               ? "Give a name, or leave empty to use 'Mom', 'Grandma', etc." 
                               : "Optional custom name for this character"}
                           </p>
+                        </div>
+                      )}
+
+                      {/* NEW: Appearance Details for Non-Child Characters (Pets, Family Members, Other) */}
+                      {character.characterType.group !== "Child" && (
+                        <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
+                            Appearance Details
+                          </h3>
+                          <p className="text-xs text-gray-600 dark:text-slate-400">
+                            These details help create accurate illustrations of this character
+                          </p>
+                          
+                          {/* Hair/Fur & Eye Color */}
+                          <div className="grid grid-cols-2 gap-3">
+                            {/* Hair/Fur Color */}
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                {character.characterType.group === "Pets" ? "Fur Color" : "Hair Color"} <span className="text-red-500">*</span>
+                              </Label>
+                              <Select
+                                value={character.hairColor || ""}
+                                onValueChange={(value) => handleChildDetailsChange(character.id, "hairColor", value)}
+                              >
+                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                  <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {hairColorOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                  {character.characterType.group === "Pets" && (
+                                    <>
+                                      <SelectItem value="white">White</SelectItem>
+                                      <SelectItem value="gray">Gray</SelectItem>
+                                      <SelectItem value="spotted">Spotted</SelectItem>
+                                    </>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {/* Eye Color */}
+                            <div className="space-y-2">
+                              <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                                Eye Color <span className="text-red-500">*</span>
+                              </Label>
+                              <Select
+                                value={character.eyeColor || ""}
+                                onValueChange={(value) => handleChildDetailsChange(character.id, "eyeColor", value)}
+                              >
+                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                  <SelectValue placeholder="Select..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {eyeColorOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          {/* Special Features */}
+                          <div className="space-y-2">
+                            <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                              Special Features (optional)
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {specialFeaturesOptions.map((option) => (
+                                <div key={option.value} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`feature-${character.id}-${option.value}`}
+                                    checked={character.specialFeatures?.includes(option.value) || false}
+                                    onCheckedChange={(checked) => {
+                                      const currentFeatures = character.specialFeatures || []
+                                      const updatedFeatures = checked
+                                        ? [...currentFeatures, option.value]
+                                        : currentFeatures.filter((f) => f !== option.value)
+                                      handleChildDetailsChange(character.id, "specialFeatures", updatedFeatures)
+                                    }}
+                                  />
+                                  <Label
+                                    htmlFor={`feature-${character.id}-${option.value}`}
+                                    className="text-xs font-normal text-gray-700 dark:text-slate-300 cursor-pointer"
+                                  >
+                                    {option.label}
+                                  </Label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>

@@ -6,6 +6,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { CharacterDescription } from '@/lib/prompts/types'
+import { createClient } from '@/lib/supabase/server'
 
 // ============================================================================
 // Types
@@ -17,6 +18,7 @@ export interface Character {
   name: string
   age: number
   gender: 'boy' | 'girl' | 'other'
+  character_type?: any // JSONB: {group, value, displayName}
   reference_photo_url?: string
   reference_photo_path?: string
   description: CharacterDescription
@@ -39,6 +41,7 @@ export interface CreateCharacterInput {
   hair_color: string
   eye_color: string
   features?: string[]
+  character_type?: any // JSONB: {group, value, displayName}
   reference_photo_url?: string
   reference_photo_path?: string
   ai_analysis?: any
@@ -56,6 +59,7 @@ export interface UpdateCharacterInput {
   hair_color?: string
   eye_color?: string
   features?: string[]
+  character_type?: any // JSONB: {group, value, displayName}
   description?: CharacterDescription
   is_default?: boolean
 }
@@ -77,6 +81,7 @@ export async function createCharacter(
         name: input.name,
         age: input.age,
         gender: input.gender,
+        character_type: input.character_type, // NEW: Character type info
         hair_color: input.hair_color,
         eye_color: input.eye_color,
         features: input.features || [],
@@ -151,7 +156,7 @@ export async function getDefaultCharacter(
   userId: string
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data, error } = await supabase
       .from('characters')
@@ -181,11 +186,11 @@ export async function updateCharacter(
   input: UpdateCharacterInput
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // If updating description, save current version to history
     if (input.description) {
-      const { data: current } = await getCharacterById(characterId)
+      const { data: current } = await getCharacterById(supabase, characterId)
       if (current) {
         const previousVersions = current.previous_versions || []
         previousVersions.push({
@@ -238,7 +243,7 @@ export async function markCharacterUsed(
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // The trigger will handle updating used_in_books array
     // We just need to update the book's character_id
@@ -264,10 +269,10 @@ export async function deleteCharacter(
   characterId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Check if character is used in any books
-    const { data: character } = await getCharacterById(characterId)
+    const { data: character } = await getCharacterById(supabase, characterId)
     if (character && character.total_books > 0) {
       return {
         error: new Error(
@@ -303,7 +308,7 @@ export async function getCharacterStats(characterId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data, error } = await supabase.rpc('get_character_stats', {
       p_character_id: characterId,
@@ -329,7 +334,7 @@ export async function getBooksByCharacter(characterId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data, error } = await supabase.rpc('get_books_by_character', {
       p_character_id: characterId,

@@ -71,11 +71,20 @@ export default function Step6Page() {
   // Get actual data from wizardData (localStorage)
   // NEW: Support both old characterPhoto and new characters array
   const getCharactersData = () => {
+    console.log("[Step 6] getCharactersData - wizardData.step2:", wizardData?.step2)
+    console.log("[Step 6] getCharactersData - characters array:", wizardData?.step2?.characters)
+    
     if (wizardData?.step2?.characters && Array.isArray(wizardData.step2.characters)) {
       // New format: characters array
-      return wizardData.step2.characters
+      // Filter out characters that don't have at least an id or characterType
+      const validCharacters = wizardData.step2.characters.filter((char: any) => 
+        char && (char.id || char.characterType || char.photo)
+      )
+      console.log("[Step 6] Using new format - valid characters count:", validCharacters.length)
+      return validCharacters
     } else if (wizardData?.step2?.characterPhoto) {
       // Old format: single characterPhoto (backward compatibility)
+      console.log("[Step 6] Using old format - single characterPhoto")
       return [
         {
           id: "1",
@@ -85,10 +94,13 @@ export default function Step6Page() {
         },
       ]
     }
+    console.log("[Step 6] No characters found - returning empty array")
     return []
   }
 
   const charactersData = getCharactersData()
+  console.log("[Step 6] Final charactersData:", charactersData)
+  console.log("[Step 6] Characters count:", charactersData.length)
 
   const formData = {
     character: {
@@ -367,25 +379,60 @@ export default function Step6Page() {
                                     <span className="font-semibold">Eye Color:</span>{" "}
                                     {char.eyeColor || formData.character.eyeColor}
                                   </p>
-                                  {(char.specialFeatures?.length > 0 ||
-                                    formData.character.specialFeatures.length > 0) && (
-                                    <p>
-                                      <span className="font-semibold">Special Features:</span>{" "}
-                                      {(char.specialFeatures ||
-                                        formData.character.specialFeatures || []).join(", ")}
-                                    </p>
-                                  )}
+                                  {(() => {
+                                    const features = char.specialFeatures || formData.character.specialFeatures || []
+                                    return features.length > 0 ? (
+                                      <p>
+                                        <span className="font-semibold">Special Features:</span>{" "}
+                                        {features.join(", ")}
+                                      </p>
+                                    ) : null
+                                  })()}
                                 </div>
                               ) : (
-                                // Additional characters - Show only type and name
+                                // Additional characters - Show type and appearance details
                                 <div className="mt-2 space-y-1 text-sm text-gray-700 dark:text-slate-300">
                                   <p>
                                     <span className="font-semibold">Type:</span>{" "}
                                     {char.characterType?.value || "Unknown"}
                                   </p>
-                                  <p className="text-xs text-gray-500 dark:text-slate-400">
+                                  <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">
                                     {char.characterType?.group || "Other"}
                                   </p>
+                                  
+                                  {/* Appearance Details for Non-Child Characters */}
+                                  {char.hairColor && (
+                                    <p>
+                                      <span className="font-semibold">
+                                        {char.characterType?.group === "Pets" ? "Fur Color:" : "Hair Color:"}
+                                      </span>{" "}
+                                      {char.hairColor}
+                                    </p>
+                                  )}
+                                  {char.eyeColor && (
+                                    <p>
+                                      <span className="font-semibold">Eye Color:</span>{" "}
+                                      {char.eyeColor}
+                                    </p>
+                                  )}
+                                  {char.age && (
+                                    <p>
+                                      <span className="font-semibold">Age:</span>{" "}
+                                      {char.age} years old
+                                    </p>
+                                  )}
+                                  {char.gender && (
+                                    <p>
+                                      <span className="font-semibold">Gender:</span>{" "}
+                                      {char.gender}
+                                    </p>
+                                  )}
+                                  {char.specialFeatures && char.specialFeatures.length > 0 && (
+                                    <p>
+                                      <span className="font-semibold">Special Features:</span>{" "}
+                                      {char.specialFeatures.join(", ")}
+                                    </p>
+                                  )}
                                 </div>
                               )}
                             </div>

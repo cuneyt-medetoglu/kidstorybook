@@ -113,6 +113,14 @@ Create an illustration for each page:
    - Only clothing and position can change
    - **Pay special attention to hair length - this is a common mistake. If the photo shows short hair, the illustration must show short hair. If long, show long.**
 
+   [IF MULTIPLE CHARACTERS EXIST]
+   - **Additional Characters:** Each additional character must maintain their unique appearance:
+     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1)
+     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1)
+     * **CRITICAL:** Each character must maintain their individual characteristics. Do NOT mix features between characters.
+     * **CRITICAL:** Match each character's text description with its corresponding reference image (image 1 → character 1, image 2 → character 2, etc.)
+   [END IF]
+
 2. **Illustration Style:**
    - [ILLUSTRATION_STYLE_DESCRIPTION]
    [3D_ANIMATION_SPECIAL_NOTES_IF_APPLICABLE]

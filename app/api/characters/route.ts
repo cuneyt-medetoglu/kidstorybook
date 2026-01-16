@@ -33,6 +33,7 @@ export async function POST(request: NextRequest) {
       eyeColor,
       specialFeatures = [],
       photoBase64, // Base64 encoded photo (data URL without prefix)
+      characterType, // NEW: Character type info {group, value, displayName}
     } = body
 
     // Validation
@@ -120,6 +121,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Log character type for debugging
+    if (characterType) {
+      console.log('[Character Creation] Character type:', JSON.stringify(characterType))
+    } else {
+      console.log('[Character Creation] Warning: No characterType provided, using default (Child)')
+    }
+
     // Create character in database
     const { data: character, error: dbError } = await createCharacter(
       supabase,
@@ -128,6 +136,7 @@ export async function POST(request: NextRequest) {
         name,
         age: parseInt(age) || 5,
         gender: (gender.toLowerCase() as 'boy' | 'girl' | 'other'),
+        character_type: characterType || { group: 'Child', value: 'Child', displayName: name }, // NEW: Character type info
         hair_color: hairColor || 'brown',
         eye_color: eyeColor || 'brown',
         features: Array.isArray(specialFeatures) ? specialFeatures : [],

@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.0',
+  version: '1.0.1',
   releaseDate: new Date('2026-01-10'),
   status: 'active',
   changelog: [
@@ -25,6 +25,7 @@ export const VERSION: PromptVersion = {
     'Strong language enforcement directives added - 24 Ocak 2026',
     'Language mixing prevention (no English words in non-English stories) - 24 Ocak 2026',
     'Final language check mechanism added - 24 Ocak 2026',
+    'v1.0.1: Enhanced additional characters section with detailed appearance descriptions (age, hair color, eye color, features) and explicit character name usage directive (16 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -67,25 +68,48 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n\nADDITIONAL CHARACTERS:\n`
     
     characters.slice(1).forEach((char, index) => {
-      characterDesc += `\n${index + 2}. ${char.type.displayName} (${char.type.group})`
+      const charName = char.name || char.type.displayName
+      const charNumber = index + 2
       
       if (char.type.group === "Pets") {
-        characterDesc += ` - A friendly ${char.type.value.toLowerCase()}`
-        if (char.type.displayName !== char.type.value) {
-          characterDesc += ` (${char.type.displayName})`
+        characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} fur`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
         }
+        characterDesc += ` - A friendly and playful companion`
       } else if (char.type.group === "Family Members") {
-        characterDesc += ` - ${characterName}'s ${char.type.value.toLowerCase()}`
-        if (char.type.displayName !== char.type.value) {
-          characterDesc += ` (${char.type.displayName})`
+        // NEW: Detailed family member description
+        characterDesc += `\n${charNumber}. ${charName} (${characterName}'s ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.age) characterDesc += `, ${char.description.age} years old`
+          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} hair`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
         }
+        characterDesc += ` - A warm and caring family member`
       } else {
         // Other
-        characterDesc += ` - ${char.name || char.type.displayName}`
+        characterDesc += `\n${charNumber}. ${charName}`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} hair`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
       }
     })
     
-    characterDesc += `\n\n**IMPORTANT:** All ${characters.length} characters should appear in the story. The main character is ${characterName}.`
+    characterDesc += `\n\n**IMPORTANT:** All ${characters.length} characters should appear in the story. The main character is ${characterName}. Use the character names (${characters.map(c => c.name || c.type.displayName).join(', ')}) throughout the story, not generic terms like "friends" or "companions".`
   }
 
   // Main prompt

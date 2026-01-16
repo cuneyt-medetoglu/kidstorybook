@@ -44,6 +44,14 @@ Create a magical and engaging 10-page children's story.
   - Physical features (for image prompts - MUST be in English): [CHARACTER_FEATURES_ENGLISH]
   - Photo reference: The child in the uploaded photo
 
+ADDITIONAL CHARACTERS:
+[IF MULTIPLE CHARACTERS EXIST]
+2. [CHARACTER_2_NAME] ([CHARACTER_NAME]'s [CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - A warm and caring family member
+3. [CHARACTER_3_NAME] ([CHARACTER_NAME]'s [CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes - A warm and caring family member
+[END IF]
+
+**IMPORTANT:** All [TOTAL_CHARACTER_COUNT] characters should appear in the story. The main character is [CHARACTER_NAME]. Use the character names ([CHARACTER_NAMES_LIST]) throughout the story, not generic terms like "friends" or "companions".
+
 # STORY SETTINGS
 - **Theme:** [THEME] - [SUBTHEME]
 - **Age Group:** [AGE_GROUP] years
