@@ -39,6 +39,7 @@ docs/
 │   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
 │   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
+│   ├── IMAGE_EDIT_FEATURE_GUIDE.md # Image edit feature rehberi (ChatGPT-style mask-based editing)
 │   └── ...
 │
 ├── reports/                    # Raporlar (aktif)
@@ -227,5 +228,13 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 10 Ocak 2026
+**Son Güncelleme:** 17 Ocak 2026
+
+- **17 Ocak 2026:**
+  - Image Edit Feature tamamlandı
+    - ChatGPT-style mask-based editing sistemi
+    - OpenAI Image Edit API entegrasyonu
+    - Version history ve revert sistemi
+    - Parent-only access (Book Settings page)
+    - `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md` oluşturuldu
 

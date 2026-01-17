@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -104,6 +105,7 @@ interface BookViewerProps {
 }
 
 export function BookViewer({ bookId, onClose }: BookViewerProps) {
+  const router = useRouter()
   const [book, setBook] = useState<any>(null)
   const [isLoadingBook, setIsLoadingBook] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -1100,6 +1102,18 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           aria-label="Share book"
         >
           <Share2 className="h-5 w-5" />
+        </Button>
+
+        {/* Parent Settings - Subtle link for parents */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => router.push(`/books/${bookId}/settings`)}
+          className="hidden text-xs text-muted-foreground hover:text-foreground md:flex"
+          aria-label="Parent Settings"
+        >
+          <Settings className="h-3 w-3 mr-1" />
+          <span className="hidden lg:inline">Parent Settings</span>
         </Button>
       </footer>
     </div>

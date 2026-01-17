@@ -194,8 +194,7 @@ export default function LibraryPage() {
   }
 
   const handleEditBook = (bookId: string) => {
-    // TODO: Navigate to edit page (Faz 3'te implement edilecek)
-    console.log("Edit book:", bookId)
+    router.push(`/books/${bookId}/settings`)
   }
 
   const handleDownloadBook = async (bookId: string) => {

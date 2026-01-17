@@ -576,6 +576,38 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - ✅ Anatomik hatalar minimize edildi
   - **İlham:** Magical Children's Book örnekleri analizi
   - **Durum:** Production'da aktif ✅
+- [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
+  - [x] Database migration (`011_add_image_edit_feature.sql`)
+    - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns
+    - [x] `image_edit_history` table (version tracking)
+    - [x] RLS policies ve SQL functions
+  - [x] API Endpoints:
+    - [x] `POST /api/ai/edit-image` - OpenAI Image Edit API entegrasyonu
+    - [x] `GET /api/books/[id]/edit-history` - Edit history endpoint
+    - [x] `POST /api/books/[id]/revert-image` - Version revert endpoint
+  - [x] Frontend Components:
+    - [x] `ImageEditModal` - Canvas-based mask drawing (ChatGPT-style)
+    - [x] `EditHistoryPanel` - Version history viewer
+    - [x] `BookSettingsPage` - Parent-only edit interface
+  - [x] Features:
+    - [x] Mask-based editing (transparent = edit, opaque = preserve)
+    - [x] 3 edits per book quota system
+    - [x] Full version history tracking
+    - [x] Revert to previous versions
+    - [x] Parent-only access (separated from child-safe Book Viewer)
+  - [x] OpenAI API Integration:
+    - [x] Model: `gpt-image-1.5`
+    - [x] Size: `1024x1536` (portrait)
+    - [x] Quality: `low`
+    - [x] `input_fidelity: high` (preserve original image)
+    - [x] Mask inversion logic (painted areas → transparent = edit zone)
+  - [x] Bug Fixes:
+    - [x] Mask logic inversion (transparent = edit, opaque = preserve)
+    - [x] Response format (b64_json only, no URL)
+    - [x] Logging optimization (no base64 dumps)
+    - [x] Variable name conflicts resolved
+  - **Documentation:** `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md`
+  - **Status:** ✅ Production ready, tested and working
 
 ### 3.6 PDF Generation ✅
 - [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
@@ -1549,7 +1581,14 @@ Response: {
 - ✅ Type definitions güncellendi (8 dil desteği)
 - ✅ Step 6'da dil bilgisi review'da gösteriliyor ve book creation request'ine ekleniyor
 
-**Son Yapılanlar (16 Ocak 2026):**
+**Son Yapılanlar (17 Ocak 2026):**
+- ✅ **Image Edit Feature** - ChatGPT-style mask-based editing tamamlandı
+  - Canvas-based mask drawing tool
+  - OpenAI Image Edit API entegrasyonu (`/v1/images/edits`)
+  - Version history ve revert sistemi
+  - Parent-only access (Book Settings page)
+  - 3 edits per book quota
+  - Mask logic düzeltmesi (transparent = edit zone)
 - ✅ GPT-image API entegrasyonu (`/v1/images/edits` endpoint)
 - ✅ Size selection eklendi (1024x1024, 1024x1792, 1792x1024)
 - ✅ Model selection eklendi (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
