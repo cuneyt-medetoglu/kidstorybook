@@ -178,7 +178,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <Badge variant={isCurrent ? 'default' : 'secondary'}>
-                                  Version {item.version}
+                                  {item.version === 0 ? 'Original' : `Version ${item.version}`}
                                 </Badge>
                                 {isCurrent && (
                                   <Badge variant="default" className="bg-purple-500">
@@ -200,7 +200,11 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
 
                             <div className="space-y-2">
                               <p className="text-xs text-muted-foreground">
-                                <strong>Edit:</strong> {item.editPrompt}
+                                {item.version === 0 ? (
+                                  <strong>Original:</strong>
+                                ) : (
+                                  <strong>Edit:</strong>
+                                )} {item.editPrompt}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {new Date(item.createdAt).toLocaleString()}

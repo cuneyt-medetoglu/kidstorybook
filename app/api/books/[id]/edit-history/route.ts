@@ -76,25 +76,72 @@ export async function GET(
     }
 
     // ====================================================================
-    // 4. GROUP HISTORY BY PAGE
+    // 4. GROUP HISTORY BY PAGE AND ADD ORIGINAL VERSIONS (Version 0)
     // ====================================================================
     const pageHistoryMap: { [pageNumber: number]: PageEditHistory } = {}
+    const allPages = book.story_data?.pages || []
 
+    // First, collect all pages that have edits
+    const pagesWithEdits = new Set<number>()
+    if (historyData && Array.isArray(historyData)) {
+      historyData.forEach((item: any) => {
+        pagesWithEdits.add(item.page_number)
+      })
+    }
+
+    // For each page, add version 0 (original) if it has edits OR always show all pages
+    allPages.forEach((page: any, index: number) => {
+      const pageNumber = index + 1
+      if (!page.imageUrl) return
+
+      // Get original image URL from first edit (if exists), otherwise use current image
+      let originalImageUrl = page.imageUrl
+      if (pagesWithEdits.has(pageNumber)) {
+        const firstEdit = historyData?.find(
+          (item: any) => item.page_number === pageNumber
+        )
+        if (firstEdit?.original_image_url) {
+          originalImageUrl = firstEdit.original_image_url
+        }
+      }
+
+      pageHistoryMap[pageNumber] = {
+        currentVersion: 0, // Will be updated below if edits exist
+        versions: [
+          {
+            version: 0,
+            imageUrl: originalImageUrl,
+            editPrompt: 'Original generated image',
+            createdAt: book.created_at || new Date().toISOString(),
+          },
+        ],
+      }
+    })
+
+    // Then, add edit history on top
     if (historyData && Array.isArray(historyData)) {
       historyData.forEach((item: any) => {
         const pageNumber = item.page_number
 
+        // Ensure page exists in map (should already exist from above)
         if (!pageHistoryMap[pageNumber]) {
           pageHistoryMap[pageNumber] = {
             currentVersion: 0,
-            versions: [],
+            versions: [
+              {
+                version: 0,
+                imageUrl: item.original_image_url || item.edited_image_url,
+                editPrompt: 'Original generated image',
+                createdAt: book.created_at || new Date().toISOString(),
+              },
+            ],
           }
         }
 
         const historyItem: EditHistoryItem = {
           version: item.version,
           imageUrl: item.edited_image_url,
-          editPrompt: item.edit_prompt,
+          editPrompt: item.edit_prompt || 'Image edit',
           createdAt: item.created_at,
         }
 

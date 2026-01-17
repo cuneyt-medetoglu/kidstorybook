@@ -86,23 +86,44 @@ export async function POST(
     }
 
     // ====================================================================
-    // 5. FETCH TARGET VERSION FROM HISTORY
+    // 5. FETCH TARGET VERSION FROM HISTORY OR USE ORIGINAL
     // ====================================================================
-    const { data: historyData, error: historyError } = await supabase
-      .from('image_edit_history')
-      .select('*')
-      .eq('book_id', bookId)
-      .eq('page_number', pageNumber)
-      .eq('version', targetVersion)
-      .single()
+    let targetImageUrl: string
 
-    if (historyError || !historyData) {
-      return errorResponse(`Version ${targetVersion} not found for page ${pageNumber}`, 404)
+    if (targetVersion === 0) {
+      // Version 0 = Original image (from story_data, not from history)
+      const currentPage = book.story_data.pages[pageIndex]
+      if (!currentPage.imageUrl) {
+        return errorResponse(`Page ${pageNumber} has no original image`, 404)
+      }
+      
+      // Try to get original from first edit history, otherwise use current
+      const { data: firstEdit } = await supabase
+        .from('image_edit_history')
+        .select('original_image_url')
+        .eq('book_id', bookId)
+        .eq('page_number', pageNumber)
+        .order('version', { ascending: true })
+        .limit(1)
+        .single()
+
+      targetImageUrl = firstEdit?.original_image_url || currentPage.imageUrl
+    } else {
+      // Version > 0 = Edited version (from history)
+      const { data: historyData, error: historyError } = await supabase
+        .from('image_edit_history')
+        .select('*')
+        .eq('book_id', bookId)
+        .eq('page_number', pageNumber)
+        .eq('version', targetVersion)
+        .single()
+
+      if (historyError || !historyData) {
+        return errorResponse(`Version ${targetVersion} not found for page ${pageNumber}`, 404)
+      }
+
+      targetImageUrl = historyData.edited_image_url
     }
-
-    const targetImageUrl = targetVersion === 0 
-      ? historyData.original_image_url 
-      : historyData.edited_image_url
 
     console.log(`[Revert Image] Target image URL: ${targetImageUrl}`)
 

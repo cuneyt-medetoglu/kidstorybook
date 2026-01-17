@@ -418,6 +418,55 @@ default_quota_limit: 3 // Per book
 **Maintained by:** @project-manager  
 **Last Updated:** 17 Ocak 2026
 
+## Prompt Security System
+
+### Positive Prompt Structure
+
+The edit prompt includes comprehensive safety directives:
+
+1. **Mask Area Restrictions:**
+   - Only modify masked area
+   - Keep rest of image unchanged
+   - Maintain original style and character consistency
+
+2. **Anatomical Correctness Directives:**
+   - Hand/finger anatomy rules (5 fingers, proper joints)
+   - Body anatomy rules (2 hands, 2 arms, 2 legs)
+   - Facial symmetry rules
+   - **CRITICAL:** NO hand-holding directive
+
+3. **Prohibitions (DO NOT):**
+   - Violence, scary elements, inappropriate content
+   - Character appearance changes (unless requested)
+   - Adding/removing elements not mentioned
+   - Changes outside masked area
+
+### Negative Prompt Integration
+
+The system uses the same negative prompt system as main image generation:
+
+- **Universal Negative Prompts:** Violence, scary content, inappropriate themes
+- **Age-Specific Negatives:** Tailored to book's target age group
+- **Style-Specific Negatives:** Maintains illustration style consistency
+- **Theme-Specific Negatives:** Prevents theme-inappropriate elements
+- **Anatomical Negatives:** Prevents anatomical errors and hand-holding
+
+**Source:** `lib/prompts/image/v1.0.0/negative.ts`
+
+### Safety Flow
+
+```
+User Edit Request
+  ↓
++ Positive Prompt (with anatomical directives)
++ Negative Prompt (from main generation system)
++ Book Metadata (age, style, theme)
+  ↓
+OpenAI Image Edit API
+  ↓
+Safe, targeted edit
+```
+
 ## Implementation Notes
 
 ### Critical Fixes Applied (17 Ocak 2026)

@@ -606,6 +606,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [x] Response format (b64_json only, no URL)
     - [x] Logging optimization (no base64 dumps)
     - [x] Variable name conflicts resolved
+  - [x] Version 0 (Original) Support:
+    - [x] Original images shown in edit history
+    - [x] Revert to original version (version 0)
+    - [x] UI improvements (Original badge, proper labeling)
+  - [x] Prompt Security Enhancements:
+    - [x] Positive prompt with anatomical correctness directives
+    - [x] Negative prompt integration (from main image generation)
+    - [x] Safety constraints to prevent unwanted edits
+    - [x] Age-group, style, and theme-specific restrictions
   - **Documentation:** `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md`
   - **Status:** ✅ Production ready, tested and working
 

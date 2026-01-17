@@ -234,7 +234,8 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
   - Image Edit Feature tamamlandı
     - ChatGPT-style mask-based editing sistemi
     - OpenAI Image Edit API entegrasyonu
-    - Version history ve revert sistemi
+    - Version history ve revert sistemi (Version 0 - Original support)
     - Parent-only access (Book Settings page)
+    - Prompt security enhancements (positive + negative prompts)
     - `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md` oluşturuldu
 

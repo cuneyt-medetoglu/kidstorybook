@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
+import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/v1.0.0/negative'
 
 export interface ImageEditRequest {
   bookId: string
@@ -68,12 +69,6 @@ export async function POST(request: NextRequest) {
       return errorResponse('editPrompt must be at least 5 characters', 400)
     }
 
-    console.log(`[Image Edit] Starting edit for book ${bookId}, page ${pageNumber}`)
-    console.log(`[Image Edit] User: ${user.email}`)
-    const promptPrefix = 'Only modify the masked area. Keep the rest of the image unchanged.'
-    const finalPrompt = `${promptPrefix} ${editPrompt}`.trim()
-    console.log(`[Image Edit] Prompt: ${finalPrompt}`)
-
     // ====================================================================
     // 3. FETCH BOOK & CHECK OWNERSHIP
     // ====================================================================
@@ -85,6 +80,43 @@ export async function POST(request: NextRequest) {
     if (book.user_id !== user.id) {
       return errorResponse('Unauthorized', 403)
     }
+
+    console.log(`[Image Edit] Starting edit for book ${bookId}, page ${pageNumber}`)
+    console.log(`[Image Edit] User: ${user.email}`)
+
+    // ====================================================================
+    // BUILD SAFE EDIT PROMPT WITH POSITIVE AND NEGATIVE CONSTRAINTS
+    // ====================================================================
+    // Get book metadata for prompt context
+    const ageGroup = book.story_data?.ageGroup || 'preschool'
+    const illustrationStyle = book.story_data?.illustrationStyle || 'watercolor'
+    const theme = book.story_data?.theme || 'adventure'
+
+    // Get negative prompts for safety (prevent unwanted content)
+    const negativeItems = getNegativePrompt(ageGroup, illustrationStyle, theme).split(', ')
+    
+    // Build comprehensive positive prompt with safety directives
+    const promptPrefix = [
+      'CRITICAL EDITING RULES:',
+      '1. Only modify the masked area. Keep the rest of the image completely unchanged.',
+      '2. Maintain the original illustration style and character consistency.',
+      '3. Follow these anatomical correctness rules:',
+      getAnatomicalCorrectnessDirectives(),
+      '',
+      'STRICT PROHIBITIONS (DO NOT):',
+      `DO NOT include: ${negativeItems.slice(0, 10).join(', ')} (and other inappropriate content).`,
+      'DO NOT change anything outside the masked area.',
+      'DO NOT alter character appearance or clothing unless specifically requested.',
+      'DO NOT add or remove elements not mentioned in the edit request.',
+      'DO NOT introduce violence, scary elements, or inappropriate content.',
+      '',
+      'EDIT REQUEST:',
+    ].join('\n')
+
+    const finalPrompt = `${promptPrefix}\n${editPrompt}`.trim()
+    
+    console.log(`[Image Edit] Prompt length: ${finalPrompt.length} characters`)
+    console.log(`[Image Edit] Negative items count: ${negativeItems.length}`)
 
     // ====================================================================
     // 4. CHECK EDIT QUOTA
