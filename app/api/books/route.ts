@@ -645,10 +645,31 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           supabase
         )
         console.log(`[Create Book] ✅ Master illustration created: ${masterIllustrationUrl}`)
+        
+        // Update generation_metadata with master illustration URL
+        const currentMetadata = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMetadata,
+            masterIllustrationUrl: masterIllustrationUrl,
+            masterIllustrationCreated: true,
+          },
+        })
+        console.log(`[Create Book] 💾 Master illustration URL saved to generation_metadata`)
       } catch (error) {
         console.error('[Create Book] ❌ Master illustration generation failed:', error)
         // Continue without master - fallback to character photos
         console.log('[Create Book] ⚠️  Continuing without master illustration (using character photos)')
+        
+        // Update metadata to indicate master was not created
+        const currentMetadata = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMetadata,
+            masterIllustrationCreated: false,
+            masterIllustrationError: error instanceof Error ? error.message : 'Unknown error',
+          },
+        })
       }
     }
 
