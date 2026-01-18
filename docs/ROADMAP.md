@@ -723,35 +723,64 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)
   - [x] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
   - [x] Sayfa layout iyileştirmesi (görsel + metin düzeni) - A4 landscape, double-page spread
-  - [x] Font seçimi (çocuk dostu, okunabilir) - 16pt font, 1.6 line height
-  - [x] Renk şeması ve tema uyumu - Pastel arka plan deseni (CSS pattern)
-  - [x] Sayfa numaraları ve footer tasarımı - Sadece metin sayfalarına
+  - [x] Font seçimi (çocuk dostu, okunabilir) - Başlık: Fredoka (Bold), Metin: Alegreya (Regular), 18pt font, 1.8 line height
+  - [x] Renk şeması ve tema uyumu - #fef9f3 arka plan rengi
+  - [x] Sayfa numaraları ve footer tasarımı - Sağ altta, sadece metin sayfalarına
   - [x] Görsel kalitesi optimizasyonu - 1024x1536 aspect ratio korunuyor
   - [x] **Puppeteer + HTML/CSS yaklaşımına geçiş** ✅ (17 Ocak 2026)
     - [x] jsPDF yerine Puppeteer kullanımı (daha iyi kalite)
     - [x] HTML/CSS template sistemi (profesyonel layout)
-    - [x] Double-page spread layout (A4 landscape)
+    - [x] Double-page spread layout (A4 landscape, her yarı A5 dikey)
     - [x] Alternatif görsel-metin pattern
     - **Not:** jsPDF yaklaşımından vazgeçildi, Puppeteer ile HTML/CSS template kullanılıyor
+- [x] **5.7.1.1** PDF Layout İyileştirmeleri ✅ (25 Ocak 2026)
+  - [x] A5 dikey sayfa düzeni (her yarı 148.5mm x 210mm)
+  - [x] Görsel hizalama: Sol sayfa sola, sağ sayfa sağa hizalı
+  - [x] Metin hizalama: Sol yaslı, dikey ortalı
+  - [x] 4 köşe pattern: Text sayfalarında SVG pattern (her köşe rotate edilmiş)
+  - [x] Kesik çizgi ayırıcı: Sayfa ortasında dashed border
+  - [x] Pattern sadece text sayfalarında (image sayfalarında yok)
 - [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme)
 - [ ] **5.7.3** PDF customization seçenekleri (opsiyonel)
   - [ ] Farklı sayfa boyutları (A4, Letter, Square)
   - [ ] Farklı layout seçenekleri
 - [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri
-  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik)
+  - [x] Temel 4 köşe pattern sistemi ✅ (25 Ocak 2026) - `public/pdf-backgrounds/children-pattern.svg`
+  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik) - `public/pdf-backgrounds/` klasörüne eklenebilir
   - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında)
   - [ ] Tema bazlı desenler (deniz, orman, uzay vb.)
+  - [ ] **Hikaye Temasına Göre Arka Plan Rengi:**
+    - [ ] Otomatik renk seçimi (macera: mavi tonları, orman: yeşil tonları, vb.)
+    - [ ] Kullanıcı arka plan rengi seçimi
+    - [ ] Tema bazlı renk paletleri
 - [ ] **5.7.5** PDF boyut optimizasyonu (gelecek iyileştirme) (17 Ocak 2026)
   - [ ] Daha agresif compression teknikleri (SLOW mode vs MEDIUM)
   - [ ] Görsel boyutlarını daha da küçültme (70-75% seviyesine)
   - [ ] PDF boyut hedefi: 5-6 MB altı (10 sayfalık kitap için)
   - [ ] Kalite vs boyut dengesi testleri
   - **Not:** Şu an `pdfs` bucket (50 MB limit) kullanılıyor, optimizasyon opsiyonel
-- **Not:** Temel PDF generation çalışıyor ✅ (11 Ocak 2026), Tasarım iyileştirmesi tamamlandı ✅ (17 Ocak 2026), Bucket `pdfs` (50 MB) olarak güncellendi ✅ (17 Ocak 2026), Puppeteer + HTML/CSS yaklaşımına geçildi ✅ (17 Ocak 2026)
+- [x] **5.7.6** Cover Page İyileştirmeleri ✅ (25 Ocak 2026)
+  - [x] **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026)
+    - [x] Double-page spread layout (sol: görsel, sağ: başlık)
+    - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
+    - [x] Diğer sayfalardaki görsel hizalaması ile aynı mantık
+  - [ ] **Şirket Bilgisi Ekleme:**
+    - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi
+    - [ ] Logo ve şirket bilgileri yerleşimi
+    - [ ] Footer veya alt kısımda şirket bilgisi
+  - [x] **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026)
+    - [x] "adventure • collage" gibi seçilen bilgilerin yer aldığı bölümün kapaktan kaldırılması
+    - [x] Sadece başlık ve görsel kalacak şekilde sadeleştirme
+- **Not:** Temel PDF generation çalışıyor ✅ (11 Ocak 2026), Tasarım iyileştirmesi tamamlandı ✅ (17 Ocak 2026), Layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Cover page layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Bucket `pdfs` (50 MB) olarak güncellendi ✅ (17 Ocak 2026), Puppeteer + HTML/CSS yaklaşımına geçildi ✅ (17 Ocak 2026)
   - **Teknoloji:** Puppeteer + HTML/CSS Template (jsPDF'den geçildi)
-  - **Format:** A4 landscape, double-page spread (kitap formatı)
+  - **Format:** A4 landscape, double-page spread (her yarı A5 dikey: 148.5mm x 210mm)
   - **Layout:** Alternatif görsel-metin düzeni (spread bazlı değişir)
-  - **Görseller:** 1024x1536 portrait, aspect ratio korunuyor
+  - **Görseller:** 1024x1536 portrait, aspect ratio korunuyor, sayfa kenarına hizalı
+  - **Metin:** 18pt font (Alegreya Regular), 1.8 line height, sol yaslı, dikey ortalı
+  - **Başlık:** 36pt font (Fredoka Bold)
+  - **Pattern:** 4 köşede SVG pattern (sadece text sayfalarında, her köşe rotate edilmiş)
+  - **Arka Plan:** #fef9f3 (açık krem/bej)
+  - **Ayırıcı:** Kesik çizgi (dashed) ortada
   - **Arka Plan:** CSS ile pastel noktalı desen
   - **Sayfa Numaraları:** Sadece metin sayfalarında görünür
   - **Font:** 16pt, 1.6 line height (çocuk dostu)

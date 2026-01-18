@@ -85,21 +85,17 @@ function formatText(text: string): string {
  */
 function generateCoverHTML(options: PDFOptions): string {
   const coverImage = options.coverImageUrl
-    ? `<img src="${escapeHtml(options.coverImageUrl)}" alt="Cover" class="cover-image" />`
+    ? `<img src="${escapeHtml(options.coverImageUrl)}" alt="Cover" class="page-image cover-image" />`
     : ''
-
-  const metadata = [options.theme, options.illustrationStyle]
-    .filter(Boolean)
-    .map((item) => `<span>${escapeHtml(item!)}</span>`)
-    .join(' <span class="separator">•</span> ')
 
   return `
     <div class="page cover-page">
-      <div class="cover-container">
-        ${coverImage}
-        <div class="cover-content">
+      <div class="spread-container">
+        <div class="half-page image-page cover-image-page">
+          ${coverImage}
+        </div>
+        <div class="half-page cover-title-page">
           <h1 class="cover-title">${escapeHtml(options.title)}</h1>
-          ${metadata ? `<p class="cover-metadata">${metadata}</p>` : ''}
         </div>
       </div>
     </div>
@@ -122,6 +118,10 @@ function generateSpreadHTML(spread: SpreadData): string {
     } else if (spread.left.type === 'text') {
       leftHTML = `
         <div class="half-page text-page">
+          <span class="corner-pattern corner-top-left"></span>
+          <span class="corner-pattern corner-top-right"></span>
+          <span class="corner-pattern corner-bottom-left"></span>
+          <span class="corner-pattern corner-bottom-right"></span>
           <div class="text-content">
             <div class="page-text">${formatText(spread.left.data.text)}</div>
             <span class="page-number">${spread.left.data.pageNumber}</span>
@@ -143,6 +143,10 @@ function generateSpreadHTML(spread: SpreadData): string {
     } else if (spread.right.type === 'text') {
       rightHTML = `
         <div class="half-page text-page">
+          <span class="corner-pattern corner-top-left"></span>
+          <span class="corner-pattern corner-top-right"></span>
+          <span class="corner-pattern corner-bottom-left"></span>
+          <span class="corner-pattern corner-bottom-right"></span>
           <div class="text-content">
             <div class="page-text">${formatText(spread.right.data.text)}</div>
             <span class="page-number">${spread.right.data.pageNumber}</span>
@@ -167,7 +171,21 @@ function generateSpreadHTML(spread: SpreadData): string {
  */
 function generateHTML(options: PDFOptions, spreads: SpreadData[]): string {
   const cssPath = path.join(process.cwd(), 'lib', 'pdf', 'templates', 'book-styles.css')
-  const css = fs.readFileSync(cssPath, 'utf-8')
+  let css = fs.readFileSync(cssPath, 'utf-8')
+
+  // Load SVG pattern and convert to base64 data URI
+  const svgPath = path.join(process.cwd(), 'public', 'pdf-backgrounds', 'children-pattern.svg')
+  if (fs.existsSync(svgPath)) {
+    const svgContent = fs.readFileSync(svgPath, 'utf-8')
+    const base64Svg = Buffer.from(svgContent).toString('base64')
+    const dataUri = `data:image/svg+xml;base64,${base64Svg}`
+    
+    // Replace SVG URL with data URI in CSS
+    css = css.replace(
+      /url\(['"]?\/pdf-backgrounds\/children-pattern\.svg['"]?\)/g,
+      `url('${dataUri}')`
+    )
+  }
 
   const coverHTML = generateCoverHTML(options)
   const spreadsHTML = spreads.map(generateSpreadHTML).join('\n')
@@ -179,6 +197,9 @@ function generateHTML(options: PDFOptions, spreads: SpreadData[]): string {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(options.title)}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Alegreya:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     ${css}
   </style>

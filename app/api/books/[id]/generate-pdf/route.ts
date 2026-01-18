@@ -57,7 +57,38 @@ export async function POST(
     const { searchParams } = new URL(request.url)
     const forceRegenerate = searchParams.get('force') === 'true'
     
-    if (!forceRegenerate && book.pdf_url && book.pdf_path) {
+    // Verify PDF actually exists in storage bucket
+    let pdfExistsInBucket = false
+    if (!forceRegenerate && book.pdf_path) {
+      try {
+        // Split path to get folder and filename
+        const pathParts = book.pdf_path.split('/')
+        const fileName = pathParts.pop() || ''
+        const folderPath = pathParts.join('/')
+        
+        // List files in the folder and check if our file exists
+        const { data: fileData, error: fileError } = await supabase.storage
+          .from('pdfs')
+          .list(folderPath || '', {
+            limit: 1000,
+          })
+        
+        if (!fileError && fileData) {
+          // Check if file exists in the list
+          pdfExistsInBucket = fileData.some((file) => file.name === fileName)
+        }
+        
+        if (!pdfExistsInBucket) {
+          console.log('[PDF Generation] PDF path in database but file not found in bucket, will regenerate')
+        }
+      } catch (error) {
+        console.error('[PDF Generation] Error checking file existence:', error)
+        // If check fails, assume file doesn't exist to be safe
+        pdfExistsInBucket = false
+      }
+    }
+    
+    if (!forceRegenerate && book.pdf_url && book.pdf_path && pdfExistsInBucket) {
       console.log('[PDF Generation] PDF already exists, returning cached URL')
       return successResponse(
         {
@@ -70,6 +101,15 @@ export async function POST(
           generationTime: 0,
         }
       )
+    }
+    
+    // If PDF path exists in DB but file is missing from bucket, clear DB records
+    if (book.pdf_path && !pdfExistsInBucket && !forceRegenerate) {
+      console.log('[PDF Generation] PDF missing from bucket, clearing database records')
+      await updateBook(supabase, bookId, {
+        pdf_url: null,
+        pdf_path: null,
+      })
     }
     
     if (forceRegenerate) {

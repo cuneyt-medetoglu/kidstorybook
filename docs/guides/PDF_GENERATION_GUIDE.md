@@ -1,7 +1,7 @@
 # PDF Generation Guide
 
-**Versiyon:** 3.0 (Puppeteer + HTML/CSS)  
-**Tarih:** 17 Ocak 2026  
+**Versiyon:** 3.1 (Puppeteer + HTML/CSS + 4 Köşe Pattern)  
+**Tarih:** 25 Ocak 2026  
 **Durum:** Aktif  
 **Teknoloji:** Puppeteer + HTML/CSS Template
 
@@ -26,14 +26,20 @@ KidStoryBook PDF generation sistemi, çocuk kitaplarını profesyonel bir format
 ### Özellikler
 
 ✅ A4 landscape format (297mm x 210mm)  
-✅ Double-page spread (her PDF sayfasında 2 içerik sayfası)  
+✅ Double-page spread (her PDF sayfasında 2 A5 dikey sayfa)  
+✅ Cover page: Double-page spread (sol: görsel tam köşelere yaslı, sağ: başlık ortalanmış)  
 ✅ Alternatif görsel-metin düzeni  
 ✅ 1024x1536 görseller aspect ratio korunarak yerleştirilir  
-✅ Çocuklara uygun font ve tipografi (16pt, 1.6 line height)  
-✅ CSS ile arka plan desenleri  
-✅ Sayfa numaraları sadece metin sayfalarında  
+✅ Görseller sayfa kenarına hizalı (sol sayfa: sola, sağ sayfa: sağa)  
+✅ Çocuklara uygun font ve tipografi (18pt, 1.8 line height)  
+✅ **Fontlar:** Başlık: Fredoka (Bold), Metin: Alegreya (Regular)  
+✅ Metinler sol yaslı ve dikey ortalı  
+✅ Text sayfalarında 4 köşede SVG pattern (rotate edilmiş)  
+✅ Arka plan rengi: #fef9f3 (açık krem/bej)  
+✅ Sayfa ayırıcı: kesik çizgi (dashed)  
+✅ Sayfa numaraları sağ altta (sadece metin sayfalarında)  
 ✅ HTML/CSS ile tam layout kontrolü  
-✅ Web font desteği (gelecek)  
+✅ Web font desteği (Google Fonts: Fredoka, Alegreya)  
 
 ---
 
@@ -74,12 +80,22 @@ PDF Sayfası: A4 Landscape
 - Genişlik: 297mm
 - Yükseklik: 210mm
 
-İçerik Sayfası (Her yarı): A5 equivalent
+İçerik Sayfası (Her yarı): A5 Dikey (148.5mm x 210mm)
 - Genişlik: 148.5mm (50% of A4 landscape)
-- Yükseklik: 210mm
-- Margin: 10mm
-- İçerik Alanı: 128.5mm x 190mm
+- Yükseklik: 210mm (A5 dikey yükseklik)
+- Arka plan: #fef9f3 (açık krem/bej)
+- Görsel sayfalar: padding 0 (tam köşelere yaslı)
+- Metin sayfaları: padding 10mm
 ```
+
+### Görsel Yerleştirme
+
+- **Aspect Ratio:** Görsellerin en-boy oranı korunur (esnetme yok)
+- **Ölçekleme:** Görsel sayfa yüksekliğine göre ölçeklenir, kırpma yapılmaz
+- **Hizalama:**
+  - Sol sayfadaki görsel: Sola hizalı (`object-position: left center`)
+  - Sağ sayfadaki görsel: Sağa hizalı (`object-position: right center`)
+- **Spiral Gutter:** En-boy oranı korunduğu için otomatik olarak iç kenarda boşluk oluşur
 
 ### Layout Pattern
 
@@ -121,11 +137,15 @@ lib/pdf/
 PDF generator, sayfa verilerinden dinamik HTML oluşturur:
 
 ```typescript
-// Cover page
+// Cover page - Double-page spread (sol: görsel, sağ: başlık)
 <div class="page cover-page">
-  <div class="cover-container">
-    <img src="..." class="cover-image" />
-    <h1 class="cover-title">Title</h1>
+  <div class="spread-container">
+    <div class="half-page image-page cover-image-page">
+      <img src="..." class="page-image cover-image" />
+    </div>
+    <div class="half-page cover-title-page">
+      <h1 class="cover-title">Title</h1>
+    </div>
   </div>
 </div>
 
@@ -155,20 +175,62 @@ PDF generator, sayfa verilerinden dinamik HTML oluşturur:
 }
 ```
 
-**Arka Plan Pattern:**
+**Arka Plan:**
 ```css
-.spread-page::before {
-  background-image: radial-gradient(...);
-  /* Pastel dot pattern */
+.spread-page {
+  background: #fef9f3; /* Açık krem/bej tonu */
+}
+
+.text-page {
+  background: #fef9f3;
+}
+```
+
+**4 Köşe Pattern (Sadece Text Sayfalarında):**
+```css
+.corner-pattern {
+  position: absolute;
+  width: 40mm;
+  height: 40mm;
+  background-image: url('/pdf-backgrounds/children-pattern.svg');
+  background-size: 100% 100%;
+  opacity: 0.4;
+}
+
+/* Her köşe farklı açıda rotate edilmiş */
+.corner-top-left { top: 0; left: 0; transform: rotate(0deg); }
+.corner-top-right { top: 0; right: 0; transform: rotate(90deg); }
+.corner-bottom-left { bottom: 0; left: 0; transform: rotate(-90deg); }
+.corner-bottom-right { bottom: 0; right: 0; transform: rotate(180deg); }
+```
+
+**Sayfa Ayırıcı:**
+```css
+.spread-container::after {
+  border-left: 1px dashed rgba(232, 213, 192, 0.4);
+  /* Kesik çizgi, arka plan renginin koyusu */
 }
 ```
 
 **Typography:**
 ```css
+/* Cover Title - Fredoka Bold */
+.cover-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 36pt;
+  font-weight: 700; /* Bold */
+  line-height: 1.3;
+}
+
+/* Page Text - Alegreya Regular */
 .page-text {
-  font-size: 16pt;
-  line-height: 1.6;
+  font-family: 'Alegreya', serif;
+  font-size: 18pt;
+  font-weight: 400; /* Regular */
+  line-height: 1.8;
   color: #1a1a1a;
+  text-align: left; /* Sol yaslı */
+  justify-content: center; /* Dikey ortalı */
 }
 ```
 
@@ -323,15 +385,22 @@ const pdfBuffer = await page.pdf({
 
 ### Planlanan Özellikler
 
-1. **Web Font Support**
-   - Google Fonts entegrasyonu
-   - Çocuk dostu fontlar (Nunito, Comic Neue, Quicksand)
-   - Font subsetting (boyut optimizasyonu)
+1. **Web Font Support** ✅ (25 Ocak 2026)
+   - ✅ Google Fonts entegrasyonu
+   - ✅ Çocuk dostu fontlar: Fredoka (Başlık), Alegreya (Metin)
+   - ⏳ Font subsetting (boyut optimizasyonu)
 
 2. **Template Customization**
    - Kullanıcı template seçimi
    - Tema bazlı template'ler
-   - Arka plan deseni seçenekleri
+   - **Arka Plan Deseni Seçenekleri:**
+     - Farklı SVG pattern'ler (`public/pdf-backgrounds/` klasörüne eklenebilir)
+     - Pattern seçimi (yıldızlar, kalpler, bulutlar, vb.)
+     - Pattern yoğunluğu ayarı
+   - **Arka Plan Rengi Seçenekleri:**
+     - Hikaye temasına göre otomatik renk seçimi
+     - Kullanıcı arka plan rengi seçimi
+     - Tema bazlı renk paletleri (macera: mavi tonları, orman: yeşil tonları, vb.)
 
 3. **PDF Preview** (Faz 5.7.2)
    - İndirmeden önce önizleme
@@ -343,7 +412,20 @@ const pdfBuffer = await page.pdf({
    - Farklı layout seçenekleri
    - Sayfa numarası stil seçenekleri
 
-5. **Performance İyileştirmeleri**
+5. **Cover Page İyileştirmeleri**
+   - ✅ **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026)
+     - ✅ Double-page spread layout (sol: görsel, sağ: başlık)
+     - ✅ Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
+     - ✅ Diğer sayfalardaki görsel hizalaması ile aynı mantık
+   - **Şirket Bilgisi Ekleme:**
+     - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi
+     - [ ] Logo ve şirket bilgileri yerleşimi
+     - [ ] Footer veya alt kısımda şirket bilgisi
+   - ✅ **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026)
+     - ✅ "adventure • collage" gibi seçilen bilgilerin yer aldığı bölümün kapaktan kaldırılması
+     - ✅ Sadece başlık ve görsel kalacak şekilde sadeleştirme
+
+6. **Performance İyileştirmeleri**
    - Browser pool (Puppeteer reuse)
    - Image lazy loading
    - Progressive PDF generation
@@ -427,6 +509,25 @@ Sorun: Fontlar doğru render olmuyor
 
 ---
 
-**Son Güncelleme:** 17 Ocak 2026  
+**Son Güncelleme:** 25 Ocak 2026  
 **Geliştirici:** KidStoryBook Team  
-**Versiyon:** 3.0 (Puppeteer + HTML/CSS Template)
+**Versiyon:** 3.1 (Puppeteer + HTML/CSS Template + 4 Köşe Pattern)
+
+## Son Güncellemeler (25 Ocak 2026)
+
+### Yeni Özellikler
+- ✅ **A5 Dikey Sayfa Düzeni:** Her yarı sayfa A5 dikey boyutunda (148.5mm x 210mm)
+- ✅ **Görsel Hizalama:** Sol sayfada sola, sağ sayfada sağa hizalı
+- ✅ **Metin Hizalama:** Sol yaslı ve dikey ortalı
+- ✅ **4 Köşe Pattern:** Text sayfalarında 4 köşede SVG pattern (her köşe farklı açıda rotate)
+- ✅ **Kesik Çizgi Ayırıcı:** Sayfa ortasında kesik çizgi (dashed) ayırıcı
+- ✅ **Arka Plan Rengi:** #fef9f3 (açık krem/bej tonu)
+- ✅ **Cover Page Layout:** Double-page spread (sol: görsel tam köşelere yaslı, sağ: başlık ortalanmış)
+- ✅ **Cover Metadata Temizleme:** "adventure • collage" gibi metadata kaldırıldı, sadece başlık ve görsel
+- ✅ **Font Güncellemeleri:** Başlık: Fredoka (Bold), Metin: Alegreya (Regular) - Google Fonts entegrasyonu
+
+### Gelecek Özellikler
+- ⏳ **Farklı Pattern Seçenekleri:** `public/pdf-backgrounds/` klasörüne yeni SVG pattern'ler eklenebilir
+- ⏳ **Tema Bazlı Arka Plan Renkleri:** Hikaye temasına göre otomatik renk seçimi
+- ⏳ **Kullanıcı Özelleştirme:** Pattern ve renk seçimi için UI
+- ⏳ **Şirket Bilgisi:** "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi eklenecek
