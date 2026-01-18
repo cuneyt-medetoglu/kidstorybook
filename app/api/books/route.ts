@@ -13,7 +13,7 @@ import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/book
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt, analyzeSceneDiversity, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
+import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -604,6 +604,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       console.log('[Create Book] 🎨 Illustration style:', illustrationStyle)
       console.log('[Create Book] 📏 Final prompt length:', textPrompt.length, 'characters')
       console.log('[Create Book] 📄 Prompt preview (first 200 chars):', textPrompt.substring(0, 200) + '...')
+      console.log('[Create Book] 🧾 Cover FULL PROMPT START')
+      console.log(textPrompt)
+      console.log('[Create Book] 🧾 Cover FULL PROMPT END')
       
       // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
       const hasClothingDirective = textPrompt.toLowerCase().includes('clothing') || 
@@ -637,8 +640,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       console.log('[Create Book] 📸 Reference images:', referenceImageUrls.length > 0 ? `Provided ✅ (${referenceImageUrls.length})` : 'Not provided ❌')
       if (referenceImageUrls.length > 0) {
         referenceImageUrls.forEach((url, index) => {
-          console.log(`[Create Book] 📸 Reference image ${index + 1} URL length:`, url.length, 'chars')
-          console.log(`[Create Book] 📸 Reference image ${index + 1} URL preview:`, url.substring(0, 100) + '...')
+          console.log(`[Create Book] 📸 Reference image ${index + 1} URL:`, url)
         })
         console.log('[Create Book] 🔍 Reference image will be used for /v1/images/edits API (multimodal input)')
       } else {
@@ -1182,7 +1184,11 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const ageGroup = storyData.metadata?.ageGroup || 'preschool'
         
         // Extract character action from page text (what character is doing)
-        const characterAction = page.text || sceneDescription
+        const characterActionRaw = page.text || sceneDescription
+        const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
+        const characterAction = riskAnalysis.hasRisk
+          ? getSafeSceneAlternative(characterActionRaw)
+          : characterActionRaw
         
         // Determine focus point (first page = character focus, last page = balanced, others = balanced)
         const focusPoint: 'character' | 'environment' | 'balanced' = 
@@ -1217,6 +1223,10 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           focusPoint,
           sceneDescriptionLength: sceneDescription.length,
         })
+        if (riskAnalysis.hasRisk) {
+          console.log(`[Create Book] ⚠️  Page ${pageNumber} risky scene detected:`, riskAnalysis.riskyElements)
+          console.log(`[Create Book] ✅ Page ${pageNumber} safe action applied:`, characterAction)
+        }
 
         // Generate full page prompt with correct parameters (NEW: Multiple characters, Cover reference)
         // Note: coverImageUrl is already defined above (line ~951, outside the loop)
@@ -1265,6 +1275,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         if (additionalCharactersCount > 0) {
           console.log(`[Create Book] 👥 Page ${pageNumber} includes ${additionalCharactersCount + 1} characters`)
         }
+        console.log(`[Create Book] 🧾 Page ${pageNumber} FULL PROMPT START`)
+        console.log(fullPrompt)
+        console.log(`[Create Book] 🧾 Page ${pageNumber} FULL PROMPT END`)
         
         // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
         const hasClothingDirective = fullPrompt.toLowerCase().includes('clothing') || 
@@ -1306,6 +1319,15 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           coverImage: useCoverReference ? 'Yes ✅' : 'No',
           totalReferences: referenceImageUrls.length
         })
+        if (referenceImageUrls.length > 0) {
+          console.log(`[Create Book] Page ${pageNumber} - Reference image URLs (full):`)
+          referenceImageUrls.forEach((url, index) => {
+            const label = useCoverReference && index === referenceImageUrls.length - 1
+              ? 'cover'
+              : `character_${index + 1}`
+            console.log(`[Create Book]   - ${label}: ${url}`)
+          })
+        }
         
         if (referenceImageUrls.length > 0) {
           // Convert reference image URLs to Blobs (support both data URL and HTTP URL)

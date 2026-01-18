@@ -71,22 +71,6 @@ export async function GET(
         hasImageUrl: !!book.story_data.pages[0]?.imageUrl,
         imageUrl: book.story_data.pages[0]?.imageUrl || 'MISSING',
       })
-      console.log('[GET /api/books/:id]   - All pages imageUrl status:', book.story_data.pages.map((p: any, i: number) => ({
-        page: i + 1,
-        pageNumber: p.pageNumber,
-        hasImageUrl: !!p.imageUrl,
-        imageUrl: p.imageUrl ? p.imageUrl.substring(0, 50) + '...' : 'MISSING',
-      })))
-    }
-    
-    if (Array.isArray(book.images_data) && book.images_data.length > 0) {
-      console.log('[GET /api/books/:id]   - images_data sample:', book.images_data.slice(0, 2).map((img: any) => ({
-        pageNumber: img.pageNumber,
-        hasImageUrl: !!img.imageUrl,
-        imageUrl: img.imageUrl ? img.imageUrl.substring(0, 50) + '...' : 'MISSING',
-      })))
-    } else {
-      console.log('[GET /api/books/:id]   - images_data is empty or not an array')
     }
 
     // Verify ownership (RLS should handle this, but double-check for security)

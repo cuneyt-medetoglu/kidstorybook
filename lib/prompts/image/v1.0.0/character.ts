@@ -16,8 +16,8 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.5',
-  releaseDate: new Date('2026-01-16'),
+  version: '1.0.6',
+  releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -31,6 +31,7 @@ export const VERSION: PromptVersion = {
     'Individual eye color preservation for each character (16 Ocak 2026)',
     'v1.0.4: Hands descriptor added to buildCharacterPrompt - contextual anchoring for anatomical accuracy (16 Ocak 2026)',
     'v1.0.5: Enhanced family member descriptions with character names, detailed appearance (hair/eye color, age, features), and critical individual character emphasis (16 Ocak 2026)',
+    'v1.0.6: Hands descriptor simplified - research-backed simple directives (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -207,8 +208,9 @@ export function buildCharacterPrompt(character: CharacterDescription): string {
     parts.push(character.uniqueFeatures.join(', '))
   }
 
-  // NEW: Hands descriptor (intrinsic to character) - Contextual anchoring for anatomical accuracy
-  parts.push('anatomically correct hands with 5 distinct fingers, natural skin texture')
+  // NEW: Hands descriptor (UPDATED: 18 Ocak 2026) - Simplified, GPT research-backed
+  // Research shows: Simple, clear directives more effective than overly detailed ones
+  parts.push('hands with 5 fingers each, in natural relaxed pose')
 
   // Build and posture
   parts.push(`${character.height} height`)

@@ -1,6 +1,6 @@
 import type { PromptVersion } from '../../types'
 import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes } from './style-descriptions'
-import { getAnatomicalCorrectnessDirectives } from './negative'
+import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative'
 
 /**
  * Scene Generation Prompts - Version 1.0.0
@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives } from './negative'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.1',
-  releaseDate: new Date('2026-01-16'),
+  version: '1.0.2',
+  releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -30,6 +30,8 @@ export const VERSION: PromptVersion = {
     'Added 3D Animation style special notes',
     'v1.0.1: Prompt order optimization - anatomical directives moved to beginning (anatomy-first approach) (16 Ocak 2026)',
     'v1.0.1: Style emphasis added with uppercase for better attention (16 Ocak 2026)',
+    'v1.0.2: Risky scene detection added - detectRiskySceneElements() (GPT research-backed) (18 Ocak 2026)',
+    'v1.0.2: Safe scene alternatives - getSafeSceneAlternative() for risk mitigation (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -613,6 +615,12 @@ export function generateFullPagePrompt(
   // 1. EN BAŞA: ANATOMICAL CORRECTNESS (CRITICAL) - Research-backed: anatomy first = %30 daha iyi
   const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
   promptParts.push(anatomicalDirectives)
+  
+  // 1.1. SAFE HAND POSES (NEW: 18 Ocak 2026) - Suggest safe alternatives
+  const safeHandPoses = getSafeHandPoses()
+  promptParts.push('[SAFE_POSES]')
+  promptParts.push('Preferred hand poses: ' + safeHandPoses.join(', '))
+  promptParts.push('[/SAFE_POSES]')
   promptParts.push('') // Empty line for separation
 
   // 2. STYLE (uppercase emphasis for better attention)
@@ -916,6 +924,96 @@ export function getCompositionForPage(
 }
 
 /**
+ * Detect risky scene elements that may cause anatomical errors
+ * NEW: 18 Ocak 2026 - GPT research-backed risk detection
+ */
+export interface RiskySceneAnalysis {
+  hasRisk: boolean
+  riskyElements: string[]
+  suggestions: string[]
+}
+
+export function detectRiskySceneElements(
+  sceneDescription: string,
+  characterAction: string
+): RiskySceneAnalysis {
+  const combined = `${sceneDescription} ${characterAction}`.toLowerCase()
+  const riskyElements: string[] = []
+  const suggestions: string[] = []
+  
+  // Riskli el etkileşimleri
+  const handInteractionKeywords = [
+    'holding hands', 'hand in hand', 'holding', 'grabbing', 'grasping',
+    'clutching', 'gripping', 'carrying', 'holding object'
+  ]
+  
+  for (const keyword of handInteractionKeywords) {
+    if (combined.includes(keyword)) {
+      riskyElements.push(`Hand interaction: "${keyword}"`)
+      if (keyword.includes('holding hands') || keyword.includes('hand in hand')) {
+        suggestions.push('Replace with: characters standing near each other, arms at sides')
+      } else if (keyword.includes('holding') || keyword.includes('carrying')) {
+        suggestions.push('Simplify: avoid detailed object manipulation, use simple poses')
+      }
+    }
+  }
+  
+  // Karmaşık el pozisyonları
+  const complexPoseKeywords = [
+    'pointing', 'fingers crossed', 'thumbs up', 'peace sign',
+    'waving with fingers', 'interlocked fingers'
+  ]
+  
+  for (const keyword of complexPoseKeywords) {
+    if (combined.includes(keyword)) {
+      riskyElements.push(`Complex hand pose: "${keyword}"`)
+      suggestions.push('Simplify: use open palm wave or simple raised hand instead')
+    }
+  }
+  
+  // Çoklu karakter el etkileşimleri
+  if ((combined.includes('together') || combined.includes('with')) && 
+      (combined.includes('hand') || combined.includes('arm'))) {
+    riskyElements.push('Multiple character hand interaction detected')
+    suggestions.push('Ensure: hands clearly separated, individual poses for each character')
+  }
+  
+  return {
+    hasRisk: riskyElements.length > 0,
+    riskyElements,
+    suggestions
+  }
+}
+
+/**
+ * Get safe alternative for risky scene
+ * NEW: 18 Ocak 2026 - Provides safe alternatives to risky poses
+ */
+export function getSafeSceneAlternative(characterAction: string): string {
+  const action = characterAction.toLowerCase()
+  
+  // Replace risky actions with safe alternatives
+  if (action.includes('holding hands')) {
+    return characterAction.replace(/holding hands?/gi, 'standing together')
+  }
+  
+  if (action.includes('waving')) {
+    return 'character with one arm raised in greeting, open palm visible'
+  }
+  
+  if (action.includes('holding') || action.includes('carrying')) {
+    return characterAction.replace(/holding|carrying/gi, 'near') + ', hands at sides'
+  }
+  
+  if (action.includes('pointing')) {
+    return characterAction.replace(/pointing/gi, 'looking toward') + ', arm extended naturally'
+  }
+  
+  // If no specific replacement, return original
+  return characterAction
+}
+
+/**
  * Generate scene diversity prompt directives
  */
 export function getSceneDiversityDirectives(
@@ -972,5 +1070,8 @@ export default {
   getPerspectiveForPage,
   getCompositionForPage,
   getSceneDiversityDirectives,
+  // NEW: Risk detection functions (18 Ocak 2026)
+  detectRiskySceneElements,
+  getSafeSceneAlternative,
 }
 

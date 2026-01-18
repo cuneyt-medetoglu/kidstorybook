@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { getCharacterById } from '@/lib/db/characters'
 import { buildCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt } from '@/lib/prompts/image/v1.0.0/scene'
+import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternative } from '@/lib/prompts/image/v1.0.0/scene'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 
 export interface ImageGenerationRequest {
@@ -183,9 +183,13 @@ export async function POST(request: NextRequest) {
       
       const illustrationStyle = book.illustration_style
       const coverSceneDescription = coverPage.imagePrompt || coverPage.sceneDescription || coverPage.text
-      const coverCharacterAction = validCharacters.length > 1
+      const coverCharacterActionRaw = validCharacters.length > 1
         ? `all ${validCharacters.length} characters standing together prominently, looking at the viewer with a sense of wonder and adventure`
         : coverPage.text || coverSceneDescription
+      const coverRiskAnalysis = detectRiskySceneElements(coverSceneDescription, coverCharacterActionRaw)
+      const coverCharacterAction = coverRiskAnalysis.hasRisk
+        ? getSafeSceneAlternative(coverCharacterActionRaw)
+        : coverCharacterActionRaw
       
       const coverMood = themeKey === 'adventure' ? 'exciting' :
                         themeKey === 'fantasy' ? 'mysterious' :
@@ -215,6 +219,13 @@ export async function POST(request: NextRequest) {
 
       console.log(`[Image Generation] Cover prompt length:`, coverPrompt.length)
       console.log(`[Image Generation] Cover prompt preview:`, coverPrompt.substring(0, 300) + '...')
+      console.log('[Image Generation] 🧾 Cover FULL PROMPT START')
+      console.log(coverPrompt)
+      console.log('[Image Generation] 🧾 Cover FULL PROMPT END')
+      if (coverRiskAnalysis.hasRisk) {
+        console.log('[Image Generation] ⚠️  Cover risky scene detected:', coverRiskAnalysis.riskyElements)
+        console.log('[Image Generation] ✅ Cover safe action applied:', coverCharacterAction)
+      }
       
       // Build FormData for cover (only original reference photos)
       const coverFormData = new FormData()
@@ -225,6 +236,12 @@ export async function POST(request: NextRequest) {
       
       // Add ALL character reference images to cover
       console.log(`[Image Generation] Adding ${allCharacterReferences.length} reference images to cover`)
+      if (allCharacterReferences.length > 0) {
+        console.log('[Image Generation] Cover reference image URLs (full):')
+        allCharacterReferences.forEach((url, index) => {
+          console.log(`[Image Generation]   - character_${index + 1}: ${url}`)
+        })
+      }
       for (let idx = 0; idx < allCharacterReferences.length; idx++) {
         const imgUrl = allCharacterReferences[idx]
         
@@ -340,7 +357,11 @@ export async function POST(request: NextRequest) {
       const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
       
       // Extract character action from page text
-      const characterAction = page.text || sceneDescription
+      const characterActionRaw = page.text || sceneDescription
+      const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
+      const characterAction = riskAnalysis.hasRisk
+        ? getSafeSceneAlternative(characterActionRaw)
+        : characterActionRaw
       
       // Determine focus point
       const focusPoint: 'character' | 'environment' | 'balanced' = 
@@ -375,6 +396,13 @@ export async function POST(request: NextRequest) {
       )
 
       console.log(`[Image Generation] Page ${pageNumber} prompt:`, fullPrompt.substring(0, 200) + '...')
+      console.log(`[Image Generation] 🧾 Page ${pageNumber} FULL PROMPT START`)
+      console.log(fullPrompt)
+      console.log(`[Image Generation] 🧾 Page ${pageNumber} FULL PROMPT END`)
+      if (riskAnalysis.hasRisk) {
+        console.log(`[Image Generation] ⚠️  Page ${pageNumber} risky scene detected:`, riskAnalysis.riskyElements)
+        console.log(`[Image Generation] ✅ Page ${pageNumber} safe action applied:`, characterAction)
+      }
 
       // Build FormData with ALL reference images + Cover image
       const formData = new FormData()
@@ -393,6 +421,15 @@ export async function POST(request: NextRequest) {
         coverImage: coverImageUrl ? 'Yes' : 'No',
         totalReferences: referenceImages.length
       })
+      if (referenceImages.length > 0) {
+        console.log(`[Image Generation] Page ${pageNumber} reference image URLs (full):`)
+        referenceImages.forEach((url, index) => {
+          const label = coverImageUrl && index === referenceImages.length - 1
+            ? 'cover'
+            : `character_${index + 1}`
+          console.log(`[Image Generation]   - ${label}: ${url}`)
+        })
+      }
       
       // Add ALL reference images (original photos + cover)
       for (let idx = 0; idx < referenceImages.length; idx++) {

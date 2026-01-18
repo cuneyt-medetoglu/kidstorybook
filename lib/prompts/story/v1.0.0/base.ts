@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.1',
-  releaseDate: new Date('2026-01-10'),
+  version: '1.0.2',
+  releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -26,6 +26,7 @@ export const VERSION: PromptVersion = {
     'Language mixing prevention (no English words in non-English stories) - 24 Ocak 2026',
     'Final language check mechanism added - 24 Ocak 2026',
     'v1.0.1: Enhanced additional characters section with detailed appearance descriptions (age, hair color, eye color, features) and explicit character name usage directive (16 Ocak 2026)',
+    'v1.0.2: Visual safety guidelines added - avoid risky hand interactions for better anatomical accuracy (GPT research-backed) (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -315,6 +316,35 @@ For each page, provide:
 3. Character appearance (consistent across all pages)
 4. Setting details (colors, lighting, mood)
 5. Composition (what's in focus, perspective)
+
+# VISUAL SAFETY GUIDELINES (CRITICAL - NEW: 18 Ocak 2026)
+**To avoid anatomical errors in generated images, follow these guidelines:**
+
+## AVOID RISKY HAND INTERACTIONS:
+- **DO NOT** have characters holding hands
+- **DO NOT** have characters holding detailed objects (books, toys, tools)
+- **DO NOT** have complex hand gestures (pointing with fingers, thumbs up, peace signs)
+- **DO NOT** have hands overlapping between characters
+- **DO NOT** have detailed hand-to-object interactions
+
+## PREFER SAFE HAND POSES:
+- **DO** keep hands at sides in natural relaxed poses
+- **DO** use simple raised hand for waving (open palm)
+- **DO** use arms spread wide for joy/excitement
+- **DO** use hands behind back
+- **DO** use hands on hips
+- **DO** describe hands as "in natural relaxed pose" without specifics
+
+## SAFE CHARACTER INTERACTIONS:
+- Characters can stand together, but keep hands separate
+- Characters can talk to each other, but avoid hand contact
+- If story requires "giving" something, describe it verbally without showing detailed hand interaction
+- Focus on character facial expressions and body language rather than complex hand poses
+
+**EXAMPLE - BAD (Risky):** "${characterName} and ${characters && characters.length > 1 ? characters[1].name || characters[1].type.displayName : 'friend'} holding hands, walking together through the forest"
+**EXAMPLE - GOOD (Safe):** "${characterName} and ${characters && characters.length > 1 ? characters[1].name || characters[1].type.displayName : 'friend'} walking together through the forest, hands at their sides, smiling at each other"
+
+**REMEMBER:** Simple, clear poses = better anatomical accuracy. Complex hand interactions = higher error rate.
 
 # OUTPUT FORMAT (JSON)
 Return a valid JSON object with this exact structure:
