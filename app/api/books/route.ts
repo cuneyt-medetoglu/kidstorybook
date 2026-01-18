@@ -107,6 +107,107 @@ async function retryWithBackoff<T>(
 }
 
 /**
+ * Generate Master Character Illustration
+ * NEW: 18 Ocak 2026 - Canonical reference image for character consistency
+ * Creates a neutral, front-facing portrait from character photos
+ */
+async function generateMasterCharacterIllustration(
+  characterPhotos: string[],
+  characterDescriptions: any[],
+  illustrationStyle: string,
+  userId: string,
+  supabase: any
+): Promise<string> {
+  console.log('[Master Illustration] 🎨 Generating master character illustration...')
+  console.log('[Master Illustration] 📸 Character photos:', characterPhotos.length)
+  
+  // Build optimized prompt for master illustration
+  const characterPrompts = characterDescriptions.map((desc, idx) => {
+    const char = buildCharacterPrompt(desc)
+    return `CHAR ${idx + 1}: ${char}`
+  }).join('. ')
+  
+  // Style directive (optimized)
+  const styleDirective = illustrationStyle === '3d_animation' 
+    ? 'Pixar-style 3D' 
+    : illustrationStyle === 'watercolor' 
+    ? 'Watercolor' 
+    : illustrationStyle
+  
+  // Master illustration prompt (optimized, minimal)
+  const masterPrompt = [
+    '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]',
+    `[STYLE] ${styleDirective} [/STYLE]`,
+    `Neutral front-facing portrait. ${characterPrompts}. Plain neutral background. Illustration style (NOT photorealistic). Match reference photos.`,
+  ].join(' ')
+  
+  console.log('[Master Illustration] 📏 Prompt length:', masterPrompt.length, 'characters')
+  console.log('[Master Illustration] 🧾 Master prompt:', masterPrompt)
+  
+  // Download character photos as blobs
+  const imageBlobs: Array<{ blob: Blob; filename: string }> = []
+  for (let i = 0; i < characterPhotos.length; i++) {
+    const photoUrl = characterPhotos[i]
+    const imageRes = await fetch(photoUrl)
+    const imageBlob = await imageRes.blob()
+    imageBlobs.push({ blob: imageBlob, filename: `character_${i + 1}.png` })
+  }
+  
+  // Prepare FormData
+  const formData = new FormData()
+  formData.append('model', 'gpt-image-1.5')
+  formData.append('prompt', masterPrompt)
+  formData.append('size', '1024x1536')
+  formData.append('quality', 'low')
+  formData.append('input_fidelity', 'high')
+  
+  imageBlobs.forEach(({ blob, filename }) => {
+    formData.append('image[]', blob, filename)
+  })
+  
+  // Call /v1/images/edits API
+  const apiKey = process.env.OPENAI_API_KEY
+  const response = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}` },
+    body: formData,
+  })
+  
+  if (!response.ok) {
+    throw new Error(`Master illustration generation failed: ${response.status}`)
+  }
+  
+  const result = await response.json()
+  const b64Image = result.data?.[0]?.b64_json
+  
+  if (!b64Image) {
+    throw new Error('No image data in master illustration response')
+  }
+  
+  // Upload to Supabase
+  const imageBuffer = Buffer.from(b64Image, 'base64')
+  const filename = `master_${Date.now()}.png`
+  const filePath = `${userId}/masters/${filename}`
+  
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('book-images')
+    .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: false })
+  
+  if (uploadError) {
+    throw new Error(`Failed to upload master illustration: ${uploadError.message}`)
+  }
+  
+  const { data: urlData } = supabase.storage
+    .from('book-images')
+    .getPublicUrl(filePath)
+  
+  const masterUrl = urlData.publicUrl
+  console.log('[Master Illustration] ✅ Master illustration created:', masterUrl)
+  
+  return masterUrl
+}
+
+/**
  * Retry wrapper specifically for fetch calls
  */
 async function retryFetch(
@@ -523,10 +624,59 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       console.log(`[Create Book] ✅ Book created: ${book.id}`)
     }
 
+    // ====================================================================
+    // STEP 2: GENERATE MASTER CHARACTER ILLUSTRATION (NEW: 18 Ocak 2026)
+    // ====================================================================
+    console.log(`[Create Book] 🎨 Starting master character illustration generation...`)
+    
+    const characterPhotos = characters
+      .map(c => c.reference_photo_url)
+      .filter((url): url is string => Boolean(url))
+    
+    let masterIllustrationUrl: string | null = null
+    
+    if (characterPhotos.length > 0) {
+      try {
+        masterIllustrationUrl = await generateMasterCharacterIllustration(
+          characterPhotos,
+          characters.map(c => c.description),
+          illustrationStyle,
+          user.id,
+          supabase
+        )
+        console.log(`[Create Book] ✅ Master illustration created: ${masterIllustrationUrl}`)
+        
+        // Update generation_metadata with master illustration URL
+        const currentMetadata = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMetadata,
+            masterIllustrationUrl: masterIllustrationUrl,
+            masterIllustrationCreated: true,
+          },
+        })
+        console.log(`[Create Book] 💾 Master illustration URL saved to generation_metadata`)
+      } catch (error) {
+        console.error('[Create Book] ❌ Master illustration generation failed:', error)
+        // Continue without master - fallback to character photos
+        console.log('[Create Book] ⚠️  Continuing without master illustration (using character photos)')
+        
+        // Update metadata to indicate master was not created
+        const currentMetadata = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMetadata,
+            masterIllustrationCreated: false,
+            masterIllustrationError: error instanceof Error ? error.message : 'Unknown error',
+          },
+        })
+      }
+    }
+
     console.log(`[Create Book] 🎨 Starting cover generation...`)
 
     // ====================================================================
-    // STEP 2: GENERATE COVER IMAGE
+    // STEP 3: GENERATE COVER IMAGE
     // ====================================================================
     // Store cover image URL for page generation (NEW: 16 Ocak 2026)
     let generatedCoverImageUrl: string | null = null
@@ -627,9 +777,12 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         throw new Error('OPENAI_API_KEY is not configured')
       }
 
-      const referenceImageUrls = characters
-        .map((char) => char.reference_photo_url)
-        .filter((url): url is string => Boolean(url))
+      // NEW: Use master illustration as reference (if available)
+      // Fallback to character photos if master generation failed
+      const referenceImageUrls = masterIllustrationUrl
+        ? [masterIllustrationUrl]
+        : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
+      
       let coverImageUrl: string | null = null
       let coverImageB64: string | null = null
       let coverImageOutputFormat: string | null = null
@@ -637,14 +790,15 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       let referenceImageBlobTotalBytes = 0
       let editsApiSuccess = false // Track if edits API was successful
 
-      console.log('[Create Book] 📸 Reference images:', referenceImageUrls.length > 0 ? `Provided ✅ (${referenceImageUrls.length})` : 'Not provided ❌')
+      console.log('[Create Book] 📸 Reference type:', masterIllustrationUrl ? 'Master Illustration ✅' : 'Character Photos ⚠️')
+      console.log('[Create Book] 📸 Reference images:', referenceImageUrls.length)
       if (referenceImageUrls.length > 0) {
         referenceImageUrls.forEach((url, index) => {
           console.log(`[Create Book] 📸 Reference image ${index + 1} URL:`, url)
         })
-        console.log('[Create Book] 🔍 Reference image will be used for /v1/images/edits API (multimodal input)')
+        console.log('[Create Book] 🔍 Reference will be used for /v1/images/edits API')
       } else {
-        console.log('[Create Book] ⚠️  No reference image - will use /v1/images/generations (text-only)')
+        console.log('[Create Book] ⚠️  No reference - will use /v1/images/generations')
       }
 
       // Use /v1/images/edits if reference image available, otherwise /v1/images/generations
@@ -1108,33 +1262,24 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const pages = storyData.pages
         const totalPages = pages.length
         
-        // NEW: Get ALL characters' reference images (not just main character)
-        const characterReferenceImageUrls = characters
-          .map((char) => char.reference_photo_url)
-          .filter((url): url is string => Boolean(url))
-        
-        // NEW: Get cover image URL if available (for pages 2+)
-        // Use generatedCoverImageUrl first (from cover generation), fallback to book.cover_image_url
+        // Get cover image URL (needed for fallback)
         const coverImageUrl = generatedCoverImageUrl || book.cover_image_url || null
         
-        console.log(`[Create Book] 📸 Page images - Character reference images: ${characterReferenceImageUrls.length > 0 ? `Provided ✅ (${characterReferenceImageUrls.length})` : 'Not provided ❌'}`)
+        // NEW: Use master illustration as reference (if available)
+        // Fallback to character photos + cover if master generation failed
+        const characterReferenceImageUrls = masterIllustrationUrl
+          ? [masterIllustrationUrl]
+          : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
+        
+        console.log(`[Create Book] 📸 Page images - Reference type:`, masterIllustrationUrl ? 'Master Illustration ✅' : 'Character Photos ⚠️')
+        console.log(`[Create Book] 📸 Page images - Reference images:`, characterReferenceImageUrls.length)
         if (characterReferenceImageUrls.length > 0) {
           characterReferenceImageUrls.forEach((url, index) => {
-            console.log(`[Create Book] 📸 Page images - Reference image ${index + 1} URL length:`, url.length, 'chars')
+            console.log(`[Create Book] 📸 Page images - Reference ${index + 1} URL:`, url)
           })
         }
-        console.log(`[Create Book] 📸 Page images - Cover image source:`, {
-          fromGeneratedVariable: generatedCoverImageUrl ? 'Yes ✅' : 'No',
-          fromDatabase: book.cover_image_url ? 'Yes' : 'No',
-          final: coverImageUrl ? 'Available ✅ (will be used for pages 2+)' : 'Not available ❌'
-        })
-        if (coverImageUrl) {
-          console.log(`[Create Book] 📸 Page images - Cover image URL length:`, coverImageUrl.length, 'chars')
-          if (generatedCoverImageUrl) {
-            console.log(`[Create Book] 📸 Page images - ✅ Using cover URL from generation (not database)`)
-          } else if (book.cover_image_url) {
-            console.log(`[Create Book] 📸 Page images - ⚠️  Using cover URL from database (fallback)`)
-          }
+        if (coverImageUrl && !masterIllustrationUrl) {
+          console.log(`[Create Book] 📸 Page images - Cover URL (fallback):`, coverImageUrl)
         } else {
           console.log(`[Create Book] 📸 Page images - ❌ Cover image not available - pages will use only character photos`)
         }
@@ -1305,27 +1450,18 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const pageImageStartTime = Date.now()
         console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
 
-        // Use /v1/images/edits if reference images available, otherwise /v1/images/generations
-        // NEW: Support multiple reference images (character photos + cover image for pages 2+)
-        // For page 1: Only character reference photos
-        // For pages 2+: Character reference photos + Cover image
-        // Note: isCoverPage and useCoverReference are already defined above (line ~1045)
-        const referenceImageUrls = useCoverReference
-          ? [...characterReferenceImageUrls, coverImageUrl]
-          : characterReferenceImageUrls
+        // NEW: Use master illustration only (no cover image needed)
+        // If master illustration failed, fallback to old system (character photos + cover)
+        const referenceImageUrls = masterIllustrationUrl
+          ? [masterIllustrationUrl]
+          : (useCoverReference ? [...characterReferenceImageUrls, coverImageUrl] : characterReferenceImageUrls)
         
-        console.log(`[Create Book] Page ${pageNumber} - Reference images:`, {
-          characterPhotos: characterReferenceImageUrls.length,
-          coverImage: useCoverReference ? 'Yes ✅' : 'No',
-          totalReferences: referenceImageUrls.length
-        })
+        console.log(`[Create Book] Page ${pageNumber} - Reference type:`, masterIllustrationUrl ? 'Master ✅' : 'Photos+Cover ⚠️')
+        console.log(`[Create Book] Page ${pageNumber} - Reference count:`, referenceImageUrls.length)
         if (referenceImageUrls.length > 0) {
-          console.log(`[Create Book] Page ${pageNumber} - Reference image URLs (full):`)
+          console.log(`[Create Book] Page ${pageNumber} - Reference URLs:`)
           referenceImageUrls.forEach((url, index) => {
-            const label = useCoverReference && index === referenceImageUrls.length - 1
-              ? 'cover'
-              : `character_${index + 1}`
-            console.log(`[Create Book]   - ${label}: ${url}`)
+            console.log(`[Create Book]   - ref_${index + 1}: ${url}`)
           })
         }
         

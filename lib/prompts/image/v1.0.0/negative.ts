@@ -8,7 +8,7 @@ import type { PromptVersion } from '../../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.5',
+  version: '1.1.0',
   releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
@@ -27,6 +27,7 @@ export const VERSION: PromptVersion = {
     'v1.0.5: Yapılandırılmış format uygulandı - [ANATOMY_RULES] tag-based structure (GPT research-backed) (18 Ocak 2026)',
     'v1.0.5: ANATOMICAL_NEGATIVE daha da sadeleştirildi - tekrarlar kaldırıldı (18 Ocak 2026)',
     'v1.0.5: getSafeHandPoses() eklendi - güvenli el pozisyonları listesi (18 Ocak 2026)',
+    'v1.1.0: Prompt optimization - anatomical directives ultra-simplified (500→120 chars), safe poses minimized (150→40 chars), ANATOMICAL_NEGATIVE reduced to 3 items (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -281,12 +282,7 @@ export const THEME_NEGATIVE: Record<string, string[]> = {
  * STRATEGY: Minimal, genel terimler - pozitif direktiflere odaklan
  */
 export const ANATOMICAL_NEGATIVE = [
-  // Genel anatomik hatalar (minimal, tekrarsız)
-  'deformed', 'malformed',
-  'bad anatomy',
-  'extra limbs', 'missing limbs',
-  // Riskli el etkileşimleri (sadeleştirilmiş)
-  'holding hands', 'hands together',
+  'deformed', 'extra limbs', 'holding hands',
 ]
 
 // ============================================================================
@@ -357,14 +353,7 @@ export function getNegativePrompt(
  * Simplified to avoid token attention issues
  */
 export function getAnatomicalCorrectnessDirectives(): string {
-  return [
-    '[ANATOMY_RULES]',
-    'HANDS: exactly 5 fingers per hand (thumb, index, middle, ring, pinky), clearly separated with visible gaps, natural relaxed pose',
-    'HANDS_POSITION: hands at sides or in simple poses, NOT holding objects or other hands, clearly visible',
-    'BODY: 2 arms, 2 legs, correct proportions for age',
-    'FACE: symmetrical features (2 eyes, 1 nose, 1 mouth), clean skin',
-    '[/ANATOMY_RULES]',
-  ].join('\n')
+  return '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]'
 }
 
 /**
@@ -372,13 +361,7 @@ export function getAnatomicalCorrectnessDirectives(): string {
  * Research shows: Simple, clear poses reduce error rate by ~30%
  */
 export function getSafeHandPoses(): string[] {
-  return [
-    'hands resting naturally at sides',
-    'one hand raised in greeting wave',
-    'hands behind back',
-    'arms spread wide in joy',
-    'hands on hips',
-  ]
+  return ['hands at sides', 'simple wave', 'behind back']
 }
 
 export function getContentSafetyFilter(): string[] {

@@ -16,7 +16,7 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.6',
+  version: '1.1.0',
   releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
@@ -32,6 +32,7 @@ export const VERSION: PromptVersion = {
     'v1.0.4: Hands descriptor added to buildCharacterPrompt - contextual anchoring for anatomical accuracy (16 Ocak 2026)',
     'v1.0.5: Enhanced family member descriptions with character names, detailed appearance (hair/eye color, age, features), and critical individual character emphasis (16 Ocak 2026)',
     'v1.0.6: Hands descriptor simplified - research-backed simple directives (18 Ocak 2026)',
+    'v1.1.0: Major optimization - buildCharacterPrompt simplified (800→300 chars), buildMultipleCharactersPrompt reduced (1500→500 chars), removed verbose descriptions, minimized CRITICAL/IMPORTANT emphasis, streamlined adult/child distinction (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -175,55 +176,34 @@ IMPORTANT: Be extremely detailed. This description will be used for ALL future b
  */
 export function buildCharacterPrompt(character: CharacterDescription): string {
   const parts: string[] = []
-
-  // Name and basics
-  parts.push(`${character.age}-year-old ${character.gender} named ${character.name || 'child'}`)
-
-  // Face
-  parts.push(`with ${character.faceShape} face shape`)
+  
+  // Basic info
+  parts.push(`${character.age}yo ${character.gender}`)
+  
+  // Hair (combined, simplified)
+  const hair = [character.hairColor, character.hairLength, character.hairStyle].filter(Boolean).join(' ')
+  if (hair) parts.push(`${hair} hair`)
+  
+  // Eyes (simplified - keep blue emphasis for accuracy)
+  const eyes = character.eyeColor?.toLowerCase() === 'blue' 
+    ? 'blue eyes' 
+    : `${character.eyeColor} eyes`
+  parts.push(eyes)
+  
+  // Skin
   parts.push(`${character.skinTone} skin`)
   
-  // Eye color with special handling for hazel and blue (NEW: 16 Ocak 2026)
-  // Hazel is often misinterpreted as pure green, so we add clarification
-  // Blue is sometimes misinterpreted as brown, so we add strong emphasis
-  let eyeColorDesc = character.eyeColor
-  if (character.eyeColor?.toLowerCase() === 'hazel') {
-    eyeColorDesc = 'hazel (brown-green mix, not pure green)'
-  } else if (character.eyeColor?.toLowerCase() === 'blue') {
-    eyeColorDesc = 'bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)'
-  }
-  parts.push(`${eyeColorDesc} ${character.eyeShape} eyes`)
-  
-  // Hair - VERY DETAILED
-  const hairDesc = [
-    character.hairColor,
-    character.hairLength,
-    character.hairStyle,
-    character.hairTexture,
-  ].filter(Boolean).join(' ')
-  parts.push(`${hairDesc} hair`)
-
-  // Unique features
+  // Unique features (max 2 for brevity)
   if (character.uniqueFeatures && character.uniqueFeatures.length > 0) {
-    parts.push(character.uniqueFeatures.join(', '))
+    parts.push(character.uniqueFeatures.slice(0, 2).join(', '))
   }
-
-  // NEW: Hands descriptor (UPDATED: 18 Ocak 2026) - Simplified, GPT research-backed
-  // Research shows: Simple, clear directives more effective than overly detailed ones
-  parts.push('hands with 5 fingers each, in natural relaxed pose')
-
-  // Build and posture
-  parts.push(`${character.height} height`)
-  parts.push(`${character.build} build`)
-
-  // Expression
-  parts.push(`with ${character.typicalExpression} expression`)
-
-  // Clothing (for this specific scene)
+  
+  // Clothing (simplified)
   if (character.clothingStyle) {
-    parts.push(`wearing ${character.clothingStyle} in ${character.clothingColors?.join(' and ') || 'bright colors'}`)
+    const colors = character.clothingColors?.join(' and ') || 'bright colors'
+    parts.push(`${character.clothingStyle} in ${colors}`)
   }
-
+  
   return parts.join(', ')
 }
 
@@ -241,150 +221,51 @@ export function buildMultipleCharactersPrompt(
 ): string {
   const parts: string[] = []
 
-  // CRITICAL: Multiple Reference Images Instruction (NEW: 16 Ocak 2026)
-  parts.push(`CRITICAL INSTRUCTION FOR MULTIPLE CHARACTERS WITH REFERENCE IMAGES:`)
-  parts.push(`You are provided with ${additionalCharacters ? additionalCharacters.length + 1 : 1} reference image(s).`)
-  parts.push(`Each reference image corresponds to one character below, in order (image 1 → character 1, image 2 → character 2, etc.).`)
-  parts.push(`You MUST match each character's text description with its corresponding reference image.`)
-  parts.push(`Pay close attention to EACH character's eye color, hair color, age, and unique features as specified.`)
-  parts.push(`Do NOT mix features between characters - each character must maintain their individual characteristics.`)
-  parts.push(`\n`)
+  // Multiple reference images instruction (simplified)
+  const totalChars = additionalCharacters ? additionalCharacters.length + 1 : 1
+  parts.push(`${totalChars} reference images provided (image 1-${totalChars}). Match each character's description with its reference image. Do NOT mix features between characters.\n`)
 
-  // Main character (reference image 1 available)
-  parts.push(`CHARACTER 1 (MAIN - Reference Image 1):`)
-  parts.push(buildCharacterPrompt(mainCharacter))
+  // Main character
+  parts.push(`CHAR 1: ${buildCharacterPrompt(mainCharacter)}`)
 
-  // Additional characters (reference images 2, 3, ... available)
+  // Additional characters
   if (additionalCharacters && additionalCharacters.length > 0) {
-    parts.push(`\n`)
-    
     additionalCharacters.forEach((char, index) => {
-      const charParts: string[] = []
-      const charNumber = index + 2
+      const charNum = index + 2
+      const charParts: string[] = [`CHAR ${charNum}:`]
       
-      // Add reference image indicator
-      charParts.push(`CHARACTER ${charNumber} (Reference Image ${charNumber}):`)
-      
-      if (char.type.group === "Child") {
-        // NEW: Child character description (detailed, like main character but without reference image)
-        if (char.description) {
-          // Use full character description for Child
-          charParts.push(buildCharacterPrompt(char.description))
-          // CRITICAL: Emphasize individual eye color for this character
-          charParts.push(`(IMPORTANT: This character has ${char.description.eyeColor} eyes, NOT the same eye color as Character 1)`)
-        } else {
-          // Fallback if no description available
-          charParts.push(`a child named ${char.type.displayName || 'child'}`)
-        }
+      if (char.type.group === "Child" && char.description) {
+        charParts.push(buildCharacterPrompt(char.description))
+        charParts.push(`(${char.description.eyeColor} eyes, NOT same as Char 1)`)
       } else if (char.type.group === "Pets") {
-        // Pet description
-        charParts.push(`a ${char.type.value.toLowerCase()}`)
-        
+        charParts.push(`${char.type.value.toLowerCase()}`)
         if (char.description) {
-          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} fur`)
+          if (char.description.hairColor) charParts.push(`${char.description.hairColor} fur`)
           if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
-          // Add special features for pets
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            charParts.push(char.description.uniqueFeatures.join(', '))
-          }
-          charParts.push(`friendly and playful expression`)
-        } else {
-          charParts.push(`friendly and cute appearance`)
         }
       } else if (char.type.group === "Family Members") {
-        // Family member description - ENHANCED with name and detailed appearance (NEW: 16 Ocak 2026)
-        const charName = char.type.displayName || char.type.value
-        charParts.push(`${charName} (${char.type.value.toLowerCase()})`)
+        const name = char.type.displayName || char.type.value
+        charParts.push(`${name} (${char.type.value.toLowerCase()})`)
         
         if (char.description) {
-          // CRITICAL: Age and adult physical features (NEW: 16 Ocak 2026)
-          if (char.description.age) {
-            charParts.push(`${char.description.age} years old`)
-            // Strong emphasis: This is an ADULT, NOT a child
-            if (char.description.age >= 18) {
-              charParts.push(`(CRITICAL: This is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height)`)
-              charParts.push(`(CRITICAL: Adult physical characteristics: mature face, adult body proportions, NOT childlike features)`)
-            } else if (char.description.age >= 13) {
-              charParts.push(`(CRITICAL: This is a TEENAGER/ADOLESCENT, NOT a child - must have teenager body proportions, NOT childlike features)`)
-            }
-          } else {
-            // Fallback: If no age, assume adult for Mom/Dad
-            if (char.type.value === "Mom" || char.type.value === "Dad") {
-              charParts.push(`(CRITICAL: This is an ADULT ${char.type.value.toLowerCase()}, NOT a child - must have adult body proportions, adult facial features)`)
-            }
+          const age = char.description.age
+          if (age) {
+            const ageNote = age >= 18 ? 'adult proportions' : age >= 13 ? 'teen proportions' : ''
+            charParts.push(`${age}yo ${ageNote}`)
+          } else if (char.type.value === "Mom" || char.type.value === "Dad") {
+            charParts.push('adult proportions')
           }
           
-          // Hair details - ENHANCED (NEW: 16 Ocak 2026)
           if (char.description.hairColor) {
-            const hairDetails = [
-              char.description.hairColor,
-              char.description.hairLength,
-              char.description.hairStyle,
-              char.description.hairTexture,
-            ].filter(Boolean)
-            
-            if (hairDetails.length > 0) {
-              charParts.push(`with ${hairDetails.join(' ')} hair`)
-            } else {
-              charParts.push(`with ${char.description.hairColor} hair`)
-            }
-            
-            // CRITICAL: Emphasize hair style details match reference photo
-            if (char.description.hairStyle || char.description.hairLength) {
-              charParts.push(`(CRITICAL: Hair style and length must match reference photo EXACTLY - ${char.description.hairLength || 'length'} ${char.description.hairStyle || 'style'})`)
-            }
+            const hair = [char.description.hairColor, char.description.hairLength].filter(Boolean).join(' ')
+            charParts.push(`${hair} hair`)
           }
           
           if (char.description.eyeColor) {
-            // Eye color with special handling for blue (NEW: 16 Ocak 2026)
-            let eyeColorDesc = char.description.eyeColor
-            if (char.description.eyeColor?.toLowerCase() === 'blue') {
-              eyeColorDesc = 'bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)'
-            } else if (char.description.eyeColor?.toLowerCase() === 'hazel') {
-              eyeColorDesc = 'hazel (brown-green mix, not pure green)'
-            }
-            charParts.push(`${eyeColorDesc} eyes`)
-            // CRITICAL: Emphasize individual eye color
-            charParts.push(`(IMPORTANT: This character has ${char.description.eyeColor} eyes, NOT the same eye color as Character 1)`)
+            charParts.push(`${char.description.eyeColor} eyes (NOT same as Char 1)`)
           }
-          
-          // Add special features for family members
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            charParts.push(char.description.uniqueFeatures.join(', '))
-          }
-          
-          // Physical features emphasis (NEW: 16 Ocak 2026)
-          if (char.description.age && char.description.age >= 18) {
-            charParts.push(`adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions)`)
-          }
-          
-          charParts.push(`warm and caring expression`)
         } else {
-          // Enhanced fallback descriptions with adult emphasis (NEW: 16 Ocak 2026)
-          if (char.type.value === "Mom" || char.type.value === "Dad") {
-            charParts.push(`adult ${char.type.value.toLowerCase()}, warm and loving expression`)
-            charParts.push(`(CRITICAL: This is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height)`)
-          } else if (char.type.value === "Grandma" || char.type.value === "Grandpa") {
-            charParts.push(`elderly ${char.type.value.toLowerCase()}, kind and gentle expression`)
-            charParts.push(`(CRITICAL: This is an ELDERLY ADULT, NOT a child - must have elderly features, adult body proportions)`)
-          } else {
-            charParts.push(`family member, friendly expression`)
-            charParts.push(`(CRITICAL: This is an ADULT family member, NOT a child - must have adult body proportions)`)
-          }
-        }
-        
-        // CRITICAL: Emphasize this is a specific person, not generic
-        charParts.push(`(IMPORTANT: This is ${charName}, a specific person with unique appearance, NOT a generic ${char.type.value.toLowerCase()})`)
-      } else {
-        // Other
-        charParts.push(`${char.type.displayName}`)
-        if (char.description) {
-          if (char.description.hairColor) charParts.push(`with ${char.description.hairColor} hair`)
-          if (char.description.eyeColor) charParts.push(`${char.description.eyeColor} eyes`)
-          // Add special features for other characters
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            charParts.push(char.description.uniqueFeatures.join(', '))
-          }
+          charParts.push('adult proportions')
         }
       }
       
