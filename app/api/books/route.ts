@@ -1241,6 +1241,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const pages = storyData.pages
         const totalPages = pages.length
         
+        // Get cover image URL (needed for fallback)
+        const coverImageUrl = generatedCoverImageUrl || book.cover_image_url || null
+        
         // NEW: Use master illustration as reference (if available)
         // Fallback to character photos + cover if master generation failed
         const characterReferenceImageUrls = masterIllustrationUrl
@@ -1253,6 +1256,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           characterReferenceImageUrls.forEach((url, index) => {
             console.log(`[Create Book] 📸 Page images - Reference ${index + 1} URL:`, url)
           })
+        }
+        if (coverImageUrl && !masterIllustrationUrl) {
+          console.log(`[Create Book] 📸 Page images - Cover URL (fallback):`, coverImageUrl)
         } else {
           console.log(`[Create Book] 📸 Page images - ❌ Cover image not available - pages will use only character photos`)
         }
