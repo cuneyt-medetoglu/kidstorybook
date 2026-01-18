@@ -36,6 +36,7 @@ const hairColorOptions = [
   { value: "black", label: "Black" },
   { value: "brown", label: "Brown" },
   { value: "red", label: "Red" },
+  { value: "white", label: "White" },
 ]
 
 const eyeColorOptions = [
@@ -270,10 +271,12 @@ export default function Step2Page() {
           characterData.eyeColor = currentCharacter.eyeColor
           characterData.specialFeatures = currentCharacter.specialFeatures || []
         } else {
-          // Non-Child characters (Pets, Family Members, Other) - appearance details
-          characterData.hairColor = currentCharacter.hairColor
-          characterData.eyeColor = currentCharacter.eyeColor
-          characterData.specialFeatures = currentCharacter.specialFeatures || []
+          // Non-Child characters appearance details (Pets hariç)
+          if (currentCharacter.characterType.group !== "Pets") {
+            characterData.hairColor = currentCharacter.hairColor
+            characterData.eyeColor = currentCharacter.eyeColor
+            characterData.specialFeatures = currentCharacter.specialFeatures || []
+          }
           // Age and gender are optional for non-Child characters
           if (currentCharacter.age) characterData.age = currentCharacter.age
           if (currentCharacter.gender) characterData.gender = currentCharacter.gender
@@ -1140,8 +1143,8 @@ export default function Step2Page() {
                         </div>
                       )}
 
-                      {/* NEW: Appearance Details for Non-Child Characters (Pets, Family Members, Other) */}
-                      {character.characterType.group !== "Child" && (
+                      {/* NEW: Appearance Details for Non-Child Characters (Family Members, Other - Pets excluded) */}
+                      {character.characterType.group !== "Child" && character.characterType.group !== "Pets" && (
                         <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
                             Appearance Details

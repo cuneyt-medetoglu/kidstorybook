@@ -174,11 +174,18 @@ IMPORTANT: Be extremely detailed. This description will be used for ALL future b
  * Converts master character description to image prompt
  * This is used for EVERY image generation
  */
-export function buildCharacterPrompt(character: CharacterDescription): string {
+export function buildCharacterPrompt(
+  character: CharacterDescription,
+  includeAge: boolean = true
+): string {
   const parts: string[] = []
   
-  // Basic info
-  parts.push(`${character.age}yo ${character.gender}`)
+  // Basic info (yaş dahil edilip edilmeyeceğine göre)
+  if (includeAge) {
+    parts.push(`${character.age}yo ${character.gender}`)
+  } else {
+    parts.push(character.gender) // Sadece gender - yaş yok
+  }
   
   // Hair (combined, simplified)
   const hair = [character.hairColor, character.hairLength, character.hairStyle].filter(Boolean).join(' ')
