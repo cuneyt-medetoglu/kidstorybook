@@ -1272,16 +1272,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
         
         console.log(`[Create Book] 📸 Page images - Reference type:`, masterIllustrationUrl ? 'Master Illustration ✅' : 'Character Photos ⚠️')
-        console.log(`[Create Book] 📸 Page images - Reference images:`, characterReferenceImageUrls.length)
-        if (characterReferenceImageUrls.length > 0) {
+        console.log(`[Create Book] 📸 Page images - Reference images:`, masterIllustrationUrl ? 1 : characterReferenceImageUrls.length)
+        if (masterIllustrationUrl) {
+          console.log(`[Create Book] 📸 Page images - Master illustration URL:`, masterIllustrationUrl)
+        } else if (characterReferenceImageUrls.length > 0) {
           characterReferenceImageUrls.forEach((url, index) => {
-            console.log(`[Create Book] 📸 Page images - Reference ${index + 1} URL:`, url)
+            console.log(`[Create Book] 📸 Page images - Character photo ${index + 1} URL:`, url)
           })
-        }
-        if (coverImageUrl && !masterIllustrationUrl) {
-          console.log(`[Create Book] 📸 Page images - Cover URL (fallback):`, coverImageUrl)
-        } else {
-          console.log(`[Create Book] 📸 Page images - ❌ Cover image not available - pages will use only character photos`)
         }
         
         const characterPrompt = buildCharacterPrompt(character.description)
@@ -1373,18 +1370,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           console.log(`[Create Book] ✅ Page ${pageNumber} safe action applied:`, characterAction)
         }
 
-        // Generate full page prompt with correct parameters (NEW: Multiple characters, Cover reference)
-        // Note: coverImageUrl is already defined above (line ~951, outside the loop)
-        // FIXED (16 Ocak 2026): Page 1 is NOT cover - cover is generated separately
-        // All pages (1-10) should use cover as reference if available
-        const isCoverPage = false // Page 1 is NOT cover - cover is generated separately before pages
-        const useCoverReference = coverImageUrl !== null // Use cover reference for ALL pages if available
-        
-        console.log(`[Create Book] Page ${pageNumber} - Cover reference:`, {
-          isCoverPage,
-          useCoverReference,
-          coverImageUrl: coverImageUrl ? 'Available ✅' : 'Not available ❌'
-        })
+        // Generate full page prompt (NEW: Master illustration only, no cover reference)
+        // Master illustration is the canonical reference - cover is not needed
+        const isCoverPage = false // Page is NOT cover
         
         // NEW: Analyze scene diversity (16 Ocak 2026)
         const currentSceneAnalysis = analyzeSceneDiversity(
@@ -1409,8 +1397,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           illustrationStyle,
           ageGroup,
           additionalCharactersCount, // NEW: Pass additional characters count
-          isCoverPage, // isCover: false for all pages (cover is generated separately)
-          useCoverReference, // useCoverReference: true for ALL pages (1-10) if cover exists
+          isCoverPage, // isCover: false for all pages
+          false, // useCoverReference: false - master illustration is used instead
           sceneDiversityAnalysis.slice(0, -1) // Pass previous scenes (exclude current)
         )
 
@@ -1451,17 +1439,18 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
 
         // NEW: Use master illustration only (no cover image needed)
-        // If master illustration failed, fallback to old system (character photos + cover)
+        // If master illustration failed, fallback to character photos only
         const referenceImageUrls = masterIllustrationUrl
           ? [masterIllustrationUrl]
-          : (useCoverReference ? [...characterReferenceImageUrls, coverImageUrl] : characterReferenceImageUrls)
+          : characterReferenceImageUrls
         
-        console.log(`[Create Book] Page ${pageNumber} - Reference type:`, masterIllustrationUrl ? 'Master ✅' : 'Photos+Cover ⚠️')
+        console.log(`[Create Book] Page ${pageNumber} - Reference type:`, masterIllustrationUrl ? 'Master Illustration ✅' : 'Character Photos ⚠️')
         console.log(`[Create Book] Page ${pageNumber} - Reference count:`, referenceImageUrls.length)
         if (referenceImageUrls.length > 0) {
           console.log(`[Create Book] Page ${pageNumber} - Reference URLs:`)
           referenceImageUrls.forEach((url, index) => {
-            console.log(`[Create Book]   - ref_${index + 1}: ${url}`)
+            const label = masterIllustrationUrl ? 'master' : `character_${index + 1}`
+            console.log(`[Create Book]   - ${label}: ${url}`)
           })
         }
         
@@ -1472,8 +1461,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           
           for (let i = 0; i < referenceImageUrls.length; i += 1) {
             const referenceImageUrl = referenceImageUrls[i]
-            const isCoverRef = useCoverReference && i === referenceImageUrls.length - 1
-            const imageLabel = isCoverRef ? 'cover' : `character_${i + 1}`
+            const imageLabel = masterIllustrationUrl ? 'master' : `character_${i + 1}`
             const imageProcessingStartTime = Date.now()
             
             try {
@@ -1489,8 +1477,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
                 // HTTP URL: download the image
                 console.log(`[Create Book] Page ${pageNumber} - 📥 Downloading ${imageLabel} from URL...`)
                 console.log(`[Create Book] Page ${pageNumber} -   URL length:`, referenceImageUrl.length, 'chars')
-                if (isCoverRef) {
-                  console.log(`[Create Book] Page ${pageNumber} -   🎨 This is COVER IMAGE (will be used as reference for character consistency)`)
+                if (masterIllustrationUrl) {
+                  console.log(`[Create Book] Page ${pageNumber} -   🎨 This is MASTER ILLUSTRATION (canonical reference for character consistency)`)
                 }
                 const downloadStartTime = Date.now()
                 const imageResponse = await fetch(referenceImageUrl)
@@ -1540,13 +1528,12 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             console.log(`[Create Book] Page ${pageNumber} -   - Size:`, imageSize)
             console.log(`[Create Book] Page ${pageNumber} -   - Quality:`, imageQuality)
             console.log(`[Create Book] Page ${pageNumber} -   - Image blobs:`, imageBlobs.length)
-            console.log(`[Create Book] Page ${pageNumber} -   - Character photos:`, characterReferenceImageUrls.length)
-            console.log(`[Create Book] Page ${pageNumber} -   - Cover image:`, useCoverReference ? 'Yes ✅ (for consistency)' : 'No')
+            console.log(`[Create Book] Page ${pageNumber} -   - Reference type:`, masterIllustrationUrl ? 'Master Illustration ✅' : `Character Photos (${characterReferenceImageUrls.length})`)
             console.log(`[Create Book] Page ${pageNumber} -   - Image format: Blob (multipart/form-data)`)
             console.log(`[Create Book] Page ${pageNumber} -   - Prompt included: Yes ✅`)
             console.log(`[Create Book] Page ${pageNumber} -   - Reference images included: Yes ✅ (${imageBlobs.length} as Blobs)`)
-            if (useCoverReference) {
-              console.log(`[Create Book] Page ${pageNumber} -   - 🎨 COVER REFERENCE ACTIVE: Cover image will be used for character consistency`)
+            if (masterIllustrationUrl) {
+              console.log(`[Create Book] Page ${pageNumber} -   - 🎨 MASTER ILLUSTRATION ACTIVE: Canonical reference for character consistency`)
             }
 
             // NEW: Retry mechanism for edits API (16 Ocak 2026)
@@ -1583,7 +1570,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
                 `Status: ${errorStatus}. ` +
                 `This is a ${isPermanentError(errorStatus) ? 'permanent' : 'temporary'} error. ` +
                 `Please try creating the book again. ` +
-                `Reference images (character photos + cover) are required for character consistency.`
+                `Reference images (master illustration or character photos) are required for character consistency.`
               )
             }
 
