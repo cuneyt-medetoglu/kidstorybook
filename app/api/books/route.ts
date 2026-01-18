@@ -538,6 +538,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             throw new Error('Invalid story structure from AI')
           }
 
+          // Validate characterIds field in each page (REQUIRED)
+          for (const page of generatedStoryData.pages) {
+            if (!page.characterIds || !Array.isArray(page.characterIds) || page.characterIds.length === 0) {
+              throw new Error(`Page ${page.pageNumber} is missing required "characterIds" field`)
+            }
+          }
+
           // Enforce requested pageCount strictly
           if (pageCount !== undefined && pageCount !== null) {
             const requestedPages = Number(pageCount)
@@ -1459,10 +1466,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         const pageImageStartTime = Date.now()
         console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
 
-        // NEW: Detect which characters appear in this page text
-        // Use only those characters' master illustrations (not all characters)
-        const pageText = page.text || page.imagePrompt || page.sceneDescription || ''
-        const pageCharacters = detectCharactersInPageText(pageText, characters)
+        // Use characterIds directly from story generation (required field)
+        const pageCharacters = page.characterIds || []
         const pageMasterUrls = pageCharacters
           .map(charId => masterIllustrations[charId])
           .filter((url): url is string => Boolean(url))
@@ -1475,7 +1480,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               .map(c => c.reference_photo_url)
               .filter((url): url is string => Boolean(url))
         
-        console.log(`[Create Book] Page ${pageNumber} - Character detection:`, pageCharacters.length, 'character(s) found:', pageCharacters.map(id => characters.find(c => c.id === id)?.name || id).join(', '))
+        console.log(`[Create Book] Page ${pageNumber} - Character IDs from story:`, pageCharacters)
         console.log(`[Create Book] Page ${pageNumber} - Reference type:`, pageMasterUrls.length > 0 ? 'Master Illustrations ✅' : 'Character Photos ⚠️')
         console.log(`[Create Book] Page ${pageNumber} - Reference count:`, referenceImageUrls.length)
         if (referenceImageUrls.length > 0) {

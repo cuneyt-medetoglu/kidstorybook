@@ -1,12 +1,57 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 2.9  
-**Son Güncelleme:** 16 Ocak 2026 (Hand-Holding Ban for Anatomical Correctness)
+**Doküman Versiyonu:** 3.0  
+**Son Güncelleme:** 18 Ocak 2026 (Character Mapping Per Page)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.0.3 (18 Ocak 2026) - Character Mapping Per Page - Story Generation
+
+**Sorun:**
+- Story generation her sayfa için sadece `text`, `imagePrompt`, `sceneDescription` döndürüyordu
+- Sayfa görseli oluşturulurken hangi karakterlerin olduğu text parsing ile tespit ediliyordu (`detectCharactersInPageText`)
+- Text'te karakterler Türkçe isimlerle geçiyor ("nine" vs "Grandma")
+- Text parsing fonksiyonu İngilizce karakter adlarını arıyordu
+- Sonuç: "nine" → "Grandma" eşleşmesi olmuyordu, sadece ana karakter bulunuyordu
+
+**Çözüm:**
+
+#### 1. StoryPage Type Güncellemesi (`lib/prompts/types.ts`)
+- ✅ `StoryPage` interface'ine `characterIds: string[]` field'i eklendi (REQUIRED)
+- ✅ Her sayfa için hangi karakter(ler) olduğu explicit olarak belirtiliyor
+
+#### 2. Story Generation Prompt Güncellemesi (`lib/prompts/story/v1.0.0/base.ts`)
+- ✅ CHARACTER MAPPING bölümü eklendi (karakter ID + name mapping)
+- ✅ Her sayfa için `characterIds` field'i zorunlu kılındı (CRITICAL - REQUIRED FIELD)
+- ✅ Tek karakter durumu için de `characterIds` eklendi (consistency için)
+- ✅ OUTPUT FORMAT örneğine `characterIds` field'i eklendi
+
+#### 3. Story Response Validation (`app/api/books/route.ts`)
+- ✅ Her sayfada `characterIds` field'inin varlığı ve geçerliliği kontrol ediliyor
+- ✅ Validation hatası: `Page X is missing required "characterIds" field`
+
+#### 4. Page Generation Güncellemesi (`app/api/books/route.ts`)
+- ✅ `detectCharactersInPageText` fonksiyonu kaldırıldı (artık kullanılmıyor)
+- ✅ Direkt `page.characterIds` kullanılıyor (required field)
+- ✅ Text parsing'e güvenmek yerine structured data kullanılıyor
+
+**Beklenen İyileşme:**
+- ✅ Her sayfada doğru karakter master illustration'ları kullanılacak
+- ✅ Türkçe "nine" vs İngilizce "Grandma" sorunu çözüldü
+- ✅ Text parsing hatası riski kaldırıldı
+- ✅ Karakter ID → Master illustration mapping direkt çalışıyor
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/types.ts` - StoryPage interface güncellendi
+- `lib/prompts/story/v1.0.0/base.ts` - CHARACTER MAPPING ve OUTPUT FORMAT güncellendi (v1.0.2 → v1.0.3)
+- `app/api/books/route.ts` - Validation ve page generation güncellendi
+
+**Versiyon:** v1.0.2 → v1.0.3
+
+---
 
 ### v1.0.10 (16 Ocak 2026) - Hand-Holding Ban for Anatomical Correctness
 
@@ -589,7 +634,7 @@ Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal
 | Template | Version | Status | Release Date |
 |----------|---------|--------|--------------|
 | Image Generation | v1.0.4 | ✅ Active | 16 Ocak 2026 |
-| Story Generation | v1.0.0 | ✅ Active | 15 Ocak 2026 |
+| Story Generation | v1.0.3 | ✅ Active | 18 Ocak 2026 |
 
 ---
 

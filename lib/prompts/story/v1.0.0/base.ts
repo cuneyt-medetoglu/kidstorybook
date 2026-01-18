@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.2',
+  version: '1.0.3',
   releaseDate: new Date('2026-01-18'),
   status: 'active',
   changelog: [
@@ -27,6 +27,7 @@ export const VERSION: PromptVersion = {
     'Final language check mechanism added - 24 Ocak 2026',
     'v1.0.1: Enhanced additional characters section with detailed appearance descriptions (age, hair color, eye color, features) and explicit character name usage directive (16 Ocak 2026)',
     'v1.0.2: Visual safety guidelines added - avoid risky hand interactions for better anatomical accuracy (GPT research-backed) (18 Ocak 2026)',
+    'v1.0.3: Character mapping per page - Story generation now returns characterIds array for each page, replacing unreliable text-based character detection (18 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -111,6 +112,22 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     })
     
     characterDesc += `\n\n**IMPORTANT:** All ${characters.length} characters should appear in the story. The main character is ${characterName}. Use the character names (${characters.map(c => c.name || c.type.displayName).join(', ')}) throughout the story, not generic terms like "friends" or "companions".`
+    
+    // CHARACTER MAPPING for JSON response
+    characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
+    characters.forEach((char, index) => {
+      characterDesc += `- Character ${index + 1}: ID="${char.id}", Name="${char.name || char.type.displayName}"\n`
+    })
+    
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include a "characterIds" array indicating which characters appear on that page using their IDs from the mapping above.`
+    characterDesc += `\n- "characterIds" is a REQUIRED field - do NOT omit it`
+    characterDesc += `\n- Use the exact character IDs from the mapping above`
+    characterDesc += `\n- Example: If page 2 features both ${characterName} and ${characters[1].name || characters[1].type.displayName}, set "characterIds": ["${characters[0].id}", "${characters[1].id}"]`
+  } else if (characters && characters.length === 1) {
+    // Single character - still include characterIds for consistency
+    characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
+    characterDesc += `- Character 1: ID="${characters[0].id}", Name="${characters[0].name || characters[0].type.displayName}"\n`
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${characters[0].id}"]`
   }
 
   // Main prompt
@@ -373,7 +390,8 @@ Return a valid JSON object with this exact structure:
         - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
         - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
         - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
-        - CRITICAL: This scene MUST be DIFFERENT from previous pages"
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages",
+      "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
     }
     // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
   ],
@@ -386,6 +404,8 @@ Return a valid JSON object with this exact structure:
 }
 
 CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
+
+CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section.
 
 # CRITICAL REMINDERS
 

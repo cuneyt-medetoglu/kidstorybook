@@ -9,14 +9,19 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.0.1 | v1.0.1 | ✅ Synced | 2026-01-16 | 2026-01-16 |
+| Story | v1.0.3 | v1.0.3 | ✅ Synced | 2026-01-18 | 2026-01-18 |
 | Image | v1.0.5 | v1.0.5 | ✅ Synced | 2026-01-16 | 2026-01-16 |
 
 ---
 
 ## 📝 Son Değişiklikler
 
-### Story Prompts (v1.0.1) - 16 Ocak 2026
+### Story Prompts (v1.0.3) - 18 Ocak 2026
+- ✅ Character mapping per page - story generation returns characterIds for each page
+- ✅ CHARACTER MAPPING section added to prompt
+- ✅ characterIds field required in StoryPage type
+- ✅ Validation added for characterIds in story response
+- ✅ Text-based character detection replaced with structured characterIds
 - ✅ Multiple characters support with detailed appearance descriptions
 - ✅ Character name usage emphasized (not generic terms)
 - ✅ Age, hair color, eye color, special features for all character types

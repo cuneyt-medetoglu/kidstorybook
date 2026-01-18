@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Story Generation Prompts**
 
-**Version:** 1.0.2  
+**Version:** 1.0.3  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 16 Ocak 2026 (Scene Diversity & Visual Variety Improvements)  
+**Last Update:** 18 Ocak 2026 (Character Mapping Per Page)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -84,12 +84,14 @@ Return as JSON:
     {
       "pageNumber": 1,
       "text": "Page 1 text in [STORY_LANGUAGE] - This is the BOOK COVER page. Can be minimal (just title) or include a brief introduction ([WORD_COUNT_MIN]-[WORD_COUNT_MAX] words)",
-      "imagePrompt": "BOOK COVER ILLUSTRATION (NOT a book mockup): Professional children's book cover illustration as a FLAT, STANDALONE ILLUSTRATION (NOT a 3D book object, NOT a book on a shelf, NOT a photograph of a physical book). The main character ([CHARACTER_NAME]), a [AGE]-year-old [GENDER] with [CHARACTER_FEATURES_ENGLISH], should be prominently featured in the center or foreground. CRITICAL: Match the exact hair length, style, and texture from the uploaded photo - if the photo shows short hair, show short hair; if long, show long; match the exact curl pattern and texture. IMPORTANT: The character should RESEMBLE the child in the photo but MUST be an ILLUSTRATION, NOT a photorealistic rendering. The character should look like a stylized illustration that captures the child's features (hair color, eye color, face shape, etc.) but in the chosen illustration style. It should be clearly an illustration, not a photograph. Include elements representing the theme ([THEME] - [SUBTHEME]). CRITICAL: NO TEXT, NO WRITING, NO LETTERS, NO WORDS, NO TITLES in the image - text will be added separately as a separate layer. Use [ILLUSTRATION_STYLE_DESCRIPTION] style. [3D_ANIMATION_SPECIAL_NOTES_IF_APPLICABLE] Make it visually striking, colorful, and appealing to children. The cover should look professional and print-ready. DO NOT create a book mockup or 3D book object - create a flat illustration. CRITICAL: This image description must be entirely in English - no Turkish words allowed."
+      "imagePrompt": "BOOK COVER ILLUSTRATION (NOT a book mockup): Professional children's book cover illustration as a FLAT, STANDALONE ILLUSTRATION (NOT a 3D book object, NOT a book on a shelf, NOT a photograph of a physical book). The main character ([CHARACTER_NAME]), a [AGE]-year-old [GENDER] with [CHARACTER_FEATURES_ENGLISH], should be prominently featured in the center or foreground. CRITICAL: Match the exact hair length, style, and texture from the uploaded photo - if the photo shows short hair, show short hair; if long, show long; match the exact curl pattern and texture. IMPORTANT: The character should RESEMBLE the child in the photo but MUST be an ILLUSTRATION, NOT a photorealistic rendering. The character should look like a stylized illustration that captures the child's features (hair color, eye color, face shape, etc.) but in the chosen illustration style. It should be clearly an illustration, not a photograph. Include elements representing the theme ([THEME] - [SUBTHEME]). CRITICAL: NO TEXT, NO WRITING, NO LETTERS, NO WORDS, NO TITLES in the image - text will be added separately as a separate layer. Use [ILLUSTRATION_STYLE_DESCRIPTION] style. [3D_ANIMATION_SPECIAL_NOTES_IF_APPLICABLE] Make it visually striking, colorful, and appealing to children. The cover should look professional and print-ready. DO NOT create a book mockup or 3D book object - create a flat illustration. CRITICAL: This image description must be entirely in English - no Turkish words allowed.",
+      "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
     },
     {
       "pageNumber": 2,
       "text": "Page 2 text in [STORY_LANGUAGE] ([WORD_COUNT_MIN]-[WORD_COUNT_MAX] words) - Story introduction",
-      "imagePrompt": "Detailed visual description for this page as an ILLUSTRATION (NOT a photograph). The character ([CHARACTER_NAME]) has [CHARACTER_FEATURES_ENGLISH]. CRITICAL: Match the exact hair length, style, and texture from the uploaded photo - if the photo shows short hair, show short hair; if long, show long; match the exact curl pattern and texture. IMPORTANT: The character should RESEMBLE the child in the photo but MUST be an ILLUSTRATION, NOT a photorealistic rendering. The character should look like a stylized illustration that captures the child's features but in the chosen illustration style. It should be clearly an illustration, not a photograph. Theme: [THEME] - [SUBTHEME]. Style: [ILLUSTRATION_STYLE_DESCRIPTION]. [3D_ANIMATION_SPECIAL_NOTES_IF_APPLICABLE] CRITICAL: This image description must be entirely in English - no Turkish words allowed."
+      "imagePrompt": "Detailed visual description for this page as an ILLUSTRATION (NOT a photograph). The character ([CHARACTER_NAME]) has [CHARACTER_FEATURES_ENGLISH]. CRITICAL: Match the exact hair length, style, and texture from the uploaded photo - if the photo shows short hair, show short hair; if long, show long; match the exact curl pattern and texture. IMPORTANT: The character should RESEMBLE the child in the photo but MUST be an ILLUSTRATION, NOT a photorealistic rendering. The character should look like a stylized illustration that captures the child's features but in the chosen illustration style. It should be clearly an illustration, not a photograph. Theme: [THEME] - [SUBTHEME]. Style: [ILLUSTRATION_STYLE_DESCRIPTION]. [3D_ANIMATION_SPECIAL_NOTES_IF_APPLICABLE] CRITICAL: This image description must be entirely in English - no Turkish words allowed.",
+      "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
     }
     // ... pages 3-10 follow the same pattern
   ],
@@ -296,12 +298,14 @@ The story should focus on nature, animals, and the environment. Include educatio
     {
       "pageNumber": 1,
       "text": "Arya's Lost Treasure Adventure - A big adventure is beginning for a child!",
-      "imagePrompt": "BOOK COVER ILLUSTRATION (NOT a book mockup): Professional children's book cover illustration as a FLAT, STANDALONE ILLUSTRATION..."
+      "imagePrompt": "BOOK COVER ILLUSTRATION (NOT a book mockup): Professional children's book cover illustration as a FLAT, STANDALONE ILLUSTRATION...",
+      "characterIds": ["7c9860ee-98bd-4f72-a95e-a20278a4c44f"]
     },
     {
       "pageNumber": 2,
       "text": "Arya was a curious little girl. She loved adventures and treasure hunts...",
-      "imagePrompt": "Detailed visual description for this page as an ILLUSTRATION..."
+      "imagePrompt": "Detailed visual description for this page as an ILLUSTRATION...",
+      "characterIds": ["7c9860ee-98bd-4f72-a95e-a20278a4c44f"]
     }
     // ... pages 3-10
   ],

@@ -63,6 +63,7 @@ export interface StoryPage {
   text: string
   imagePrompt: string
   sceneDescription: string
+  characterIds: string[] // NEW: Which character(s) appear on this page (character IDs) - REQUIRED
 }
 
 export interface AgeGroupRules {
