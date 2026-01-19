@@ -1,12 +1,148 @@
 # 📝 Prompt Versiyon Changelog
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 3.0  
-**Son Güncelleme:** 18 Ocak 2026 (Character Mapping Per Page)
+**Doküman Versiyonu:** 5.0  
+**Son Güncelleme:** 25 Ocak 2026 (Story Safety Improvements, Character Usage Requirements, Word Count Increase)
 
 ---
 
 ## Versiyon Geçmişi
+
+### v1.2.0 (25 Ocak 2026) - Composition & Depth Improvements - Image Generation
+
+**Sorun:**
+- Görsellerde sahne derinliği eksikliği
+- Karakterler görselin çoğunu kaplıyor, çevre yetersiz
+- Sinematik atmosfer eksik (golden hour, backlighting, god rays)
+- Depth of field ve atmosferik perspektif direktifleri yok
+- Kamera açısı çeşitliliği yetersiz
+- Karakter-çevre oranı belirtilmemiş
+
+**Çözüm:**
+
+#### 1. Yeni Fonksiyonlar Eklendi (`lib/prompts/image/v1.0.0/scene.ts`)
+- ✅ `getDepthOfFieldDirectives()` - Kamera parametreleri (lens, aperture), odak düzlemleri, bokeh efektleri
+- ✅ `getAtmosphericPerspectiveDirectives()` - Uzak plan renk açılması, kontrast azalması, haze efekti
+- ✅ `getCameraAngleDirectives()` - Kamera açısı çeşitliliği, önceki sahnelerden farklılık, çocuk perspektifi
+- ✅ `getCharacterEnvironmentRatio()` - Karakter %30-40, çevre %60-70 oran direktifleri
+
+#### 2. Mevcut Fonksiyonlar Güncellendi
+- ✅ `getCinematicElements()` - Spesifik ışıklandırma teknikleri (golden hour, backlighting, god rays), "Source → Obstacle → Medium" yapısı
+- ✅ `generateLayeredComposition()` - Depth of field ve atmosferik perspektif direktifleri eklendi
+- ✅ `getCompositionRules()` - Kamera açısı çeşitliliği ve karakter-çevre oranı eklendi
+- ✅ `getLightingDescription()` - Spesifik ışıklandırma teknikleri, renk sıcaklıkları, atmosferik parçacıklar
+- ✅ `getEnvironmentDescription()` - Arka plan detayları, gökyüzü, uzak plan detayları genişletildi
+
+#### 3. Prompt Yapısı Yeniden Düzenlendi (`generateFullPagePrompt()`)
+- ✅ Yeni direktifler entegre edildi
+- ✅ Sıralama: Anatomical → Composition & Depth → Lighting & Atmosphere → Camera & Perspective → Style → Character → Environment → Layered
+- ✅ Tag-based yapı ile direktifler organize edildi
+
+**Beklenen İyileşme:**
+- ✅ Daha iyi sahne derinliği (ön/orta/arka plan net ayrımı)
+- ✅ Dengeli karakter-çevre oranı (karakterler %30-40, çevre %60-70)
+- ✅ Sinematik atmosfer (altın saat, backlighting, god rays)
+- ✅ Zengin çevre detayları (gökyüzü, arka plan, atmosferik unsurlar)
+- ✅ Daha profesyonel görsel kalitesi
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.1.0 → v1.2.0
+
+**Kaynak:**
+- Web araştırması: 2026 best practices (gpt-image.com, reelmind.ai, appiqa.com, hailiuoai.video)
+- Analiz dokümanı: `docs/guides/IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md`
+
+---
+
+### v1.1.0 (25 Ocak 2026) - Story Quality Enhancements & Safety Improvements - Story Generation
+
+**Sorun:**
+- Hikaye metinleri bazen çok kısa ve basit
+- "Show, don't tell" uygulaması yetersiz
+- Duyusal detaylar eksik
+- Pacing kontrolü yetersiz
+- Örnek metin yok (stil rehberliği eksik)
+- Word count çok düşük (kullanıcı geri bildirimi)
+- Safety violation hataları (Page 2'de "dans etmek" gibi riskli ifadeler)
+- Tüm karakterler story'de kullanılmıyor (Dad karakteri eksik)
+- Character usage requirements yetersiz
+
+**Çözüm:**
+
+#### 1. Örnek Metin Eklendi
+- ✅ `getExampleText()` fonksiyonu eklendi
+- ✅ Yaş grubuna göre örnek metinler (toddler, preschool, early-elementary, elementary, pre-teen)
+- ✅ Örnek metinlerde dialogue, duyusal detaylar, atmosferik açıklamalar
+- ✅ "Here's how I like it: [example]. Now write something similar." formatı
+
+#### 2. "Show, Don't Tell" Örnekleri Genişletildi
+- ✅ BAD örneği detaylandırıldı (çok kısa, basit cümleler)
+- ✅ GOOD örneği detaylandırıldı (dialogue, duyusal detaylar, atmosfer)
+- ✅ Her yaş grubu için uygun örnekler
+
+#### 3. Duyusal Detaylar Vurgulandı
+- ✅ Görsel: renkler, ışıklandırma, dokular
+- ✅ İşitsel: sesler, müzik, doğa sesleri
+- ✅ Dokunsal: dokular, sıcaklık, rüzgar
+- ✅ Koku: çiçekler, yemek, doğa kokuları
+- ✅ Illustration guidelines'da duyusal detayların görselleştirilmesi
+
+#### 4. Pacing Kontrolü Detaylandırıldı
+- ✅ "Strong hook early" direktifi (ilk 2 cümlede dikkat çekme)
+- ✅ "Shorter scenes" direktifi (her sayfa için)
+- ✅ "Predictable patterns" direktifi (yaş grubuna göre)
+- ✅ "Scene-by-scene breakdown" direktifi
+
+#### 5. Word Count Artırma (25 Ocak 2026 - User Request)
+- ✅ Tüm yaş grupları için word count 2 kat artırıldı
+- ✅ toddler: 35-45 → 70-90 (avg 40 → 80)
+- ✅ preschool: 50-70 → 100-140 (avg 60 → 120)
+- ✅ early-elementary: 80-100 → 160-200 (avg 90 → 180)
+- ✅ elementary: 110-130 → 220-260 (avg 120 → 240)
+- ✅ pre-teen: 110-130 → 220-260 (avg 120 → 240)
+
+#### 6. Safety & Age-Appropriate Actions (25 Ocak 2026 - NEW)
+- ✅ "SAFETY & AGE-APPROPRIATE ACTIONS" bölümü eklendi
+- ✅ Riskli ifadeler için direktifler:
+  - "dans etmek" → "hareket etmek", "neşeli şarkılar söylemek", "coşkuyla eğlenmek"
+  - "sarılmak" → "kucaklaşmak", "sevecen bir şekilde yaklaşmak"
+- ✅ Alternatif ifadeler önerildi:
+  - "el ele tutuşmak", "birlikte yürümek", "birlikte oynamak"
+  - "gülmek", "gülümsemek", "neşelenmek"
+  - "şarkı söylemek", "müzik dinlemek", "şarkı mırıldanmak"
+- ✅ Age-appropriate, family-safe actions vurgusu
+
+#### 7. Character Usage Requirements Güçlendirme (25 Ocak 2026 - NEW)
+- ✅ "CRITICAL - CHARACTER USAGE REQUIREMENTS" bölümü eklendi
+- ✅ Tüm karakterlerin kullanılması zorunlu hale getirildi
+- ✅ Family Members için özel direktifler:
+  - Family Members (Mom, Dad) en az X sayfada görünmeli
+  - Her karakter için minimum sayfa sayısı direktifi
+- ✅ Karakter eşit dağılımı direktifleri:
+  - Her karakter en az X sayfada görünmeli
+  - Karakterler eşit oranda dağıtılmalı
+  - Özellikle son sayfalarda tüm karakterler görünmeli
+- ✅ CharacterIds örneğinde tüm karakterler gösteriliyor
+
+**Beklenen İyileşme:**
+- ✅ Daha zengin ve detaylı metinler (2 kat daha uzun)
+- ✅ Daha iyi dialogue kullanımı
+- ✅ Daha fazla duyusal detay
+- ✅ Daha iyi pacing kontrolü
+- ✅ Daha iyi "show, don't tell" uygulaması
+- ✅ Safety violation hataları azalacak
+- ✅ Tüm karakterler (Dad dahil) story'de kullanılacak
+- ✅ Karakterler eşit oranda dağıtılacak
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - v1.0.3 → v1.1.0
+
+**Kaynak:**
+- Web araştırması: 2026 best practices (medium.com, techtarget.com, saasprompts.com, hostinger.com, godofprompt.ai)
+- Analiz dokümanı: `docs/guides/IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md`
+- Kullanıcı geri bildirimi: Word count çok düşük, Dad karakteri story'de yok, safety violation hataları
+
+---
 
 ### v1.0.3 (18 Ocak 2026) - Character Mapping Per Page - Story Generation
 

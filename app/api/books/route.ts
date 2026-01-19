@@ -119,12 +119,24 @@ async function generateMasterCharacterIllustration(
   illustrationStyle: string,
   userId: string,
   supabase: any,
-  includeAge: boolean = true // Whether to include age in prompt
+  includeAge: boolean = true, // Whether to include age in prompt
+  characterGender?: 'boy' | 'girl' | 'other' // NEW: Character gender from database (25 Ocak 2026)
 ): Promise<string> {
   console.log('[Master Illustration] 🎨 Generating master character illustration for character:', characterId)
+  console.log('[Master Illustration] 👤 Character gender from DB:', characterGender || 'not provided')
+  console.log('[Master Illustration] 👤 Character description gender:', characterDescription?.gender || 'not in description')
+  
+  // FIX: Use characterGender from database if available, fallback to description.gender (25 Ocak 2026)
+  // This ensures correct gender is used even if description.gender is missing or incorrect
+  const fixedDescription = {
+    ...characterDescription,
+    gender: characterGender || characterDescription?.gender || 'boy', // Fallback to 'boy' if both missing
+  }
+  
+  console.log('[Master Illustration] ✅ Fixed gender for prompt:', fixedDescription.gender)
   
   // Build optimized prompt for master illustration (single character)
-  const characterPrompt = buildCharacterPrompt(characterDescription, includeAge)
+  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge)
   
   // Style directive (optimized)
   const styleDirective = illustrationStyle === '3d_animation' 
@@ -676,6 +688,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       }
       
       try {
+        // FIX: Pass char.gender to ensure correct gender is used (25 Ocak 2026)
+        // char.gender comes from database and is always correct
+        // char.description.gender might be missing or incorrect
         const masterUrl = await generateMasterCharacterIllustration(
           char.reference_photo_url,
           char.description,
@@ -683,7 +698,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           illustrationStyle,
           user.id,
           supabase,
-          includeAge
+          includeAge,
+          char.gender // NEW: Pass character gender from database
         )
         masterIllustrations[char.id] = masterUrl
         console.log(`[Create Book] ✅ Master illustration created for character ${char.id} (${char.name}): ${masterUrl}`)
@@ -1309,27 +1325,23 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         // Get cover image URL (needed for fallback - not used as reference anymore)
         const coverImageUrl = generatedCoverImageUrl || book.cover_image_url || null
         
-        const characterPrompt = buildCharacterPrompt(character.description)
-        
-        // NEW: Additional characters for image generation
-        const additionalCharacters = characters.slice(1).map((char) => ({
-          type: char.character_type || {
-            group: "Child",
-            value: "Child",
-            displayName: char.name,
-          },
-          description: char.description,
-        }))
-        const additionalCharactersCount = additionalCharacters.length
-        
         const generatedImages: any[] = []
         
         // NEW: Scene diversity tracking (16 Ocak 2026)
         const sceneDiversityAnalysis: SceneDiversityAnalysis[] = []
         
-        console.log(`[Create Book] 👥 Total characters: ${characters.length} (1 main + ${additionalCharactersCount} additional)`)
-        if (additionalCharactersCount > 0) {
-          console.log(`[Create Book] 📝 Additional characters:`, additionalCharacters.map(c => c.type.displayName).join(', '))
+        // FIX: additionalCharactersCount removed - now calculated per page (25 Ocak 2026)
+        console.log(`[Create Book] 👥 Total characters: ${characters.length} (1 main + ${characters.length - 1} additional)`)
+        if (characters.length > 1) {
+          const allAdditionalCharacters = characters.slice(1).map((char) => ({
+            type: char.character_type || {
+              group: "Child",
+              value: "Child",
+              displayName: char.name,
+            },
+            description: char.description,
+          }))
+          console.log(`[Create Book] 📝 All additional characters:`, allAdditionalCharacters.map(c => c.type.displayName).join(', '))
         }
 
         // Process pages in batches of 4 (Tier 1: 4 IPM = 4 images per 90 seconds)
@@ -1402,6 +1414,49 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         // Master illustration is the canonical reference - cover is not needed
         const isCoverPage = false // Page is NOT cover
         
+        // FIX: Page-specific character prompt (25 Ocak 2026)
+        // Her page için sadece o page'deki karakterlerin prompt'unu oluştur
+        // Bu sayede prompt ve reference image eşleşmesi doğru olur
+        const pageCharacters = page.characterIds || []
+        
+        // Ana karakteri bul (her zaman ilk karakter)
+        const mainCharacter = characters.find(c => c.id === pageCharacters[0]) || character
+        
+        // Sadece bu page'deki ek karakterleri bul
+        const pageAdditionalCharacters = pageCharacters
+          .slice(1) // Ana karakter hariç
+          .map(charId => {
+            const char = characters.find(c => c.id === charId)
+            if (!char) return null
+            return {
+              type: char.character_type || {
+                group: "Child",
+                value: "Child", 
+                displayName: char.name,
+              },
+              description: char.description,
+            }
+          })
+          .filter((char): char is NonNullable<typeof char> => char !== null)
+        
+        // buildMultipleCharactersPrompt kullan (eğer ek karakter varsa)
+        const characterPrompt = pageAdditionalCharacters.length > 0
+          ? buildMultipleCharactersPrompt(mainCharacter.description, pageAdditionalCharacters)
+          : buildCharacterPrompt(mainCharacter.description)
+        
+        // additionalCharactersCount güncelle (sadece bu page için)
+        const additionalCharactersCount = pageAdditionalCharacters.length
+        
+        // Logging: Page-specific character info
+        console.log(`[Create Book] 📝 Page ${pageNumber} - Character IDs from story:`, pageCharacters)
+        console.log(`[Create Book] 👥 Page ${pageNumber} - Characters in prompt:`, [
+          mainCharacter.name || 'Main Character',
+          ...pageAdditionalCharacters.map(c => c.type.displayName)
+        ].join(', '))
+        if (pageAdditionalCharacters.length > 0) {
+          console.log(`[Create Book] 📝 Page ${pageNumber} - Additional characters:`, pageAdditionalCharacters.map(c => c.type.displayName).join(', '))
+        }
+        
         // NEW: Analyze scene diversity (16 Ocak 2026)
         const currentSceneAnalysis = analyzeSceneDiversity(
           sceneDescription,
@@ -1424,7 +1479,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           sceneInput,
           illustrationStyle,
           ageGroup,
-          additionalCharactersCount, // NEW: Pass additional characters count
+          additionalCharactersCount, // NEW: Pass additional characters count (page-specific)
           isCoverPage, // isCover: false for all pages
           false, // useCoverReference: false - master illustration is used instead
           sceneDiversityAnalysis.slice(0, -1) // Pass previous scenes (exclude current)
@@ -1464,10 +1519,10 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         let pageImageOutputFormat: string | null = null
 
         const pageImageStartTime = Date.now()
-        console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())
-
-        // Use characterIds directly from story generation (required field)
-        const pageCharacters = page.characterIds || []
+        console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())    
+        
+        // FIX: pageCharacters already defined above (line 1411) - use existing variable (25 Ocak 2026)
+        // Use characterIds directly from story generation (required field) - pageCharacters already defined
         const pageMasterUrls = pageCharacters
           .map(charId => masterIllustrations[charId])
           .filter((url): url is string => Boolean(url))
@@ -1480,7 +1535,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               .map(c => c.reference_photo_url)
               .filter((url): url is string => Boolean(url))
         
-        console.log(`[Create Book] Page ${pageNumber} - Character IDs from story:`, pageCharacters)
+        // Page characters already logged above (duplicate removal)
+        // console.log(`[Create Book] Page ${pageNumber} - Character IDs from story:`, pageCharacters)
         console.log(`[Create Book] Page ${pageNumber} - Reference type:`, pageMasterUrls.length > 0 ? 'Master Illustrations ✅' : 'Character Photos ⚠️')
         console.log(`[Create Book] Page ${pageNumber} - Reference count:`, referenceImageUrls.length)
         if (referenceImageUrls.length > 0) {

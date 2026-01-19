@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.1.0',
-  releaseDate: new Date('2026-01-18'),
+  version: '1.2.0',
+  releaseDate: new Date('2026-01-25'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -33,6 +33,17 @@ export const VERSION: PromptVersion = {
     'v1.0.2: Risky scene detection added - detectRiskySceneElements() (GPT research-backed) (18 Ocak 2026)',
     'v1.0.2: Safe scene alternatives - getSafeSceneAlternative() for risk mitigation (18 Ocak 2026)',
     'v1.1.0: Major optimization - style directives simplified (1500→200 chars), cinematic elements compressed (50→5 lines), environment templates reduced (90→15 lines), composition rules simplified (28→7 lines), cover directives optimized (27→3 lines), diversity directives minimized (40→10 lines), clothing consistency compressed (30→5 lines) - Total ~70% reduction (18 Ocak 2026)',
+    'v1.2.0: Major enhancement - composition and depth improvements (25 Ocak 2026)',
+    'v1.2.0: Added getDepthOfFieldDirectives() - camera parameters, focus planes, bokeh effects (25 Ocak 2026)',
+    'v1.2.0: Added getAtmosphericPerspectiveDirectives() - color desaturation, contrast reduction, haze (25 Ocak 2026)',
+    'v1.2.0: Added getCameraAngleDirectives() - perspective diversity, child\'s viewpoint (25 Ocak 2026)',
+    'v1.2.0: Added getCharacterEnvironmentRatio() - 30-40% character, 60-70% environment balance (25 Ocak 2026)',
+    'v1.2.0: Enhanced getCinematicElements() - specific lighting techniques (golden hour, backlighting, god rays) (25 Ocak 2026)',
+    'v1.2.0: Enhanced generateLayeredComposition() - depth of field and atmospheric perspective (25 Ocak 2026)',
+    'v1.2.0: Enhanced getCompositionRules() - camera angle variety and character-environment ratio (25 Ocak 2026)',
+    'v1.2.0: Enhanced getLightingDescription() - specific lighting techniques, color temperatures, atmospheric particles (25 Ocak 2026)',
+    'v1.2.0: Enhanced getEnvironmentDescription() - background details, sky, distant elements (25 Ocak 2026)',
+    'v1.2.0: Enhanced generateFullPagePrompt() - new directives integrated, prompt structure reorganized (25 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -80,7 +91,7 @@ export function generateScenePrompt(
   parts.push(`${styleDesc} illustration, cinematic quality`)
   
   // 2. CINEMATIC ELEMENTS - Add cinematic composition
-  const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood)
+  const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood, scene.timeOfDay)
   parts.push(cinematicElements)
   
   // 3. CHARACTER - With emphasis on consistency
@@ -115,8 +126,13 @@ export function generateScenePrompt(
   }
 
   // 10. COMPOSITION RULES
-  const composition = getCompositionRules(scene.focusPoint, scene.pageNumber)
-  parts.push(composition)
+  // Note: previousScenes not available in generateScenePrompt, will be handled in generateFullPagePrompt
+  // Composition rules are now handled in generateFullPagePrompt with full context
+  // Keeping basic composition here for backward compatibility
+  const baseComposition = scene.focusPoint === 'character' ? 'character centered, clear face' :
+                         scene.focusPoint === 'environment' ? 'wide environmental shot' :
+                         'balanced composition'
+  parts.push(baseComposition)
 
   // 11. QUALITY AND CONSISTENCY
   parts.push('professional children\'s book illustration')
@@ -152,15 +168,29 @@ const ENVIRONMENT_TEMPLATES: Record<string, string[]> = {
 }
 
 function getEnvironmentDescription(theme: string, sceneDesc: string): string {
-  // If scene description provided, use it
+  const envParts: string[] = []
+  
+  // If scene description provided, use it as base
   if (sceneDesc && sceneDesc.length > 50) {
-    return sceneDesc
+    envParts.push(sceneDesc)
+  } else {
+    // Otherwise use simplified template
+    const normalizedTheme = theme.toLowerCase().replace(/[-&_\s]/g, '-')
+    const templates = ENVIRONMENT_TEMPLATES[normalizedTheme] || ENVIRONMENT_TEMPLATES['adventure']
+    envParts.push(templates[0])
   }
   
-  // Otherwise use simplified template
-  const normalizedTheme = theme.toLowerCase().replace(/[-&_\s]/g, '-')
-  const templates = ENVIRONMENT_TEMPLATES[normalizedTheme] || ENVIRONMENT_TEMPLATES['adventure']
-  return templates[0]
+  // Enhanced background details
+  envParts.push('expansive sky visible')
+  envParts.push('dramatic clouds or clear sky')
+  envParts.push('distant mountains or horizon line')
+  envParts.push('atmospheric perspective in background')
+  
+  // Atmospheric elements
+  envParts.push('atmospheric haze in distance')
+  envParts.push('background elements fade into soft mist')
+  
+  return envParts.join(', ')
 }
 
 // ============================================================================
@@ -168,11 +198,57 @@ function getEnvironmentDescription(theme: string, sceneDesc: string): string {
 // ============================================================================
 
 function getLightingDescription(timeOfDay: string, mood: string): string {
-  const lighting: Record<string, string> = {
-    morning: 'soft morning light', afternoon: 'bright daylight',
-    evening: 'golden hour', night: 'moonlight',
+  const lightingParts: string[] = []
+  
+  // Base lighting based on time of day
+  if (timeOfDay === 'morning') {
+    lightingParts.push('soft morning light')
+    lightingParts.push('gentle backlighting')
+    lightingParts.push('warm diffused light')
+  } else if (timeOfDay === 'afternoon') {
+    lightingParts.push('bright daylight')
+    lightingParts.push('even, diffuse overhead light')
+  } else if (timeOfDay === 'evening') {
+    lightingParts.push('golden hour lighting')
+    lightingParts.push('warm amber tones, golden glow')
+    lightingParts.push('backlighting with rim light')
+    lightingParts.push('volumetric god rays through atmosphere')
+  } else if (timeOfDay === 'night') {
+    lightingParts.push('moonlight')
+    lightingParts.push('cool ambient light')
+    lightingParts.push('dramatic contrast between light and shadow')
+  } else {
+    lightingParts.push('bright daylight')
   }
-  return lighting[timeOfDay] || 'bright daylight'
+  
+  // Light direction
+  if (timeOfDay === 'evening' || timeOfDay === 'morning') {
+    lightingParts.push('light from behind (backlighting)')
+  } else if (timeOfDay === 'afternoon') {
+    lightingParts.push('top lighting, even distribution')
+  }
+  
+  // Light quality
+  if (mood === 'exciting') {
+    lightingParts.push('dramatic hard light with strong shadows')
+  } else if (mood === 'calm') {
+    lightingParts.push('soft diffused light, gentle shadows')
+  }
+  
+  // Color temperature
+  if (timeOfDay === 'evening') {
+    lightingParts.push('warm amber tones, honeyed light')
+  } else if (timeOfDay === 'morning') {
+    lightingParts.push('warm golden tones')
+  }
+  
+  // Atmospheric particles for god rays
+  if (timeOfDay === 'evening' || timeOfDay === 'morning') {
+    lightingParts.push('atmospheric haze, dust particles floating in air')
+    lightingParts.push('volumetric light shafts')
+  }
+  
+  return lightingParts.join(', ')
 }
 
 // ============================================================================
@@ -204,24 +280,114 @@ function getMoodDescription(mood: string): string {
 // ============================================================================
 
 /**
- * Generates cinematic composition elements (optimized)
+ * Generates cinematic composition elements (ENHANCED: 25 Ocak 2026)
+ * Based on 2026 best practices: specific lighting techniques, golden hour, backlighting, god rays
  */
-export function getCinematicElements(pageNumber: number, mood: string): string {
-  const lighting = mood === 'exciting' ? 'dynamic lighting' : mood === 'calm' ? 'soft ambient' : 'warm natural light'
+export function getCinematicElements(
+  pageNumber: number,
+  mood: string,
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night'
+): string {
+  const elements: string[] = []
+  
+  // Lighting based on time of day and mood
+  if (timeOfDay === 'evening' || timeOfDay === 'sunset') {
+    elements.push('golden hour lighting')
+    elements.push('warm amber tones, golden glow')
+    elements.push('backlighting with rim light around character')
+    elements.push('volumetric god rays through atmosphere')
+  } else if (timeOfDay === 'morning') {
+    elements.push('soft morning light')
+    elements.push('gentle backlighting')
+    elements.push('warm diffused light')
+  } else if (timeOfDay === 'night') {
+    elements.push('moonlight')
+    elements.push('cool ambient light')
+    elements.push('dramatic contrast between light and shadow')
+  } else {
+    // Afternoon or default
+    if (mood === 'exciting') {
+      elements.push('dynamic lighting with dramatic shadows')
+    } else if (mood === 'calm') {
+      elements.push('soft ambient light, even diffusion')
+    } else {
+      elements.push('warm natural light')
+    }
+  }
+  
+  // Source → Obstacle → Medium structure for realistic light effects
+  if (timeOfDay === 'morning' || timeOfDay === 'evening') {
+    elements.push('sunlight through trees into morning mist (source → obstacle → medium)')
+  }
+  
+  // Composition elements
+  elements.push('layered depth')
+  elements.push('rule of thirds composition')
+  
+  // Camera angle
   const angle = pageNumber === 1 ? 'hero shot' : 'varied perspective'
-  return `layered depth, rule of thirds, ${lighting}, ${angle}, cinematic quality`
+  elements.push(angle)
+  
+  elements.push('cinematic quality')
+  
+  return elements.join(', ')
 }
 
 // ============================================================================
 // Composition Rules
 // ============================================================================
 
-function getCompositionRules(focus: string, pageNumber: number): string {
-  const base = focus === 'character' ? 'character centered, clear face' :
-               focus === 'environment' ? 'wide environmental shot' :
-               'balanced composition'
-  const special = pageNumber === 1 ? ', inviting opening' : pageNumber >= 10 ? ', conclusion' : ''
-  return base + special
+function getCompositionRules(
+  focus: string,
+  pageNumber: number,
+  previousScenes?: SceneDiversityAnalysis[]
+): string {
+  const rules: string[] = []
+  
+  // Base composition
+  if (focus === 'character') {
+    rules.push('character centered, clear face')
+  } else if (focus === 'environment') {
+    rules.push('wide environmental shot')
+  } else {
+    rules.push('balanced composition')
+  }
+  
+  // Camera angle variety
+  const cameraAngle = getCameraAngleDirectives(pageNumber, previousScenes)
+  rules.push(cameraAngle)
+  
+  // Composition techniques
+  const compositions = ['rule of thirds', 'leading lines (path, trail)', 'symmetrical', 'diagonal composition']
+  const lastComposition = previousScenes?.[previousScenes.length - 1]?.composition
+  if (lastComposition && lastComposition !== 'unknown') {
+    // Avoid repeating same composition
+    const availableCompositions = compositions.filter(c => {
+      if (lastComposition === 'balanced' && c.includes('balanced')) return false
+      if (lastComposition === 'symmetrical' && c.includes('symmetrical')) return false
+      if (lastComposition === 'diagonal' && c.includes('diagonal')) return false
+      return true
+    })
+    if (availableCompositions.length > 0) {
+      const index = (pageNumber - 1) % availableCompositions.length
+      rules.push(availableCompositions[index])
+    }
+  } else {
+    const index = (pageNumber - 1) % compositions.length
+    rules.push(compositions[index])
+  }
+  
+  // Character-environment ratio
+  rules.push('character 30-40% of frame, environment 60-70%')
+  
+  // Page-specific
+  if (pageNumber === 1) {
+    rules.push('inviting opening')
+  } else if (pageNumber >= 10) {
+    rules.push('conclusion')
+  }
+  
+  return rules.join(', ')
 }
 
 // ============================================================================
@@ -306,12 +472,147 @@ export function getClothingConsistencyNote(
 }
 
 // ============================================================================
+// Depth of Field Directives (NEW: 25 Ocak 2026)
+// ============================================================================
+
+/**
+ * Generates depth of field directives for cinematic composition
+ * Based on 2026 best practices: camera parameters, focus planes, bokeh effects
+ */
+export function getDepthOfFieldDirectives(pageNumber: number, focusPoint: string): string {
+  const directives: string[] = []
+  
+  // Camera parameters based on focus point
+  if (focusPoint === 'character') {
+    // Shallow DoF for character focus (portrait style)
+    directives.push('50mm prime lens, f/1.4 aperture')
+    directives.push('shallow depth of field')
+    directives.push('sharp focus on character\'s eyes and face')
+    directives.push('background softly out-of-focus with creamy bokeh')
+  } else if (focusPoint === 'environment') {
+    // Deep focus for environmental shots
+    directives.push('24mm wide-angle lens, f/11 aperture')
+    directives.push('deep focus throughout frame')
+    directives.push('foreground, midground, and background all in sharp detail')
+  } else {
+    // Balanced: medium DoF
+    directives.push('35mm lens, f/4 aperture')
+    directives.push('medium depth of field')
+    directives.push('character in sharp focus, background softly blurred')
+    directives.push('bokeh effect in distant background')
+  }
+  
+  // Page-specific variations
+  if (pageNumber === 1) {
+    directives.push('hero shot with dramatic depth separation')
+  } else {
+    directives.push('varied depth of field for visual interest')
+  }
+  
+  // Focus plane details
+  directives.push('foreground elements may have slight blur for depth')
+  directives.push('middle ground in sharp detail')
+  directives.push('background elements fade into atmospheric haze')
+  
+  return directives.join(', ')
+}
+
+// ============================================================================
+// Atmospheric Perspective Directives (NEW: 25 Ocak 2026)
+// ============================================================================
+
+/**
+ * Generates atmospheric perspective directives for depth
+ * Based on 2026 best practices: color desaturation, contrast reduction, haze
+ */
+export function getAtmosphericPerspectiveDirectives(): string {
+  return [
+    'atmospheric perspective: distant elements fade into soft mist',
+    'background colors become lighter and less saturated with distance',
+    'background contrast decreases gradually',
+    'foreground sharp and detailed, midground moderately detailed, background atmospheric',
+    'atmospheric haze in distant background',
+    'horizon line visible with soft transition to sky'
+  ].join(', ')
+}
+
+// ============================================================================
+// Camera Angle Directives (NEW: 25 Ocak 2026)
+// ============================================================================
+
+/**
+ * Generates camera angle directives for visual variety
+ * Based on 2026 best practices: perspective diversity, child's viewpoint
+ */
+export function getCameraAngleDirectives(
+  pageNumber: number,
+  previousScenes?: SceneDiversityAnalysis[]
+): string {
+  const angles: string[] = [
+    'wide shot',
+    'medium shot',
+    'close-up',
+    'low-angle view (child\'s perspective)',
+    'high-angle view',
+    'eye-level view',
+    'bird\'s-eye view'
+  ]
+  
+  // Get previous perspectives to avoid repetition
+  const previousPerspectives = previousScenes?.map(s => s.perspective) || []
+  const lastPerspective = previousPerspectives[previousPerspectives.length - 1]
+  
+  // Filter out last perspective for variety
+  const availableAngles = angles.filter(angle => {
+    if (!lastPerspective || lastPerspective === 'unknown') return true
+    // Map perspective to angle keywords
+    if (lastPerspective === 'wide' && angle.includes('wide')) return false
+    if (lastPerspective === 'medium' && angle.includes('medium')) return false
+    if (lastPerspective === 'close-up' && angle.includes('close-up')) return false
+    if (lastPerspective === 'low-angle' && angle.includes('low-angle')) return false
+    if (lastPerspective === 'high-angle' && angle.includes('high-angle')) return false
+    if (lastPerspective === 'eye-level' && angle.includes('eye-level')) return false
+    if (lastPerspective === 'bird-eye' && angle.includes('bird')) return false
+    return true
+  })
+  
+  // Rotate through available angles
+  const index = (pageNumber - 1) % availableAngles.length
+  const selectedAngle = availableAngles[index] || angles[0]
+  
+  // Add child's perspective emphasis for children's books
+  if (selectedAngle.includes('low-angle')) {
+    return `${selectedAngle}, child's eye level, immersive perspective`
+  }
+  
+  return selectedAngle
+}
+
+// ============================================================================
+// Character-Environment Ratio Directives (NEW: 25 Ocak 2026)
+// ============================================================================
+
+/**
+ * Generates character-environment ratio directives for balanced composition
+ * Based on 2026 best practices: 30-40% character, 60-70% environment
+ */
+export function getCharacterEnvironmentRatio(): string {
+  return [
+    'character occupies 30-40% of frame, environment 60-70%',
+    'wide environmental context, character integrated into scene',
+    'expansive background with sky, trees, landscape visible',
+    'character not dominating frame, balanced with surroundings',
+    'environment provides depth and atmosphere, character is part of the scene'
+  ].join(', ')
+}
+
+// ============================================================================
 // FOREGROUND/MIDGROUND/BACKGROUND LAYER SYSTEM (NEW: 15 Ocak 2026)
 // ============================================================================
 
 /**
- * Generates layered composition instructions
- * Ensures proper depth and visual hierarchy like Magical Children's Book examples
+ * Generates layered composition instructions (ENHANCED: 25 Ocak 2026)
+ * Ensures proper depth and visual hierarchy with depth of field and atmospheric perspective
  */
 export function generateLayeredComposition(
   sceneInput: SceneInput,
@@ -320,19 +621,23 @@ export function generateLayeredComposition(
 ): string {
   const layers: string[] = []
   
-  // FOREGROUND - Character and immediate elements
-  layers.push(`FOREGROUND: ${characterAction}, main character in clear focus with detailed features visible`)
+  // FOREGROUND - Character and immediate elements with depth of field
+  layers.push(`FOREGROUND: ${characterAction}, main character in sharp focus with detailed features visible`)
+  layers.push('foreground elements may have slight blur (foreground bokeh) for depth')
   
   // MIDGROUND - Story elements and context
   if (sceneInput.sceneDescription && sceneInput.sceneDescription.length > 20) {
     // Extract key elements from scene description
-    layers.push(`MIDGROUND: ${sceneInput.sceneDescription}`)
+    layers.push(`MIDGROUND: ${sceneInput.sceneDescription}, in sharp detail`)
   } else {
-    layers.push(`MIDGROUND: story elements and contextual objects related to the scene`)
+    layers.push(`MIDGROUND: story elements and contextual objects related to the scene, in sharp detail`)
   }
   
-  // BACKGROUND - Environment and atmosphere
+  // BACKGROUND - Environment and atmosphere with atmospheric perspective
   layers.push(`BACKGROUND: ${environment}, providing depth and atmosphere`)
+  layers.push('background elements fade into soft mist with atmospheric perspective')
+  layers.push('background colors become lighter and less saturated with distance')
+  layers.push('focus plane on character, background softly out-of-focus')
   
   return layers.join('. ')
 }
@@ -404,11 +709,47 @@ export function generateFullPagePrompt(
   promptParts.push('[/SAFE_POSES]')
   promptParts.push('') // Empty line for separation
 
-  // 2. STYLE (uppercase emphasis for better attention)
+  // 2. NEW: COMPOSITION & DEPTH DIRECTIVES (25 Ocak 2026)
+  const depthOfField = getDepthOfFieldDirectives(sceneInput.pageNumber, sceneInput.focusPoint)
+  promptParts.push('[COMPOSITION_DEPTH]')
+  promptParts.push(depthOfField)
+  const atmosphericPerspective = getAtmosphericPerspectiveDirectives()
+  promptParts.push(atmosphericPerspective)
+  promptParts.push('[/COMPOSITION_DEPTH]')
+  promptParts.push('') // Empty line for separation
+
+  // 3. NEW: LIGHTING & ATMOSPHERE DIRECTIVES (25 Ocak 2026)
+  // Enhanced lighting from getLightingDescription (already in scenePrompt, but adding emphasis)
+  if (sceneInput.timeOfDay) {
+    const enhancedLighting = getLightingDescription(sceneInput.timeOfDay, sceneInput.mood)
+    promptParts.push('[LIGHTING_ATMOSPHERE]')
+    promptParts.push(enhancedLighting)
+    promptParts.push('[/LIGHTING_ATMOSPHERE]')
+    promptParts.push('') // Empty line for separation
+  }
+
+  // 4. NEW: CAMERA & PERSPECTIVE DIRECTIVES (25 Ocak 2026)
+  const cameraAngle = getCameraAngleDirectives(sceneInput.pageNumber, previousScenes)
+  promptParts.push('[CAMERA_PERSPECTIVE]')
+  promptParts.push(cameraAngle)
+  // Enhanced composition rules with full context
+  const compositionRules = getCompositionRules(sceneInput.focusPoint, sceneInput.pageNumber, previousScenes)
+  promptParts.push(compositionRules)
+  promptParts.push('[/CAMERA_PERSPECTIVE]')
+  promptParts.push('') // Empty line for separation
+
+  // 5. NEW: CHARACTER-ENVIRONMENT RATIO (25 Ocak 2026)
+  const characterRatio = getCharacterEnvironmentRatio()
+  promptParts.push('[CHARACTER_ENVIRONMENT_RATIO]')
+  promptParts.push(characterRatio)
+  promptParts.push('[/CHARACTER_ENVIRONMENT_RATIO]')
+  promptParts.push('') // Empty line for separation
+
+  // 6. STYLE (uppercase emphasis for better attention)
   const styleDesc = getStyleDescription(illustrationStyle)
   promptParts.push(`ILLUSTRATION STYLE: ${styleDesc}`)
 
-  // 3. Add layered composition
+  // 7. Add layered composition (enhanced with depth of field and atmospheric perspective)
   promptParts.push(layeredComp)
   promptParts.push(scenePrompt)
   promptParts.push(ageRules.join(', '))
@@ -738,5 +1079,10 @@ export default {
   // NEW: Risk detection functions (18 Ocak 2026)
   detectRiskySceneElements,
   getSafeSceneAlternative,
+  // NEW: Composition and depth functions (25 Ocak 2026)
+  getDepthOfFieldDirectives,
+  getAtmosphericPerspectiveDirectives,
+  getCameraAngleDirectives,
+  getCharacterEnvironmentRatio,
 }
 

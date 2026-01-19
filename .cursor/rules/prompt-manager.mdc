@@ -233,11 +233,23 @@ interface ABTestConfig {
 ### Story Generation
 - **Clear Structure:** "Create a X-page story for Y-year-old"
 - **Safety First:** Explicit avoid rules (no violence, fear, etc.)
+  - **Age-Appropriate Actions (NEW: 25 Ocak 2026):** Avoid ambiguous actions ("dans etmek", "sarılmak") that could trigger safety filters
+  - **Safe Alternatives:** Use clear, innocent actions ("hareket etmek", "kucaklaşmak", "el ele tutuşmak")
+  - **Family-Safe:** All interactions must be clearly family-friendly and age-appropriate
 - **Age-Appropriate:** Vocabulary and themes match age
 - **Educational Value:** Subtle lessons (friendship, courage, etc.)
 - **Engaging:** Adventure, humor, relatable situations
 - **Diverse:** Different cultures, abilities represented
 - **Image Prompts:** Detailed scene descriptions for DALL-E
+- **Character Usage (NEW: 25 Ocak 2026):**
+  - **All Characters Required:** All provided characters must appear in the story
+  - **Family Members Priority:** Family Members (Mom, Dad) must appear in multiple pages
+  - **Equal Distribution:** Characters should be distributed evenly across pages
+  - **CharacterIds Field:** Each page must include characterIds array with all appearing characters
+- **Word Count (NEW: 25 Ocak 2026):**
+  - **Rich Content:** Word counts doubled for all age groups (toddler: 70-90, preschool: 100-140, etc.)
+  - **Detailed Text:** Write detailed, rich text with dialogue, emotions, and sensory details
+  - **Minimum Sentences:** 6-10 sentences per page to reach target word count
 
 ### Image Generation
 - **Character Consistency:** Detailed character description in every prompt
@@ -442,7 +454,112 @@ Pixar animation quality"
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026 (Illustration Style İyileştirmesi eklendi)  
+## 🔐 Safety & Age-Appropriate Actions (NEW: 25 Ocak 2026)
+
+### Safety Violation Önleme Stratejisi
+
+**Sorun:**
+- Story generation'da bazı ifadeler safety filter'ları tetikliyor
+- "dans etmek", "sarılmak" gibi ifadeler belirsiz olabilir
+- Page 2'de "Babası ateşin etrafında dans ederken" ifadesi safety violation hatasına neden oldu
+
+**Çözüm:**
+- ✅ "SAFETY & AGE-APPROPRIATE ACTIONS" bölümü story prompt'una eklendi
+- ✅ Riskli ifadeler için direktifler eklendi
+- ✅ Alternatif ifadeler önerildi (family-safe, age-appropriate)
+
+**Riskli İfadeler ve Alternatifleri:**
+- "dans etmek" → "hareket etmek", "neşeli şarkılar söylemek", "coşkuyla eğlenmek"
+- "sarılmak" → "kucaklaşmak", "sevecen bir şekilde yaklaşmak"
+- Belirsiz fiziksel etkileşimler → Açık, masum etkileşimler
+
+**Önerilen Güvenli İfadeler:**
+- "el ele tutuşmak" (holding hands)
+- "birlikte yürümek" (walking together)
+- "birlikte oynamak" (playing together)
+- "gülmek" (laughing), "gülümsemek" (smiling), "neşelenmek" (being cheerful)
+- "şarkı söylemek" (singing), "müzik dinlemek" (listening to music)
+
+**Workflow:**
+1. Safety violation hatası alındığında → Riskli ifadeyi tespit et
+2. Alternatif ifade öner → Prompt'a ekle
+3. Test et → Başarılıysa dokümante et
+4. Benzer ifadeler için pattern'leri belirle → Prompt'u genelleştir
+
+---
+
+## 👥 Character Usage Requirements (NEW: 25 Ocak 2026)
+
+### Tüm Karakterlerin Kullanımı Zorunluluğu
+
+**Sorun:**
+- Story generation'da tüm karakterler kullanılmıyor (Dad karakteri eksik)
+- "ALL X characters should appear" direktifi yeterli değil
+- Ek karakterler (Family Members) bazı sayfalarda görünmüyor
+
+**Çözüm:**
+- ✅ "CRITICAL - CHARACTER USAGE REQUIREMENTS" bölümü eklendi
+- ✅ Family Members için özel direktifler:
+  - Family Members (Mom, Dad) en az X sayfada görünmeli
+  - Her Family Member için minimum sayfa sayısı direktifi
+- ✅ Karakter eşit dağılımı direktifleri:
+  - Her karakter en az X sayfada görünmeli
+  - Karakterler eşit oranda dağıtılmalı
+  - Özellikle son sayfalarda tüm karakterler görünmeli
+- ✅ CharacterIds örneğinde tüm karakterler gösteriliyor
+- ✅ CharacterIds validation - her sayfa için characterIds array'i zorunlu
+
+**Direktifler:**
+- "ALL X characters MUST appear in the story"
+- "Family Members (Mom, Dad) MUST appear in multiple pages"
+- "Each character should appear in at least X pages"
+- "Pages X-Y should feature all X characters when possible"
+- "Distribute characters evenly - do not favor some characters over others"
+
+**Workflow:**
+1. Karakter kullanım hatası tespit edildiğinde → Hangi karakter eksik?
+2. Prompt'a spesifik direktif ekle → Family Members için özel vurgu
+3. CharacterIds örneğini güncelle → Tüm karakterler göster
+4. Test et → Tüm karakterler kullanılıyor mu kontrol et
+
+---
+
+## 📊 Word Count Management (NEW: 25 Ocak 2026)
+
+### Word Count Artırma Stratejisi
+
+**Sorun:**
+- Kullanıcı geri bildirimi: Hikaye içeriği çok kısa
+- Mevcut word count'lar yetersiz (toddler: 35-45, preschool: 50-70, etc.)
+- Detaylı, zengin metin üretilmiyor
+
+**Çözüm:**
+- ✅ Tüm yaş grupları için word count 2 kat artırıldı
+- ✅ `getWordCount()` fonksiyonu güncellendi
+- ✅ Prompt'ta word count vurgusu güçlendirildi
+
+**Yeni Word Count'lar:**
+- toddler: 70-90 (avg 80) - önceden 35-45 (avg 40)
+- preschool: 100-140 (avg 120) - önceden 50-70 (avg 60)
+- early-elementary: 160-200 (avg 180) - önceden 80-100 (avg 90)
+- elementary: 220-260 (avg 240) - önceden 110-130 (avg 120)
+- pre-teen: 220-260 (avg 240) - önceden 110-130 (avg 120)
+
+**Prompt Direktifleri:**
+- "Each page text MUST be approximately X words (AVERAGE)"
+- "Write detailed, rich text with dialogue, emotions, and sensory details"
+- "6-10 sentences per page to reach target word count"
+- "Detailed emotions with sensory details add word count - be descriptive!"
+
+**Workflow:**
+1. Kullanıcı word count geri bildirimi → Mevcut word count'u kontrol et
+2. Word count artırma kararı → getWordCount() fonksiyonunu güncelle
+3. Prompt'ta vurgu güçlendir → Word count direktiflerini genişlet
+4. Test et → Hedef word count'a ulaşılıyor mu kontrol et
+
+---
+
+**Son Güncelleme:** 25 Ocak 2026 (Safety & Character Usage Improvements, Word Count Management eklendi)  
 **Oluşturan:** @project-manager agent
 
 **Not:** Bu agent'ı kullanmak için: `@prompt-manager [sorun veya istediğin]`

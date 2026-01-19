@@ -40,6 +40,7 @@ docs/
 │   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
 │   ├── IMAGE_EDIT_FEATURE_GUIDE.md # Image edit feature rehberi (ChatGPT-style mask-based editing)
+│   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md # Görsel kompozisyon ve derinlik analizi
 │   └── ...
 │
 ├── reports/                    # Raporlar (aktif)

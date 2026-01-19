@@ -36,8 +36,25 @@ export async function POST(request: NextRequest) {
       characterType, // NEW: Character type info {group, value, displayName}
     } = body
 
+    // FIX: Gender validation based on characterType (25 Ocak 2026)
+    // Dad/Mom için otomatik gender düzeltme - frontend'den yanlış gender gönderilme riskini önler
+    let validatedGender = gender ? gender.toLowerCase() : ''
+    
+    if (characterType) {
+      // Dad için otomatik olarak "boy" yap
+      if (characterType.value === "Dad" || characterType.value === "dad") {
+        validatedGender = 'boy'
+        console.log('[Character Creation] 🔧 Gender auto-corrected: Dad character must be "boy" (was: ' + gender + ')')
+      }
+      // Mom için otomatik olarak "girl" yap
+      else if (characterType.value === "Mom" || characterType.value === "mom") {
+        validatedGender = 'girl'
+        console.log('[Character Creation] 🔧 Gender auto-corrected: Mom character must be "girl" (was: ' + gender + ')')
+      }
+    }
+    
     // Validation
-    if (!name || !age || !gender) {
+    if (!name || !age || !validatedGender) {
       return NextResponse.json(
         { error: 'Missing required fields: name, age, gender' },
         { status: 400 }
@@ -47,7 +64,7 @@ export async function POST(request: NextRequest) {
     // Build character description from Step 1 data (simple mapping, no AI Analysis)
     const characterDescription: CharacterDescription = {
       age: parseInt(age) || 5,
-      gender: gender.toLowerCase(),
+      gender: validatedGender,
       skinTone: 'fair', // Default, can be adjusted later
       hairColor: hairColor || 'brown',
       hairStyle: 'natural', // Default
@@ -135,7 +152,7 @@ export async function POST(request: NextRequest) {
       {
         name,
         age: parseInt(age) || 5,
-        gender: (gender.toLowerCase() as 'boy' | 'girl' | 'other'),
+        gender: (validatedGender as 'boy' | 'girl' | 'other'), // FIX: Use validatedGender (25 Ocak 2026)
         character_type: characterType || { group: 'Child', value: 'Child', displayName: name }, // NEW: Character type info
         hair_color: hairColor || 'brown',
         eye_color: eyeColor || 'brown',

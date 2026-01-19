@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.0.3',
-  releaseDate: new Date('2026-01-18'),
+  version: '1.1.0',
+  releaseDate: new Date('2026-01-25'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -28,6 +28,12 @@ export const VERSION: PromptVersion = {
     'v1.0.1: Enhanced additional characters section with detailed appearance descriptions (age, hair color, eye color, features) and explicit character name usage directive (16 Ocak 2026)',
     'v1.0.2: Visual safety guidelines added - avoid risky hand interactions for better anatomical accuracy (GPT research-backed) (18 Ocak 2026)',
     'v1.0.3: Character mapping per page - Story generation now returns characterIds array for each page, replacing unreliable text-based character detection (18 Ocak 2026)',
+    'v1.1.0: Enhanced writing quality improvements (25 Ocak 2026)',
+    'v1.1.0: Added getExampleText() - age-group specific example texts with dialogue and sensory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced "show, don\'t tell" examples - detailed BAD and GOOD examples with full sensory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced sensory details emphasis - visual, auditory, tactile, olfactory, gustatory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced pacing control - strong hook early, shorter scenes, predictable patterns, scene-by-scene breakdown (25 Ocak 2026)',
+    'v1.1.0: Enhanced illustration guidelines - sensory details visualization (25 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -111,7 +117,29 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
       }
     })
     
-    characterDesc += `\n\n**IMPORTANT:** All ${characters.length} characters should appear in the story. The main character is ${characterName}. Use the character names (${characters.map(c => c.name || c.type.displayName).join(', ')}) throughout the story, not generic terms like "friends" or "companions".`
+    characterDesc += `\n\n**CRITICAL - CHARACTER USAGE REQUIREMENTS (MANDATORY - NO EXCEPTIONS):**`
+    characterDesc += `\n- ALL ${characters.length} characters MUST appear in the story`
+    characterDesc += `- The main character is ${characterName}`
+    characterDesc += `- Use ALL character names (${characters.map(c => c.name || c.type.displayName).join(', ')}) throughout the story, not generic terms like "friends" or "companions"`
+    
+    // Character distribution requirements (NEW: 25 Ocak 2026)
+    const familyMembers = characters.filter(c => c.type?.group === "Family Members")
+    if (familyMembers.length > 0) {
+      characterDesc += `\n\n**FAMILY MEMBERS USAGE (MANDATORY):**`
+      characterDesc += `\n- Family Members (${familyMembers.map(c => c.name || c.type.displayName).join(', ')}) MUST appear in multiple pages`
+      characterDesc += `\n- Each Family Member should appear in at least ${Math.max(3, Math.floor(getPageCount(ageGroup, pageCount) * 0.4))} pages`
+      characterDesc += `\n- DO NOT exclude any Family Member from the story - ALL must be included`
+    }
+    
+    characterDesc += `\n\n**CHARACTER DISTRIBUTION REQUIREMENTS:**`
+    characterDesc += `\n- ALL ${characters.length} characters should appear throughout the story`
+    characterDesc += `\n- Each character should appear in at least ${Math.max(2, Math.floor(getPageCount(ageGroup, pageCount) * 0.3))} pages`
+    characterDesc += `\n- Main character (${characterName}) will appear in most/all pages`
+    if (characters.length > 2) {
+      characterDesc += `\n- Pages 2-${Math.floor(getPageCount(ageGroup, pageCount) * 0.6)} should feature at least 2 characters`
+      characterDesc += `\n- Pages ${Math.floor(getPageCount(ageGroup, pageCount) * 0.6) + 1}-${getPageCount(ageGroup, pageCount)} should feature all ${characters.length} characters when possible`
+    }
+    characterDesc += `\n- Distribute characters evenly - do not favor some characters over others`
     
     // CHARACTER MAPPING for JSON response
     characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
@@ -123,6 +151,9 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n- "characterIds" is a REQUIRED field - do NOT omit it`
     characterDesc += `\n- Use the exact character IDs from the mapping above`
     characterDesc += `\n- Example: If page 2 features both ${characterName} and ${characters[1].name || characters[1].type.displayName}, set "characterIds": ["${characters[0].id}", "${characters[1].id}"]`
+    characterDesc += `\n- **CRITICAL:** ALL ${characters.length} characters must appear in the story - check each page's characterIds to ensure ALL characters are included across all pages`
+    characterDesc += `\n- **VERIFICATION:** Before returning JSON, verify that ALL character IDs (${characters.map(c => c.id).join(', ')}) appear in at least one page's characterIds array`
+    characterDesc += `\n- **DO NOT** exclude any character - ALL ${characters.length} characters must be used in the story`
   } else if (characters && characters.length === 1) {
     // Single character - still include characterIds for consistency
     characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
@@ -180,6 +211,14 @@ ${characterDesc}
 # STORY STRUCTURE - DETAILED PAGE-BY-PAGE REQUIREMENTS (NEW: 16 Ocak 2026)
 
 **CRITICAL:** Each page MUST have a UNIQUE, DISTINCT scene. NO REPEATING SCENES or SIMILAR COMPOSITIONS.
+
+**PACING CONTROL (NEW: 25 Ocak 2026):**
+- **Strong hook early:** First 2 sentences must grab attention and create interest
+- **Shorter scenes:** Each page should be a complete mini-scene, not dragging on
+- **Predictable patterns:** For younger ages, use repetition and patterns (e.g., "First they tried X, then Y, then Z")
+- **Scene-by-scene breakdown:** Each page should have clear beginning, middle, and end
+- **Pacing variety:** Mix fast-paced action scenes with slower, contemplative moments
+- **Page transitions:** Smooth transitions between pages, but each page should feel complete
 
 ## Page-by-Page Structure:
 
@@ -289,11 +328,16 @@ Before finalizing each page's imagePrompt, verify ALL of these:
    - Balance dialogue with descriptive narration
    - **Dialogue adds length and richness - use it!**
    
-2. **Describe emotions and feelings**
+2. **Describe emotions and feelings with sensory details**
    - Show character's internal thoughts and emotional responses
-   - Use sensory details (what they see, hear, feel)
-   - Example: "${characterName} felt proud and warm, even as the evening air grew cooler"
-   - **Detailed emotions add word count - be descriptive!**
+   - Use ALL sensory details (what they see, hear, feel, smell, taste)
+   - **Visual:** What they see - colors, lighting, textures, shapes, movements
+   - **Auditory:** What they hear - sounds, music, nature sounds, voices, silence
+   - **Tactile:** What they feel - textures, temperature, wind, surfaces, objects
+   - **Olfactory:** What they smell - flowers, food, nature scents, fresh air
+   - **Gustatory:** What they taste (if applicable) - food, drinks, fresh air
+   - Example: "${characterName} felt proud and warm, even as the evening air grew cooler. The golden sunset painted everything in orange and pink. ${characterName} could hear birds singing and smell the sweet scent of wildflowers. The soft grass felt ticklish under ${characterName}'s feet."
+   - **Detailed emotions with sensory details add word count - be descriptive!**
    
 3. **Use descriptive language for atmosphere and setting**
    - Paint a vivid picture with words
@@ -303,8 +347,20 @@ Before finalizing each page's imagePrompt, verify ALL of these:
    - **Atmospheric descriptions are essential for reaching ${getWordCount(ageGroup)} words**
    
 4. **Show, don't just tell**
-   - **BAD (TOO SHORT):** "${characterName} went to the forest. She saw trash. She cleaned it." (3 sentences, ~15 words - TOO SHORT!)
-   - **GOOD (${getWordCount(ageGroup)} words):** Write detailed, descriptive text with dialogue and atmosphere in ${getLanguageName(language)} ONLY
+   
+   **BAD (TOO SHORT - DO NOT DO THIS):**
+   "${characterName} went to the forest. She saw trash. She cleaned it."
+   - Only 3 sentences, ~15 words - TOO SHORT!
+   - No dialogue, no sensory details, no atmosphere
+   - Just tells what happened, doesn't show it
+   - Boring and flat
+   
+   **GOOD (${getWordCount(ageGroup)} words - DO THIS):**
+   "As ${characterName} walked along the forest path, the morning sun filtered through the tall trees, creating dappled patterns on the ground. 'What's that?' ${characterName} asked, stopping to look at something colorful on the path. ${characterName} could hear birds chirping overhead and smell the fresh, earthy scent of the forest. The air felt cool and refreshing. ${characterName} bent down and picked up a piece of colorful paper. 'This doesn't belong here,' ${characterName} said thoughtfully. ${characterName} looked around and saw more trash scattered nearby. 'I should clean this up,' ${characterName} decided, feeling determined. With a smile, ${characterName} began collecting the trash, feeling proud to help the forest."
+   - Multiple sentences with dialogue
+   - Sensory details: see (sun, trees, patterns), hear (birds), smell (forest), feel (cool air)
+   - Shows emotions and thoughts
+   - Creates atmosphere and immersion
    - **IMPORTANT:** All examples in this prompt are in English for instruction purposes, but YOUR story text MUST be written entirely in ${getLanguageName(language)}
    
 5. **Page structure** (each page should include ALL of these to reach ${getWordCount(ageGroup)} words):
@@ -315,9 +371,12 @@ Before finalizing each page's imagePrompt, verify ALL of these:
    - **Total: 6-10 sentences per page = ${getWordCount(ageGroup)} words**
    
 6. **Example of quality writing structure (${getWordCount(ageGroup)} words):**
-   - Write detailed, descriptive text with dialogue and atmosphere
-   - Include character emotions, sensory details, and dialogue
-   - **CRITICAL:** All text in your story MUST be in ${getLanguageName(language)} - the examples above are in English only for instruction purposes
+   
+   Here's how I like it - example text for ${ageGroup} age group (${getLanguageName(language)}):
+   
+   ${getExampleText(ageGroup, characterName, language, characters)}
+   
+   **CRITICAL:** All text in your story MUST be in ${getLanguageName(language)} - the example above is in ${getLanguageName(language)} to show you the style. Write your story in the same language, with the same level of detail, dialogue, and sensory richness.
 
 # SAFETY RULES (CRITICAL - MUST FOLLOW)
 ## MUST INCLUDE:
@@ -333,6 +392,11 @@ For each page, provide:
 3. Character appearance (consistent across all pages)
 4. Setting details (colors, lighting, mood)
 5. Composition (what's in focus, perspective)
+6. **Sensory details visualization (NEW: 25 Ocak 2026):** Include visual elements that represent the sensory details from the story text:
+   - Visual: Show the colors, lighting, textures mentioned in the text
+   - Auditory: Show elements that suggest sounds (birds, rustling leaves, flowing water)
+   - Tactile: Show textures and surfaces that characters interact with
+   - Olfactory: Show flowers, food, or nature elements that suggest scents
 
 # VISUAL SAFETY GUIDELINES (CRITICAL - NEW: 18 Ocak 2026)
 **To avoid anatomical errors in generated images, follow these guidelines:**
@@ -392,6 +456,10 @@ Return a valid JSON object with this exact structure:
         - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
         - CRITICAL: This scene MUST be DIFFERENT from previous pages",
       "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
+      // CRITICAL: ALL ${characters.length} characters (${characters.map(c => c.id).join(', ')}) must appear across all pages
+      // Main character (${characterName}) will appear in most pages
+      // Family Members (${characters.filter(c => c.type?.group === "Family Members").map(c => c.name || c.type.displayName).join(', ')}) must appear in multiple pages
+      // Example with all 3 characters: "characterIds": ["${characters[0].id}", "${characters[1].id}", "${characters[2]?.id || ''}"]
     }
     // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
   ],
@@ -434,6 +502,19 @@ CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include i
 - NO scary, violent, or inappropriate content
 - Include subtle educational value
 - Make it engaging and memorable
+
+## SAFETY & AGE-APPROPRIATE ACTIONS (CRITICAL - NEW: 25 Ocak 2026):
+- **AVOID ambiguous actions that could trigger safety filters:**
+  - DO NOT use "dans etmek" (dancing) for adult characters in certain contexts - use "hareket etmek" (moving), "neşeli şarkılar söylemek" (singing happy songs), "coşkuyla eğlenmek" (joyfully celebrating) instead
+  - DO NOT use "sarılmak" (hugging) in ways that could be misinterpreted - use "kucaklaşmak" (embracing), "sevecen bir şekilde yaklaşmak" (approaching warmly) instead
+  - DO NOT use physical interactions that could be ambiguous - keep all interactions clearly family-friendly and age-appropriate
+- **PREFER clear, innocent actions:**
+  - "el ele tutuşmak" (holding hands), "birlikte yürümek" (walking together), "birlikte oynamak" (playing together)
+  - "gülmek" (laughing), "gülümsemek" (smiling), "neşelenmek" (being cheerful)
+  - "şarkı söylemek" (singing), "müzik dinlemek" (listening to music), "şarkı mırıldanmak" (humming songs)
+- **ALWAYS ensure actions are clearly innocent and family-safe**
+- If unsure about an action, use a safer alternative that conveys the same positive emotion
+
 - **MOST IMPORTANT: You MUST return EXACTLY ${getPageCount(ageGroup, pageCount)} pages in the "pages" array. Count them before returning!**
 
 ## LANGUAGE COMPLIANCE (CRITICAL - FINAL CHECK):
@@ -519,16 +600,16 @@ function getComplexityLevel(ageGroup: string): string {
 }
 
 function getWordCount(ageGroup: string): string {
-  // Updated word counts (15 Ocak 2026): All values are AVERAGES, not fixed
-  // Designed to match quality examples (Magical Children's Book)
+  // Updated word counts (25 Ocak 2026): All values are AVERAGES, doubled from previous version
+  // User request: Increase word counts by 2x for richer story content
   const counts: Record<string, string> = {
-    toddler: '35-45',           // avg 40 words
-    preschool: '50-70',          // avg 60 words
-    'early-elementary': '80-100', // avg 90 words
-    elementary: '110-130',       // avg 120 words (max 120)
-    'pre-teen': '110-130',       // avg 120 words (max 120)
+    toddler: '70-90',           // avg 80 words (doubled from 35-45)
+    preschool: '100-140',        // avg 120 words (doubled from 50-70)
+    'early-elementary': '160-200', // avg 180 words (doubled from 80-100)
+    elementary: '220-260',       // avg 240 words (doubled from 110-130)
+    'pre-teen': '220-260',       // avg 240 words (doubled from 110-130)
   }
-  return counts[ageGroup] || '80-100'
+  return counts[ageGroup] || '160-200'
 }
 
 function getReadingTime(ageGroup: string): number {
@@ -540,6 +621,38 @@ function getReadingTime(ageGroup: string): number {
     'pre-teen': 5,
   }
   return times[ageGroup] || 3
+}
+
+/**
+ * Get example text for age group (NEW: 25 Ocak 2026)
+ * Provides concrete examples with dialogue, sensory details, and atmosphere
+ */
+function getExampleText(
+  ageGroup: string,
+  characterName: string,
+  language: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  // Note: Examples are in English for instruction, but the actual story should be in the specified language
+  // The function returns English examples as templates - the model should write in the target language
+  
+  const companionName = characters && characters.length > 1 
+    ? (characters[1].name || characters[1].type.displayName)
+    : 'companion'
+  
+  const examples: Record<string, string> = {
+    toddler: `"Look!" ${characterName} said, pointing at the colorful flowers. The sun felt warm on ${characterName}'s face. ${characterName} smiled and touched the soft petals. "Pretty!" ${characterName} giggled. The flowers smelled sweet like honey.`,
+    
+    preschool: `"Wow!" ${characterName} said, looking at the big tree. The leaves rustled in the gentle breeze. ${characterName} could hear birds singing high above. "I want to climb it!" ${characterName} said excitedly. The bark felt rough under ${characterName}'s small hands.`,
+    
+    'early-elementary': `As ${characterName} walked through the forest, the morning sun filtered through the tall trees. "This is amazing!" ${characterName} whispered to ${companionName}. The air smelled fresh and earthy, like rain and pine needles. ${characterName} could hear the crunch of leaves underfoot and the distant call of a bird. "I feel so happy here," ${characterName} said, feeling the warm sunlight on ${characterName}'s face.`,
+    
+    elementary: `The golden afternoon light painted everything in warm colors as ${characterName} and ${companionName} explored the meadow. "Do you hear that?" ${characterName} asked, stopping to listen. The gentle hum of bees mixed with the rustle of tall grass in the breeze. ${characterName} took a deep breath, smelling wildflowers and fresh earth. "This is the best day ever!" ${characterName} said, feeling the soft grass tickle ${characterName}'s bare feet. The sky above was a brilliant blue with fluffy white clouds.`,
+    
+    'pre-teen': `As the sun began to set, casting long shadows across the path, ${characterName} felt a sense of wonder. "Look at those colors," ${characterName} said to ${companionName}, pointing at the sky painted in orange, pink, and purple. The evening air was cool against ${characterName}'s skin, and ${characterName} could hear the distant sound of crickets beginning their nightly song. "I'll never forget this moment," ${characterName} thought, feeling grateful and peaceful. The world seemed to slow down, and everything felt perfect.`,
+  }
+  
+  return examples[ageGroup] || examples['early-elementary']
 }
 
 function getSafetyRules(ageGroup: string) {

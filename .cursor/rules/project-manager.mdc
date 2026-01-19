@@ -87,6 +87,24 @@ Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğ
 - Her changelog entry → dokümantasyon güncellemesi gerektirir
 - Kod ve dokümantasyon version'ları her zaman sync olmalı
 
+### 7. Son Güncellemeler (25 Ocak 2026)
+**Story Prompt İyileştirmeleri:**
+- ✅ Word count artırma (tüm yaş grupları için 2 kat)
+- ✅ Safety & age-appropriate actions direktifleri (riskli ifadeler önleme)
+- ✅ Character usage requirements güçlendirme (tüm karakterler zorunlu)
+- ✅ Character distribution requirements (eşit karakter dağılımı)
+- ✅ Family Members özel direktifleri (minimum sayfa sayısı)
+
+**Sistem İyileştirmeleri (Prompt dışı):**
+- ✅ Gender validation (character creation'da Dad → "boy", Mom → "girl" otomatik düzeltme)
+- ✅ Page-specific character prompt (her page için dinamik prompt, sadece o page'deki karakterler)
+- ✅ Master illustration gender düzeltme (database'den gelen gender kullanılıyor)
+
+**Dokümantasyon:**
+- ✅ `docs/prompts/CHANGELOG.md` güncellendi (v1.1.0 detayları)
+- ✅ `docs/prompts/VERSION_STATUS.md` güncellendi (son değişiklikler)
+- ✅ `.cursor/rules/prompt-manager.mdc` güncellendi (yeni bölümler eklendi)
+
 ### 7. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
 1. **Dosya tipini belirle:**
