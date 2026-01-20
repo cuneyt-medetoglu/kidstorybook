@@ -1,0 +1,655 @@
+"use client"
+
+import React from "react"
+import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
+
+import { useState, useCallback, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
+import { Eye, Plus, ChevronLeft, ChevronRight, BookOpen, Search, ArrowRight, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+import { mockExampleBooks, type ExampleBook, type UsedPhoto, type AgeGroup } from "./types"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+
+const ageFilters = [
+  { value: "all", label: "All" },
+  { value: "0-2", label: "0-2 years" },
+  { value: "3-5", label: "3-5 years" },
+  { value: "6-9", label: "6-9 years" },
+  { value: "10+", label: "10+ years" },
+]
+
+// Loading skeleton component
+function BookCardSkeleton() {
+  return (
+    <div className="bg-card rounded-xl border p-4 md:p-5 animate-pulse">
+      <div className="relative aspect-[3/4] rounded-lg bg-muted mb-4" />
+      <div className="space-y-2 mb-4">
+        <div className="h-5 bg-muted rounded w-3/4" />
+        <div className="h-4 bg-muted rounded w-full" />
+        <div className="h-4 bg-muted rounded w-2/3" />
+      </div>
+      <div className="space-y-2 mb-4">
+        <div className="h-3 bg-muted rounded w-1/3" />
+        <div className="flex gap-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-10 h-10 md:w-14 md:h-14 rounded bg-muted" />
+          ))}
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-11 bg-muted rounded-lg" />
+        <div className="h-11 bg-muted rounded-lg" />
+      </div>
+    </div>
+  )
+}
+
+// Empty state component
+function EmptyState({ onReset }: { onReset: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center"
+    >
+      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
+        <Search className="w-10 h-10 text-muted-foreground" />
+      </div>
+      <h3 className="text-lg font-semibold text-foreground mb-2">
+        No examples available for this age group yet
+      </h3>
+      <p className="text-muted-foreground mb-6 max-w-sm">
+        You can select a different age group or view all examples.
+      </p>
+      <Button variant="outline" onClick={onReset}>
+        View All Examples
+      </Button>
+    </motion.div>
+  )
+}
+
+// Photo comparison modal
+function PhotoModal({
+  open,
+  onOpenChange,
+  photos,
+  initialIndex = 0,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  photos: UsedPhoto[]
+  initialIndex?: number
+}) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex)
+  const [showTransformed, setShowTransformed] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+
+  useEffect(() => {
+    setCurrentIndex(initialIndex)
+    setShowTransformed(false)
+  }, [initialIndex, open])
+
+  const goNext = useCallback(() => {
+    if (currentIndex < photos.length - 1) {
+      setCurrentIndex(currentIndex + 1)
+      setShowTransformed(false)
+    }
+  }, [currentIndex, photos.length])
+
+  const goPrev = useCallback(() => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1)
+      setShowTransformed(false)
+    }
+  }, [currentIndex])
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStart === null) return
+    const touchEnd = e.changedTouches[0].clientX
+    const diff = touchStart - touchEnd
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        goNext()
+      } else {
+        goPrev()
+      }
+    }
+    setTouchStart(null)
+  }
+
+  const currentPhoto = photos[currentIndex]
+  if (!currentPhoto) return null
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent 
+        className="max-w-3xl w-full p-0 overflow-hidden bg-background/95 backdrop-blur-sm"
+      >
+        <div 
+          className="relative"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Close button */}
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground hover:bg-background transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* Image container */}
+          <div className="relative aspect-square md:aspect-[4/3] bg-muted">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${currentIndex}-${showTransformed}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={showTransformed && currentPhoto.transformedImage 
+                    ? currentPhoto.transformedImage 
+                    : currentPhoto.originalPhoto}
+                  alt={currentPhoto.characterName}
+                  fill
+                  className="object-cover"
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Before/After toggle */}
+            {currentPhoto.transformedImage && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex bg-background/80 backdrop-blur-sm rounded-full p-1">
+                <button
+                  onClick={() => setShowTransformed(false)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+                    !showTransformed 
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Before
+                </button>
+                <button
+                  onClick={() => setShowTransformed(true)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+                    showTransformed 
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white" 
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  After
+                </button>
+              </div>
+            )}
+
+            {/* Navigation arrows */}
+            {photos.length > 1 && (
+              <>
+                <button
+                  onClick={goPrev}
+                  disabled={currentIndex === 0}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-background transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={goNext}
+                  disabled={currentIndex === photos.length - 1}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center text-foreground disabled:opacity-30 disabled:cursor-not-allowed hover:bg-background transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Footer info */}
+          <div className="p-4 md:p-6">
+            <DialogHeader>
+              <DialogTitle className="text-center">
+                {currentPhoto.characterName}
+              </DialogTitle>
+            </DialogHeader>
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              {currentIndex + 1} / {photos.length}
+            </p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Book card component
+function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (photos: UsedPhoto[], index: number) => void }) {
+  const displayPhotos = book.usedPhotos.slice(0, 4)
+  const remainingCount = book.usedPhotos.length - 4
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+      className="group bg-card rounded-xl border shadow-sm p-4 md:p-5 hover:shadow-lg transition-shadow duration-200"
+    >
+      {/* Cover image */}
+      <div className="relative aspect-[3/4] rounded-lg overflow-hidden mb-4 bg-muted">
+        {book.coverImage ? (
+          <Image
+            src={book.coverImage}
+            alt={book.title}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement
+              target.style.display = 'none'
+            }}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+            <BookOpen className="w-12 h-12 md:w-16 md:h-16" />
+          </div>
+        )}
+        {/* Age badge */}
+        <Badge className="absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-xs">
+          {book.ageGroup} yaş
+        </Badge>
+        {/* Theme badge */}
+        <Badge variant="secondary" className="absolute top-2 left-2 text-xs">
+          {book.theme}
+        </Badge>
+      </div>
+
+      {/* Title and description */}
+      <div className="mb-4">
+        <h3 className="font-semibold text-lg md:text-xl text-foreground mb-1 line-clamp-1">
+          {book.title}
+        </h3>
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {book.description}
+        </p>
+      </div>
+
+      {/* Used photos section */}
+      <div className="mb-4">
+        <p className="text-xs text-muted-foreground mb-2">Used Photos</p>
+        {book.usedPhotos.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5">
+              {displayPhotos.map((photo, index) => (
+                <button
+                  key={photo.id}
+                  onClick={() => onPhotoClick(book.usedPhotos, index)}
+                  className="relative w-10 h-10 md:w-14 md:h-14 rounded overflow-hidden ring-2 ring-transparent hover:ring-purple-500 transition-all bg-muted"
+                >
+                  {photo.originalPhoto ? (
+                    <>
+                      <Image
+                        src={photo.originalPhoto}
+                        alt={photo.characterName}
+                        fill
+                        className="object-cover"
+                        onError={(e) => {
+                          // Görsel yüklenemezse parent'a placeholder class ekle
+                          const target = e.target as HTMLImageElement
+                          const parent = target.closest('button')
+                          if (parent) {
+                            target.style.display = 'none'
+                            if (!parent.querySelector('.photo-placeholder')) {
+                              const placeholder = document.createElement('div')
+                              placeholder.className = 'photo-placeholder w-full h-full flex items-center justify-center text-xs text-muted-foreground'
+                              placeholder.innerHTML = '<span class="text-[8px] md:text-[10px]">📷</span>'
+                              parent.appendChild(placeholder)
+                            }
+                          }
+                        }}
+                      />
+                      {/* Fallback placeholder - görsel yüklenemezse gösterilir */}
+                      <div className="photo-placeholder hidden w-full h-full absolute inset-0 flex items-center justify-center text-xs text-muted-foreground bg-muted">
+                        <span className="text-[8px] md:text-[10px]">📷</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground bg-muted">
+                      <span className="text-[8px] md:text-[10px]">📷</span>
+                    </div>
+                  )}
+                </button>
+              ))}
+              {remainingCount > 0 && (
+                <button
+                  onClick={() => onPhotoClick(book.usedPhotos, 4)}
+                  className="w-10 h-10 md:w-14 md:h-14 rounded bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground hover:bg-muted/80 transition-colors"
+                >
+                  +{remainingCount}
+                </button>
+              )}
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <div className="relative w-10 h-10 md:w-14 md:h-14 rounded overflow-hidden border-2 border-purple-500 bg-muted">
+              {book.coverImage ? (
+                <>
+                  <Image
+                    src={book.coverImage}
+                    alt="Kitap kapağı"
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const parent = target.closest('div')
+                      if (parent) {
+                        const placeholder = parent.querySelector('.cover-placeholder') as HTMLElement
+                        if (placeholder) placeholder.classList.remove('hidden')
+                      }
+                    }}
+                  />
+                  <div className="cover-placeholder hidden w-full h-full absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
+                    <span className="text-[8px] md:text-[10px]">📖</span>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                  <span className="text-[8px] md:text-[10px]">📖</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Photos will be added soon</span>
+          </div>
+        )}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex flex-col gap-2">
+        <Link href={`/book/${book.id}`} className="w-full">
+          <Button className="w-full h-11 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white">
+            <Eye className="w-4 h-4 mr-2" />
+            View Example
+          </Button>
+        </Link>
+        <Link href="/create/step1" className="w-full">
+          <Button variant="outline" className="w-full h-11 bg-transparent">
+            <Plus className="w-4 h-4 mr-2" />
+            Create Your Own Book
+          </Button>
+        </Link>
+      </div>
+    </motion.div>
+  )
+}
+
+function ExamplesPageContent() {
+  const [selectedAge, setSelectedAge] = useState<AgeGroup | "all">("all")
+  const [isLoading, setIsLoading] = useState(true)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalPhotos, setModalPhotos] = useState<UsedPhoto[]>([])
+  const [modalInitialIndex, setModalInitialIndex] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Reset to page 1 when age filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedAge])
+
+  const filteredBooks = selectedAge === "all" 
+    ? mockExampleBooks 
+    : mockExampleBooks.filter(book => book.ageGroup === selectedAge)
+
+  // Pagination logic - responsive items per page
+  const getItemsPerPage = () => {
+    if (typeof window === 'undefined') return 8 // SSR default
+    const width = window.innerWidth
+    if (width < 768) return 4 // Mobile: 1 column
+    if (width < 1024) return 6 // Tablet: 2 columns
+    if (width < 1440) return 8 // Desktop: 3 columns
+    return 8 // Large Desktop: 4 columns
+  }
+
+  const [itemsPerPage, setItemsPerPage] = useState(8)
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      setItemsPerPage(getItemsPerPage())
+    }
+    updateItemsPerPage()
+    window.addEventListener('resize', updateItemsPerPage)
+    return () => window.removeEventListener('resize', updateItemsPerPage)
+  }, [])
+
+  const totalPages = Math.ceil(filteredBooks.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedBooks = filteredBooks.slice(startIndex, endIndex)
+
+  const handlePhotoClick = (photos: UsedPhoto[], index: number) => {
+    setModalPhotos(photos)
+    setModalInitialIndex(Math.min(index, photos.length - 1))
+    setModalOpen(true)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top of books section
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-background py-12 md:py-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(236,72,153,0.1),transparent_50%)]" />
+        
+        <div className="container relative px-4 md:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
+              <BookOpen className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 text-balance">
+              Example Books
+            </h1>
+            <p className="text-lg text-muted-foreground text-pretty">
+              Discover how we create magical stories from your child's photos
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Filter chips */}
+      <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
+        <div className="container px-4 md:px-6 lg:px-8 py-3 md:py-4">
+          <div className="flex gap-1.5 md:gap-2 overflow-x-auto pb-2 -mb-2 scrollbar-hide flex-nowrap">
+            {ageFilters.map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => setSelectedAge(filter.value as AgeGroup | "all")}
+                className={cn(
+                  "flex-shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap",
+                  selectedAge === filter.value
+                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                )}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Book cards grid */}
+      <section className="container px-4 md:px-6 lg:px-8 py-8 md:py-12">
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <BookCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filteredBooks.length === 0 ? (
+          <EmptyState onReset={() => setSelectedAge("all")} />
+        ) : (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
+            >
+              <AnimatePresence mode="popLayout">
+                {paginatedBooks.map((book, index) => (
+                  <motion.div
+                    key={book.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <BookCard book={book} onPhotoClick={handlePhotoClick} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-12">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                        className={cn(
+                          currentPage === 1 && "pointer-events-none opacity-50"
+                        )}
+                      />
+                    </PaginationItem>
+
+                    {/* Page numbers */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                      // Show first page, last page, current page, and pages around current
+                      const showPage =
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+
+                      if (!showPage) {
+                        // Show ellipsis
+                        if (page === currentPage - 2 || page === currentPage + 2) {
+                          return (
+                            <PaginationItem key={page}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )
+                        }
+                        return null
+                      }
+
+                      return (
+                        <PaginationItem key={page}>
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                          >
+                            {page}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    })}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                        className={cn(
+                          currentPage === totalPages && "pointer-events-none opacity-50"
+                        )}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+      {/* Photo comparison modal */}
+      <PhotoModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        photos={modalPhotos}
+        initialIndex={modalInitialIndex}
+      />
+
+      {/* Hide scrollbar utility */}
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </div>
+  )
+}
+
+export default function ExamplesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Yükleniyor...</p>
+        </div>
+      </div>
+    }>
+      <ExamplesPageContent />
+    </Suspense>
+  )
+}

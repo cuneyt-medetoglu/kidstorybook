@@ -327,6 +327,19 @@
 **Notlar:**
 - Placeholder görseller şimdilik gradient divs olarak kullanılıyor
 - Gerçek görseller backend/API kurulduktan sonra eklenecek
+
+**25 Ocak 2026 - ExampleBooksCarousel İyileştirmeleri:**
+- ✅ Mock data entegrasyonu: `mockExampleBooks.slice(0, 6)` kullanılıyor (`app/examples/types.ts`)
+- ✅ Desktop/tablet görünümü: Grid'den flex'e geçiş (yatay slider, alt satıra inmemesi için)
+  - `flex flex-nowrap` kullanılıyor
+  - Tablet: 2 kart (`md:w-[calc((100%-24px)/2)]`)
+  - Desktop: 3 kart (`lg:w-[calc((100%-48px)/3)]`)
+  - `flex-shrink-0` ve `flex-grow-0` ile kartların küçülmesi/büyümesi engellendi
+- ✅ Navigation butonları spacing: `mt-2 md:-mt-2` (desktop'ta negatif margin ile yukarı çekiliyor)
+- ✅ Image fallback mekanizması: `onError` handler ile placeholder gösterimi (📷 veya 📖 icon)
+- ✅ Age group badge formatı: "X-Y years" veya "10+ years" formatında gösteriliyor
+- ✅ Link href güncellemeleri: `/examples#book-${book.id}` formatında
+- ✅ BookCard component'i: `ExampleBook` type kullanıyor, `usedPhotos[0]` gösteriliyor
 - "Used Photos" gösterimi bu carousel içinde implement edildi (fotoğraf → kitap kapağı transformation)
 
 ---

@@ -2,61 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import Image from "next/image"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, ChevronLeft, ChevronRight, Eye } from "lucide-react"
-
-interface Book {
-  id: number
-  title: string
-  theme: string
-  ageGroup: string
-  description: string
-  photoPlaceholder: string
-  coverPlaceholder: string
-}
-
-const exampleBooks: Book[] = [
-  {
-    id: 1,
-    title: "Emma's Garden Adventure",
-    theme: "Adventure",
-    ageGroup: "3-5 years",
-    description:
-      "A magical journey through a blooming garden filled with talking flowers and friendly butterflies.",
-    photoPlaceholder: "from-amber-200 to-amber-300",
-    coverPlaceholder: "from-green-400 to-emerald-500",
-  },
-  {
-    id: 2,
-    title: "Lucas and the Dinosaur",
-    theme: "Adventure",
-    ageGroup: "6-9 years",
-    description: "An exciting prehistoric adventure where friendship conquers all challenges.",
-    photoPlaceholder: "from-blue-200 to-blue-300",
-    coverPlaceholder: "from-orange-400 to-red-500",
-  },
-  {
-    id: 3,
-    title: "Sophie's Magical Forest",
-    theme: "Fairy Tale",
-    ageGroup: "3-5 years",
-    description: "A enchanting tale of discovery in a mystical forest filled with wonder and magic.",
-    photoPlaceholder: "from-rose-200 to-rose-300",
-    coverPlaceholder: "from-purple-400 to-pink-500",
-  },
-  {
-    id: 4,
-    title: "Max's Space Journey",
-    theme: "Science Fiction",
-    ageGroup: "6-9 years",
-    description: "An intergalactic adventure exploring distant planets and meeting alien friends.",
-    photoPlaceholder: "from-cyan-200 to-cyan-300",
-    coverPlaceholder: "from-indigo-400 to-blue-500",
-  },
-]
+import { Badge } from "@/components/ui/badge"
+import { ArrowRight, ChevronLeft, ChevronRight, Eye, BookOpen } from "lucide-react"
+import { mockExampleBooks, type ExampleBook } from "@/app/examples/types"
 
 export function ExampleBooksCarousel() {
+  // Use first 6 books from mockExampleBooks
+  const exampleBooks = mockExampleBooks.slice(0, 6)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [direction, setDirection] = useState(0)
@@ -229,8 +185,8 @@ export function ExampleBooksCarousel() {
               </AnimatePresence>
             </div>
 
-            {/* Desktop/Tablet: Multiple cards view */}
-            <div className="hidden md:block relative h-[500px]">
+            {/* Desktop/Tablet: Multiple cards view - Horizontal slider */}
+            <div className="hidden md:block relative h-[500px] overflow-x-hidden overflow-y-visible">
               <AnimatePresence initial={false} custom={direction}>
                 <motion.div
                   key={currentIndex}
@@ -245,7 +201,7 @@ export function ExampleBooksCarousel() {
                   }}
                   className="absolute inset-0"
                 >
-                  <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+                  <div className="flex flex-nowrap gap-6 h-full items-start overflow-x-hidden">
                     {exampleBooks
                       .slice(currentIndex, currentIndex + 3)
                       .concat(
@@ -253,7 +209,9 @@ export function ExampleBooksCarousel() {
                       )
                       .slice(0, 3)
                       .map((book, idx) => (
-                        <BookCard key={`${book.id}-${idx}`} book={book} index={idx} />
+                        <div key={`${book.id}-${idx}`} className="flex-shrink-0 flex-grow-0 md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)]">
+                          <BookCard book={book} index={idx} />
+                        </div>
                       ))}
                   </div>
                 </motion.div>
@@ -262,7 +220,7 @@ export function ExampleBooksCarousel() {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="mt-8 flex items-center justify-center gap-4">
+          <div className="mt-2 flex items-center justify-center gap-4 md:-mt-2">
             <Button
               variant="outline"
               size="icon"
@@ -304,72 +262,99 @@ export function ExampleBooksCarousel() {
 }
 
 interface BookCardProps {
-  book: Book
+  book: ExampleBook
   index: number
 }
 
-function BookCard({ book, index }: BookCardProps) {
+function BookCard({ book }: BookCardProps) {
+  const firstPhoto = book.usedPhotos[0]
+
   return (
     <Card className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:bg-slate-900">
-        {/* Photo → Book Cover Transformation */}
-        <div className="mb-6 flex items-center justify-center gap-4">
-          {/* Used Photo */}
-          <motion.div
-            className={`flex h-28 w-28 items-center justify-center rounded-2xl border-4 border-white bg-gradient-to-br shadow-md ${book.photoPlaceholder}`}
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="text-center">
-              <div className="text-xs font-semibold text-gray-700">Photo</div>
-              <div className="mt-1 text-[10px] text-gray-600">Placeholder</div>
+      {/* Photo → Book Cover Transformation */}
+      <div className="mb-6 flex items-center justify-center gap-4">
+        {/* Used Photo */}
+        <motion.div
+          className="relative h-28 w-28 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-muted"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.3 }}
+        >
+          {firstPhoto?.originalPhoto ? (
+            <Image
+              src={firstPhoto.originalPhoto}
+              alt={firstPhoto.characterName}
+              fill
+              className="object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+              <span className="text-[10px]">📷</span>
             </div>
-          </motion.div>
+          )}
+        </motion.div>
 
-          {/* Arrow Icon */}
-          <motion.div
-            animate={{
-              x: [0, 5, 0],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "easeInOut",
-            }}
-          >
-            <ArrowRight className="h-8 w-8 text-purple-500 dark:text-purple-400" />
-          </motion.div>
+        {/* Arrow Icon */}
+        <motion.div
+          animate={{
+            x: [0, 5, 0],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "easeInOut",
+          }}
+        >
+          <ArrowRight className="h-8 w-8 text-purple-500 dark:text-purple-400" />
+        </motion.div>
 
-          {/* Book Cover */}
-          <motion.div
-            className={`flex h-40 w-28 items-center justify-center rounded-2xl bg-gradient-to-br shadow-xl ${book.coverPlaceholder}`}
-            whileHover={{ scale: 1.05, rotate: 2 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="text-center">
-              <div className="text-xs font-bold text-white drop-shadow-lg">Book</div>
-              <div className="mt-1 text-[10px] text-white/90 drop-shadow">Cover</div>
+        {/* Book Cover */}
+        <motion.div
+          className="relative h-40 w-28 rounded-2xl shadow-xl overflow-hidden bg-muted"
+          whileHover={{ scale: 1.05, rotate: 2 }}
+          transition={{ duration: 0.3 }}
+        >
+          {book.coverImage ? (
+            <Image
+              src={book.coverImage}
+              alt={book.title}
+              fill
+              className="object-cover"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white">
+              <BookOpen className="w-8 h-8" />
             </div>
-          </motion.div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Book Information */}
+      <div>
+        <h3 className="text-balance text-xl font-bold text-foreground mb-3">{book.title}</h3>
+
+        <div className="flex flex-wrap gap-2 mb-3">
+          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-0">
+            {book.theme}
+          </Badge>
+          <Badge className="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-0">
+            {book.ageGroup === '10+' ? '10+ years' : `${book.ageGroup} years`}
+          </Badge>
         </div>
 
-        {/* Book Information */}
-        <div className="space-y-3">
-          <h3 className="text-balance text-xl font-bold text-foreground">{book.title}</h3>
+        <p className="text-pretty text-sm text-muted-foreground line-clamp-2 mb-1">
+          {book.description}
+        </p>
 
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-              {book.theme}
-            </span>
-            <span className="rounded-full bg-pink-100 px-3 py-1 text-xs font-medium text-pink-700 dark:bg-pink-900/30 dark:text-pink-300">
-              {book.ageGroup}
-            </span>
-          </div>
-
-          <p className="text-pretty text-sm text-muted-foreground line-clamp-2">
-            {book.description}
-          </p>
-
-          {/* CTA Button */}
+        {/* CTA Button */}
+        <Link href={`/examples#book-${book.id}`} className="block mt-1">
           <Button
             className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:scale-105 hover:from-purple-600 hover:to-pink-600 hover:shadow-xl"
             size="sm"
@@ -377,11 +362,12 @@ function BookCard({ book, index }: BookCardProps) {
             <Eye className="mr-2 h-4 w-4" />
             View Example
           </Button>
-        </div>
+        </Link>
+      </div>
 
-        {/* Decorative Corner Accent */}
-        <div className="absolute right-0 top-0 h-20 w-20 translate-x-10 -translate-y-10 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-2xl transition-all group-hover:translate-x-8 group-hover:-translate-y-8" />
-      </Card>
+      {/* Decorative Corner Accent */}
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-10 -translate-y-10 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-2xl transition-all group-hover:translate-x-8 group-hover:-translate-y-8" />
+    </Card>
   )
 }
 

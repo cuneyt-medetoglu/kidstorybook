@@ -19,7 +19,6 @@ import {
   Home,
   BookOpen,
   Tag,
-  Info,
   X,
   Sun,
   Moon,
@@ -42,7 +41,6 @@ const navLinks = [
   { label: "Home", href: "/", icon: Home },
   { label: "Examples", href: "/examples", icon: BookOpen },
   { label: "Pricing", href: "/pricing", icon: Tag },
-  { label: "About", href: "/about", icon: Info },
 ]
 
 export function Header() {

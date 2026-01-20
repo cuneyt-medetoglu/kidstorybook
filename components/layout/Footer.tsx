@@ -27,7 +27,6 @@ const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Examples", href: "/examples" },
   { label: "Pricing", href: "/pricing" },
-  { label: "About", href: "/about" },
 ]
 
 const supportLinks = [

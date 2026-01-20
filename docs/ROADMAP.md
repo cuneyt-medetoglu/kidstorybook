@@ -354,29 +354,62 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 2.7 Statik Sayfalar
 - [ ] **2.7.1** Özellikler (Features) sayfası
 - [ ] **2.7.2** Fiyatlandırma sayfası
-- [ ] **2.7.3** Hakkımızda sayfası
 - [ ] **2.7.4** İletişim sayfası
 - [ ] **2.7.5** Gizlilik Politikası
 - [ ] **2.7.6** Kullanım Şartları
 - [ ] **2.7.7** KVKK Aydınlatma Metni
-- [ ] **2.7.8** Examples sayfası (tüm örnek kitaplar, "View Example" butonları)
+- [x] **2.7.8** Examples sayfası (tüm örnek kitaplar, "View Example" butonları) - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] v0.app prompt hazırlandı ✅ (`docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`)
+  - [x] v0.app'den component'ler oluşturuldu ve entegre edildi ✅
+  - [x] Mobil-first responsive tasarım (1/2/3/4 sütun grid) ✅
+  - [x] Yaş grubu filtreleme (flex-wrap mobilde, justify-center, responsive padding) ✅
+  - [x] Kitap kartları (cover image, badges, used photos, action buttons) ✅
+  - [x] "Used Photos" gösterimi (thumbnail grid + modal) ✅
+  - [x] "View Example" butonu (UI hazır, route gelecek fazda eklenecek)
+  - [x] "Create Your Own" butonu (wizard'a yönlendirme çalışıyor) ✅
+  - [x] Empty state component ✅
+  - [x] Loading skeleton component ✅
+  - [x] Mock data entegrasyonu ✅
+  - [x] Görseller public klasörüne kopyalandı ✅
+  - [x] Image fallback mekanizması eklendi ✅
+  - [x] Tüm metinler İngilizceye çevrildi ✅
+  - [x] Pagination sistemi eklendi ✅ (25 Ocak 2026)
+    - [x] Responsive items per page: 4 (mobil), 6 (tablet), 8 (desktop/large desktop)
+    - [x] Pagination component entegrasyonu (shadcn/ui)
+    - [x] Sayfa değişiminde scroll to top
+    - [x] Ellipsis gösterimi (çok sayfa varsa)
+    - [x] Test için 24 kitap mock data eklendi
+  - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek.
+  - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek).
+  - **Detaylı Plan:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
+  - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
 - [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)
-- [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış)
+- [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8)
 - [ ] **2.7.12** "View All Examples" ve "View All Themes" linkleri
 
 ### 2.8 Çok Dilli Destek (i18n) - ⏸️ Ertelendi
 **Durum:** 🔵 Post-MVP / Faz 5  
 **Karar (4 Ocak 2026):** Şu an tüm UI sadece İngilizce (EN) olarak geliştiriliyor. Localization sistemi Faz 5 veya Post-MVP'de eklenecek.
 
-- [ ] **2.8.1** i18n library seçimi (next-intl, react-i18next, vb.)
-- [ ] **2.8.2** Dil seçici component (header'da)
-- [ ] **2.8.3** Tüm UI metinlerinin çeviri dosyalarına taşınması
-- [ ] **2.8.4** Dinamik dil değiştirme
-- [ ] **2.8.5** URL-based dil routing (/tr/, /en/, vb.)
-- [ ] **2.8.6** Cookie/localStorage ile dil tercihi saklama
-- [ ] **2.8.7** TR çevirileri
-- [ ] **2.8.8** Gelecekte 25+ dil desteği
+**Önemli Not (25 Ocak 2026):** Examples sayfası başlangıçta Türkçe yapılmıştı, İngilizceye çevrildi. Gelecekte localization sistemi eklendiğinde tüm sayfalar (Examples dahil) otomatik olarak çok dilli destek alacak.
+
+**Planlanan Özellikler:**
+- [ ] **2.8.1** i18n library seçimi (next-intl önerilir - Next.js App Router ile mükemmel entegrasyon)
+- [ ] **2.8.2** Dil seçici component (header'da, dropdown veya flag icons)
+- [ ] **2.8.3** Tüm UI metinlerinin çeviri dosyalarına taşınması (JSON veya TypeScript object format)
+- [ ] **2.8.4** Dinamik dil değiştirme (sayfa yenilenmeden)
+- [ ] **2.8.5** URL-based dil routing (/tr/, /en/, vb.) - SEO dostu
+- [ ] **2.8.6** Cookie/localStorage ile dil tercihi saklama (kullanıcı tercihi hatırlansın)
+- [ ] **2.8.7** TR çevirileri (tüm UI metinleri için)
+- [ ] **2.8.8** Gelecekte 25+ dil desteği (Almanca, Fransızca, İspanyolca, vb.)
+
+**Teknik Yaklaşım:**
+- **Library:** next-intl (Next.js 14 App Router ile native entegrasyon)
+- **Dosya Yapısı:** `messages/` klasörü (en.json, tr.json, vb.)
+- **Kullanım:** `useTranslations()` hook ile component'lerde
+- **Server Components:** `getTranslations()` ile server-side
+- **Type Safety:** TypeScript ile çeviri key'leri type-safe
 
 **Not:** Detaylı plan için "Notlar ve Fikirler" → "Localization (i18n) Planı" bölümüne bakın.
 
@@ -1022,6 +1055,26 @@ Requirements:
 - Clean, trustworthy design
 ```
 
+### Examples Sayfası (Örnek Kitaplar) 🆕
+**Detaylı Prompt:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
+
+**Kısa Özet:**
+```
+Create a mobile-first Examples page for a children's personalized storybook website that showcases example books with before/after photo transformations.
+
+Key Features:
+- Age filter chips (horizontal scroll on mobile): [All] [0-2] [3-5] [6-9] [10+]
+- Responsive grid: 1 column (mobile), 2 (tablet), 3 (desktop), 4 (large)
+- Book cards with: cover image, age/theme badges, used photos thumbnails, action buttons
+- "Used Photos" modal with before/after comparison
+- "View Example" and "Create Your Own" buttons
+- Empty state and loading skeleton components
+
+Mobile-first design with touch-friendly interactions.
+```
+
+**Tam Prompt:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md` dosyasına bakın.
+
 ---
 
 ## 📝 Notlar ve Fikirler
@@ -1038,6 +1091,46 @@ Requirements:
   - Terminal log'lar: Spread sayısı ile page sayısı uyuşmuyor
 - **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
 - **Not:** Bu bug PDF generation'ın temel işlevselliğini etkiliyor. Düzeltilmeden production'a geçilemez.
+
+### Examples Sayfası İyileştirmeleri (25 Ocak 2026)
+- **Kategori:** Faz 2.7.8 - Examples Sayfası
+- **Durum:** ✅ Tasarım Tamamlandı, İyileştirmeler Gelecek Fazda
+- **Öncelik:** 🟡 Önemli
+- **Tarih:** 25 Ocak 2026
+- **Tamamlananlar:**
+  - ✅ Mobil-first responsive tasarım
+  - ✅ ExampleBooksCarousel iyileştirmeleri (25 Ocak 2026):
+    - ✅ Desktop/tablet görünümünde yatay slider (grid'den flex'e geçiş, alt satıra inmemesi için)
+    - ✅ Navigation butonları spacing ayarlamaları (`mt-2 md:-mt-2`)
+    - ✅ Mock data entegrasyonu (`mockExampleBooks.slice(0, 6)`)
+    - ✅ Image fallback mekanizması (`onError` handler ile placeholder)
+    - ✅ Age group badge formatı ("X-Y years" veya "10+ years")
+    - ✅ Link href güncellemeleri (`/examples#book-${book.id}`)
+  - ✅ Yaş grubu filtreleme (flex-wrap, responsive padding)
+  - ✅ Kitap kartları ve "Used Photos" modal
+  - ✅ Görseller public klasörüne kopyalandı
+  - ✅ Image fallback mekanizması
+  - ✅ Tüm metinler İngilizceye çevrildi
+  - ✅ **Pagination Sistemi (25 Ocak 2026):** Responsive pagination eklendi
+    - Mobil: 4 kitap/sayfa (1 sütun)
+    - Tablet: 6 kitap/sayfa (2 sütun)
+    - Desktop: 8 kitap/sayfa (3 sütun)
+    - Large Desktop: 8 kitap/sayfa (4 sütun)
+    - Pagination component (shadcn/ui) entegre edildi
+    - Sayfa değişiminde scroll to top
+    - Ellipsis gösterimi (çok sayfa varsa)
+    - Test için 24 kitap mock data eklendi
+- **Gelecek İyileştirmeler:**
+  - [ ] **Before/After Toggle:** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek. Örnek kitaplar database'e eklendiğinde, her fotoğraf için originalPhoto ve transformedImage URL'leri kaydedilecek.
+  - [ ] **Swipe Navigation İyileştirmesi:** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir. Şu an arrow butonları var, touch gesture (sağa/sola kaydırma) geliştirilecek. `handleTouchStart` ve `handleTouchEnd` fonksiyonları mevcut ama daha smooth hale getirilebilir.
+  - [ ] **"View Example" Route:** `/book/[id]` route'u oluşturulacak, örnek kitabı görüntüleme sayfası eklenecek.
+  - [ ] **API Entegrasyonu:** Mock data yerine gerçek API çağrısı yapılacak, örnek kitaplar database'den çekilecek.
+  - [ ] **Gerçek Örnek Kitaplar:** Test için eklenen duplicate kitaplar yerine gerçek, farklı örnek kitaplar eklenecek.
+- **İlgili Faz:** Faz 2.7.8
+- **Notlar:** 
+  - Sayfa şu an mock data ile çalışıyor
+  - Tüm UI metinleri İngilizce (localization sonrası TR desteği eklenecek)
+  - Mobil optimizasyon tamamlandı (iPhone 14 Pro Max test edildi)
 
 ### PDF Tasarım İyileştirmesi (11 Ocak 2026)
 - **Kategori:** Faz 5.7 - Polish ve Lansman
@@ -1193,6 +1286,11 @@ Requirements:
   - **Detaylı Plan:** `docs/strategies/CHARACTER_LIBRARY_STRATEGY.md` (oluşturulacak)
 
 ### Gelecek Özellikler (Post-MVP)
+- [ ] **Hakkımızda (About) Sayfası** - Şirket hikayesi, ekip bilgileri, misyon/vizyon
+  - **Tarih:** 25 Ocak 2026
+  - **Kategori:** Post-MVP / Backlog
+  - **Durum:** ⏸️ Ertelendi - MVP için gerekli değil
+  - **Not:** Header ve Footer'dan About linki kaldırıldı. Gelecekte ihtiyaç duyulduğunda eklenebilir.
 - [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)**
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** MVP / Faz 2.4.2
