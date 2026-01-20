@@ -1,7 +1,7 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 24 Ocak 2026  
+**Son Güncelleme:** 25 Ocak 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
@@ -71,8 +71,17 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 #### 3.4.1-3.4.6 - Karakter API'leri ✅
 - **Tarih:** 10 Ocak 2026
-- **Son Güncelleme:** 16 Ocak 2026
+- **Son Güncelleme:** 25 Ocak 2026
 - **Durum:** Tüm karakter CRUD operasyonları hazır
+- **Yeni Özellikler (25 Ocak 2026):**
+  - ✅ **AI Analysis for Non-Child Characters:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
+    - Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+    - User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+    - Master karakter oluşturma için detaylı description kullanımı
+  - ✅ **Gender Validation Improvements:** Character type'a göre otomatik gender düzeltme
+    - Family Members için otomatik gender (Dad → boy, Mom → girl, Uncle → boy, Aunt → girl, etc.)
+    - "Other Family" için displayName'e göre gender belirleme
+    - Toys için gender-neutral validation (gender gerekmiyor)
 - **Yeni Özellikler (16 Ocak 2026):**
   - ✅ Storage key sanitization: Türkçe karakterler ve özel karakterler temizleniyor (ör: "Venüs" → "Venus")
   - ✅ Supabase Storage "Invalid key" hatası düzeltildi

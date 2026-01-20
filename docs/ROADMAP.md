@@ -186,10 +186,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
   - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
   - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)**
-    - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Other)
+    - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other)
     - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input
     - [x] Pets grubu: Dog, Cat, Rabbit, Bird, Other Pet (custom input)
-    - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Other Family (custom input)
+    - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Uncle, Aunt, Other Family (custom input)
+    - [x] Toys grubu: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal, Other Toy (custom input) - ✅ **EKLENDI (25 Ocak 2026)**
     - [x] Other: Custom text input
     - [x] "Add Character" butonu (maksimum 3 karakter)
     - [x] Her karakter için ayrı upload alanı
@@ -447,8 +448,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API
 - [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
 - [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
-- [ ] **3.4.7** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
-- [ ] **3.4.8** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+- [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi
+  - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+  - [x] User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+  - [x] Toys için gender-neutral validation
+- [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
+- [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
   - [ ] `GET /api/characters` response'a `total_books` ekle (her karakter için)
   - [ ] `GET /api/characters` response'a `last_used_at` ekle
   - [ ] Book oluşturulduğunda `last_used_at` güncelleme (trigger)
@@ -1706,6 +1711,21 @@ Response: {
   - İyzico webhook handler → Faz 4.2.5
 - 🎉 **FAZ 3 TAMAMLANDI (%96 - MVP için %100):** MVP için gerekli tüm backend ve AI entegrasyonları tamamlandı ✅
 - 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (webhook'lar dahil)
+
+**Son Yapılanlar (25 Ocak 2026):**
+- ✅ **AI Analysis for Non-Child Characters:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
+  - Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+  - User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+  - Master karakter oluşturma için detaylı description kullanımı
+- ✅ **Toys Character Group:** Step 2'ye Toys karakter grubu eklendi
+  - 10 popüler oyuncak seçeneği: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal
+  - "Other Toy" custom input desteği
+  - Gender-neutral validation (Toys için gender gerekmiyor)
+  - Story generation'da Toys desteği eklendi
+- ✅ **Gender Validation Improvements:** Character type'a göre otomatik gender düzeltme
+  - Family Members için otomatik gender (Dad → boy, Mom → girl, Uncle → boy, etc.)
+  - "Other Family" için displayName'e göre gender belirleme
+  - Frontend ve backend'de tutarlı gender validation
 
 **Son Yapılanlar (24 Ocak 2026):**
 - ✅ **Dil Seçimi Özelliği:** Step 3'e dil seçimi eklendi (8 dil: tr, en, de, fr, es, zh, pt, ru)

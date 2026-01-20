@@ -29,13 +29,15 @@ Step 2'de karakter ekleme bölümünü iyileştirerek:
 3. Seçilen karakter tiplerinin hem story hem görsel prompt'larına entegre edilmesi
 
 ### Kapsamdaki Özellikler
-- ✅ Karakter tipi gruplama sistemi (Child, Pets, Family Members, Other)
+- ✅ Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other)
 - ✅ Conditional UI (grup seçimine göre dinamik dropdown/input)
 - ✅ localStorage yapısı güncellemesi (characterPhoto → characters array)
 - ✅ Her karakter için ayrı API çağrısı
 - ✅ Story generation'da birden fazla karakter desteği
 - ✅ Image generation'da birden fazla karakter desteği
 - ✅ Books API'de birden fazla karakter desteği
+- ✅ **Toys Character Group (25 Ocak 2026):** 10 popüler oyuncak seçeneği + Other Toy
+- ✅ **AI Analysis for Non-Child Characters (25 Ocak 2026):** Family Members, Pets, Other, Toys için fotoğraf analizi
 
 ### Kapsam Dışı
 - ❌ 3'ten fazla karakter desteği (gelecekte eklenebilir)
@@ -50,17 +52,22 @@ Step 2'de karakter ekleme bölümünü iyileştirerek:
 
 **Dosya:** `app/create/step2/page.tsx`
 
-**Mevcut Yapı:**
+**Mevcut Yapı (Güncellenmiş - 25 Ocak 2026):**
 ```typescript
-type CharacterType = "Child" | "Dog" | "Cat" | "Rabbit" | "Teddy Bear" | "Other"
+type CharacterGroup = "Child" | "Pets" | "Family Members" | "Toys" | "Other"
 
 type Character = {
   id: string
-  type: CharacterType
+  characterType: {
+    group: CharacterGroup
+    value: string
+    displayName: string
+  }
   uploadedFile: File | null
   previewUrl: string | null
   uploadError: string | null
   isDragging: boolean
+  // ... other fields
 }
 ```
 
@@ -144,7 +151,11 @@ const CHARACTER_OPTIONS = {
   },
   FamilyMembers: {
     label: "Family Members",
-    options: ["Mom", "Dad", "Grandma", "Grandpa", "Sister", "Brother", "Other Family"]
+    options: ["Mom", "Dad", "Grandma", "Grandpa", "Sister", "Brother", "Uncle", "Aunt", "Other Family"]
+  },
+  Toys: {
+    label: "Toys",
+    options: ["Teddy Bear", "Doll", "Action Figure", "Robot", "Car", "Train", "Ball", "Blocks", "Puzzle", "Stuffed Animal", "Other Toy"]
   },
   Other: { label: "Other", hasInput: true }
 }
@@ -1654,7 +1665,50 @@ if (referenceImageUrls.length > 0) {
 
 ---
 
-**Son Güncelleme:** 16 Ocak 2026  
+---
+
+## 🔄 Son Güncellemeler (25 Ocak 2026)
+
+### 4. Toys Character Group Eklendi ✅
+**Özellik:** Step 2'ye Toys karakter grubu eklendi
+- ✅ 10 popüler oyuncak seçeneği: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal
+- ✅ "Other Toy" custom input desteği
+- ✅ Gender-neutral validation (Toys için gender gerekmiyor)
+- ✅ Story generation'da Toys desteği eklendi
+- ✅ Appearance details için "Color" label'ı (Hair Color yerine)
+
+**Dosyalar:**
+- `app/create/step2/page.tsx` - Toys UI ve dropdown
+- `lib/prompts/story/v1.0.0/base.ts` - Toys story generation desteği
+- `app/api/characters/route.ts` - Toys gender validation
+
+### 5. AI Analysis for Non-Child Characters ✅
+**Özellik:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
+- ✅ Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+- ✅ User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+- ✅ Master karakter oluşturma için detaylı description kullanımı
+- ✅ Fallback mekanizması (AI analizi başarısız olursa basic description kullanılıyor)
+
+**Dosya:** `app/api/characters/route.ts` (25 Ocak 2026)
+
+**Etki:** Kritik - Non-Child karakterlerin master karakterleri artık referans fotoğrafa daha çok benziyor ✅
+
+### 6. Gender Validation Improvements ✅
+**Özellik:** Character type'a göre otomatik gender düzeltme
+- ✅ Family Members için otomatik gender (Dad → boy, Mom → girl, Uncle → boy, Aunt → girl, etc.)
+- ✅ "Other Family" için displayName'e göre gender belirleme
+- ✅ Frontend ve backend'de tutarlı gender validation
+- ✅ Toys için gender-neutral validation (gender gerekmiyor)
+
+**Dosyalar:**
+- `app/api/characters/route.ts` - Backend gender validation
+- `app/create/step2/page.tsx` - Frontend gender determination
+
+**Etki:** Önemli - "Other Family" karakterlerinde gender yanlış atanma sorunu çözüldü ✅
+
+---
+
+**Son Güncelleme:** 25 Ocak 2026  
 **Oluşturan:** @project-manager agent  
 **Durum:** ✅ Tamamlandı - Production Ready
 

@@ -1,14 +1,20 @@
 /**
- * Character Creation API (Simplified - No AI Analysis)
+ * Character Creation API
  * 
  * POST /api/characters
- * Creates a character using Step 1 data only (no AI Analysis needed)
+ * Creates a character with AI photo analysis for non-Child characters
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createCharacter } from '@/lib/db/characters'
+import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/v1.0.0/character'
 import type { CharacterDescription } from '@/lib/prompts/types'
+import OpenAI from 'openai'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,48 +43,180 @@ export async function POST(request: NextRequest) {
     } = body
 
     // FIX: Gender validation based on characterType (25 Ocak 2026)
-    // Dad/Mom için otomatik gender düzeltme - frontend'den yanlış gender gönderilme riskini önler
+    // Automatic gender correction for male/female character types - prevents incorrect gender from frontend
     let validatedGender = gender ? gender.toLowerCase() : ''
     
     if (characterType) {
-      // Dad için otomatik olarak "boy" yap
-      if (characterType.value === "Dad" || characterType.value === "dad") {
+      const charTypeValue = characterType.value?.toLowerCase() || ''
+      const charName = name?.toLowerCase() || ''
+      const charDisplayName = characterType.displayName?.toLowerCase() || ''
+      
+      // Male character types - automatic "boy" gender
+      const maleTypes = ['dad', 'father', 'brother', 'grandpa', 'grandfather', 'uncle']
+      const maleKeywords = ['uncle', 'brother', 'dad', 'father', 'grandpa', 'grandfather']
+      
+      if (maleTypes.includes(charTypeValue) || 
+          maleKeywords.some(keyword => charName.includes(keyword) || charDisplayName.includes(keyword))) {
         validatedGender = 'boy'
-        console.log('[Character Creation] 🔧 Gender auto-corrected: Dad character must be "boy" (was: ' + gender + ')')
+        console.log(`[Character Creation] 🔧 Gender auto-corrected: ${characterType.value || name} character must be "boy" (was: ${gender})`)
       }
-      // Mom için otomatik olarak "girl" yap
-      else if (characterType.value === "Mom" || characterType.value === "mom") {
+      // Female character types - automatic "girl" gender
+      else if (charTypeValue === "mom" || charTypeValue === "mother" || 
+               charTypeValue === "sister" || charTypeValue === "grandma" || charTypeValue === "grandmother" ||
+               charTypeValue === "aunt") {
         validatedGender = 'girl'
-        console.log('[Character Creation] 🔧 Gender auto-corrected: Mom character must be "girl" (was: ' + gender + ')')
+        console.log(`[Character Creation] 🔧 Gender auto-corrected: ${characterType.value || name} character must be "girl" (was: ${gender})`)
+      }
+      // "Other Family" - determine gender based on name
+      else if (characterType.value === "Other Family" || characterType.value === "other family") {
+        const femaleKeywords = ['aunt', 'mother', 'mom', 'sister', 'grandma', 'grandmother']
+        const hasFemaleKeyword = femaleKeywords.some(keyword => charName.includes(keyword) || charDisplayName.includes(keyword))
+        
+        if (hasFemaleKeyword) {
+          validatedGender = 'girl'
+          console.log(`[Character Creation] 🔧 Gender auto-corrected: ${name} (Other Family) character must be "girl" based on name (was: ${gender})`)
+        } else if (maleKeywords.some(keyword => charName.includes(keyword) || charDisplayName.includes(keyword))) {
+          validatedGender = 'boy'
+          console.log(`[Character Creation] 🔧 Gender auto-corrected: ${name} (Other Family) character must be "boy" based on name (was: ${gender})`)
+        }
       }
     }
     
     // Validation
-    if (!name || !age || !validatedGender) {
+    // Toys don't need gender validation (gender-neutral)
+    const isToys = characterType?.group === 'Toys'
+    if (!name || !age || (!validatedGender && !isToys)) {
       return NextResponse.json(
         { error: 'Missing required fields: name, age, gender' },
         { status: 400 }
       )
     }
 
-    // Build character description from Step 1 data (simple mapping, no AI Analysis)
-    const characterDescription: CharacterDescription = {
-      age: parseInt(age) || 5,
-      gender: validatedGender,
-      skinTone: 'fair', // Default, can be adjusted later
-      hairColor: hairColor || 'brown',
-      hairStyle: 'natural', // Default
-      hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long', // Age-based default
-      eyeColor: eyeColor || 'brown',
-      eyeShape: 'round', // Default for children
-      faceShape: 'round', // Default for children
-      height: 'average',
-      build: 'normal',
-      clothingStyle: 'casual',
-      clothingColors: ['blue', 'red'], // Default
-      uniqueFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
-      typicalExpression: 'happy',
-      personalityTraits: ['curious', 'friendly'], // Default
+    // Determine if AI analysis is needed
+    const needsAIAnalysis = photoBase64 && characterType && characterType.group !== 'Child'
+    let characterDescription: CharacterDescription
+    let aiAnalysisData: any = null
+    let analysisConfidence: number | null = null
+
+    if (needsAIAnalysis) {
+      // Perform AI analysis for non-Child characters with photos
+      console.log(`[Character Creation] 🤖 Performing AI analysis for ${characterType.group} character`)
+      
+      try {
+        const analysisPrompt = generateCharacterAnalysisPrompt(
+          'Analyze this photo and extract detailed character features',
+          {
+            name,
+            age: parseInt(age) || 5,
+            gender: validatedGender || 'other',
+            additionalDetails: {
+              hairColor,
+              eyeColor,
+              specialFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+            },
+          }
+        )
+
+        const imageInput = {
+          type: 'image_url' as const,
+          image_url: { url: `data:image/jpeg;base64,${photoBase64.includes(',') ? photoBase64.split(',')[1] : photoBase64}` },
+        }
+
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: analysisPrompt },
+                imageInput,
+              ],
+            },
+          ],
+          response_format: { type: 'json_object' },
+          max_tokens: 2000,
+        })
+
+        const analysisResult = completion.choices[0].message.content
+        if (!analysisResult) {
+          throw new Error('No analysis result from OpenAI')
+        }
+
+        aiAnalysisData = JSON.parse(analysisResult)
+        analysisConfidence = aiAnalysisData.confidence || 0.8
+
+        // Extract fields from AI analysis, merge with user-provided data
+        const analyzedHairColor = aiAnalysisData.hair?.color || aiAnalysisData.finalDescription?.hairColor || hairColor || 'brown'
+        const analyzedEyeColor = aiAnalysisData.physicalFeatures?.eyeColor || aiAnalysisData.finalDescription?.eyeColor || eyeColor || 'brown'
+        const analyzedFeatures = aiAnalysisData.uniqueFeatures || aiAnalysisData.finalDescription?.uniqueFeatures || []
+        // Merge with user-provided specialFeatures
+        const mergedFeatures = Array.isArray(specialFeatures) && specialFeatures.length > 0
+          ? [...new Set([...analyzedFeatures, ...specialFeatures])]
+          : analyzedFeatures
+
+        // Build character description from AI analysis
+        characterDescription = aiAnalysisData.finalDescription || {
+          age: aiAnalysisData.age || parseInt(age) || 5,
+          gender: validatedGender || aiAnalysisData.gender || 'other',
+          skinTone: aiAnalysisData.physicalFeatures?.skinTone || 'fair',
+          hairColor: hairColor || analyzedHairColor, // User input takes priority
+          hairStyle: aiAnalysisData.hair?.style || 'natural',
+          hairLength: aiAnalysisData.hair?.length || (parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long'),
+          eyeColor: eyeColor || analyzedEyeColor, // User input takes priority
+          eyeShape: aiAnalysisData.physicalFeatures?.eyeShape || 'round',
+          faceShape: aiAnalysisData.physicalFeatures?.faceShape || 'round',
+          height: aiAnalysisData.body?.heightForAge || 'average',
+          build: aiAnalysisData.body?.build || 'normal',
+          clothingStyle: aiAnalysisData.clothingStyle?.style || 'casual',
+          clothingColors: aiAnalysisData.clothingStyle?.colors || ['blue', 'red'],
+          uniqueFeatures: mergedFeatures,
+          typicalExpression: aiAnalysisData.expression?.typical || 'happy',
+          personalityTraits: aiAnalysisData.personalityTraits || ['curious', 'friendly'],
+        }
+
+        console.log(`[Character Creation] ✅ AI analysis completed (confidence: ${analysisConfidence})`)
+      } catch (analysisError) {
+        console.error('[Character Creation] ⚠️ AI analysis failed, falling back to basic description:', analysisError)
+        // Fallback to basic description if analysis fails
+        characterDescription = {
+          age: parseInt(age) || 5,
+          gender: validatedGender || 'other',
+          skinTone: 'fair',
+          hairColor: hairColor || 'brown',
+          hairStyle: 'natural',
+          hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long',
+          eyeColor: eyeColor || 'brown',
+          eyeShape: 'round',
+          faceShape: 'round',
+          height: 'average',
+          build: 'normal',
+          clothingStyle: 'casual',
+          clothingColors: ['blue', 'red'],
+          uniqueFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+          typicalExpression: 'happy',
+          personalityTraits: ['curious', 'friendly'],
+        }
+      }
+    } else {
+      // Build character description from Step 1 data (simple mapping, no AI Analysis)
+      characterDescription = {
+        age: parseInt(age) || 5,
+        gender: validatedGender || 'other',
+        skinTone: 'fair', // Default, can be adjusted later
+        hairColor: hairColor || 'brown',
+        hairStyle: 'natural', // Default
+        hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long', // Age-based default
+        eyeColor: eyeColor || 'brown',
+        eyeShape: 'round', // Default for children
+        faceShape: 'round', // Default for children
+        height: 'average',
+        build: 'normal',
+        clothingStyle: 'casual',
+        clothingColors: ['blue', 'red'], // Default
+        uniqueFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+        typicalExpression: 'happy',
+        personalityTraits: ['curious', 'friendly'], // Default
+      }
     }
 
     let referencePhotoUrl: string | undefined
@@ -161,11 +299,11 @@ export async function POST(request: NextRequest) {
         reference_photo_path: referencePhotoPath,
         description: characterDescription,
         is_default: true, // First character is default
-        // No AI analysis fields
-        ai_analysis: null,
-        full_description: null,
-        analysis_raw: null,
-        analysis_confidence: null,
+        // AI analysis fields (only for non-Child characters with photos)
+        ai_analysis: aiAnalysisData,
+        full_description: aiAnalysisData ? JSON.stringify(aiAnalysisData) : null,
+        analysis_raw: aiAnalysisData,
+        analysis_confidence: analysisConfidence,
       }
     )
 

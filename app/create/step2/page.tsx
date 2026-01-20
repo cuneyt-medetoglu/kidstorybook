@@ -26,7 +26,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 
 // Character Type System (Group-based)
-type CharacterGroup = "Child" | "Pets" | "Family Members" | "Other"
+type CharacterGroup = "Child" | "Pets" | "Family Members" | "Toys" | "Other"
 
 // Options for Child character details (same as Step 1)
 const hairColorOptions = [
@@ -90,7 +90,11 @@ const CHARACTER_OPTIONS = {
   },
   FamilyMembers: {
     label: "Family Members",
-    options: ["Mom", "Dad", "Grandma", "Grandpa", "Sister", "Brother", "Other Family"],
+    options: ["Mom", "Dad", "Grandma", "Grandpa", "Sister", "Brother", "Uncle", "Aunt", "Other Family"],
+  },
+  Toys: {
+    label: "Toys",
+    options: ["Teddy Bear", "Doll", "Action Figure", "Robot", "Car", "Train", "Ball", "Blocks", "Puzzle", "Stuffed Animal", "Other Toy"],
   },
   Other: {
     label: "Other",
@@ -325,7 +329,43 @@ export default function Step2Page() {
               // NEW: For non-Child characters, use THEIR OWN form data (not Step 1 data)
               characterName = currentCharacter.characterType.displayName || currentCharacter.characterType.value
               characterAge = currentCharacter.age || 5 // Default age for non-child characters
-              characterGender = currentCharacter.gender || step1Data.gender?.toLowerCase() || "other"
+              
+              // Toys are gender-neutral - no gender needed
+              if (currentCharacter.characterType.group === "Toys") {
+                characterGender = "other" // Toys don't have gender
+              }
+              // FIX: Gender determination - determine default based on character type instead of taking from Step 1
+              else if (currentCharacter.gender) {
+                characterGender = currentCharacter.gender
+              } else {
+                // Determine default gender based on character type
+                const charTypeValue = currentCharacter.characterType.value?.toLowerCase() || ''
+                const charDisplayName = currentCharacter.characterType.displayName?.toLowerCase() || ''
+                const charName = characterName?.toLowerCase() || ''
+                
+                // For "Other Family", check displayName (user's manual input like "uncle", "amca", etc.)
+                const checkText = charTypeValue === "other family" ? charDisplayName || charName : charTypeValue || charName
+                
+                // Male character types
+                if (charTypeValue === "dad" || charTypeValue === "brother" || charTypeValue === "grandpa" ||
+                    charTypeValue === "uncle" ||
+                    checkText.includes("uncle") || checkText.includes("father") || checkText.includes("dad") ||
+                    checkText.includes("brother") || checkText.includes("grandpa")) {
+                  characterGender = "boy"
+                }
+                // Female character types
+                else if (charTypeValue === "mom" || charTypeValue === "sister" || charTypeValue === "grandma" ||
+                         charTypeValue === "aunt" ||
+                         checkText.includes("aunt") || checkText.includes("mother") || checkText.includes("mom") ||
+                         checkText.includes("sister") || checkText.includes("grandma")) {
+                  characterGender = "girl"
+                }
+                // Other cases default to "other" (will be corrected in backend)
+                else {
+                  characterGender = "other"
+                }
+              }
+              
               // CRITICAL: Use character's own appearance data (from form), NOT Step 1 data
               characterHairColor = currentCharacter.hairColor || "brown" // Required from form
               characterEyeColor = currentCharacter.eyeColor || "brown" // Required from form
@@ -334,6 +374,7 @@ export default function Step2Page() {
               console.log(`[Step 2] Non-Child character appearance:`, {
                 name: characterName,
                 type: currentCharacter.characterType,
+                gender: characterGender,
                 hairColor: characterHairColor,
                 eyeColor: characterEyeColor,
                 specialFeatures: characterSpecialFeatures,
@@ -630,6 +671,15 @@ export default function Step2Page() {
                 displayName: "Mom",
               },
             }
+          } else if (group === "Toys") {
+            return {
+              ...char,
+              characterType: {
+                group: "Toys",
+                value: "Teddy Bear", // Default toy
+                displayName: "Teddy Bear",
+              },
+            }
           } else {
             // Other
             return {
@@ -696,6 +746,8 @@ export default function Step2Page() {
     } else if (characterType.group === "Pets") {
       return `Upload ${characterType.displayName} Photo`
     } else if (characterType.group === "Family Members") {
+      return `Upload ${characterType.displayName} Photo`
+    } else if (characterType.group === "Toys") {
       return `Upload ${characterType.displayName} Photo`
     } else {
       return characterType.displayName 
@@ -842,6 +894,7 @@ export default function Step2Page() {
                             <SelectItem value="Child">Child</SelectItem>
                             <SelectItem value="Pets">Pets</SelectItem>
                             <SelectItem value="Family Members">Family Members</SelectItem>
+                            <SelectItem value="Toys">Toys</SelectItem>
                             <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>
                         </Select>
@@ -895,9 +948,34 @@ export default function Step2Page() {
                         </div>
                       )}
 
-                      {/* Conditional: Custom Input (Other Pet, Other Family, Other) */}
+                      {/* Conditional: Toys Dropdown */}
+                      {character.characterType.group === "Toys" && (
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
+                            Select Toy
+                          </label>
+                          <Select 
+                            value={character.characterType.value} 
+                            onValueChange={(value) => handleCharacterValueChange(character.id, value)}
+                          >
+                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {CHARACTER_OPTIONS.Toys.options.map((toy) => (
+                                <SelectItem key={toy} value={toy}>
+                                  {toy}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+
+                      {/* Conditional: Custom Input (Other Pet, Other Family, Other Toy, Other) */}
                       {(character.characterType.value === "Other Pet" || 
-                        character.characterType.value === "Other Family" || 
+                        character.characterType.value === "Other Family" ||
+                        character.characterType.value === "Other Toy" ||
                         character.characterType.group === "Other") && (
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
@@ -905,6 +983,8 @@ export default function Step2Page() {
                               ? "Pet Type" 
                               : character.characterType.value === "Other Family" 
                               ? "Family Member Type" 
+                              : character.characterType.value === "Other Toy"
+                              ? "Toy Type"
                               : "Character Type"}
                           </label>
                           <Input
@@ -914,6 +994,8 @@ export default function Step2Page() {
                                 ? "e.g., Hamster, Turtle" 
                                 : character.characterType.value === "Other Family" 
                                 ? "e.g., Uncle, Cousin" 
+                                : character.characterType.value === "Other Toy"
+                                ? "e.g., Truck, Plane"
                                 : "e.g., Robot, Alien"
                             }
                             value={character.characterType.displayName}
@@ -1138,12 +1220,14 @@ export default function Step2Page() {
                               ? "Give your pet a name, or leave empty to use 'Dog', 'Cat', etc." 
                               : character.characterType.group === "Family Members" 
                               ? "Give a name, or leave empty to use 'Mom', 'Grandma', etc." 
+                              : character.characterType.group === "Toys"
+                              ? "Give your toy a name, or leave empty to use 'Teddy Bear', 'Doll', etc."
                               : "Optional custom name for this character"}
                           </p>
                         </div>
                       )}
 
-                      {/* NEW: Appearance Details for Non-Child Characters (Family Members, Other - Pets excluded) */}
+                      {/* NEW: Appearance Details for Non-Child Characters (Family Members, Toys, Other - Pets excluded) */}
                       {character.characterType.group !== "Child" && character.characterType.group !== "Pets" && (
                         <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
@@ -1158,7 +1242,11 @@ export default function Step2Page() {
                             {/* Hair/Fur Color */}
                             <div className="space-y-2">
                               <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
-                                {character.characterType.group === "Pets" ? "Fur Color" : "Hair Color"} <span className="text-red-500">*</span>
+                                {character.characterType.group === "Pets" 
+                                  ? "Fur Color" 
+                                  : character.characterType.group === "Toys"
+                                  ? "Color"
+                                  : "Hair Color"} <span className="text-red-500">*</span>
                               </Label>
                               <Select
                                 value={character.hairColor || ""}

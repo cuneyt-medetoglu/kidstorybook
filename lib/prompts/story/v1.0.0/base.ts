@@ -90,6 +90,17 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
           }
         }
         characterDesc += ` - A friendly and playful companion`
+      } else if (char.type.group === "Toys") {
+        characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} color`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} details`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
+        characterDesc += ` - A beloved and special toy`
       } else if (char.type.group === "Family Members") {
         // NEW: Detailed family member description
         characterDesc += `\n${charNumber}. ${charName} (${characterName}'s ${char.type.value.toLowerCase()})`
