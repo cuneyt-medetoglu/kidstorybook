@@ -336,7 +336,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 
 ### 2.6 Kullanıcı Dashboard
 - [x] **2.6.1** Kitaplık sayfası (tüm kitaplar grid) - ✅ Dashboard sayfası oluşturuldu, grid/list view toggle
-- [x] **2.6.2** Kitap kartı component - ✅ Book card component (cover, title, character, status, actions)
+- [x] **2.6.2** Kitap kartı component - ✅ Book card component (cover, title, status, actions) - Character bilgisi kaldırıldı (26 Ocak 2026)
 - [x] **2.6.3** Filtreleme ve sıralama - ✅ Filter tabs (All, Completed, In Progress, Drafts), Sort dropdown (Date, Title), Search bar
 - [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons)
 - [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing)

@@ -18,7 +18,6 @@ import { useToast } from "@/hooks/use-toast"
 type Book = {
   id: string
   title: string
-  character: string
   coverImage: string
   status: "completed" | "in-progress" | "draft"
   createdDate: string
@@ -28,7 +27,6 @@ const mockBooks: Book[] = [
   {
     id: "book-123",
     title: "Arya's Adventure",
-    character: "Arya",
     coverImage: "/children-s-book-cover-with-magical-adventure-theme.jpg",
     status: "completed",
     createdDate: "Jan 5, 2026",
@@ -36,7 +34,6 @@ const mockBooks: Book[] = [
   {
     id: "book-456",
     title: "Emma's Space Journey",
-    character: "Emma",
     coverImage: "/children-s-book-cover-with-space-theme.jpg",
     status: "in-progress",
     createdDate: "Jan 8, 2026",
@@ -44,7 +41,6 @@ const mockBooks: Book[] = [
   {
     id: "book-789",
     title: "Oliver's Magic Forest",
-    character: "Oliver",
     coverImage: "/children-s-book-cover-with-enchanted-forest-theme.jpg",
     status: "draft",
     createdDate: "Jan 10, 2026",
@@ -113,7 +109,6 @@ export default function LibraryPage() {
           const transformedBooks: Book[] = (result.data || []).map((book: any) => ({
             id: book.id,
             title: book.title,
-            character: book.character_id ? "Character" : "Unknown", // TODO: Fetch character name
             coverImage: book.cover_image_url || "", // No mock data fallback - empty string if no cover
             status: book.status === 'completed' ? 'completed' : 
                    book.status === 'generating' ? 'in-progress' : 'draft',
@@ -445,7 +440,6 @@ export default function LibraryPage() {
                     {/* Book Info */}
                     <div className="space-y-2 mb-4">
                       <h3 className="font-semibold text-lg line-clamp-2 text-foreground">{book.title}</h3>
-                      <p className="text-sm text-muted-foreground">Character: {book.character}</p>
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-muted-foreground">Created {book.createdDate}</p>
                         <Badge variant="secondary" className={statusConfig[book.status].color}>
