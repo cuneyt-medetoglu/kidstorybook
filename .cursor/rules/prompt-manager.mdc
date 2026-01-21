@@ -559,7 +559,9 @@ Pixar animation quality"
 
 ---
 
-**Son Güncelleme:** 25 Ocak 2026 (Safety & Character Usage Improvements, Word Count Management eklendi)  
-**Oluşturan:** @project-manager agent
-
 **Not:** Bu agent'ı kullanmak için: `@prompt-manager [sorun veya istediğin]`
+
+**İlgili Dokümantasyon:**
+- `docs/prompts/` - Prompt template'leri ve versiyon geçmişi
+- `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md` - Karakter tutarlılığı stratejisi
+- `lib/prompts/` - Prompt kod dosyaları

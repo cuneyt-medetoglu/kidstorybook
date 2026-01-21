@@ -196,8 +196,9 @@ Kullanıcı şunları diyebilir:
 
 ---
 
-**Son Güncelleme:** 10 Ocak 2026  
-**Oluşturan:** @project-manager agent  
-**Owner:** API Team
-
 **Not:** Bu agent'ı kullanmak için: `@api-manager [sorun veya istediğin]`
+
+**İlgili Dokümantasyon:**
+- `docs/api/API_DOCUMENTATION.md` - API endpoint dokümantasyonu
+- `docs/api/POSTMAN_COLLECTION.md` - Postman collection rehberi
+- `postman/` - Postman collection dosyaları

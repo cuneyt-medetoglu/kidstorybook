@@ -73,7 +73,7 @@ Kullanıcı ilerleme sorduğunda:
 - İlgili fazın `docs/implementation/FAZ{X}_IMPLEMENTATION.md` dosyasındaki istatistikleri göster
 - Tamamlanan/kalan iş sayısını göster
 
-### 6. Prompt Version Sync ve Takip (YENİ - 15 Ocak 2026)
+### 6. Prompt Version Sync ve Takip
 Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğunda:
 - **Sync Kontrolü:** `lib/prompts/version-sync.ts` kullanarak kod-dokümantasyon sync durumunu kontrol et
 - **Version Bump:** Değişiklik tipine göre (major/minor/patch) uygun version artışını öner
@@ -86,28 +86,6 @@ Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğ
 - Her version bump → changelog entry gerektirir
 - Her changelog entry → dokümantasyon güncellemesi gerektirir
 - Kod ve dokümantasyon version'ları her zaman sync olmalı
-
-### 7. Son Güncellemeler (25 Ocak 2026)
-**Story Prompt İyileştirmeleri:**
-- ✅ Word count artırma (tüm yaş grupları için 2 kat)
-- ✅ Safety & age-appropriate actions direktifleri (riskli ifadeler önleme)
-- ✅ Character usage requirements güçlendirme (tüm karakterler zorunlu)
-- ✅ Character distribution requirements (eşit karakter dağılımı)
-- ✅ Family Members özel direktifleri (minimum sayfa sayısı)
-
-**Sistem İyileştirmeleri (Prompt dışı):**
-- ✅ Gender validation (character creation'da Dad → "boy", Mom → "girl" otomatik düzeltme)
-- ✅ Page-specific character prompt (her page için dinamik prompt, sadece o page'deki karakterler)
-- ✅ Master illustration gender düzeltme (database'den gelen gender kullanılıyor)
-
-**Frontend İyileştirmeleri:**
-- ✅ **Hero Transformation Component Yenilendi (25 Ocak 2026):** Yeni side-by-side layout ile fotoğraftan karaktere dönüşüm gösterimi. Magic arrow, theme selector, auto-cycle özellikleri. Responsive tasarım (mobil: dikey, desktop: yatay). `HeroBookTransformation.tsx` component'i entegre edildi, eski `HeroTransformation.tsx` kaldırıldı.
-
-**Dokümantasyon:**
-- ✅ `docs/prompts/CHANGELOG.md` güncellendi (v1.1.0 detayları)
-- ✅ `docs/prompts/VERSION_STATUS.md` güncellendi (son değişiklikler)
-- ✅ `.cursor/rules/prompt-manager.mdc` güncellendi (yeni bölümler eklendi)
-- ✅ `docs/ROADMAP.md` güncellendi (Hero Transformation component güncellemesi eklendi)
 
 ### 7. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
@@ -187,19 +165,12 @@ Kullanıcı şunları diyebilir:
   
 ### Sorumluluk Alanları
 - **@project-manager (sen):** 
-  - `docs/ROADMAP.md` - Ana plan
+  - `docs/ROADMAP.md` - Ana plan ve iş listesi
   - `docs/implementation/FAZ{X}_IMPLEMENTATION.md` - Faz bazlı implementasyon takibi
   - `docs/checklists/` - Kontrol listeleri
   - `docs/reports/` - Raporlar
   - `docs/guides/` - Rehberler
-  - **Prompt Version Sync ve Takip (YENİ - 15 Ocak 2026):**
-    - `lib/prompts/` (kod) ve `docs/prompts/` (dokümantasyon) arasındaki sync kontrolü
-    - Semantic versioning takibi (major.minor.patch)
-    - Changelog güncellemeleri ve tutarlılığı
-    - Version bump kontrolü (her değişiklik için uygun version artışı)
-    - Dokümantasyon-kod senkronizasyonu
-    - Rehber: `docs/prompts/VERSION_SYNC_GUIDE.md`
-    - Utility: `lib/prompts/version-sync.ts`
+  - Prompt version sync ve takip (`lib/prompts/` ve `docs/prompts/` arasındaki senkronizasyon)
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
 - **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
 - **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
@@ -244,8 +215,7 @@ Kullanıcı şunları diyebilir:
 
 ---
 
-## 🎨 Image Generation Configuration
-
-**Production Defaults (Locked):** Model: `gpt-image-1.5`, Size: `1024x1536` (portrait), Quality: `low`, Rate Limit: 4 images/90s
-
-**Implementation:** ✅ Backend'de sabit değerlerle kilitli, ✅ Paralel batch processing (4 görsel), ✅ Queue sistemi (`lib/queue/image-generation-queue.ts`), ✅ Rate limiting aktif
+**İlgili Dokümantasyon:**
+- `docs/ROADMAP.md` - Ana proje planı ve iş listesi
+- `docs/DOCUMENTATION.md` - Dokümantasyon indeksi
+- `docs/implementation/` - Faz bazlı implementasyon takibi

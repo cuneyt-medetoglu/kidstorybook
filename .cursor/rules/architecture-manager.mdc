@@ -211,3 +211,7 @@ Agent:
 ---
 
 **Not:** Her mimari karar önemlidir ve kaydedilmelidir. Gelecekte "Neden böyle yaptık?" sorusunun cevabı docs/ARCHITECTURE.md'de olmalı.
+
+**İlgili Dokümantasyon:**
+- `docs/ARCHITECTURE.md` - Ana mimari dokümantasyon
+- `docs/technical/` - Teknik kararlar ve araştırmalar

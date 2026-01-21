@@ -430,8 +430,9 @@ Kullanıcı şunları diyebilir:
 
 ---
 
-**Son Güncelleme:** 10 Ocak 2026  
-**Oluşturan:** @project-manager agent  
-**Owner:** Database Team
-
 **Not:** Bu agent'ı kullanmak için: `@database-manager [sorun veya istediğin]`
+
+**İlgili Dokümantasyon:**
+- `docs/database/SCHEMA.md` - Database schema dokümantasyonu
+- `docs/guides/SUPABASE_MIGRATION_GUIDE.md` - Migration rehberi
+- `supabase/migrations/` - Migration dosyaları
