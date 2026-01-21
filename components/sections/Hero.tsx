@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, BookOpen, Star } from "lucide-react"
 import { useRef } from "react"
+import { HeroBookTransformation } from "./HeroBookTransformation"
 
 export function Hero() {
   const heroRef = useRef<HTMLDivElement>(null)
@@ -14,70 +15,26 @@ export function Hero() {
 
   // Parallax effect for hero image
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1])
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]) // Declared imageScale variable
 
   // Floating animations for decorative elements
-  const floatingVariants = {
-    animate: (i: number) => ({
-      y: [0, -20, 0],
-      rotate: [0, 5, 0, -5, 0],
-      transition: {
-        duration: 3 + i * 0.5,
-        repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
-      },
-    }),
-  }
+  const getFloatingAnimation = (i: number) => ({
+    y: [0, -20, 0],
+    rotate: [0, 5, 0, -5, 0],
+    transition: {
+      duration: 3 + i * 0.5,
+      repeat: Number.POSITIVE_INFINITY,
+      ease: "easeInOut" as const,
+    },
+  })
 
   const decorativeElements = [
-    {
-      Icon: Star,
-      top: "15%",
-      left: "10%",
-      delay: 0,
-      size: "h-8 w-8",
-      color: "text-yellow-400",
-    },
-    {
-      Icon: Heart,
-      top: "25%",
-      right: "15%",
-      delay: 0.5,
-      size: "h-10 w-10",
-      color: "text-pink-400",
-    },
-    {
-      Icon: Sparkles,
-      top: "60%",
-      left: "8%",
-      delay: 1,
-      size: "h-7 w-7",
-      color: "text-purple-400",
-    },
-    {
-      Icon: BookOpen,
-      top: "70%",
-      right: "12%",
-      delay: 1.5,
-      size: "h-9 w-9",
-      color: "text-blue-400",
-    },
-    {
-      Icon: Star,
-      top: "40%",
-      left: "5%",
-      delay: 0.8,
-      size: "h-6 w-6",
-      color: "text-pink-300",
-    },
-    {
-      Icon: Heart,
-      top: "80%",
-      left: "20%",
-      delay: 1.2,
-      size: "h-8 w-8",
-      color: "text-purple-300",
-    },
+    { Icon: Star, top: "15%", left: "10%", delay: 0, size: "h-8 w-8", color: "text-yellow-400" },
+    { Icon: Heart, top: "25%", right: "15%", delay: 0.5, size: "h-10 w-10", color: "text-pink-400" },
+    { Icon: Sparkles, top: "60%", left: "8%", delay: 1, size: "h-7 w-7", color: "text-purple-400" },
+    { Icon: BookOpen, top: "70%", right: "12%", delay: 1.5, size: "h-9 w-9", color: "text-blue-400" },
+    { Icon: Star, top: "40%", left: "5%", delay: 0.8, size: "h-6 w-6", color: "text-pink-300" },
+    { Icon: Heart, top: "80%", left: "20%", delay: 1.2, size: "h-8 w-8", color: "text-purple-300" },
   ]
 
   return (
@@ -92,9 +49,7 @@ export function Hero() {
           return (
             <motion.div
               key={index}
-              custom={index}
-              variants={floatingVariants}
-              animate="animate"
+              animate={getFloatingAnimation(index)}
               initial={{ opacity: 0, scale: 0 }}
               whileInView={{ opacity: 0.6, scale: 1 }}
               viewport={{ once: true }}
@@ -106,9 +61,7 @@ export function Hero() {
                 right: element.right,
               }}
             >
-              <Icon
-                className={`${element.size} ${element.color} drop-shadow-lg`}
-              />
+              <Icon className={`${element.size} ${element.color} drop-shadow-lg`} />
             </motion.div>
           )
         })}
@@ -155,9 +108,8 @@ export function Hero() {
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-pretty text-lg leading-relaxed text-gray-600 dark:text-slate-400 md:text-xl"
             >
-              Transform your child into the hero of their own adventure with
-              AI-generated personalized storybooks. Beautifully illustrated
-              tales that inspire imagination and create lasting memories.
+              Transform your child into the hero of their own adventure with AI-generated personalized storybooks.
+              Beautifully illustrated tales that inspire imagination and create lasting memories.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -203,143 +155,30 @@ export function Hero() {
                     />
                   ))}
                 </div>
-                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
-                  10,000+ happy families
-                </span>
+                <span className="text-sm font-medium text-gray-700 dark:text-slate-300">10,000+ happy families</span>
               </div>
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star
-                    key={i}
-                    className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                  />
+                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 ))}
-                <span className="ml-1 text-sm font-medium text-gray-700 dark:text-slate-300">
-                  4.9/5 rating
-                </span>
+                <span className="ml-1 text-sm font-medium text-gray-700 dark:text-slate-300">4.9/5 rating</span>
               </div>
             </motion.div>
           </motion.div>
 
-          {/* Right Column - Hero Image */}
+          {/* Right Column - Book Transformation */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
             className="relative"
+            style={{ y: imageY }}
           >
-            <motion.div
-              style={{ y: imageY, scale: imageScale }}
-              className="relative mx-auto aspect-square w-full max-w-lg"
-            >
-              {/* Background Glow */}
-              <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-purple-400/30 to-pink-400/30 blur-3xl" />
-
-              {/* Main Image Container */}
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.3 }}
-                className="relative h-full w-full overflow-hidden rounded-3xl bg-gradient-to-br from-purple-200 to-pink-200 shadow-2xl dark:from-purple-900/40 dark:to-pink-900/40"
-              >
-                {/* Placeholder image with decorative elements */}
-                <div className="flex h-full w-full items-center justify-center p-8">
-                  <div className="relative">
-                    {/* Book Icon */}
-                    <motion.div
-                      animate={{
-                        rotate: [0, -5, 0, 5, 0],
-                        scale: [1, 1.05, 1],
-                      }}
-                      transition={{
-                        duration: 4,
-                        repeat: Number.POSITIVE_INFINITY,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      <BookOpen
-                        className="h-48 w-48 text-purple-500 dark:text-purple-300"
-                        strokeWidth={1.5}
-                      />
-                    </motion.div>
-
-                    {/* Sparkles around book */}
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                      className="absolute -right-4 -top-4"
-                    >
-                      <Sparkles className="h-12 w-12 text-yellow-400" />
-                    </motion.div>
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-                      transition={{
-                        duration: 2,
-                        delay: 1,
-                        repeat: Number.POSITIVE_INFINITY,
-                      }}
-                      className="absolute -bottom-4 -left-4"
-                    >
-                      <Heart className="h-12 w-12 text-pink-400" />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Overlay text */}
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/10 to-transparent">
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1, duration: 0.6 }}
-                    className="text-center text-sm font-medium text-purple-800 dark:text-purple-200"
-                  >
-                    {/* Placeholder for actual book image */}
-                  </motion.p>
-                </div>
-              </motion.div>
-
-              {/* Floating stats cards */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.2, duration: 0.6 }}
-                className="absolute -left-4 top-1/4 hidden rounded-2xl bg-white/90 p-4 shadow-xl backdrop-blur-sm dark:bg-slate-800/90 lg:block"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-gradient-to-br from-purple-400 to-pink-400 p-2">
-                    <Sparkles className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 dark:text-slate-100">
-                      AI Powered
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-slate-400">
-                      Smart Generation
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 1.4, duration: 0.6 }}
-                className="absolute -right-4 bottom-1/4 hidden rounded-2xl bg-white/90 p-4 shadow-xl backdrop-blur-sm dark:bg-slate-800/90 lg:block"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="rounded-full bg-gradient-to-br from-purple-400 to-pink-400 p-2">
-                    <Heart className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-900 dark:text-slate-100">
-                      Personalized
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-slate-400">
-                      Unique Stories
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
+            {/* Background Glow */}
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-3xl" />
+            
+            {/* 3D Book Transformation Component */}
+            <HeroBookTransformation />
           </motion.div>
         </div>
       </div>
@@ -362,4 +201,3 @@ export function Hero() {
     </section>
   )
 }
-

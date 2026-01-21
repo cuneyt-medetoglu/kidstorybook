@@ -100,10 +100,14 @@ Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğ
 - ✅ Page-specific character prompt (her page için dinamik prompt, sadece o page'deki karakterler)
 - ✅ Master illustration gender düzeltme (database'den gelen gender kullanılıyor)
 
+**Frontend İyileştirmeleri:**
+- ✅ **Hero Transformation Component Yenilendi (25 Ocak 2026):** Yeni side-by-side layout ile fotoğraftan karaktere dönüşüm gösterimi. Magic arrow, theme selector, auto-cycle özellikleri. Responsive tasarım (mobil: dikey, desktop: yatay). `HeroBookTransformation.tsx` component'i entegre edildi, eski `HeroTransformation.tsx` kaldırıldı.
+
 **Dokümantasyon:**
 - ✅ `docs/prompts/CHANGELOG.md` güncellendi (v1.1.0 detayları)
 - ✅ `docs/prompts/VERSION_STATUS.md` güncellendi (son değişiklikler)
 - ✅ `.cursor/rules/prompt-manager.mdc` güncellendi (yeni bölümler eklendi)
+- ✅ `docs/ROADMAP.md` güncellendi (Hero Transformation component güncellemesi eklendi)
 
 ### 7. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
