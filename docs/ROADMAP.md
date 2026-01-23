@@ -361,6 +361,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **1.3.2** Tüm API key'leri ekle (OpenAI, Groq, Supabase) - ✅ `.env.example` template hazır
 - [x] **1.3.3** Vercel environment variables ayarla - ✅ Dokümante edildi (`docs/guides/ENVIRONMENT_SETUP.md`)
 - [x] **1.3.4** Development/Production config ayrımı - ✅ `lib/config.ts` oluşturuldu
+- [ ] **1.3.5** Log Yapısı (23 Ocak 2026)
+  - Sunucuda çalışırken log yapısı ayarlanmalı
+  - Log açılıp kapatılabilmeli gibi
+  - Veya bir log yapısı nasıl olması gerekiyor ise o profesyonellikte ve önerilen gibi bir log yapısı olmalı
+  - Log seviyeleri (DEBUG, INFO, WARN, ERROR)
+  - Log rotation ve retention
+  - Production'da log seviyesi kontrolü
+  - Structured logging (JSON format)
+  - Log aggregation (opsiyonel: Sentry, LogRocket, vb.)
 
 ---
 
@@ -420,6 +429,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] Format kontrolü (JPG, PNG)
   - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
   - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
+  - [ ] **2.4.2.1** Fotoğraf yükleme sistemi iyileştirmesi (23 Ocak 2026)
+    - Nasıl bir fotoğraf sisteme yüklenmesi gerekiyor belirtilmeli
+    - Yüklendikten sonra sadece kafayı crop gibi yapabilmeli
+    - Belki otomatik crop gibi bir UX ile yönlendirme yapabiliriz
+    - AI için daha kolay oluyor sadece kafa görseli
+    - Fotoğraf yükleme talimatları (format, boyut, kalite)
+    - Otomatik yüz algılama ve crop özelliği
+    - Manuel crop düzenleme seçeneği
   - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)**
     - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other)
     - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input
@@ -459,7 +476,17 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ✅ **Dil Karışıklığı Sorunu Çözüldü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi, İngilizce kelime kullanımı yasaklandı
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
+  - [ ] **2.4.5.1** Custom request örnekleri ekleme (23 Ocak 2026)
+    - Seçilen kategoriye göre örnek custom request'ler gösterilebilir
+    - Kullanıcıya fikir vermek için örnek metinler
+    - Örnek: "Adventure" kategorisi için "Add a magical forest with talking animals"
+- [ ] **2.4.5.2** Custom request dil desteği (23 Ocak 2026)
+  - Şu an custom request'te sadece İngilizce mi yazılıyor bilinmiyor
+  - Her dilde verilebilmeli
+  - Uygulama dili ne ise otomatik o dili algılar
+  - Düşünülecek: Nasıl yapılabilir? (Dil algılama, çeviri, prompt'a dil bilgisi ekleme)
 - [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
+- [ ] **2.4.11** Wizard adımlarını kısaltma (UX iyileştirme) - Şu an 6 adım var, daha kolay bir UX için adımlar birleştirilebilir veya kısaltılabilir. Düşünülecek.
   - ✅ Debug mode eklendi (prompt preview, API test butonları)
   - ✅ Story prompt gösterimi ve test butonu eklendi
   - ✅ Story generation testi tamamlandı ✅ (API response başarılı, 10 sayfa)
@@ -492,6 +519,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.4.8** Form validasyonu (Zod + React Hook Form) - ✅ Tüm step'lerde mevcut (Step 1,3,4,5: Zod + RHF, Step 2: Custom file validation, Step 6: Preview sayfası)
 - [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)
 - [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)
+- [ ] **2.4.12** Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026)
+  - Kitap oluştur adımından sonra tatlı bir animasyon ve loading gösterilmeli
+  - Tahmini süre gibi bilgiler eklenmeli
+  - Beklerken kapatabilir, hazır olunca bilgi gelecek (notification, email, vb.)
+  - Progress indicator (story generation, cover generation, page images generation)
+  - Kullanıcı deneyimi iyileştirmesi
 
 ### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM** ✅ **TAMAMLANDI VE ÇALIŞIYOR** (11 Ocak 2026)
 **Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Çok iyi planlanmalı ve harika bir UX sunmalı.  
@@ -518,9 +551,23 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.5.1.6** Tam ekran modu (fullscreen) - ✅ Fullscreen toggle button ve keyboard shortcut (F)
 - [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma) - ⏳ Sonraki adım
 - [ ] **2.5.1.8** Loading states ve skeleton screens - ⏳ Sonraki adım
+- [ ] **2.5.1.9** PDF link paylaşma (23 Ocak 2026)
+  - Oluşturulan PDF'i link olarak paylaşma özelliği
+  - Paylaşılabilir link oluşturma
+  - Link üzerinden PDF indirme
+- [ ] **2.5.1.10** Hikaye link paylaşma (23 Ocak 2026)
+  - Oluşturulan hikayeyi link olarak paylaşma
+  - Login olmadan ebook olarak açılabilecek bir link oluşturma
+  - Public/private link seçenekleri
+  - Link expiration (opsiyonel)
 
 #### 2.5.2 Mobil ve Responsive Özellikler
 - [x] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma) - ✅ useSwipeGesture hook ile entegre edildi
+- [ ] **2.5.2.2** Hikaye sayfası tasarımı iyileştirmesi (23 Ocak 2026)
+  - Özellikle telefon ile tek sayfada hem metin hem görsel olamıyor
+  - Bu biraz zorluyor, nasıl yapılabilir düşünülecek
+  - Şu an flip yapılmış, bakılacak
+  - Alternatif yaklaşımlar: Split view, overlay, accordion, scroll-based layout
 - [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.) - ⏳ Sonraki adım (zoom ile birlikte)
 - [x] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı - ✅ v0.app'den alındı ve entegre edildi
@@ -563,6 +610,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.5.6.5** Shadow ve depth effects (3D görünüm) - ✅ Shadow-2xl, drop-shadow, depth effects (z-index)
 
 #### 2.5.7 Gelecek Özellikler (Post-MVP)
+- [ ] **2.5.8** Çocuk Modu (Kids Mode) (23 Ocak 2026)
+  - Tablet veya telefondan hikayeleri okuyup/dinlerken ayrı bir çocuk modu olabilir
+  - Bu moda nasıl girilip çıkılır? Düşünülecek
+  - Basitleştirilmiş UI, büyük butonlar, otomatik oynatma
+  - Erişim kontrolü (ebeveyn kilidi gibi)
 - [ ] **2.5.7.1** Notes/annotations (sayfaya not alma)
 - [ ] **2.5.7.2** Search in book (kitap içinde arama)
 - [ ] **2.5.7.3** Multi-language subtitle support (sesli okuma için altyazı)
@@ -617,12 +669,19 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [x] Test için 24 kitap mock data eklendi
   - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek.
   - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek).
+  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli.
   - **Detaylı Plan:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
 - [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)
 - [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8)
 - [ ] **2.7.12** "View All Examples" ve "View All Themes" linkleri
+- [ ] **2.7.13** "Sizden Gelenler" bölümü (23 Ocak 2026)
+  - Kullanıcıların gönderdiği görselleri ve paylaşımları gösterebileceğimiz bir bölüm
+  - Sektöre göre düşünüp nasıl olması gerekiyor ise analiz yapılıp ona göre yapılacak
+  - User-generated content showcase
+  - Onay mekanizması (moderation)
+  - Privacy ve izin kontrolü
 
 ### 2.8 Çok Dilli Destek (i18n) - ⏸️ Ertelendi
 **Durum:** 🔵 Post-MVP / Faz 5  
@@ -701,6 +760,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **3.6.4** `GET /api/books/:id` - Kitap detay - ✅ View count increment, ownership check (10 Ocak 2026)
 - [x] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ✅ Favorite, status, images update (10 Ocak 2026)
 - [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026)
+- [ ] **3.6.7** Hikaye edit özelliği (23 Ocak 2026)
+  - Hikayeleri edit yapabilme özelliği eklenmeli
+  - Eğer bir hikaye içeriği edit yapıldı ise download PDF mevcut cache'i silip tekrar oluşturmalı
+  - PDF indirilmek istenirse yani
+  - Story content edit API endpoint'i
+  - PDF cache invalidation mekanizması
 
 ### 3.5 AI Entegrasyonu ✅
 - [x] **3.5.10** Karakter Tutarlılığı İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
@@ -816,8 +881,21 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] Cover-only mode desteği (pageCount = 0) ✅ (11 Ocak 2026)
   - **Implementasyon:** `app/api/books/route.ts` - Status workflow tam olarak implement edildi
   - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
-- [ ] **3.5.12** Queue sistemi (uzun işlemler için) - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.12** Queue sistemi (uzun işlemler için) (23 Ocak 2026)
+  - Aynı anda birden çok kullanıcı kitap oluşturmak isterse API alt yapımız bu durumda ne yapıyor?
+  - Nasıl bir queue yapısı var?
+  - Mevcut durum analizi gerekli
+  - Queue sistemi tasarımı ve implementasyonu
+  - Priority queue (ücretli kullanıcılar öncelikli)
+  - Rate limiting ve throttling
 - [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
+  - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
+  - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
+  - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
+  - Version control sistemi (prompt versiyonları)
+  - A/B testing için farklı prompt versiyonları
+  - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
 - [x] **3.5.14** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing)
 - [x] **3.5.15** Prompt Kalite İyileştirmesi v2.0 - ✅ **TAMAMLANDI** (15 Ocak 2026)
   - **Hedef:** Magical Children's Book kalitesini yakalamak
@@ -837,14 +915,20 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - **Documentation:**
     - [x] `STORY_PROMPT_TEMPLATE_v1.0.0.md` güncellendi
     - [x] `IMAGE_PROMPT_TEMPLATE_v1.0.0.md` güncellendi (v1.0.1 features)
-  - **Kod Değişiklikleri:**
-    - [x] `lib/prompts/story/v1.0.0/base.ts` - Word counts, writing style directives
-    - [x] `lib/prompts/image/v1.0.0/scene.ts` - Cinematic elements, layered composition
-    - [x] `lib/prompts/image/v1.0.0/negative.ts` - ANATOMICAL_NEGATIVE (100+ items)
-  - **Success Metrics:**
-    - ✅ Hikaye metinleri 40-120 kelime arası (yaş grubuna göre)
-    - ✅ Her sayfada diyalog ve detaylı atmosfer
-    - ✅ Sahne detayları artmış (foreground/midground/background)
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
+  - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
+  - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
+  - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
+  - Version control sistemi (prompt versiyonları)
+  - A/B testing için farklı prompt versiyonları
+  - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
+- [ ] **3.5.18** Gemini Banana Model Entegrasyonu (23 Ocak 2026)
+  - İleriye dönük Gemini Banana model eklenmesi düşünülecek
+  - Deneme konusu iyi yada kötü mü olur bilinmiyor
+  - Maliyetler de belli değil
+  - Araştırma ve test gerekli
+  - **Kategori:** Gelecek / Araştırma
+  - **Not:** Şu an için sadece fikir aşamasında, maliyet ve performans analizi yapılmalı
     - ✅ Karakter kıyafet tutarlılığı
     - ✅ Anatomik hatalar minimize edildi
   - **İlham:** Magical Children's Book örnekleri analizi
@@ -890,6 +974,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [x] Age-group, style, and theme-specific restrictions
   - **Documentation:** `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md`
   - **Status:** ✅ Production ready, tested and working
+- [ ] **3.5.17** Görsel Revize UX İyileştirmesi (23 Ocak 2026)
+  - Ebeveynlerin 3 kere revize verebilecekleri alan mevcut (Image Edit Feature)
+  - Bu özelliği güzel bir UX ile sunmak gerekiyor
+  - Düşünülmesi gereken bir konu: Nasıl daha kullanıcı dostu hale getirilebilir?
+  - Mevcut: ImageEditModal, EditHistoryPanel, BookSettingsPage
+  - İyileştirmeler: Daha görsel, daha anlaşılır, daha kolay kullanım
 
 ### 3.6 PDF Generation ✅
 - [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
@@ -953,6 +1043,27 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **4.4.2** E-book vs Basılı kitap fiyatları
 - [ ] **4.4.3** İndirim kodu sistemi (gelecekte)
 - [ ] **4.4.4** Ücretsiz kapak hakkı takibi
+- [ ] **4.4.7** Yurtdışı Şirket Kurulumu (23 Ocak 2026)
+  - Ürünü yurtdışında satabilmek için TR dışında bir yerde şirket olmalı
+  - Stripe Atlas diye bizim için şirket açan yapısı var
+  - Başvuru hazırlanacak ve bakılacak
+  - Aynı zamanda Firstbase diye bir yerde var, onlara da bakmak lazım
+  - Hangisi olursa olsun, yurtdışı şirket kurulumu gerekli
+  - **Kategori:** Yasal / İş Geliştirme
+  - **Öncelik:** 🟡 Önemli
+- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026)
+  - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
+  - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
+  - Örneğin 10 sayfa lazımsa, zaten karakter ve kapak yaptıysak aslında 8 sayfa daha yapacağız gibi
+  - Draft kitap (sadece kapak) → Satın alma → Kalan sayfalar generate
+  - Ne noktada para isteyeceğiz? (Düşünülecek)
+  - Hem ebook satış hem de ebook almış kullanıcıya hardcopy satış
+  - Sepet sistemi ve ödeme akışı tasarlanmalı
+- [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026)
+  - Hardcopy şu an için sadece Türkiye'de var
+  - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
+  - Ebook alabilir ama baskı alamaz - satın alma sırasında bu bilgi verilmeli
+  - Checkout sayfasında ülke kontrolü ve bilgilendirme mesajı
 
 ---
 
@@ -972,12 +1083,49 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.2.3** Conversion tracking
 - [ ] **5.2.4** Custom dashboard (opsiyonel)
 
+### 5.8 Admin Panel / Dashboard (23 Ocak 2026)
+- [ ] **5.8.1** Admin panel oluşturma
+  - Dashboard içeride her şey olacak
+  - Kullanıcılar ne yapmış, kim kaç kitap almış gibi istatistikler
+  - Sistem yönetimi için hayal edilebilecek tüm özellikler
+- [ ] **5.8.2** UI Kit seçimi
+  - Hazır bir UI kit kullanılabilir (v0.app'den UI yaptırılabilir)
+  - Veya hazır bir admin panel çözümü (analytics filan da olur içinde)
+  - Örnek: shadcn/ui + v0.app, veya Retool, AdminJS gibi hazır çözümler
+- [ ] **5.8.3** Analytics entegrasyonu
+  - Kullanıcı istatistikleri
+  - Kitap oluşturma metrikleri
+  - Satış analizi
+  - Kullanıcı davranış analizi
+
 ### 5.3 Güvenlik
 - [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik)
 - [ ] **5.3.2** Rate limiting
 - [ ] **5.3.3** Input validasyonu
 - [ ] **5.3.4** CSRF protection
 - [ ] **5.3.5** GDPR/KVKK uyumluluk kontrolü
+- [ ] **5.3.6** GDPR/KVKK Veri Silme ve Hesap Silme (23 Ocak 2026)
+  - Kullanıcıların "verilerimi sil", "hesabımı sil" gibi yerlere GDPR ve KVKK gizlilik konularında ne gerekiyorsa araştırılmalı
+  - Her şey kurallara uygun ilerlemeli
+  - Konular nedir bilinmiyor, araştırma yapılıp ona göre işler yapılmalı
+  - Veri silme API endpoint'i
+  - Hesap silme akışı
+  - Veri export özelliği (GDPR right to data portability)
+  - Onay mekanizmaları
+- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026)
+  - Aynı IP üzerinden bir şekilde attack gibi durumlar olursa algılamak ve alarm üretmek
+  - Engellemek vs.
+  - Rate limiting per IP
+  - Suspicious activity detection
+  - Alert system (email, Slack, vb.)
+  - IP blocking mekanizması
+- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026)
+  - Aynı IP üzerinden bir şekilde attack gibi durumlar olursa algılamak ve alarm üretmek
+  - Engellemek vs.
+  - Rate limiting per IP
+  - Suspicious activity detection
+  - Alert system (email, Slack, vb.)
+  - IP blocking mekanizması
 
 ### 5.4 Test
 - [ ] **5.4.1** Manuel test (tüm akışlar)
@@ -1106,6 +1254,22 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.6.2** Sosyal medya hesapları
 - [ ] **5.6.3** Landing page son kontrolü
 - [ ] **5.6.4** Beta kullanıcılar ile test
+
+### 5.9 Pazarlama ve Marketing (23 Ocak 2026)
+- [ ] **5.9.1** Product Hunt yayınlama
+  - Ürün hazır olup production olduğunda https://www.producthunt.com/ 'da yayınlanması gerekiyor
+  - Buradan trafik gelebilir
+  - Launch stratejisi hazırlanmalı
+- [ ] **5.9.2** There's an AI for That yayınlama
+  - https://theresanaiforthat.com/ sitesinde yayınlanması gerekiyor
+  - AI kategorisinde listelenmeli
+  - Buradan da trafik gelebilir
+- [ ] **5.9.3** Diğer pazarlama kanalları
+  - SEO optimizasyonu
+  - İçerik pazarlama (blog, sosyal medya)
+  - Influencer işbirlikleri
+  - Email pazarlama
+  - Reklam kampanyaları (Google Ads, Facebook Ads)
 
 ---
 
@@ -1319,6 +1483,51 @@ Mobile-first design with touch-friendly interactions.
 
 ## 📝 Notlar ve Fikirler
 
+### Pazarlama ve Satış Stratejisi (23 Ocak 2026)
+- **Kategori:** Pazarlama / Marketing
+- **Öncelik:** 🟡 Önemli
+- **Açıklama:** Roadmap'te pazarlama, marketing ve satış alanları eklenmeli. Bu konulardaki fikirler ilgili yerlere eklenmeli.
+- **Eklenenler:**
+  - ✅ Faz 5.9: Pazarlama ve Marketing bölümü eklendi
+  - ✅ Product Hunt yayınlama planı
+  - ✅ There's an AI for That yayınlama planı
+  - ✅ Diğer pazarlama kanalları listesi
+- **Not:** Detaylı pazarlama stratejisi Faz 5.9 bölümünde yer alıyor.
+
+### Product Manager Agent (23 Ocak 2026)
+- **Kategori:** Agent / Yönetim
+- **Öncelik:** 🟡 Önemli
+- **Açıklama:** Ürünü sahiplenen bir product manager agent oluşturulmalı. Her şeyi bilen ve ihtiyaç durumunda bize fikir verebilen.
+- **Özellikler:**
+  - Tüm projeyi bilir (ROADMAP, dokümantasyon, kod yapısı)
+  - Ürün stratejisi konusunda fikir verebilir
+  - Önceliklendirme yapabilir
+  - Kullanıcı geri bildirimlerini analiz edebilir
+  - Feature önerileri yapabilir
+  - Teknik ve ürün kararları konusunda danışmanlık
+- **İlgili Dosyalar:**
+  - `.cursor/rules/product-manager.mdc` (oluşturulacak)
+  - `docs/ROADMAP.md` - Tüm proje bilgisi
+  - `docs/DOCUMENTATION.md` - Teknik dokümantasyon
+- **Not:** Bu agent @project-manager'dan farklı olarak ürün stratejisi ve kullanıcı deneyimi odaklı çalışacak.
+
+### Sosyal Medya Agent (23 Ocak 2026)
+- **Kategori:** Agent / Pazarlama
+- **Öncelik:** 🟡 Önemli
+- **Açıklama:** Sosyal medya hesapları yeni açılacak. Bu işten sorumlu bir agent olmalı. Takipçiler gerekiyor. Bu işi düşünmesi lazım.
+- **Özellikler:**
+  - Sosyal medya stratejisi geliştirme
+  - İçerik planlama ve önerileri
+  - Takipçi büyütme stratejileri
+  - Hazır takipçi satan yerler var, satın alınabilir (araştırılacak)
+  - Sosyal medya uzmanı bir agent yapılacak
+  - Platform yönetimi (Instagram, Facebook, Twitter/X, TikTok, vb.)
+  - Engagement analizi ve optimizasyon
+- **İlgili Dosyalar:**
+  - `.cursor/rules/social-media-manager.mdc` (oluşturulacak)
+  - Sosyal medya hesapları (yeni açılacak)
+- **Not:** Bu agent pazarlama ve sosyal medya odaklı çalışacak, takipçi büyütme ve engagement artırma konusunda uzman olacak.
+
 ### 🚨 PDF Generation Bug - Eksik Sayfalar ve Son Sayfa Text Problemi (25 Ocak 2026)
 - **Kategori:** Faz 5.7 - PDF Tasarım İyileştirmesi
 - **Durum:** 🔴 Kritik Bug (Açık)
@@ -1476,6 +1685,10 @@ Mobile-first design with touch-friendly interactions.
     - İlk karakter otomatik default olur, kullanıcı değiştirebilir
     - Karakter seçildiğinde Step 1 verileri otomatik doldurulur (kullanıcı isterse edit edebilir)
     - Edit yapılırsa karakter de güncellenir
+  - **Güncelleme (23 Ocak 2026):**
+    - Kullanıcılar oluşturdukları karakterleri görebilmeli ve seçebilmeli
+    - Yeni kitap oluştururken aynı karakteri tekrar kullanabilmeli
+    - Karakter seçimi ve görüntüleme sistemi geliştirilmeli
   - **Özellikler:**
     - **Dashboard Characters Tab:**
       - Grid layout (karakter kartları)
@@ -1544,7 +1757,14 @@ Mobile-first design with touch-friendly interactions.
 - [ ] Pet ve oyuncak karakterleri (genişletilmiş liste)
 - [ ] Görsel yeniden oluşturma (revize)
 - [ ] Sesli kitap (text-to-speech)
-- [ ] Video hikayeler
+- [ ] Video hikayeler / Çizgi film (23 Ocak 2026)
+  - Video ile çizgi film yapmak satış ve ARGE açısından iyi bir yere gidebilir
+  - Hemen değil ama roadmap'te kesinlikle olmalı
+  - Kişiye özel çizgi film
+  - Google Veo3 veya bize en uygun sonuc vereceklerden deneyebiliriz
+  - Araştırılması lazım
+  - **Kategori:** Gelecek / ARGE
+  - **Not:** Şu an için sadece fikir aşamasında, teknoloji ve maliyet analizi gerekli
 - [x] Mobil uygulama - ✅ **Faz 6'ya taşındı** (PWA yaklaşımı ile)
 - [ ] Abonelik modeli
 - [ ] Referral programı
@@ -1598,6 +1818,7 @@ Mobile-first design with touch-friendly interactions.
   - [ ] Dinamik dil değiştirme
   - [ ] URL-based dil routing (/tr/, /en/, vb.)
   - [ ] Cookie/localStorage ile dil tercihi saklama
+  - [ ] **Localization Agent (23 Ocak 2026):** Bu işten sorumlu bir agent olmalı. Tüm düzeni bilir ve bu işleri hep onunla yaparız. Tüm localization işleri bu agent üzerinden yönetilmeli.
   - **Not:** Şu an tüm UI EN olarak geliştiriliyor, localization Faz 5 veya Post-MVP'de eklenecek
 - [ ] **Çoklu Para Birimi** - USD, EUR, GBP, TRY, vb. otomatik dönüşüm
 - [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı
