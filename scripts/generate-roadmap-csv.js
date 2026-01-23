@@ -30,6 +30,59 @@ const STATUS_MAP = {
   '📝': 'Draft',
 };
 
+// Kategori mapping (Faz ve Alt Faz'a göre)
+function getCategory(faz, altFaz, currentAltFazName) {
+  const fazNum = parseInt(faz);
+  const altFazNum = altFaz ? parseInt(altFaz.split('.')[1]) : null;
+  
+  // Faz bazlı kategoriler
+  if (fazNum === 1) return 'Altyapı';
+  if (fazNum === 2) {
+    // Faz 2 alt kategorileri
+    if (altFazNum === 1) return 'Frontend - Layout';
+    if (altFazNum === 2) return 'Frontend - Ana Sayfa';
+    if (altFazNum === 3) return 'Frontend - Auth';
+    if (altFazNum === 4) return 'Frontend - Wizard';
+    if (altFazNum === 5) return 'Frontend - E-book Viewer';
+    if (altFazNum === 6) return 'Frontend - Dashboard';
+    if (altFazNum === 7) return 'Frontend - Statik Sayfalar';
+    return 'Frontend';
+  }
+  if (fazNum === 3) {
+    // Faz 3 alt kategorileri
+    if (altFazNum === 1) return 'Backend - API';
+    if (altFazNum === 2) return 'Backend - Database';
+    if (altFazNum === 3) return 'Backend - Storage';
+    if (altFazNum === 4) return 'Backend - Auth';
+    if (altFazNum === 5) return 'AI - Entegrasyon';
+    if (altFazNum === 6) return 'Backend - Kitap API';
+    if (altFazNum === 7) return 'Backend - Webhook';
+    return 'Backend / AI';
+  }
+  if (fazNum === 4) {
+    if (altFazNum === 1) return 'E-ticaret - Stripe';
+    if (altFazNum === 2) return 'E-ticaret - İyzico';
+    if (altFazNum === 3) return 'E-ticaret - Sipariş';
+    if (altFazNum === 4) return 'E-ticaret - Fiyatlandırma';
+    return 'E-ticaret';
+  }
+  if (fazNum === 5) {
+    if (altFazNum === 1) return 'SEO';
+    if (altFazNum === 2) return 'Analytics';
+    if (altFazNum === 3) return 'Güvenlik';
+    if (altFazNum === 4) return 'Test';
+    if (altFazNum === 5) return 'Deployment';
+    if (altFazNum === 6) return 'Lansman';
+    if (altFazNum === 7) return 'PDF Tasarım';
+    if (altFazNum === 8) return 'Admin Panel';
+    if (altFazNum === 9) return 'Pazarlama';
+    return 'Polish / Lansman';
+  }
+  if (fazNum === 6) return 'Mobil / PWA';
+  
+  return 'Diğer';
+}
+
 function parseRoadmap() {
   const content = fs.readFileSync(ROADMAP_PATH, 'utf-8');
   const lines = content.split('\n');
@@ -109,7 +162,7 @@ function parseRoadmap() {
           baslik: cleanTitle,
           durum: status === 'x' ? 'Tamamlandı' : 'Bekliyor',
           oncelik: currentPriority || 'Önemli',
-          kategori: 'İş',
+          kategori: getCategory(faz, altFaz, currentAltFaz),
           notlar: notes,
           tarih: '',
           link: currentAltFaz ? `#${currentAltFaz.toLowerCase().replace(/\s+/g, '-')}` : '',

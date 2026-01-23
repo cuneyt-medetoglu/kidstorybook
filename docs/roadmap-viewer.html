@@ -346,9 +346,7 @@
         <label>Kategori</label>
         <select id="filterCategory">
           <option value="">Tümü</option>
-          <option value="İş">İş</option>
-          <option value="Fikir">Fikir</option>
-          <option value="Bug">Bug</option>
+          <!-- Kategoriler CSV'den dinamik olarak yüklenecek -->
         </select>
       </div>
 
@@ -515,6 +513,28 @@
       }).join('');
     }
 
+    // Kategorileri yükle (CSV'den dinamik)
+    function loadCategories(data) {
+      const categories = new Set();
+      data.forEach(row => {
+        if (row.Kategori && row.Kategori.trim()) {
+          categories.add(row.Kategori.trim());
+        }
+      });
+      
+      const categorySelect = document.getElementById('filterCategory');
+      // "Tümü" seçeneğini koru, diğerlerini temizle
+      categorySelect.innerHTML = '<option value="">Tümü</option>';
+      
+      // Kategorileri alfabetik sırayla ekle
+      Array.from(categories).sort().forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+      });
+    }
+
     // İstatistikleri güncelle
     function updateStats() {
       const total = allData.length;
@@ -632,6 +652,7 @@
       reader.onload = (event) => {
         const text = event.target.result;
         allData = parseCSV(text);
+        loadCategories(allData);
         applyFilters();
       };
       reader.readAsText(file, 'UTF-8');
@@ -658,6 +679,7 @@
         })
         .then(text => {
           allData = parseCSV(text);
+          loadCategories(allData);
           applyFilters();
         })
         .catch(() => {
