@@ -89,7 +89,7 @@ function MagicalParticles({ colors }: { colors: string[] }) {
   )
 }
 
-// Transformation arrow with magic effect
+// Transformation arrow with magic effect - tablet proportionally smaller
 function MagicArrow() {
   return (
     <motion.div
@@ -108,9 +108,9 @@ function MagicArrow() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-3 shadow-2xl md:p-4"
+        className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2.5 shadow-2xl md:p-2.5 lg:p-4"
       >
-        <Wand2 className="h-5 w-5 text-white md:h-6 md:w-6" />
+        <Wand2 className="h-4 w-4 text-white md:h-4 md:w-4 lg:h-6 lg:w-6" />
       </motion.div>
 
       {/* Sparkle effect around arrow */}
@@ -170,33 +170,33 @@ export function HeroBookTransformation() {
   }, [])
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center px-4">
-      {/* Title */}
+    <div className="relative flex w-full flex-col items-center justify-center px-3 pb-2 sm:px-4 sm:pb-12 md:h-full md:pb-0 md:px-3 lg:px-4">
+      {/* Title - tablet proportionally smaller */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="mb-4 text-center md:mb-6"
+        className="mb-2 text-center sm:mb-3 md:mb-2 lg:mb-4"
       >
-        <h3 className="flex items-center justify-center gap-2 text-xl font-bold text-gray-800 dark:text-white md:text-2xl">
-          <Wand2 className="h-5 w-5 text-purple-500 md:h-6 md:w-6" />
+        <h3 className="flex items-center justify-center gap-2 text-lg font-bold text-gray-800 dark:text-white sm:text-xl md:text-lg md:gap-1.5 lg:text-xl xl:text-2xl">
+          <Wand2 className="h-4 w-4 text-purple-500 sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
           <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             Your Child, The Hero
           </span>
-          <Wand2 className="h-5 w-5 scale-x-[-1] text-pink-500 md:h-6 md:w-6" />
+          <Wand2 className="h-4 w-4 scale-x-[-1] text-pink-500 sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
         </h3>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="mt-2 text-sm text-gray-600 dark:text-gray-400"
+          className="mt-1.5 text-xs text-gray-600 dark:text-gray-400 sm:mt-2 sm:text-sm md:mt-1.5 md:text-xs lg:mt-2 lg:text-sm"
         >
           Watch the magic happen
         </motion.p>
       </motion.div>
 
-      {/* Main Transformation Container */}
-      <div className="relative w-full max-w-4xl">
+      {/* Main Transformation Container - larger on iPad/web for Real Photo & Story Character */}
+      <div className="relative w-full max-w-2xl sm:max-w-3xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-5xl">
         {/* Background glow */}
         <motion.div
           animate={{
@@ -211,24 +211,24 @@ export function HeroBookTransformation() {
           className={`absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r ${currentTheme.gradient} blur-3xl`}
         />
 
-        {/* Theme indicator */}
+        {/* Theme indicator - tablet smaller */}
         <motion.div
           key={currentTheme.id}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
-          className="mb-3 flex items-center justify-center gap-2"
+          className="mb-2 flex items-center justify-center gap-2 sm:mb-3 md:mb-2 md:gap-1.5 lg:mb-3"
         >
-          <div className={`rounded-full bg-gradient-to-r ${currentTheme.gradient} p-1.5 shadow-lg`}>
-            <Icon className="h-3 w-3 text-white md:h-4 md:w-4" />
+          <div className={`rounded-full bg-gradient-to-r ${currentTheme.gradient} p-1.5 shadow-lg md:p-1 lg:p-1.5`}>
+            <Icon className="h-3 w-3 text-white md:h-3 md:w-3 lg:h-4 lg:w-4" />
           </div>
-          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 md:text-sm">
+          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 md:text-xs lg:text-sm">
             {currentTheme.name}
           </span>
         </motion.div>
 
-        {/* Transformation Grid: Photo → Character */}
-        <div className="relative grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr] md:gap-6">
+        {/* Transformation Grid: Photo → Character - tablet smaller gap */}
+        <div className="relative grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr] md:gap-4 lg:gap-6">
           {/* Left: Real Photo */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -236,13 +236,13 @@ export function HeroBookTransformation() {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="relative"
           >
-            <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-purple-200 dark:bg-slate-800 dark:ring-purple-800 md:p-3">
+            <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-purple-200 dark:bg-slate-800 dark:ring-purple-800 md:p-2 lg:p-3">
               {/* Label */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="mb-2 flex items-center justify-center gap-2"
+                className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2"
               >
                 <div className="h-1.5 w-1.5 rounded-full bg-gray-400" />
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Real Photo</span>
@@ -259,7 +259,7 @@ export function HeroBookTransformation() {
                 />
 
                 {/* Polaroid-style bottom */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-3 py-2 text-center dark:bg-slate-800/95">
+                <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
                   <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Emma, Age 7</p>
                 </div>
               </div>
@@ -304,13 +304,13 @@ export function HeroBookTransformation() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="relative"
             >
-              <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-pink-200 dark:bg-slate-800 dark:ring-pink-800 md:p-3">
+              <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-pink-200 dark:bg-slate-800 dark:ring-pink-800 md:p-2 lg:p-3">
                 {/* Label */}
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="mb-2 flex items-center justify-center gap-2"
+                  className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2"
                 >
                   <Sparkles className="h-3 w-3 text-pink-500" />
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
@@ -336,7 +336,7 @@ export function HeroBookTransformation() {
                   />
 
                   {/* Theme badge at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-3 py-2 text-center dark:bg-slate-800/95">
+                  <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
                     <div className="flex items-center justify-center gap-1.5">
                       <Icon className="h-3 w-3 text-purple-600" />
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -372,12 +372,12 @@ export function HeroBookTransformation() {
           </AnimatePresence>
         </div>
 
-        {/* Theme selector dots */}
+        {/* Theme selector dots - tablet smaller margin */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.6 }}
-          className="mt-4 flex justify-center gap-2 md:mt-6"
+          className="mt-4 flex justify-center gap-2 md:mt-3 lg:mt-6"
         >
           {themes.map((theme, index) => (
             <motion.button
@@ -402,15 +402,14 @@ export function HeroBookTransformation() {
         </motion.div>
       </div>
 
-      {/* Stat badges */}
+      {/* Stat badges - tablet proportionally smaller */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.2, duration: 0.6 }}
-        className="mt-6 flex flex-wrap justify-center gap-2 md:mt-8 md:gap-3"
+        className="mt-4 mb-20 flex flex-wrap justify-center gap-2 sm:mb-6 md:mb-0 md:mt-3 md:gap-2 lg:mt-5 lg:gap-3"
       >
         {[
-          { label: "24 Pages", icon: BookOpen },
           { label: "AI Powered", icon: Sparkles },
           { label: "100% Personalized", icon: Star },
         ].map((stat, index) => (
@@ -420,9 +419,9 @@ export function HeroBookTransformation() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 1.3 + index * 0.1, duration: 0.4 }}
             whileHover={{ scale: 1.05, y: -2 }}
-            className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-md backdrop-blur-sm ring-1 ring-gray-200 dark:bg-slate-800/90 dark:text-gray-200 dark:ring-slate-700 md:px-4 md:py-2"
+            className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-md backdrop-blur-sm ring-1 ring-gray-200 dark:bg-slate-800/90 dark:text-gray-200 dark:ring-slate-700 md:gap-1 md:px-2.5 md:py-1 lg:gap-1.5 lg:px-4 lg:py-2"
           >
-            <stat.icon className="h-3.5 w-3.5 text-purple-500 md:h-4 md:w-4" />
+            <stat.icon className="h-3.5 w-3.5 text-purple-500 md:h-3 md:w-3 lg:h-4 lg:w-4" />
             <span className="whitespace-nowrap">{stat.label}</span>
           </motion.div>
         ))}

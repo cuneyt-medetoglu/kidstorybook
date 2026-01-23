@@ -34,7 +34,6 @@ const pricingPlans = [
     icon: BookOpen,
     features: [
       "Hardcover book",
-      "24 pages",
       "A4 format (21x29.7 cm)",
       "High-quality printing",
       "3-5 weeks delivery",

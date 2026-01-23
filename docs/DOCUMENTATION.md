@@ -230,7 +230,17 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 17 Ocak 2026
+**Son Güncelleme:** Şubat 2026
+
+- **Şubat 2026:**
+  - **Anasayfa UI iyileştirmeleri (tamamlandı):**
+    - Trust Indicators (10,000+ happy families, 4.9/5 rating) anasayfadan kaldırıldı. Kullanıcı review’leri için ileride ayrı bir sayfa yapılacak (`docs/ROADMAP.md` → Gelecek Özellikler).
+    - Hero: tablet/web’te `min-height` kaldırıldı (`md:min-h-0 lg:min-h-0`); How It Works yukarı çekildi.
+    - How It Works: üst padding responsive ayarlandı (mobil `pt-8`, tablet/web `md:pt-4 lg:pt-5`). Tablet görünümünde 3 adım yan yana gösteriliyor (`md:grid-cols-3`).
+    - Real Photo & Story Character: iPad/web’de büyütüldü (max-width, grid).
+    - Wave separator: Mobilde How It Works section'ın bir parçası, badge'lerin altında görünüyor. Tablet/web'de Hero section'ın altında.
+    - "24 Pages" badge'i kaldırıldı (HeroBookTransformation ve PricingSection'dan).
+    - HeroBookTransformation: Badge'lerin altına margin eklendi (`mb-20` mobil, `sm:mb-6`) - wave separator ile boşluk için.
 
 - **17 Ocak 2026:**
   - Image Edit Feature tamamlandı

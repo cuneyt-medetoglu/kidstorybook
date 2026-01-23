@@ -1315,6 +1315,9 @@ Mobile-first design with touch-friendly interactions.
 - [ ] Abonelik modeli
 - [ ] Referral programı
 - [ ] Blog sayfası
+- [ ] **Kullanıcı review sayfası** – Kullanıcı yorumları ve puanları (10,000+ mutlu aile, 4.9/5 vb.) için ayrı sayfa. Anasayfadaki Trust Indicators bölümü kaldırıldı; review içeriği bu sayfada toplanacak.
+  - **Kategori:** Post-MVP / Gelecek Özellikler
+  - **Not:** Anasayfa UI iyileştirmeleri kapsamında Trust Indicators kaldırıldı (Şubat 2026).
 - [ ] **B2B (Business-to-Business) Özelliği** - Kreşler, özel okullar gibi şirketler için toplu kitap oluşturma sistemi
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** Post-MVP / Gelecek Özellikler
