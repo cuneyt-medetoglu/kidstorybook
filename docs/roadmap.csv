@@ -1,0 +1,216 @@
+ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Notlar,Tarih,Link
+	1.1.1,1,1.1,"Next.js 14 projesi oluştur",Tamamlandı,Önemli,İş,"",,#11-proje-kurulumu
+	1.1.2,1,1.1,"Tailwind CSS kur",Tamamlandı,Önemli,İş,"",,#11-proje-kurulumu
+	1.1.3,1,1.1,"shadcn/ui kur",Tamamlandı,Önemli,İş,"",,#11-proje-kurulumu
+	1.1.4,1,1.1,"ESLint + Prettier ayarla",Tamamlandı,Önemli,İş,"",,#11-proje-kurulumu
+	1.1.5,1,1.1,"Git repo kurulumu",Tamamlandı,Önemli,İş,"",,#11-proje-kurulumu
+	1.2.1,1,1.2,"Supabase projesi oluştur",Tamamlandı,Önemli,İş,"",,#12-supabase-kurulumu
+	1.2.2,1,1.2,"Veritabanı şeması",Tamamlandı,Önemli,İş,"",,#12-supabase-kurulumu
+	1.2.3,1,1.2,"Supabase Auth entegrasyonu",Tamamlandı,Önemli,İş,"",,#12-supabase-kurulumu
+	1.2.4,1,1.2,"Storage bucket'ları",Tamamlandı,Önemli,İş,"",,#12-supabase-kurulumu
+	1.2.5,1,1.2,"RLS kuralları",Tamamlandı,Önemli,İş,"",,#12-supabase-kurulumu
+	1.3.1,1,1.3,"Environment dosyası",Tamamlandı,Önemli,İş,"",,#13-environment-ve-yapılandırma
+	1.3.2,1,1.3,"API key'leri ekle",Tamamlandı,Önemli,İş,"",,#13-environment-ve-yapılandırma
+	1.3.3,1,1.3,"Vercel environment variables",Tamamlandı,Önemli,İş,"",,#13-environment-ve-yapılandırma
+	1.3.4,1,1.3,"Development/Production config",Tamamlandı,Önemli,İş,"",,#13-environment-ve-yapılandırma
+	2.1.1,2,2.1,"Ana layout component",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.2,2,2.1,"Responsive tasarım",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.3,2,2.1,"Tema sistemi",Bekliyor,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.4,2,2.1,"Loading states",Bekliyor,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.5,2,2.1,"Ülke/para birimi seçici",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.6,2,2.1,"Sepet ikonu",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.7,2,2.1,"Create book butonu",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.1.8,2,2.1,"Dark/Light mode toggle",Tamamlandı,Önemli,İş,"",,#21-layout-ve-navigasyon
+	2.2.1,2,2.2,"Hero section",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.2,2,2.2,"Nasıl Çalışır bölümü",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.3,2,2.2,"Örnek kitaplar carousel",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.4,2,2.2,"Özellikler özeti",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.5,2,2.2,"Fiyatlandırma özeti",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.6,2,2.2,"FAQ bölümü",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.7,2,2.2,"Kampanya banner'ları",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.2.8,2,2.2,"Cookie banner",Tamamlandı,Önemli,İş,"",,#22-ana-sayfa-homepage
+	2.3.1,2,2.3,"Giriş sayfası",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.2,2,2.3,"Kayıt sayfası",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.3,2,2.3,"Şifre sıfırlama",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.4,2,2.3,"Google OAuth",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.5,2,2.3,"Facebook OAuth",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.6,2,2.3,"Instagram OAuth",Bekliyor,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.7,2,2.3,"Email doğrulama",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.3.8,2,2.3,"OAuth callback sayfaları",Tamamlandı,Önemli,İş,"",,#23-auth-sayfaları
+	2.4.1,2,2.4,"Step 1: Karakter bilgileri",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.2,2,2.4,"Step 2: Referans görsel",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.3,2,2.4,"Step 3: Tema ve yaş grubu",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.4,2,2.4,"Step 4: Illustration style",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.5,2,2.4,"Step 5: Özel istekler",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.6,2,2.4,"Step 6: Önizleme ve onay",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.7,2,2.4,"Progress indicator",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.8,2,2.4,"Form validasyonu",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.9,2,2.4,"Ücretsiz kapak hakkı kontrolü",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.4.10,2,2.4,"Ücretsiz kapak butonu",Tamamlandı,Önemli,İş,"",,#24-kitap-oluşturma-wizard
+	2.5.1,2,2.5,"Temel görüntüleme",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.5.2,2,2.5,"Mobil ve responsive",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.5.3,2,2.5,"Sesli okuma (TTS)",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.5.4,2,2.5,"Otomatik oynatma",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.5.5,2,2.5,"UX iyileştirmeleri",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.5.6,2,2.5,"Görsel ve animasyonlar",Tamamlandı,Önemli,İş,"",,#25-e-book-viewer-
+	2.6.1,2,2.6,"Kitaplık sayfası",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.2,2,2.6,"Kitap kartı component",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.3,2,2.6,"Filtreleme ve sıralama",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.4,2,2.6,"Sipariş geçmişi",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.5,2,2.6,"Profil ayarları",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.6,2,2.6,"Ücretsiz kapak hakkı göstergesi",Tamamlandı,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.6.7,2,2.6,"Characters tab",Bekliyor,Önemli,İş,"",,#26-kullanıcı-dashboard
+	2.7.1,2,2.7,"Özellikler sayfası",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.2,2,2.7,"Fiyatlandırma sayfası",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.4,2,2.7,"İletişim sayfası",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.5,2,2.7,"Gizlilik Politikası",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.6,2,2.7,"Kullanım Şartları",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.7,2,2.7,"KVKK Aydınlatma Metni",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.8,2,2.7,"Examples sayfası",Tamamlandı,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.9,2,2.7,"Ideas sayfası",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.10,2,2.7,"Tema kartları görsel gösterimi",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.11,2,2.7,"Used Photos gösterimi",Tamamlandı,Önemli,İş,"",,#27-statik-sayfalar
+	2.7.12,2,2.7,"View All Examples linkleri",Bekliyor,Önemli,İş,"",,#27-statik-sayfalar
+	3.1.1,3,3.1,"API klasör yapısı",Tamamlandı,Önemli,İş,"",,#31-api-routes-kurulumu
+	3.1.2,3,3.1,"Middleware",Tamamlandı,Önemli,İş,"",,#31-api-routes-kurulumu
+	3.1.3,3,3.1,"API response formatı",Tamamlandı,Önemli,İş,"",,#31-api-routes-kurulumu
+	3.2.1,3,3.2,"Register endpoint",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.2,3,3.2,"Login endpoint",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.3,3,3.2,"Logout endpoint",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.4,3,3.2,"GET /api/users/me",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.5,3,3.2,"PATCH /api/users/me",Bekliyor,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.6,3,3.2,"Google OAuth callback",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.7,3,3.2,"Facebook OAuth callback",Tamamlandı,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.2.8,3,3.2,"Instagram OAuth callback",Bekliyor,Önemli,İş,"",,#32-kullanıcı-apileri
+	3.4.1,3,3.4,"POST /api/characters/analyze",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.2,3,3.4,"GET /api/characters",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.3,3,3.4,"GET /api/characters/:id",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.4,3,3.4,"PATCH /api/characters/:id",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.5,3,3.4,"DELETE /api/characters/:id",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.6,3,3.4,"POST /api/characters/:id/set-default",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.7,3,3.4,"POST /api/characters (Non-Child)",Tamamlandı,Önemli,İş,"",,#34-karakter-apileri
+	3.4.8,3,3.4,"POST /api/characters/upload-photo",Bekliyor,Önemli,İş,"",,#34-karakter-apileri
+	3.4.9,3,3.4,"API iyileştirmeleri",Bekliyor,Önemli,İş,"",,#34-karakter-apileri
+	3.6.1,3,3.6,"Books database helpers",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.6.2,3,3.6,"POST /api/books",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.6.3,3,3.6,"GET /api/books",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.6.4,3,3.6,"GET /api/books/:id",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.6.5,3,3.6,"PATCH /api/books/:id",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.6.6,3,3.6,"DELETE /api/books/:id",Tamamlandı,Önemli,İş,"",,#36-kitap-apileri
+	3.5.1,3,3.5,"Prompt Management System",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.2,3,3.5,"Story Generation Prompts",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.3,3,3.5,"Image Generation Prompts",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.4,3,3.5,"Character Consistency System",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.5,3,3.5,"POST /api/ai/generate-story",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.6,3,3.5,"POST /api/ai/generate-images",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.7,3,3.5,"POST /api/ai/generate-cover",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.8,3,3.5,"Prompt template'leri",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.9,3,3.5,"Create Book'da cover generation",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.10,3,3.5,"Create Book'da page images",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.11,3,3.5,"Book status management",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.12,3,3.5,"Queue sistemi",Bekliyor,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.13,3,3.5,"Retry ve hata yönetimi",Bekliyor,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.14,3,3.5,"AI provider seçimi",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.15,3,3.5,"Prompt Kalite İyileştirmesi",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.5.16,3,3.5,"Image Edit Feature",Tamamlandı,Önemli,İş,"",,#35-ai-entegrasyonu
+	3.6.1,3,3.6,"POST /api/books/:id/generate-pdf",Tamamlandı,Önemli,İş,"",,#36-pdf-generation
+	3.6.2,3,3.6,"PDF template tasarımı",Tamamlandı,Önemli,İş,"",,#36-pdf-generation
+	3.6.3,3,3.6,"Supabase Storage'a kaydet",Tamamlandı,Önemli,İş,"",,#36-pdf-generation
+	3.6.4,3,3.6,"İndirme linki oluştur",Tamamlandı,Önemli,İş,"",,#36-pdf-generation
+	3.7.1,3,3.7,"Stripe webhook handler",Bekliyor,Önemli,İş,"",,#37-webhooklar
+	3.7.2,3,3.7,"İyzico webhook handler",Bekliyor,Önemli,İş,"",,#37-webhooklar
+	4.1.1,4,4.1,"Stripe hesabı oluştur",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.2,4,4.1,"Stripe SDK kurulumu",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.3,4,4.1,"Ürünler ve fiyatlar",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.4,4,4.1,"Checkout session",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.5,4,4.1,"Payment intent flow",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.6,4,4.1,"Stripe webhook handler",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.1.7,4,4.1,"Test modu",Bekliyor,Önemli,İş,"",,#41-stripe-entegrasyonu
+	4.2.1,4,4.2,"İyzico hesabı oluştur",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.2,4,4.2,"İyzico SDK kurulumu",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.3,4,4.2,"Ödeme formu entegrasyonu",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.4,4,4.2,"3D Secure desteği",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.5,4,4.2,"İyzico webhook handler",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.6,4,4.2,"Callback handler",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.2.7,4,4.2,"Test modu",Bekliyor,Önemli,İş,"",,#42-iyzico-entegrasyonu-türkiye
+	4.3.1,4,4.3,"Checkout sayfası",Bekliyor,Önemli,İş,"",,#43-sipariş-yönetimi
+	4.3.2,4,4.3,"Sipariş özeti component",Bekliyor,Önemli,İş,"",,#43-sipariş-yönetimi
+	4.3.3,4,4.3,"Ödeme başarılı sayfası",Bekliyor,Önemli,İş,"",,#43-sipariş-yönetimi
+	4.3.4,4,4.3,"Sipariş durumu takibi",Bekliyor,Önemli,İş,"",,#43-sipariş-yönetimi
+	4.3.5,4,4.3,"Email bildirimleri",Bekliyor,Önemli,İş,"",,#43-sipariş-yönetimi
+	4.4.1,4,4.4,"Sayfa sayısına göre fiyatlandırma",Bekliyor,Önemli,İş,"",,#44-fiyatlandırma-sistemi
+	4.4.2,4,4.4,"E-book vs Basılı kitap fiyatları",Bekliyor,Önemli,İş,"",,#44-fiyatlandırma-sistemi
+	4.4.3,4,4.4,"İndirim kodu sistemi",Bekliyor,Önemli,İş,"",,#44-fiyatlandırma-sistemi
+	4.4.4,4,4.4,"Ücretsiz kapak hakkı takibi",Bekliyor,Önemli,İş,"",,#44-fiyatlandırma-sistemi
+	5.1.1,5,5.1,"Meta tags ve Open Graph",Bekliyor,Önemli,İş,"",,#51-seo-optimizasyonu
+	5.1.2,5,5.1,"Sitemap.xml",Bekliyor,Önemli,İş,"",,#51-seo-optimizasyonu
+	5.1.3,5,5.1,"robots.txt",Bekliyor,Önemli,İş,"",,#51-seo-optimizasyonu
+	5.1.4,5,5.1,"Structured data",Bekliyor,Önemli,İş,"",,#51-seo-optimizasyonu
+	5.1.5,5,5.1,"Performance optimizasyonu",Bekliyor,Önemli,İş,"",,#51-seo-optimizasyonu
+	5.2.1,5,5.2,"Google Analytics 4",Bekliyor,Önemli,İş,"",,#52-analytics
+	5.2.2,5,5.2,"Event tracking",Bekliyor,Önemli,İş,"",,#52-analytics
+	5.2.3,5,5.2,"Conversion tracking",Bekliyor,Önemli,İş,"",,#52-analytics
+	5.2.4,5,5.2,"Custom dashboard",Bekliyor,Önemli,İş,"",,#52-analytics
+	5.3.1,5,5.3,"HTTPS sertifikası",Bekliyor,Önemli,İş,"",,#53-güvenlik
+	5.3.2,5,5.3,"Rate limiting",Bekliyor,Önemli,İş,"",,#53-güvenlik
+	5.3.3,5,5.3,"Input validasyonu",Bekliyor,Önemli,İş,"",,#53-güvenlik
+	5.3.4,5,5.3,"CSRF protection",Bekliyor,Önemli,İş,"",,#53-güvenlik
+	5.3.5,5,5.3,"GDPR/KVKK uyumluluk",Bekliyor,Önemli,İş,"",,#53-güvenlik
+	5.4.1,5,5.4,"Manuel test",Bekliyor,Önemli,İş,"",,#54-test
+	5.4.2,5,5.4,"Mobil test",Bekliyor,Önemli,İş,"",,#54-test
+	5.4.3,5,5.4,"Cross-browser test",Bekliyor,Önemli,İş,"",,#54-test
+	5.4.4,5,5.4,"Ödeme testleri",Bekliyor,Önemli,İş,"",,#54-test
+	5.5.1,5,5.5,"Vercel production deployment",Bekliyor,Önemli,İş,"",,#55-deployment
+	5.5.2,5,5.5,"Domain bağlantısı",Bekliyor,Önemli,İş,"",,#55-deployment
+	5.5.3,5,5.5,"SSL sertifikası",Bekliyor,Önemli,İş,"",,#55-deployment
+	5.5.4,5,5.5,"Monitoring kurulumu",Bekliyor,Önemli,İş,"",,#55-deployment
+	5.5.5,5,5.5,"Error tracking",Bekliyor,Önemli,İş,"",,#55-deployment
+	5.6.1,5,5.6,"Örnek kitaplar oluştur",Bekliyor,Önemli,İş,"",,#56-lansman-hazırlıkları
+	5.6.2,5,5.6,"Sosyal medya hesapları",Bekliyor,Önemli,İş,"",,#56-lansman-hazırlıkları
+	5.6.3,5,5.6,"Landing page son kontrolü",Bekliyor,Önemli,İş,"",,#56-lansman-hazırlıkları
+	5.6.4,5,5.6,"Beta kullanıcılar ile test",Bekliyor,Önemli,İş,"",,#56-lansman-hazırlıkları
+	5.7.1,5,5.7,"Profesyonel PDF template",Tamamlandı,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	5.7.2,5,5.7,"PDF preview özelliği",Bekliyor,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	5.7.3,5,5.7,"PDF customization seçenekleri",Bekliyor,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	5.7.4,5,5.7,"Arka plan desenleri",Bekliyor,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	5.7.5,5,5.7,"PDF boyut optimizasyonu",Bekliyor,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	5.7.6,5,5.7,"Cover Page İyileştirmeleri",Tamamlandı,Önemli,İş,"",,#57-pdf-tasarım-iyileştirmesi
+	6.1.1,6,6.1,"next-pwa paketi",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.2,6,6.1,"Manifest.json",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.3,6,6.1,"Service Worker",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.4,6,6.1,"App icon'ları",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.5,6,6.1,"Splash screen",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.6,6,6.1,"Offline desteği",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.1.7,6,6.1,"Install prompt",Bekliyor,Önemli,İş,"",,#61-pwa-temel-kurulumu
+	6.2.1,6,6.2,"Touch gesture desteği",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.2.2,6,6.2,"Mobil navigasyon",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.2.3,6,6.2,"Fotoğraf yükleme optimizasyonu",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.2.4,6,6.2,"Push notification",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.2.5,6,6.2,"Share API entegrasyonu",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.2.6,6,6.2,"Responsive tasarım son kontrolleri",Bekliyor,Önemli,İş,"",,#62-mobil-optimizasyon
+	6.3.1,6,6.3,"TWA projesi oluştur",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.2,6,6.3,"Android manifest",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.3,6,6.3,"APK/AAB build",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.4,6,6.3,"Google Play Console",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.5,6,6.3,"Store listing",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.6,6,6.3,"Play Store'a yükleme",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.3.7,6,6.3,"Test ve inceleme",Bekliyor,Önemli,İş,"",,#63-android-play-store---twa-build
+	6.4.1,6,6.4,"Capacitor kurulumu",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.2,6,6.4,"iOS platform ekleme",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.3,6,6.4,"iOS native wrapper",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.4,6,6.4,"Xcode projesi",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.5,6,6.4,"Apple Developer hesabı",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.6,6,6.4,"App Store Connect",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.7,6,6.4,"Store listing",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.8,6,6.4,"App Store'a yükleme",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.4.9,6,6.4,"Test ve inceleme",Bekliyor,Önemli,İş,"",,#64-ios-app-store---capacitor-wrapper
+	6.5.1,6,6.5,"PWA test",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.5.2,6,6.5,"Android cihazlarda test",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.5.3,6,6.5,"iOS cihazlarda test",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.5.4,6,6.5,"Performance optimizasyonu",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.5.5,6,6.5,"Offline functionality test",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.5.6,6,6.5,"Store'larda görünürlük testi",Bekliyor,Önemli,İş,"",,#65-test-ve-optimizasyon
+	6.6.1,6,6.6,"OTA güncelleme stratejisi",Bekliyor,Önemli,İş,"",,#66-güncelleme-ve-bakım
+	6.6.2,6,6.6,"Store güncelleme süreci",Bekliyor,Önemli,İş,"",,#66-güncelleme-ve-bakım
+	6.6.3,6,6.6,"Kullanıcı geri bildirimi",Bekliyor,Önemli,İş,"",,#66-güncelleme-ve-bakım
+	6.6.4,6,6.6,"Crash reporting",Bekliyor,Önemli,İş,"",,#66-güncelleme-ve-bakım

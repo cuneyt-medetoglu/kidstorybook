@@ -44,6 +44,10 @@ docs/
 │   ├── EXAMPLES_PAGE_V0_PROMPT.md # Examples sayfası v0.app prompt rehberi (mobil-first tasarım)
 │   └── ...
 │
+├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
+├── roadmap-viewer.html        # HTML tablo görüntüleyici (filtreleme, sıralama, arama) - Gizli
+├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (Google Sheets filtreleme, draft fikirler, HTML Viewer, vb.)
+│
 ├── reports/                    # Raporlar (aktif)
 │   ├── GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md # GPT-image API hata analizi
 │   ├── CURRENT_STATUS_ANALYSIS.md # Mevcut durum analizi ve eksikler listesi
@@ -110,6 +114,25 @@ docs/
 1. **ROADMAP.md** - Tüm işlerin listesi, buradan takip et
 2. **PRD.md** - Ürün gereksinimleri
 3. **FEATURES.md** - Özellik listesi ve önceliklendirme
+
+### İş Takibi ve CSV Yönetimi
+1. **roadmap.csv** - Google Sheets'e import edilebilir CSV dosyası (Gizli - `docs/` klasöründe)
+   - ROADMAP.md'den otomatik oluşturulur (`npm run roadmap`)
+   - Google Sheets'te filtreleme, sıralama, grafik oluşturma
+   - Draft fikirler ekleme
+2. **roadmap-viewer.html** - HTML tablo görüntüleyici ⭐ (Gizli - `docs/` klasöründe)
+   - Tarayıcıda çalışan interaktif tablo
+   - CSV otomatik yükleme (aynı klasörde `roadmap.csv`)
+   - Filtreleme, sıralama, arama özellikleri
+   - İstatistikler ve renklendirme
+   - Responsive tasarım
+   - **Güvenlik:** Son kullanıcılar erişemez (public/ klasöründe değil)
+3. **ROADMAP_CSV_README.md** - CSV kullanım rehberi
+   - HTML Viewer kullanımı (önerilen)
+   - Google Sheets import adımları
+   - Filtreleme örnekleri
+   - Draft fikir ekleme rehberi
+   - Sync (senkronizasyon) bilgileri
 
 ### Teknik Kararlar
 1. **technical/TECHNICAL_DECISIONS.md** - Next.js 14, Supabase seçimleri
@@ -230,7 +253,17 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** Şubat 2026
+**Son Güncelleme:** 23 Ocak 2026
+
+- **23 Ocak 2026:**
+  - **ROADMAP CSV Sistemi eklendi:**
+    - `docs/roadmap.csv` - Google Sheets'e import edilebilir CSV dosyası
+    - `scripts/generate-roadmap-csv.js` - CSV oluşturma script'i
+    - `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
+    - ROADMAP.md'den otomatik CSV oluşturma
+    - Google Sheets'te filtreleme, sıralama, grafik oluşturma
+    - Draft fikirler ekleme desteği
+    - Project-manager agent'ına CSV yönetimi sorumluluğu eklendi
 
 - **Şubat 2026:**
   - **Anasayfa UI iyileştirmeleri (tamamlandı):**

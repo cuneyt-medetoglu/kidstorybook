@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KidStoryBook - Roadmap Viewer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #1a1a1a;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .control-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+    }
+
+    .control-group select,
+    .control-group input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .control-group input[type="text"] {
+      min-width: 200px;
+    }
+
+    .file-upload {
+      position: relative;
+      display: inline-block;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload-btn {
+      padding: 10px 20px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .file-upload-btn:hover {
+      background: #4f46e5;
+    }
+
+    .stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      min-width: 150px;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .stat-card .value {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .stat-card.completed .value {
+      color: #10b981;
+    }
+
+    .stat-card.pending .value {
+      color: #f59e0b;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border: 1px solid #e5e5e5;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: #f9f9f9;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: #666;
+      border-bottom: 2px solid #e5e5e5;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    th:hover {
+      background: #f0f0f0;
+    }
+
+    th.sort-asc::after {
+      content: ' ▲';
+      font-size: 10px;
+    }
+
+    th.sort-desc::after {
+      content: ' ▼';
+      font-size: 10px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    tr:hover {
+      background: #f9f9f9;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-badge.completed {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-badge.pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-badge.draft {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .priority-badge.critical {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .priority-badge.important {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .priority-badge.low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: #666;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .controls {
+        flex-direction: column;
+      }
+
+      .control-group {
+        width: 100%;
+      }
+
+      table {
+        font-size: 12px;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 KidStoryBook Roadmap Viewer</h1>
+    <p class="subtitle">CSV import edip filtreleme, sıralama ve arama yapabilirsin</p>
+
+    <div class="controls">
+      <div class="file-upload">
+        <input type="file" id="csvFile" accept=".csv" />
+        <button class="file-upload-btn">📁 CSV Yükle</button>
+      </div>
+
+      <div class="control-group">
+        <label>Durum</label>
+        <select id="filterStatus">
+          <option value="">Tümü</option>
+          <option value="Tamamlandı">Tamamlandı</option>
+          <option value="Bekliyor">Bekliyor</option>
+          <option value="Ertelendi">Ertelendi</option>
+          <option value="Draft">Draft</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Öncelik</label>
+        <select id="filterPriority">
+          <option value="">Tümü</option>
+          <option value="Kritik">Kritik</option>
+          <option value="Önemli">Önemli</option>
+          <option value="Düşük">Düşük</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Faz</label>
+        <select id="filterFaz">
+          <option value="">Tümü</option>
+          <option value="1">Faz 1</option>
+          <option value="2">Faz 2</option>
+          <option value="3">Faz 3</option>
+          <option value="4">Faz 4</option>
+          <option value="5">Faz 5</option>
+          <option value="6">Faz 6</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Kategori</label>
+        <select id="filterCategory">
+          <option value="">Tümü</option>
+          <option value="İş">İş</option>
+          <option value="Fikir">Fikir</option>
+          <option value="Bug">Bug</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>Arama</label>
+        <input type="text" id="searchInput" placeholder="Başlık veya notlarda ara..." />
+      </div>
+    </div>
+
+    <div class="stats" id="stats" style="display: none;">
+      <div class="stat-card">
+        <div class="label">Toplam</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card completed">
+        <div class="label">Tamamlanan</div>
+        <div class="value" id="statCompleted">0</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="label">Bekleyen</div>
+        <div class="value" id="statPending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Gösterilen</div>
+        <div class="value" id="statFiltered">0</div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th data-sort="id">ID</th>
+            <th data-sort="faz">Faz</th>
+            <th data-sort="altFaz">Alt Faz</th>
+            <th data-sort="baslik">Başlık</th>
+            <th data-sort="durum">Durum</th>
+            <th data-sort="oncelik">Öncelik</th>
+            <th data-sort="kategori">Kategori</th>
+            <th data-sort="notlar">Notlar</th>
+            <th data-sort="tarih">Tarih</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="10">
+              <div class="empty-state">
+                <h3>📁 CSV Dosyası Yükle</h3>
+                <p>Yukarıdaki "CSV Yükle" butonuna tıklayarak roadmap.csv dosyasını yükleyin</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let allData = [];
+    let filteredData = [];
+    let sortColumn = null;
+    let sortDirection = 'asc';
+
+    // CSV Parse fonksiyonu
+    function parseCSV(text) {
+      const lines = text.split('\n').filter(line => line.trim());
+      if (lines.length === 0) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const data = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+
+        for (let j = 0; j < lines[i].length; j++) {
+          const char = lines[i][j];
+          
+          if (char === '"') {
+            if (inQuotes && lines[i][j + 1] === '"') {
+              current += '"';
+              j++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            values.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current.trim());
+
+        if (values.length === headers.length) {
+          const row = {};
+          headers.forEach((header, index) => {
+            let value = values[index];
+            // ID kolonundaki tab karakterini ve ="..." formatını temizle
+            if (header === 'ID') {
+              value = value.replace(/^\t+/, '').replace(/^="|"$/g, '').replace(/^"|"$/g, '');
+            } else {
+              value = value.replace(/^="|"$/g, '').replace(/^"|"$/g, '');
+            }
+            row[header] = value;
+          });
+          data.push(row);
+        }
+      }
+
+      return data;
+    }
+
+    // Tablo render
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10">
+              <div class="empty-state">
+                <h3>🔍 Sonuç Bulunamadı</h3>
+                <p>Filtreleri değiştirerek tekrar deneyin</p>
+              </div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = data.map(row => {
+        const statusClass = row.Durum === 'Tamamlandı' ? 'completed' : 
+                           row.Durum === 'Draft' ? 'draft' : 'pending';
+        const priorityClass = row.Öncelik === 'Kritik' ? 'critical' :
+                             row.Öncelik === 'Önemli' ? 'important' : 'low';
+
+        return `
+          <tr>
+            <td>${row.ID || ''}</td>
+            <td>${row.Faz || ''}</td>
+            <td>${row['Alt Faz'] || ''}</td>
+            <td>${row.Başlık || ''}</td>
+            <td><span class="status-badge ${statusClass}">${row.Durum || ''}</span></td>
+            <td><span class="priority-badge ${priorityClass}">${row.Öncelik || ''}</span></td>
+            <td>${row.Kategori || ''}</td>
+            <td>${row.Notlar || ''}</td>
+            <td>${row.Tarih || ''}</td>
+            <td>${row.Link || ''}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // İstatistikleri güncelle
+    function updateStats() {
+      const total = allData.length;
+      const completed = allData.filter(r => r.Durum === 'Tamamlandı').length;
+      const pending = allData.filter(r => r.Durum === 'Bekliyor').length;
+      const filtered = filteredData.length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statCompleted').textContent = completed;
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statFiltered').textContent = filtered;
+      document.getElementById('stats').style.display = 'flex';
+    }
+
+    // Filtreleme
+    function applyFilters() {
+      const statusFilter = document.getElementById('filterStatus').value;
+      const priorityFilter = document.getElementById('filterPriority').value;
+      const fazFilter = document.getElementById('filterFaz').value;
+      const categoryFilter = document.getElementById('filterCategory').value;
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+      filteredData = allData.filter(row => {
+        if (statusFilter && row.Durum !== statusFilter) return false;
+        if (priorityFilter && row.Öncelik !== priorityFilter) return false;
+        if (fazFilter && row.Faz !== fazFilter) return false;
+        if (categoryFilter && row.Kategori !== categoryFilter) return false;
+        if (searchTerm) {
+          const searchText = (row.Başlık || '') + ' ' + (row.Notlar || '');
+          if (!searchText.toLowerCase().includes(searchTerm)) return false;
+        }
+        return true;
+      });
+
+      applySort();
+      renderTable(filteredData);
+      updateStats();
+    }
+
+    // Sıralama
+    function applySort() {
+      if (!sortColumn) return;
+
+      filteredData.sort((a, b) => {
+        const aVal = a[sortColumn] || '';
+        const bVal = b[sortColumn] || '';
+        
+        if (sortDirection === 'asc') {
+          return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+        } else {
+          return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+        }
+      });
+    }
+
+    // Sıralama event listener
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const column = th.getAttribute('data-sort');
+        
+        // Kolon adını header'a çevir
+        const columnMap = {
+          'id': 'ID',
+          'faz': 'Faz',
+          'altFaz': 'Alt Faz',
+          'baslik': 'Başlık',
+          'durum': 'Durum',
+          'oncelik': 'Öncelik',
+          'kategori': 'Kategori',
+          'notlar': 'Notlar',
+          'tarih': 'Tarih'
+        };
+
+        if (sortColumn === columnMap[column]) {
+          sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortColumn = columnMap[column];
+          sortDirection = 'asc';
+        }
+
+        // Sıralama işaretlerini güncelle
+        document.querySelectorAll('th').forEach(h => {
+          h.classList.remove('sort-asc', 'sort-desc');
+        });
+        th.classList.add(sortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+
+        applySort();
+        renderTable(filteredData);
+      });
+    });
+
+    // CSV yükleme
+    document.getElementById('csvFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        allData = parseCSV(text);
+        applyFilters();
+      };
+      reader.readAsText(file, 'UTF-8');
+    });
+
+    // Filtre event listener'ları
+    document.getElementById('filterStatus').addEventListener('change', applyFilters);
+    document.getElementById('filterPriority').addEventListener('change', applyFilters);
+    document.getElementById('filterFaz').addEventListener('change', applyFilters);
+    document.getElementById('filterCategory').addEventListener('change', applyFilters);
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    // Varsayılan CSV'yi yükle (eğer varsa - aynı klasörde)
+    window.addEventListener('DOMContentLoaded', () => {
+      fetch('./roadmap.csv')
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          }
+          throw new Error('CSV bulunamadı');
+        })
+        .then(text => {
+          allData = parseCSV(text);
+          applyFilters();
+        })
+        .catch(() => {
+          // CSV yoksa, kullanıcı manuel yükleyecek
+        });
+    });
+  </script>
+</body>
+</html>

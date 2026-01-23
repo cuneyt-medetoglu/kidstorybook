@@ -87,7 +87,43 @@ Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğ
 - Her changelog entry → dokümantasyon güncellemesi gerektirir
 - Kod ve dokümantasyon version'ları her zaman sync olmalı
 
-### 7. Yeni Dokümantasyon Dosyası Oluşturma
+### 7. CSV Yönetimi ve Google Sheets Entegrasyonu
+ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:
+
+**Dosyalar:**
+- `docs/roadmap.csv` - Google Sheets'e import edilebilir CSV dosyası (Gizli)
+- `docs/roadmap-viewer.html` - HTML tablo görüntüleyici (filtreleme, sıralama, arama) (Gizli)
+- `scripts/generate-roadmap-csv.js` - CSV oluşturma script'i
+- `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
+
+**Görevler:**
+1. **CSV Oluşturma:**
+   - ROADMAP.md değiştiğinde CSV'yi güncelle
+   - Script çalıştır: `npm run roadmap` (veya `node scripts/generate-roadmap-csv.js`)
+   - CSV sadece `docs/` klasörüne yazılır (güvenlik için `public/` klasöründe değil)
+   - CSV'deki kolonlar: ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Notlar, Tarih, Link
+   - ID kolonunun başında tab karakteri var (Excel/Google Sheets'te tarih olarak algılanmaması için)
+
+2. **Draft Fikirler:**
+   - Kullanıcı Google Sheets'te draft fikir eklediğinde, ROADMAP.md'ye manuel ekle
+   - Draft fikirler "Notlar ve Fikirler" bölümüne eklenir
+   - Format: `DRAFT-1`, `DRAFT-2`, vb.
+
+3. **Sync Kontrolü:**
+   - ROADMAP.md → CSV: Otomatik (script ile)
+   - CSV → ROADMAP.md: Manuel (kullanıcı yapar veya agent yardım eder)
+
+4. **İstatistikler:**
+   - CSV oluşturulduğunda istatistikleri göster (toplam, tamamlanan, bekleyen)
+   - Google Sheets'te filtreleme önerileri ver
+
+**Kullanım Senaryoları:**
+- Kullanıcı "CSV'yi güncelle" dediğinde → `npm run roadmap` çalıştır
+- Kullanıcı "HTML Viewer'ı aç" dediğinde → `docs/roadmap-viewer.html` dosyasını tarayıcıda açmasını söyle
+- Kullanıcı "Google Sheets'te filtreleme nasıl yapılır?" dediğinde → README'den örnekler ver
+- Kullanıcı "Draft fikir ekle" dediğinde → CSV'ye ekle, ROADMAP.md'ye de ekle
+
+### 8. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
 1. **Dosya tipini belirle:**
    - Checklist → `docs/checklists/`
@@ -143,6 +179,8 @@ Kullanıcı şunları diyebilir:
 - "Aklıma bir fikir geldi: ..." → Fikirleri kaydet (yeni özellik)
 - "Bu fikri kaydet: ..." → Fikirleri kaydet
 - "Bugün ne yapmalıyım?" → Günlük plan öner
+- "CSV'yi güncelle" → CSV oluşturma script'ini çalıştır
+- "Google Sheets'te filtreleme nasıl?" → CSV README'den örnekler ver
 
 ---
 
@@ -170,6 +208,9 @@ Kullanıcı şunları diyebilir:
   - `docs/checklists/` - Kontrol listeleri
   - `docs/reports/` - Raporlar
   - `docs/guides/` - Rehberler
+  - `docs/roadmap.csv` - Google Sheets için CSV export
+  - `scripts/generate-roadmap-csv.js` - CSV oluşturma script'i
+  - `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
   - Prompt version sync ve takip (`lib/prompts/` ve `docs/prompts/` arasındaki senkronizasyon)
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
 - **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`

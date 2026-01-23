@@ -2,6 +2,40 @@
 
 Bu klasör, proje için yardımcı script'leri içerir.
 
+## generate-roadmap-csv.js
+
+ROADMAP.md dosyasından CSV oluşturma script'i. Google Sheets'e import edilebilir veya HTML viewer'da görüntülenebilir.
+
+### Kullanım
+
+```bash
+npm run roadmap
+```
+
+veya doğrudan:
+
+```bash
+node scripts/generate-roadmap-csv.js
+```
+
+### Ne Yapar?
+
+- `docs/ROADMAP.md` dosyasını okur
+- Tüm işleri parse eder (ID, Faz, Durum, Öncelik, vb.)
+- `docs/roadmap.csv` dosyasını oluşturur/günceller
+- HTML viewer (`docs/roadmap-viewer.html`) ile görüntülenebilir
+- Google Sheets'e import edilebilir
+
+### Çıktı
+
+- `docs/roadmap.csv` - CSV dosyası (10 kolon: ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Notlar, Tarih, Link)
+
+### Notlar
+
+- CSV her çalıştırmada yeniden oluşturulur (mevcut dosya üzerine yazılır)
+- ID kolonunun başında tab karakteri var (Excel/Google Sheets'te tarih olarak algılanmaması için)
+- Detaylı kullanım için `docs/ROADMAP_CSV_README.md` dosyasına bakın
+
 ## generate-style-examples.ts
 
 9 farklı illustration style için örnek görseller üretir. Aynı sahne, farklı stiller.
