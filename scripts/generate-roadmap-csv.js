@@ -39,91 +39,22 @@ function parseRoadmap() {
   let currentAltFaz = null;
   let currentPriority = null;
   
-  // Özet bölümünden işleri parse et
-  let inSummarySection = false;
+  // Özet ve Genel Bakış bölümlerini atla, sadece detaylı bölümlerden oku
+  let skipSection = false;
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
-    // Özet bölümünü bul
-    if (line.includes('## 📊 Hızlı Özet')) {
-      inSummarySection = true;
+    // Özet veya Genel Bakış bölümünü bul ve atla
+    if (line.includes('## 📊 Hızlı Özet') || line.includes('## 🎯 Genel Bakış')) {
+      skipSection = true;
       continue;
     }
-    
-    // Genel Bakış'a gelince özet bölümü bitti
-    if (inSummarySection && line.includes('## 🎯 Genel Bakış')) {
-      break;
-    }
-    
-    if (!inSummarySection) continue;
-    
-    // Faz başlığı
-    const fazMatch = line.match(/^### Faz (\d+):/);
-    if (fazMatch) {
-      currentFaz = fazMatch[1];
-      continue;
-    }
-    
-    // Alt faz başlığı (opsiyonel, şimdilik atlayalım)
-    
-    // İş satırı: - [x] [1.1.1 Başlık](#link)
-    const taskMatch = line.match(/^- \[([ x])\] \[(\d+\.\d+\.\d+)\s+(.+?)\]\(#(.+?)\)/);
-    if (taskMatch) {
-      const [, status, id, title, link] = taskMatch;
-      const [faz, altFaz] = id.split('.');
-      
-      tasks.push({
-        id: id.trim(),
-        faz: faz,
-        altFaz: `${faz}.${altFaz}`,
-        baslik: title.trim(),
-        durum: status === 'x' ? 'Tamamlandı' : 'Bekliyor',
-        oncelik: currentPriority || 'Önemli', // Varsayılan
-        kategori: 'İş',
-        notlar: '',
-        tarih: '',
-        link: `#${link}`,
-      });
-      continue;
-    }
-    
-    // İş satırı (link olmayan): - [x] **1.1.1** Başlık
-    const taskMatch2 = line.match(/^- \[([ x])\]\s+\*\*(\d+\.\d+\.\d+)\*\*\s+(.+)/);
-    if (taskMatch2) {
-      const [, status, id, title] = taskMatch2;
-      const [faz, altFaz] = id.split('.');
-      
-      // Link'i oluştur (alt faz başlığından)
-      const link = currentAltFaz ? `#${currentAltFaz.toLowerCase().replace(/\s+/g, '-')}` : '';
-      
-      tasks.push({
-        id: id.trim(),
-        faz: faz,
-        altFaz: `${faz}.${altFaz}`,
-        baslik: title.trim(),
-        durum: status === 'x' ? 'Tamamlandı' : 'Bekliyor',
-        oncelik: currentPriority || 'Önemli',
-        kategori: 'İş',
-        notlar: '',
-        tarih: '',
-        link: link,
-      });
-    }
-  }
-  
-  // Detaylı bölümlerden de işleri parse et (daha detaylı bilgi için)
-  inSummarySection = false;
-  currentFaz = null;
-  currentAltFaz = null;
-  currentPriority = null;
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
     
     // Faz başlığı: ## 🏗️ FAZ 1: Temel Altyapı
     const fazHeaderMatch = line.match(/^## .*FAZ (\d+):/);
     if (fazHeaderMatch) {
+      skipSection = false; // FAZ başlığı gelince okumaya başla
       currentFaz = fazHeaderMatch[1];
       // Öncelik bilgisini bir sonraki satırdan al
       if (i + 1 < lines.length) {
@@ -139,6 +70,9 @@ function parseRoadmap() {
       continue;
     }
     
+    // Atlanacak bölümdeyken devam etme
+    if (skipSection) continue;
+    
     // Alt faz başlığı: ### 1.1 Proje Kurulumu ✅
     const altFazMatch = line.match(/^### (\d+\.\d+)\s+(.+?)(?:\s+✅)?$/);
     if (altFazMatch) {
@@ -146,28 +80,37 @@ function parseRoadmap() {
       continue;
     }
     
-    // İş satırı: - [x] **1.1.1** Başlık - açıklama
-    const taskMatch = line.match(/^- \[([ x])\]\s+\*\*(\d+\.\d+\.\d+)\*\*\s+(.+?)(?:\s+-\s+(.+))?$/);
+    // İş satırı: - [x] **1.1.1** veya **2.4.2.1** Başlık - açıklama
+    // Hem 3 seviyeli (1.1.1) hem de 4 seviyeli (2.4.2.1) ID'leri destekle
+    // Girintili görevleri de yakala (başında boşluk olabilir)
+    const taskMatch = line.match(/^\s*- \[([ x])\]\s+\*\*(\d+\.\d+\.\d+(?:\.\d+)?)\*\*\s+(.+)/);
     if (taskMatch) {
-      const [, status, id, title, notes] = taskMatch;
-      const [faz, altFaz] = id.split('.');
+      const [, status, id, title] = taskMatch;
+      const idParts = id.split('.');
+      const faz = idParts[0];
+      const altFaz = idParts.length >= 2 ? `${faz}.${idParts[1]}` : faz;
+      
+      // Başlıktan notları ayır (varsa " - " ile ayrılmış)
+      const titleParts = title.trim().split(/\s+-\s+(.+)/);
+      const cleanTitle = titleParts[0].trim();
+      const notes = titleParts[1] ? titleParts[1].trim() : '';
       
       // Mevcut task'ı bul ve güncelle
       const existingTask = tasks.find(t => t.id === id);
       if (existingTask) {
-        existingTask.notlar = notes ? notes.trim() : '';
+        existingTask.notlar = notes;
         if (currentPriority) existingTask.oncelik = currentPriority;
       } else {
         // Yeni task ekle
         tasks.push({
           id: id.trim(),
           faz: faz,
-          altFaz: `${faz}.${altFaz}`,
-          baslik: title.trim(),
+          altFaz: altFaz,
+          baslik: cleanTitle,
           durum: status === 'x' ? 'Tamamlandı' : 'Bekliyor',
           oncelik: currentPriority || 'Önemli',
           kategori: 'İş',
-          notlar: notes ? notes.trim() : '',
+          notlar: notes,
           tarih: '',
           link: currentAltFaz ? `#${currentAltFaz.toLowerCase().replace(/\s+/g, '-')}` : '',
         });
