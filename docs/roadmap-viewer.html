@@ -35,7 +35,30 @@
 
     .subtitle {
       color: #666;
+      margin-bottom: 12px;
+    }
+
+    .faz-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
       margin-bottom: 24px;
+      padding: 12px 16px;
+      background: #f0f9ff;
+      border-left: 4px solid #6366f1;
+      border-radius: 4px;
+    }
+
+    .faz-title-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #6366f1;
+    }
+
+    .faz-title-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1e40af;
     }
 
     .controls {
@@ -274,6 +297,10 @@
   <div class="container">
     <h1>📊 KidStoryBook Roadmap Viewer</h1>
     <p class="subtitle">CSV import edip filtreleme, sıralama ve arama yapabilirsin</p>
+    <div id="fazTitle" class="faz-title" style="display: none;">
+      <span class="faz-title-label">Seçili Faz:</span>
+      <span class="faz-title-text" id="fazTitleText"></span>
+    </div>
 
     <div class="controls">
       <div class="file-upload">
@@ -386,6 +413,16 @@
     let sortColumn = null;
     let sortDirection = 'asc';
 
+    // Faz başlıkları mapping
+    const fazTitles = {
+      '1': '🏗️ Faz 1: Temel Altyapı',
+      '2': '🎨 Faz 2: Frontend Geliştirme',
+      '3': '⚙️ Faz 3: Backend ve AI Entegrasyonu',
+      '4': '💳 Faz 4: E-ticaret ve Ödeme',
+      '5': '🚀 Faz 5: Polish ve Lansman',
+      '6': '📱 Faz 6: Mobil Uygulama (PWA)'
+    };
+
     // CSV Parse fonksiyonu
     function parseCSV(text) {
       const lines = text.split('\n').filter(line => line.trim());
@@ -492,6 +529,20 @@
       document.getElementById('stats').style.display = 'flex';
     }
 
+    // Faz başlığını güncelle
+    function updateFazTitle() {
+      const fazFilter = document.getElementById('filterFaz').value;
+      const fazTitleDiv = document.getElementById('fazTitle');
+      const fazTitleText = document.getElementById('fazTitleText');
+
+      if (fazFilter && fazTitles[fazFilter]) {
+        fazTitleText.textContent = fazTitles[fazFilter];
+        fazTitleDiv.style.display = 'flex';
+      } else {
+        fazTitleDiv.style.display = 'none';
+      }
+    }
+
     // Filtreleme
     function applyFilters() {
       const statusFilter = document.getElementById('filterStatus').value;
@@ -499,6 +550,9 @@
       const fazFilter = document.getElementById('filterFaz').value;
       const categoryFilter = document.getElementById('filterCategory').value;
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+      // Faz başlığını güncelle
+      updateFazTitle();
 
       filteredData = allData.filter(row => {
         if (statusFilter && row.Durum !== statusFilter) return false;
@@ -592,6 +646,9 @@
 
     // Varsayılan CSV'yi yükle (eğer varsa - aynı klasörde)
     window.addEventListener('DOMContentLoaded', () => {
+      // Faz başlığını başlangıçta güncelle
+      updateFazTitle();
+      
       fetch('./roadmap.csv')
         .then(response => {
           if (response.ok) {
