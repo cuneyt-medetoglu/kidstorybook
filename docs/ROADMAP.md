@@ -144,6 +144,7 @@
 - [x] [3.5.14 AI provider seçimi](#35-ai-entegrasyonu)
 - [x] [3.5.15 Prompt Kalite İyileştirmesi](#35-ai-entegrasyonu)
 - [x] [3.5.16 Image Edit Feature](#35-ai-entegrasyonu)
+- [x] [3.5.26 Image API Refactor - Modülerleştirme](#35-ai-entegrasyonu)
 - [x] [3.5.25 Story API Refactor - Modülerleştirme](#35-ai-entegrasyonu)
 - [ ] [3.5.24 Kitap oluşturma – Herhangi bir hata → tüm kitap fail](#35-ai-entegrasyonu)
 - [x] [3.6.1 POST /api/books/:id/generate-pdf](#36-pdf-generation)
@@ -1031,6 +1032,27 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Page image(s) fail → kitap `failed`; partial sayfa görselleriyle "completed" **asla** işaretlenmez. Gerekirse ilk sayfa hatasında batch abort vs. kurallar sonra netleştirilecek.
   - **Implementasyon:** `app/api/books/route.ts` – cover fail durumunda **throw** (page images'a geçmeme); genel hata akışının "tüm kitap fail" ile uyumlu olması.
   - **Not:** Bu madde ROADMAP'e eklenir; detaylı implementasyon **daha sonra** yapılır.
+- [x] **3.5.26** Image API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
+  - **Özet:** Image Generation API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
+  - **Faz 1: Inline Direktifleri Modülerleştir ✅**
+    - `buildCoverDirectives()` fonksiyonu oluşturuldu - cover generation direktiflerini yönetiyor
+    - `buildFirstInteriorPageDirectives()` fonksiyonu oluşturuldu - ilk iç sayfa direktiflerini yönetiyor
+    - `buildClothingDirectives()` fonksiyonu oluşturuldu - clothing direktiflerini (cover, useCoverReference, normal) yönetiyor
+    - `buildMultipleCharactersDirectives()` fonksiyonu oluşturuldu - çoklu karakter direktiflerini yönetiyor
+    - `buildCoverReferenceConsistencyDirectives()` fonksiyonu oluşturuldu - cover reference consistency direktifini yönetiyor
+    - `generateFullPagePrompt` içindeki inline kodlar bu fonksiyonlarla değiştirildi (~150 satır → ~100 satır)
+  - **Faz 2: Tekrar Eden Direktifleri Birleştir ✅**
+    - `buildCharacterConsistencyDirectives()` fonksiyonu oluşturuldu - tüm character consistency direktiflerini birleştiriyor
+    - `buildStyleDirectives()` fonksiyonu oluşturuldu - tüm style direktiflerini birleştiriyor
+    - `generateScenePrompt` ve `generateFullPagePrompt` içindeki tekrar eden direktifler birleştirildi
+  - **Faz 3: Prompt Bölümlerini Organize Et ✅**
+    - 12 Section Builder Fonksiyonu oluşturuldu (buildAnatomicalAndSafetySection, buildCompositionAndDepthSection, vb.)
+    - `generateFullPagePrompt()` refactor edildi - builder fonksiyonlarıyla yeniden yapılandırıldı
+    - Prompt sırası korundu (mevcut prompt çıktısı aynı kaldı)
+  - **Versiyon:** v1.6.0 → v1.7.0
+  - **Kod:** `lib/prompts/image/v1.0.0/scene.ts`
+  - **Dokümantasyon:** `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`, `docs/prompts/CHANGELOG.md`
+
 - [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
   - **Özet:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
   - **Faz 1: Clothing Direktiflerini Modülerleştir ✅**
@@ -2408,7 +2430,7 @@ Response: {
 | Faz 2.5 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 2.6 | ✅ Tamamlandı | 6 | 6 | 100% |
 | Faz 3 | ✅ Tamamlandı | 26 | 27 | 96% ✅ MVP için gerekli tüm özellikler tamamlandı (3.2.5 opsiyonel) |
-| Faz 3.5 | ✅ Tamamlandı | 15 | 15 | 100% ✅ Cover/page images entegrasyonu tamamlandı, Story API Refactor (v1.4.0) |
+| Faz 3.5 | ✅ Tamamlandı | 16 | 16 | 100% ✅ Cover/page images entegrasyonu tamamlandı, Story API Refactor (v1.4.0), Image API Refactor (v1.7.0) |
 | Faz 3.6 | ✅ Tamamlandı | 4 | 4 | 100% |
 | Faz 4 | 🔵 Bekliyor | 0 | 20 | 0% (Webhook'lar Faz 3.7'den taşındı: 4.1.6 ve 4.2.5) |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
@@ -2455,6 +2477,13 @@ Response: {
   - Frontend ve backend'de tutarlı gender validation
 
 **Son Yapılanlar (24 Ocak 2026):**
+- ✅ **Image API Refactor (v1.7.0):** Image Generation API modülerleştirildi - 3 fazlı refactor tamamlandı
+  - Faz 1: Inline direktifleri modülerleştir (buildCoverDirectives, buildFirstInteriorPageDirectives, buildClothingDirectives, buildMultipleCharactersDirectives, buildCoverReferenceConsistencyDirectives)
+  - Faz 2: Tekrar eden direktifleri birleştir (buildCharacterConsistencyDirectives, buildStyleDirectives)
+  - Faz 3: Prompt bölümlerini organize et (12 builder fonksiyonu, generateFullPagePrompt refactor)
+  - Kod daha modüler ve bakımı kolay, her bölüm bağımsız test edilebilir
+  - Prompt çıktısı aynı kaldı (sadece organizasyon değişti)
+  - Dokümantasyon: `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`
 - ✅ **Story API Refactor (v1.4.0):** Story API modülerleştirildi - 3 fazlı refactor tamamlandı
   - Faz 1: Clothing direktiflerini modülerleştir (getClothingDirectives, getClothingFewShotExamples)
   - Faz 2: Prompt'u 11 bölüme ayır (builder fonksiyonları)

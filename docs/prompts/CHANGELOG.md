@@ -35,6 +35,51 @@
 
 ---
 
+### Image v1.7.0 (24 Ocak 2026) - Image API Refactor (Modülerleştirme)
+
+**Hedef:** Image Generation API'yi modüler, bakımı kolay ve test edilebilir hale getirmek. Mevcut prompt yapısı korunacak, sadece organizasyon iyileştirilecek.
+
+**3 Fazlı Refactor:**
+
+#### Faz 1: Inline Direktifleri Modülerleştir
+- **buildCoverDirectives():** Cover generation direktiflerini tek yerden yöneten fonksiyon eklendi
+- **buildFirstInteriorPageDirectives():** İlk iç sayfa direktiflerini yöneten fonksiyon eklendi
+- **buildClothingDirectives():** Clothing direktiflerini (cover, useCoverReference, normal) yöneten fonksiyon eklendi
+- **buildMultipleCharactersDirectives():** Çoklu karakter direktiflerini yöneten fonksiyon eklendi
+- **buildCoverReferenceConsistencyDirectives():** Cover reference consistency direktifini yöneten fonksiyon eklendi
+- **Fayda:** Inline direktifler modülerleştirildi, `generateFullPagePrompt` daha okunabilir hale geldi (~150 satır → ~100 satır)
+
+#### Faz 2: Tekrar Eden Direktifleri Birleştir
+- **buildCharacterConsistencyDirectives():** Tüm character consistency direktiflerini birleştiren fonksiyon eklendi
+  - `generateScenePrompt` ve `generateFullPagePrompt` içindeki 3 farklı yerdeki direktifler birleştirildi
+- **buildStyleDirectives():** Tüm style direktiflerini birleştiren fonksiyon eklendi
+  - `generateScenePrompt` ve `generateFullPagePrompt` içindeki 3 farklı yerdeki direktifler birleştirildi
+- **Fayda:** Tutarlılık sağlandı, güncelleme kolaylaştı (tek yerden)
+
+#### Faz 3: Prompt Bölümlerini Organize Et
+- **12 Section Builder Fonksiyonu:** `generateFullPagePrompt` içindeki bölümler ayrı builder fonksiyonlarına taşındı:
+  - `buildAnatomicalAndSafetySection()`
+  - `buildCompositionAndDepthSection()`
+  - `buildLightingAndAtmosphereSection()`
+  - `buildCameraAndPerspectiveSection()`
+  - `buildCharacterEnvironmentRatioSection()`
+  - `buildStyleSection()`
+  - `buildSceneContentSection()`
+  - `buildSpecialPageDirectives()`
+  - `buildCharacterConsistencySection()`
+  - `buildSceneDiversitySection()`
+  - `buildClothingSection()`
+  - `buildFinalDirectives()`
+- **generateFullPagePrompt() refactor:** Ana fonksiyon builder fonksiyonlarını çağıracak şekilde yeniden yapılandırıldı
+- **Fayda:** Daha net organizasyon, her bölüm bağımsız test edilebilir, bakım kolaylaştı
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.6.0 → v1.7.0
+
+**Sonuç:** Image API zaten Story API'den daha modüler olduğu için refactor daha az kritikti, ancak yine de önemli iyileştirmeler sağlandı. Prompt çıktısı aynı kaldı, sadece organizasyon değişti.
+
+---
+
 ### Story v1.4.0 (24 Ocak 2026) - Story API Refactor (Modülerleştirme)
 
 **Hedef:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek. Mevcut prompt yapısı korunacak, sadece organizasyon iyileştirilecek.

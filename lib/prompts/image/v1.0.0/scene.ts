@@ -16,7 +16,7 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.6.0',
+  version: '1.7.0',
   releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
@@ -54,6 +54,10 @@ export const VERSION: PromptVersion = {
     'v1.6.0: Cover focusPoint → balanced (plan: Kapak/Close-up/Kıyafet); no "character centered" on cover (24 Ocak 2026)',
     'v1.6.0: Close-up removed from getCameraAngleDirectives and getPerspectiveForPage – "character 25–35%" alignment (24 Ocak 2026)',
     'v1.6.0: Story-driven clothing – SceneInput.clothing; generateFullPagePrompt uses story clothing when present, else theme (24 Ocak 2026)',
+    'v1.7.0: Image API Refactor - Modülerleştirme (3 Faz) (24 Ocak 2026)',
+    'v1.7.0: Faz 1 - Inline direktifleri modülerleştir (buildCoverDirectives, buildFirstInteriorPageDirectives, buildClothingDirectives, buildMultipleCharactersDirectives, buildCoverReferenceConsistencyDirectives)',
+    'v1.7.0: Faz 2 - Tekrar eden direktifleri birleştir (buildCharacterConsistencyDirectives, buildStyleDirectives)',
+    'v1.7.0: Faz 3 - Prompt bölümlerini organize et (12 builder fonksiyonu, generateFullPagePrompt refactor)',
   ],
   author: '@prompt-manager',
 }
@@ -98,17 +102,17 @@ export function generateScenePrompt(
 ): string {
   const parts: string[] = []
 
-  // 1. STYLE - Get detailed style description
-  const styleDesc = getStyleDescription(illustrationStyle)
-  parts.push(`${styleDesc} illustration, cinematic quality`)
+  // 1. STYLE - v1.7.0: Using buildStyleDirectives (first directive only for scene prompt)
+  const styleDirectives = buildStyleDirectives(illustrationStyle)
+  parts.push(styleDirectives[0]) // First style directive: `${styleDesc} illustration, cinematic quality`
   
   // 2. CINEMATIC ELEMENTS - Add cinematic composition
   const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood, scene.timeOfDay)
   parts.push(cinematicElements)
   
-  // 3. CHARACTER - With emphasis on consistency
+  // 3. CHARACTER - With emphasis on consistency - v1.7.0: Using buildCharacterConsistencyDirectives
   parts.push(`${characterPrompt}`)
-  parts.push(`consistent character design, same character as previous pages`)
+  parts.push(buildCharacterConsistencyDirectives()[0]) // First consistency directive
   
   // 4. CHARACTER ACTION
   parts.push(`${scene.characterAction}`)
@@ -132,9 +136,9 @@ export function generateScenePrompt(
   parts.push(getMoodDescription(scene.mood))
 
   // 9. STYLE-SPECIFIC DIRECTIVES (NEW: Illustration Style İyileştirmesi)
-  const styleDirectives = getStyleSpecificDirectives(illustrationStyle)
-  if (styleDirectives) {
-    parts.push(styleDirectives)
+  const styleSpecificDirectives = getStyleSpecificDirectives(illustrationStyle)
+  if (styleSpecificDirectives) {
+    parts.push(styleSpecificDirectives)
   }
 
   // 10. COMPOSITION RULES
@@ -152,8 +156,8 @@ export function generateScenePrompt(
   parts.push('detailed but age-appropriate')
   parts.push('warm and inviting atmosphere')
   
-  // 12. CHARACTER CONSISTENCY EMPHASIS
-  parts.push('character must match reference photo exactly, same features on every page')
+  // 12. CHARACTER CONSISTENCY EMPHASIS - v1.7.0: Using buildCharacterConsistencyDirectives
+  parts.push(buildCharacterConsistencyDirectives()[1]) // Second consistency directive
 
   return parts.join(', ')
 }
@@ -697,6 +701,330 @@ export function getStyleSpecificDirectives(illustrationStyle: string): string {
 }
 
 // ============================================================================
+// Builder Functions for Prompt Sections (v1.7.0: Refactor - Modülerleştirme)
+// ============================================================================
+
+/**
+ * Build cover directives for book cover generation
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCoverDirectives(additionalCharactersCount: number): string[] {
+  const charCount = additionalCharactersCount + 1
+  return [
+    `COVER: Reference for all pages. Match reference photos exactly (hair/eyes/skin/features). All ${charCount} characters prominent. Professional, print-ready. Adults have adult proportions.`,
+    'Cover = poster for the entire book; suggest key locations, theme, and journey in one image.',
+    'Epic wide or panoramic composition; character(s) as guides into the world, environment shows the world of the story.',
+    'Eye-catching, poster-like, movie-poster quality. Reserve clear space for title at top.',
+    'Dramatic lighting (e.g. golden hour, sun rays through clouds) where it fits the theme.',
+    'Cover: epic wide; character max 30-35% of frame; environment-dominant.',
+    'Cover composition and camera must be distinctly different from the first interior page.'
+  ]
+}
+
+/**
+ * Build first interior page directives
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildFirstInteriorPageDirectives(additionalCharactersCount: number): string[] {
+  const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character integrated into scene'
+  return [
+    'FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition (e.g. rule of thirds, character off-center), and/or expanded scene detail. Do not repeat the same framing as the cover.',
+    'Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path).',
+    `Book interior illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`
+  ]
+}
+
+/**
+ * Build clothing directives based on context
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildClothingDirectives(
+  clothing: string | undefined,
+  theme: string,
+  isCover: boolean,
+  useCoverReference: boolean
+): string {
+  const themeClothing = getThemeAppropriateClothing(theme)
+  const clothingDesc = clothing?.trim() || themeClothing
+  
+  if (isCover) {
+    return `Clothing: ${clothingDesc} (reference for all pages). No formal wear. Match story/scene.`
+  } else if (useCoverReference) {
+    return 'Clothing: Match cover exactly. No formal wear.'
+  } else {
+    return `Clothing: ${clothingDesc}. No formal wear. Match story/scene.`
+  }
+}
+
+/**
+ * Build multiple characters directives
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildMultipleCharactersDirectives(additionalCharactersCount: number): string[] {
+  const totalCharacters = additionalCharactersCount + 1
+  return [
+    `${totalCharacters} characters in the scene: main character and ${additionalCharactersCount} companion(s)`,
+    `all ${totalCharacters} characters should be visible and clearly identifiable`,
+    'group composition, balanced arrangement of characters'
+  ]
+}
+
+/**
+ * Build cover reference consistency directives
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCoverReferenceConsistencyDirectives(additionalCharactersCount: number): string {
+  const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters` : 'Character'
+  return `${charNote} match cover image exactly (hair/eyes/skin/features). Only clothing/pose vary.`
+}
+
+/**
+ * Build character consistency directives
+ * v1.7.0: Consolidates all character consistency directives from multiple locations
+ */
+function buildCharacterConsistencyDirectives(): string[] {
+  return [
+    'consistent character design, same character as previous pages',
+    'character must match reference photo exactly, same features on every page',
+    'Illustration style (NOT photorealistic). Match reference features.'
+  ]
+}
+
+/**
+ * Build style directives
+ * v1.7.0: Consolidates all style directives from multiple locations
+ */
+function buildStyleDirectives(illustrationStyle: string): string[] {
+  const styleDesc = getStyleDescription(illustrationStyle)
+  return [
+    `${styleDesc} illustration, cinematic quality`,
+    `ILLUSTRATION STYLE: ${styleDesc}`,
+    'Illustration style (NOT photorealistic). Match reference features.'
+  ]
+}
+
+// ============================================================================
+// Section Builder Functions (v1.7.0: Faz 3 - Prompt Bölümlerini Organize Et)
+// ============================================================================
+
+/**
+ * Build anatomical and safety section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildAnatomicalAndSafetySection(ageGroup: string): string[] {
+  const parts: string[] = []
+  
+  // Anatomical correctness
+  const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
+  parts.push(anatomicalDirectives)
+  
+  // Safe hand poses
+  const safeHandPoses = getSafeHandPoses()
+  parts.push('[SAFE_POSES]')
+  parts.push('Preferred hand poses: ' + safeHandPoses.join(', '))
+  parts.push('[/SAFE_POSES]')
+  parts.push('') // Empty line for separation
+  
+  return parts
+}
+
+/**
+ * Build composition and depth section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCompositionAndDepthSection(pageNumber: number, focusPoint: string): string[] {
+  const parts: string[] = []
+  
+  const depthOfField = getDepthOfFieldDirectives(pageNumber, focusPoint)
+  parts.push('[COMPOSITION_DEPTH]')
+  parts.push(depthOfField)
+  const atmosphericPerspective = getAtmosphericPerspectiveDirectives()
+  parts.push(atmosphericPerspective)
+  parts.push('[/COMPOSITION_DEPTH]')
+  parts.push('') // Empty line for separation
+  
+  return parts
+}
+
+/**
+ * Build lighting and atmosphere section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildLightingAndAtmosphereSection(timeOfDay: string | undefined, mood: string): string[] {
+  const parts: string[] = []
+  
+  if (timeOfDay) {
+    const enhancedLighting = getLightingDescription(timeOfDay, mood)
+    parts.push('[LIGHTING_ATMOSPHERE]')
+    parts.push(enhancedLighting)
+    parts.push('[/LIGHTING_ATMOSPHERE]')
+    parts.push('') // Empty line for separation
+  }
+  
+  return parts
+}
+
+/**
+ * Build camera and perspective section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCameraAndPerspectiveSection(
+  pageNumber: number,
+  focusPoint: string,
+  previousScenes?: SceneDiversityAnalysis[]
+): string[] {
+  const parts: string[] = []
+  
+  const cameraAngle = getCameraAngleDirectives(pageNumber, previousScenes)
+  parts.push('[CAMERA_PERSPECTIVE]')
+  parts.push(cameraAngle)
+  const compositionRules = getCompositionRules(focusPoint, pageNumber, previousScenes)
+  parts.push(compositionRules)
+  parts.push('[/CAMERA_PERSPECTIVE]')
+  parts.push('') // Empty line for separation
+  
+  return parts
+}
+
+/**
+ * Build character-environment ratio section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCharacterEnvironmentRatioSection(): string[] {
+  const parts: string[] = []
+  
+  const characterRatio = getCharacterEnvironmentRatio()
+  parts.push('[CHARACTER_ENVIRONMENT_RATIO]')
+  parts.push(characterRatio)
+  parts.push('[/CHARACTER_ENVIRONMENT_RATIO]')
+  parts.push('') // Empty line for separation
+  
+  return parts
+}
+
+/**
+ * Build style section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildStyleSection(illustrationStyle: string): string[] {
+  const parts: string[] = []
+  
+  const styleDirectives = buildStyleDirectives(illustrationStyle)
+  parts.push(styleDirectives[1]) // Second style directive: `ILLUSTRATION STYLE: ${styleDesc}`
+  
+  return parts
+}
+
+/**
+ * Build scene content section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildSceneContentSection(scenePrompt: string, layeredComp: string, ageRules: string[]): string[] {
+  const parts: string[] = []
+  
+  parts.push(layeredComp)
+  parts.push(scenePrompt)
+  parts.push(ageRules.join(', '))
+  
+  return parts
+}
+
+/**
+ * Build special page directives section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildSpecialPageDirectives(
+  pageNumber: number,
+  isCover: boolean,
+  useCoverReference: boolean,
+  additionalCharactersCount: number,
+  sceneInput: SceneInput
+): string[] {
+  const parts: string[] = []
+  
+  // Multiple characters note
+  if (additionalCharactersCount > 0) {
+    parts.push(...buildMultipleCharactersDirectives(additionalCharactersCount))
+  }
+  
+  // Cover generation
+  if (isCover) {
+    parts.push(...buildCoverDirectives(additionalCharactersCount))
+  }
+  
+  // Cover reference consistency
+  if (useCoverReference) {
+    parts.push(buildCoverReferenceConsistencyDirectives(additionalCharactersCount))
+  }
+  
+  // First interior page
+  if (sceneInput.pageNumber === 1 && !isCover) {
+    parts.push(...buildFirstInteriorPageDirectives(additionalCharactersCount))
+  }
+  
+  return parts
+}
+
+/**
+ * Build character consistency section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildCharacterConsistencySection(illustrationStyle: string): string[] {
+  const parts: string[] = []
+  
+  const styleDirectives = buildStyleDirectives(illustrationStyle)
+  parts.push(styleDirectives[2]) // Third style directive
+  const charConsistency = buildCharacterConsistencyDirectives()
+  parts.push(charConsistency[2]) // Third consistency directive
+  
+  return parts
+}
+
+/**
+ * Build scene diversity section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildSceneDiversitySection(isCover: boolean, previousScenes?: SceneDiversityAnalysis[]): string[] {
+  const parts: string[] = []
+  
+  if (!isCover && previousScenes && previousScenes.length > 0) {
+    const lastScene = previousScenes[previousScenes.length - 1]
+    const diversityDirectives = getSceneDiversityDirectives(lastScene)
+    if (diversityDirectives) {
+      parts.push('')
+      parts.push(diversityDirectives)
+    }
+  }
+  
+  return parts
+}
+
+/**
+ * Build clothing section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildClothingSection(
+  clothing: string | undefined,
+  theme: string,
+  isCover: boolean,
+  useCoverReference: boolean
+): string[] {
+  const parts: string[] = []
+  
+  parts.push(buildClothingDirectives(clothing, theme, isCover, useCoverReference))
+  
+  return parts
+}
+
+/**
+ * Build final directives section
+ * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ */
+function buildFinalDirectives(): string[] {
+  return ['No text/writing in image.']
+}
+
+// ============================================================================
 // Full Page Image Prompt (ENHANCED: 15 Ocak 2026)
 // ============================================================================
 
@@ -722,126 +1050,50 @@ export function generateFullPagePrompt(
   // Add age-appropriate rules
   const ageRules = getAgeAppropriateSceneRules(ageGroup)
 
-  // Start building prompt parts
+  // Start building prompt parts - v1.7.0: Using section builder functions
   const promptParts: string[] = []
 
-  // 1. EN BAŞA: ANATOMICAL CORRECTNESS (CRITICAL) - Research-backed: anatomy first = %30 daha iyi
-  const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
-  promptParts.push(anatomicalDirectives)
-  
-  // 1.1. SAFE HAND POSES (NEW: 18 Ocak 2026) - Suggest safe alternatives
-  const safeHandPoses = getSafeHandPoses()
-  promptParts.push('[SAFE_POSES]')
-  promptParts.push('Preferred hand poses: ' + safeHandPoses.join(', '))
-  promptParts.push('[/SAFE_POSES]')
-  promptParts.push('') // Empty line for separation
+  // 1. Anatomical & Safety Section
+  promptParts.push(...buildAnatomicalAndSafetySection(ageGroup))
 
-  // 2. NEW: COMPOSITION & DEPTH DIRECTIVES (25 Ocak 2026)
-  const depthOfField = getDepthOfFieldDirectives(sceneInput.pageNumber, sceneInput.focusPoint)
-  promptParts.push('[COMPOSITION_DEPTH]')
-  promptParts.push(depthOfField)
-  const atmosphericPerspective = getAtmosphericPerspectiveDirectives()
-  promptParts.push(atmosphericPerspective)
-  promptParts.push('[/COMPOSITION_DEPTH]')
-  promptParts.push('') // Empty line for separation
+  // 2. Composition & Depth Section
+  promptParts.push(...buildCompositionAndDepthSection(sceneInput.pageNumber, sceneInput.focusPoint))
 
-  // 3. NEW: LIGHTING & ATMOSPHERE DIRECTIVES (25 Ocak 2026)
-  // Enhanced lighting from getLightingDescription (already in scenePrompt, but adding emphasis)
-  if (sceneInput.timeOfDay) {
-    const enhancedLighting = getLightingDescription(sceneInput.timeOfDay, sceneInput.mood)
-    promptParts.push('[LIGHTING_ATMOSPHERE]')
-    promptParts.push(enhancedLighting)
-    promptParts.push('[/LIGHTING_ATMOSPHERE]')
-    promptParts.push('') // Empty line for separation
-  }
+  // 3. Lighting & Atmosphere Section
+  promptParts.push(...buildLightingAndAtmosphereSection(sceneInput.timeOfDay, sceneInput.mood))
 
-  // 4. NEW: CAMERA & PERSPECTIVE DIRECTIVES (25 Ocak 2026)
-  const cameraAngle = getCameraAngleDirectives(sceneInput.pageNumber, previousScenes)
-  promptParts.push('[CAMERA_PERSPECTIVE]')
-  promptParts.push(cameraAngle)
-  // Enhanced composition rules with full context
-  const compositionRules = getCompositionRules(sceneInput.focusPoint, sceneInput.pageNumber, previousScenes)
-  promptParts.push(compositionRules)
-  promptParts.push('[/CAMERA_PERSPECTIVE]')
-  promptParts.push('') // Empty line for separation
+  // 4. Camera & Perspective Section
+  promptParts.push(...buildCameraAndPerspectiveSection(sceneInput.pageNumber, sceneInput.focusPoint, previousScenes))
 
-  // 5. NEW: CHARACTER-ENVIRONMENT RATIO (25 Ocak 2026)
-  const characterRatio = getCharacterEnvironmentRatio()
-  promptParts.push('[CHARACTER_ENVIRONMENT_RATIO]')
-  promptParts.push(characterRatio)
-  promptParts.push('[/CHARACTER_ENVIRONMENT_RATIO]')
-  promptParts.push('') // Empty line for separation
+  // 5. Character-Environment Ratio Section
+  promptParts.push(...buildCharacterEnvironmentRatioSection())
 
-  // 6. STYLE (uppercase emphasis for better attention)
-  const styleDesc = getStyleDescription(illustrationStyle)
-  promptParts.push(`ILLUSTRATION STYLE: ${styleDesc}`)
+  // 6. Style Section
+  promptParts.push(...buildStyleSection(illustrationStyle))
 
-  // 7. Add layered composition (enhanced with depth of field and atmospheric perspective)
-  promptParts.push(layeredComp)
-  promptParts.push(scenePrompt)
-  promptParts.push(ageRules.join(', '))
-  
-  // Multiple characters note (NEW)
-  if (additionalCharactersCount > 0) {
-    const totalCharacters = additionalCharactersCount + 1
-    promptParts.push(`${totalCharacters} characters in the scene: main character and ${additionalCharactersCount} companion(s)`)
-    promptParts.push(`all ${totalCharacters} characters should be visible and clearly identifiable`)
-    promptParts.push('group composition, balanced arrangement of characters')
-  }
-  
-  // Cover generation (optimized) - v1.4.0: poster, epic wide, dramatic lighting
-  if (isCover) {
-    const charCount = additionalCharactersCount + 1
-    promptParts.push(`COVER: Reference for all pages. Match reference photos exactly (hair/eyes/skin/features). All ${charCount} characters prominent. Professional, print-ready. Adults have adult proportions.`)
-    promptParts.push('Cover = poster for the entire book; suggest key locations, theme, and journey in one image.')
-    promptParts.push('Epic wide or panoramic composition; character(s) as guides into the world, environment shows the world of the story.')
-    promptParts.push('Eye-catching, poster-like, movie-poster quality. Reserve clear space for title at top.')
-    promptParts.push('Dramatic lighting (e.g. golden hour, sun rays through clouds) where it fits the theme.')
-    promptParts.push('Cover: epic wide; character max 30-35% of frame; environment-dominant.')
-    promptParts.push('Cover composition and camera must be distinctly different from the first interior page.')
-  }
-  
-  // Cover reference consistency (optimized)
-  if (useCoverReference) {
-    const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters` : 'Character'
-    promptParts.push(`${charNote} match cover image exactly (hair/eyes/skin/features). Only clothing/pose vary.`)
-  }
-  
-  // First interior page: must differ from cover (3.5.20); v1.5.0: no "character centered", rule of thirds
-  if (sceneInput.pageNumber === 1 && !isCover) {
-    promptParts.push('FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition (e.g. rule of thirds, character off-center), and/or expanded scene detail. Do not repeat the same framing as the cover.')
-    promptParts.push('Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path).')
-    const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character integrated into scene'
-    promptParts.push(`Book interior illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`)
-  }
-  
-  // Style emphasis (optimized - no duplication)
-  // Character consistency (simplified)
-  promptParts.push('Illustration style (NOT photorealistic). Match reference features.')
-  
-  // SCENE DIVERSITY REQUIREMENTS (NEW: 16 Ocak 2026)
-  if (!isCover && previousScenes && previousScenes.length > 0) {
-    const lastScene = previousScenes[previousScenes.length - 1]
-    const diversityDirectives = getSceneDiversityDirectives(lastScene)
-    if (diversityDirectives) {
-      promptParts.push('')
-      promptParts.push(diversityDirectives)
-    }
-  }
-  
-  // Clothing consistency (optimized); v1.6.0: story-driven clothing (plan: Kapak/Close-up/Kıyafet)
-  const themeClothing = getThemeAppropriateClothing(sceneInput.theme)
-  const clothingDesc = sceneInput.clothing?.trim() || themeClothing
-  if (isCover) {
-    promptParts.push(`Clothing: ${clothingDesc} (reference for all pages). No formal wear. Match story/scene.`)
-  } else if (useCoverReference) {
-    promptParts.push('Clothing: Match cover exactly. No formal wear.')
-  } else {
-    promptParts.push(`Clothing: ${clothingDesc}. No formal wear. Match story/scene.`)
-  }
-  
-  // No text in images
-  promptParts.push('No text/writing in image.')
+  // 7. Scene Content Section
+  promptParts.push(...buildSceneContentSection(scenePrompt, layeredComp, ageRules))
+
+  // 8. Special Page Directives Section
+  promptParts.push(...buildSpecialPageDirectives(
+    sceneInput.pageNumber,
+    isCover,
+    useCoverReference,
+    additionalCharactersCount,
+    sceneInput
+  ))
+
+  // 9. Character Consistency Section
+  promptParts.push(...buildCharacterConsistencySection(illustrationStyle))
+
+  // 10. Scene Diversity Section
+  promptParts.push(...buildSceneDiversitySection(isCover, previousScenes))
+
+  // 11. Clothing Section
+  promptParts.push(...buildClothingSection(sceneInput.clothing, sceneInput.theme, isCover, useCoverReference))
+
+  // 12. Final Directives Section
+  promptParts.push(...buildFinalDirectives())
   
   // Combine everything
   const fullPrompt = promptParts.join(', ')

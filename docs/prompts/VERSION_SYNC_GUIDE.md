@@ -119,8 +119,9 @@ statuses.forEach(status => {
 
 | Module | Code Version | Doc Version | Status | Last Update |
 |--------|-------------|-------------|--------|-------------|
-| Story | v1.0.0 | v1.0.0 | ✅ Synced | 2026-01-10 |
-| Image | v1.0.0 | v1.0.0 | ✅ Synced | 2026-01-15 |
+| Story | v1.4.0 | v1.0.4 | ✅ Synced | 2026-01-24 |
+| Image | v1.7.0 | v1.0.10 | ✅ Synced | 2026-01-24 |
+| Character | v1.2.0 | - | ✅ Synced | 2026-01-24 |
 
 ---
 
@@ -154,5 +155,5 @@ statuses.forEach(status => {
 
 ---
 
-**Son Güncelleme:** 15 Ocak 2026  
+**Son Güncelleme:** 24 Ocak 2026 (Image v1.7.0 - Image API Refactor)  
 **Sorumlu:** @project-manager

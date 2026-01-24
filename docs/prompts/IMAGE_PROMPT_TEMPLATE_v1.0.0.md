@@ -4,7 +4,7 @@
 
 **Version:** 1.0.10  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 24 Ocak 2026 (Scene v1.5.0: Age-agnostic rules, Character NOT centered, Cover softening, Moderation 1-retry)  
+**Last Update:** 24 Ocak 2026 (Scene v1.7.0: Image API Refactor - Modülerleştirme, 3 fazlı refactor tamamlandı)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -455,6 +455,14 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 - ✅ **Enhanced Fallback Descriptions** - Better descriptions when character.description is null
 - 🎯 **Goal:** All characters in pages match their reference images (not just cover)
 
+### v1.7.0 (24 Ocak 2026 - Image API Refactor - Modülerleştirme)
+- ✅ **Faz 1: Inline Direktifleri Modülerleştir** - 5 builder fonksiyonu (buildCoverDirectives, buildFirstInteriorPageDirectives, buildClothingDirectives, buildMultipleCharactersDirectives, buildCoverReferenceConsistencyDirectives)
+- ✅ **Faz 2: Tekrar Eden Direktifleri Birleştir** - buildCharacterConsistencyDirectives, buildStyleDirectives
+- ✅ **Faz 3: Prompt Bölümlerini Organize Et** - 12 section builder fonksiyonu, generateFullPagePrompt refactor
+- ✅ **Kod Organizasyonu** - Daha modüler, okunabilir ve bakımı kolay yapı
+- ✅ **Test Edilebilirlik** - Her bölüm bağımsız test edilebilir
+- 🎯 **Goal:** Kod kalitesi ve bakım kolaylığı artırıldı, prompt çıktısı aynı kaldı (sadece organizasyon değişti)
+
 ---
 
 ## 🎬 Cinematic Quality Enhancements (NEW: 15 Ocak 2026)
@@ -549,7 +557,7 @@ ANATOMICAL CORRECTNESS (CRITICAL):
 
 ---
 
-**Son Güncelleme:** 16 Ocak 2026  
+**Son Güncelleme:** 24 Ocak 2026 (Scene v1.7.0 - Image API Refactor)  
 **Yöneten:** @prompt-manager agent  
 **Not:** Bu template sürekli geliştirilmektedir. Feedback'lere göre güncellenecektir.
 

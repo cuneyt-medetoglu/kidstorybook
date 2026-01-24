@@ -1,6 +1,6 @@
 # 📊 Prompt Version Sync Status
 
-**Son Kontrol:** 24 Ocak 2026 (Scene v1.6.0, Story v1.4.0 – Story API Refactor)  
+**Son Kontrol:** 24 Ocak 2026 (Scene v1.7.0, Story v1.4.0 – Image API Refactor & Story API Refactor)  
 **Sorumlu:** @project-manager
 
 ---
@@ -10,12 +10,22 @@
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
 | Story | v1.4.0 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
-| Image | v1.6.0 | v1.0.10 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Image | v1.7.0 | v1.0.10 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 | Character | v1.2.0 | - | ✅ Synced | 2026-01-24 | 2026-01-24 |
 
 ---
 
 ## 📝 Son Değişiklikler
+
+### Image Prompts (v1.7.0) - 24 Ocak 2026 – Image API Refactor (Modülerleştirme)
+- ✅ Faz 1: Inline direktifleri modülerleştir - buildCoverDirectives, buildFirstInteriorPageDirectives, buildClothingDirectives, buildMultipleCharactersDirectives, buildCoverReferenceConsistencyDirectives
+- ✅ Faz 2: Tekrar eden direktifleri birleştir - buildCharacterConsistencyDirectives, buildStyleDirectives
+- ✅ Faz 3: Prompt bölümlerini organize et - 12 builder fonksiyonu (buildAnatomicalAndSafetySection, buildCompositionAndDepthSection, vb.)
+- ✅ generateFullPagePrompt() refactor - builder fonksiyonlarıyla yeniden yapılandırıldı
+- ✅ Okunabilirlik artırıldı, her bölüm bağımsız test edilebilir, bakım kolaylaştı
+
+**Kod:** `lib/prompts/image/v1.0.0/scene.ts`  
+**Changelog:** `CHANGELOG.md`
 
 ### Story Prompts (v1.4.0) - 24 Ocak 2026 – Story API Refactor (Modülerleştirme)
 - ✅ Faz 1: Clothing direktiflerini modülerleştir - getClothingDirectives(), getClothingFewShotExamples()
