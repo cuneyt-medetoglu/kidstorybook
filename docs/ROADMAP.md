@@ -355,6 +355,20 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth) - Client setup tamamlandı
 - [x] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers)
 - [x] **1.2.5** Row Level Security (RLS) kuralları - Migration'da hazır
+- [ ] **1.2.6** Supabase vs AWS Değerlendirmesi (23 Ocak 2026)
+  - Supabase kullanmak yerine AWS'de bir makine açıp mı devam etmeliyiz değerlendirilecek
+  - Supabase limitlerine göre hareket edilecek
+  - Supabase dashboard anlaşılacak
+  - Örnek: Realtime izleme filan var, nedir bakılacak
+  - Supabase limitleri analizi (storage, bandwidth, database size, vb.)
+  - AWS alternatifi maliyet analizi
+  - Migration planı (eğer gerekirse)
+- [ ] **1.2.7** Database Backup Sistemi (23 Ocak 2026)
+  - Şimdilik Supabase'de olduğumuz için nedir ve nasıl açacağız
+  - Supabase backup özellikleri araştırılacak
+  - Otomatik backup ayarları
+  - Daha sonra AWS'ye geçersek orada da bakılmalı
+  - Backup stratejisi ve retention policy
 
 ### 1.3 Environment ve Yapılandırma ✅
 - [x] **1.3.1** `.env.local` dosyası oluştur - ✅ Kontrol edildi ve optimize edildi
@@ -391,6 +405,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
+- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)
+  - Genel olarak sitenin renkler ve teması ile ilgili dark ve light için gözden geçirmeliyiz
+  - Şu anki kullanılan renkler AI ile site yapanların hepsindeki gibi mor renk ağırlıklı
+  - Daha çocuklara uyan bir şeye dönmeliyiz
+  - Araştırılacak
+  - Çocuk dostu renk paleti araştırması
+  - Dark/Light mode renk uyumu
+  - Brand identity gözden geçirmesi
+  - Color psychology for children
 
 ### 2.2 Ana Sayfa (Homepage)
 - [x] **2.2.1** Hero section (başlık, CTA, görsel) - ✅ v0.app'den alındı ve entegre edildi
@@ -402,6 +425,10 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.2.6** FAQ bölümü - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.7** Kampanya banner'ları (free shipping, indirimler) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk) - ✅ v0.app'den alındı ve entegre edildi
+- [ ] **2.2.9** Ana Ekrana Video Çizgi Film Örneği (23 Ocak 2026)
+  - Ana ekrana video çizgi film içeriğimizden bir örnek eklenebilir
+  - Video showcase section
+  - Video player entegrasyonu
 
 ### 2.3 Auth Sayfaları
 - [x] **2.3.1** Giriş sayfası (email/şifre) - ✅ v0.app'den alındı ve entegre edildi
@@ -474,6 +501,13 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ✅ Step 6'da dil bilgisi review'da gösteriliyor
   - ✅ Book creation request'inde dil parametresi gönderiliyor
   - ✅ **Dil Karışıklığı Sorunu Çözüldü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi, İngilizce kelime kullanımı yasaklandı
+  - [ ] **2.4.3.1** Custom Theme Seçeneği (23 Ocak 2026)
+    - Choose a Theme bölümünde 1 tanesini diğerlerinin içine alıp "Other" diye bölüm eklenmeli
+    - Örneğin doğum günü temalı bir şey istiyorum, mevcut Theme'lerde ona uygun kategori yok
+    - Bu durumda custom story gibi bir akışa gidebilmek için gerekli
+    - Bu seçim yapılınca Custom Requests zorunlu olmalı ve detay girilmeli
+    - "Other" seçildiğinde custom request alanı zorunlu hale gelir
+    - Validation: Other seçildiyse custom request boş olamaz
 - [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
   - [ ] **2.4.5.1** Custom request örnekleri ekleme (23 Ocak 2026)
@@ -560,6 +594,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Login olmadan ebook olarak açılabilecek bir link oluşturma
   - Public/private link seçenekleri
   - Link expiration (opsiyonel)
+- [ ] **2.5.1.11** E-book ve PDF Paragraf Formatlaması (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Hikayelerde ebook formatında ve PDF export'ta paragraflar olsun
+  - Yaş grubuna göre 2-3-4 tane paragraf olacak içerik ayarlamamız lazım
+  - Story generation prompt'unda paragraf yapısı direktifleri
+  - PDF export'ta paragraf formatlaması
+  - Yaş gruplarına göre paragraf sayısı: 0-2 yaş: 2 paragraf, 3-5 yaş: 3 paragraf, 6-9 yaş: 4 paragraf
 
 #### 2.5.2 Mobil ve Responsive Özellikler
 - [x] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma) - ✅ useSwipeGesture hook ile entegre edildi
@@ -682,6 +722,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - User-generated content showcase
   - Onay mekanizması (moderation)
   - Privacy ve izin kontrolü
+- [ ] **2.7.14** Blog Sayfası (23 Ocak 2026)
+  - Blog sayfası yapılabilir
+  - Blog için hazır bir şey mi olacak
+  - Blog dediğimiz nedir ve nasıl yapılıyor
+  - Bu araştırılıp yapılacak
+  - Blog platform seçimi (Next.js MDX, Headless CMS, vb.)
+  - Blog içerik stratejisi (SEO, çocuk eğitimi, hikaye yazma ipuçları, vb.)
+  - Blog tasarımı ve layout
+  - Content management sistemi
 
 ### 2.8 Çok Dilli Destek (i18n) - ⏸️ Ertelendi
 **Durum:** 🔵 Post-MVP / Faz 5  
@@ -927,6 +976,44 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Deneme konusu iyi yada kötü mü olur bilinmiyor
   - Maliyetler de belli değil
   - Araştırma ve test gerekli
+- [ ] **3.5.19** Görsel Kompozisyon İyileştirmesi (23 Ocak 2026)
+  - Hikayelerdeki görsellere sahne ve derinlik kompozisyon ekledik
+  - Biraz düzelme oldu ama daha da geliştirme yapılabilir
+  - Üzerine düşünülebilir, sırası geldiğinde bakılacak
+  - Kompozisyon kuralları iyileştirmesi
+  - Depth perception artırma
+  - Scene composition guidelines
+- [ ] **3.5.20** Kapak ve İlk Sayfa Benzerliği Düzeltmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Şu anda kapak görseli ile 1. ve 2. sayfa genelde çok benzer oluyor
+  - Özellikle hikaye oluştururken ki prompt'u düzeltmek lazım
+  - Her sayfa farklı bir kompozisyon içermeli
+  - Aynı benzeyen görseller olmamalı
+  - Bu konu öncelikli, ilk bakılacaklar arasında
+  - Prompt'ta sayfa farklılığı direktifleri
+  - Composition variety enforcement
+- [ ] **3.5.21** Paragraf Yapısı İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Hikayelerde ebook formatında ve PDF export'ta paragraflar olsun
+  - Yaş grubuna göre 2-3-4 tane paragraf olacak içerik ayarlamamız lazım
+  - Story generation prompt'unda paragraf yapısı direktifleri
+  - PDF export'ta paragraf formatlaması
+  - Yaş gruplarına göre paragraf sayısı: 0-2 yaş: 2 paragraf, 3-5 yaş: 3 paragraf, 6-9 yaş: 4 paragraf
+- [ ] **3.5.22** Çocuk Boyları Prompt İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Çocukların boylarını yaşlara göre biraz ayarlamak lazım
+  - Bazen olduğundan uzun gösterebiliyor
+  - Prompt iyileştirmesi gerekli
+  - Yaş-boy oranı direktifleri eklenmeli
+  - Anatomical proportions yaş gruplarına göre
+- [ ] **3.5.23** AI Maliyet Optimizasyonu (23 Ocak 2026) - 🔴 **ACİL - ÖNEMLİ**
+  - Şu an AI ile image üretimi flow'umuz maliyeti fazla
+  - Bu maliyetleri nasıl düşürebiliriz diye araştırma yapılacak
+  - Hem hikaye hem görsel ayrıntılı düşünülecek
+  - Acil önemli konu
+  - Story generation maliyet optimizasyonu (model seçimi, token kullanımı)
+  - Image generation maliyet optimizasyonu (model seçimi, size, quality)
+  - Caching stratejileri (story cache, image cache)
+  - Batch processing optimizasyonu
+  - Alternative AI provider'lar (maliyet karşılaştırması)
+  - Cost tracking ve monitoring
   - **Kategori:** Gelecek / Araştırma
   - **Not:** Şu an için sadece fikir aşamasında, maliyet ve performans analizi yapılmalı
     - ✅ Karakter kıyafet tutarlılığı
@@ -1034,6 +1121,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 4.3 Sipariş Yönetimi
 - [ ] **4.3.1** Checkout sayfası
 - [ ] **4.3.2** Sipariş özeti component
+- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ**
+  - Sepet konusuna bakmamız lazım
+  - Hem ebook olarak satın alma sepet atma hem de hardcopy olarak sepet durumunu yapmalıyız
+  - Birden fazla ürün ekleme vs.
+  - Sepet component'i (add to cart, remove, quantity update)
+  - Ebook ve hardcopy ayrımı
+  - Multi-item cart support
+  - Cart persistence (localStorage veya session)
 - [ ] **4.3.3** Ödeme başarılı sayfası
 - [ ] **4.3.4** Sipariş durumu takibi
 - [ ] **4.3.5** Email bildirimleri
@@ -1051,6 +1146,16 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Hangisi olursa olsun, yurtdışı şirket kurulumu gerekli
   - **Kategori:** Yasal / İş Geliştirme
   - **Öncelik:** 🟡 Önemli
+- [ ] **4.4.8** Abonelik Modeli Araştırması (23 Ocak 2026)
+  - Abonelik modeli ile satış düşünülecek
+  - Nasıl bir şekilde entegre edilebilir
+  - Abone olanlara aylık x adet kitap gibi mi yada daha farklı bir şey gibi düşünülecek
+  - Araştırılması gereken konu
+  - Subscription model tasarımı (monthly, yearly)
+  - Kitap limitleri (aylık x adet)
+  - Fiyatlandırma stratejisi
+  - Stripe Subscription entegrasyonu
+  - Subscription management UI
 - [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026)
   - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
   - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
@@ -1119,13 +1224,24 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Suspicious activity detection
   - Alert system (email, Slack, vb.)
   - IP blocking mekanizması
-- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026)
-  - Aynı IP üzerinden bir şekilde attack gibi durumlar olursa algılamak ve alarm üretmek
-  - Engellemek vs.
-  - Rate limiting per IP
-  - Suspicious activity detection
-  - Alert system (email, Slack, vb.)
-  - IP blocking mekanizması
+- [ ] **5.3.8** Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026)
+  - Supabase'deki güvenlik ve dosya erişim konusu ele alınacak
+  - Örneğin kişisel bilgiler ve fotoğraflar olduğu için kullanıcıların birbirlerinin içeriğini görmemesi
+  - Bir hack durumunun önüne geçilecek önlemlerin alındığından emin olmalıyız
+  - RLS (Row Level Security) kuralları gözden geçirilecek
+  - Storage bucket erişim kontrolleri
+  - File access permissions
+  - Data isolation testleri
+  - Security audit
+- [ ] **5.3.9** API Key Güvenliği (23 Ocak 2026) - 🔴 **KRİTİK**
+  - API key güncelliğini gözden geçirmeliyiz
+  - Siteye girenlerin attack yaparak erişememesi gerekiyor
+  - Keylerimiz çok önemli
+  - Environment variables güvenliği
+  - API key rotation stratejisi
+  - Rate limiting per API key
+  - Key exposure detection
+  - Server-side only API calls (client-side'da key'ler olmamalı)
 
 ### 5.4 Test
 - [ ] **5.4.1** Manuel test (tüm akışlar)
@@ -1168,6 +1284,30 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri
   - [x] Temel 4 köşe pattern sistemi ✅ (25 Ocak 2026) - `public/pdf-backgrounds/children-pattern.svg`
   - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik) - `public/pdf-backgrounds/` klasörüne eklenebilir
+- [ ] **5.7.5** PDF Title Font Türkçe Karakter Desteği (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - PDF oluşturduğumuz ilk sayfadaki title'daki font Türkçe karakter desteklemiyor
+  - Bunu değiştirmek yada düzeltmek lazım
+  - Mevcut text'teki font'un kalın olanını yazabiliriz
+  - Font olarak yine bakarız
+  - Ayrıca font konusunu daha sonra kullanıcının seçim yapabileceği hale de getirebiliriz
+  - Türkçe karakter desteği olan font seçimi (ğ, ı, ş, ü, ö, ç)
+  - Font fallback sistemi
+- [ ] **5.7.6** PDF Kapak Sayfası A5 Dikey Format (23 Ocak 2026) - 🔴 **ACİL - YÜKSEK ÖNCELİK**
+  - PDF'in ilk sayfası şu an yan dönmüş A4 gibi
+  - Sadece ilk kapak sayfaya ve son arka kapağa özel tek ortalı A5 dikey yapabilir miyiz?
+  - Örnekteki gibi tek ortalı A5 dikey format
+  - Cover page: A5 portrait (148.5mm x 210mm), centered
+  - Back cover: A5 portrait, centered
+  - Internal pages: Mevcut double-page spread layout korunur
+  - Bu konu acil ve yüksek öncelik
+- [ ] **5.7.7** Arka Kapak Tasarımı (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Arka kapak şu an yok ve eklenmeli
+  - Arka kapağa özel bir tasarım yapılmalı
+  - Örneğin farklı kitaplar içinde önceden hazırladığımız kişisel birkaç kitap kapağı olabilir
+  - Ayrıca ön kapak içinde yapılmalı
+  - Back cover template tasarımı
+  - Örnek back cover tasarımları
+  - PDF generation'a back cover ekleme
   - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında)
   - [ ] Tema bazlı desenler (deniz, orman, uzay vb.)
   - [ ] **Hikaye Temasına Göre Arka Plan Rengi:**
@@ -1256,6 +1396,22 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **5.6.4** Beta kullanıcılar ile test
 
 ### 5.9 Pazarlama ve Marketing (23 Ocak 2026)
+- [ ] **5.9.1** Product Hunt yayınlama planı
+- [ ] **5.9.2** "There's an AI for That" yayınlama planı
+- [ ] **5.9.3** Diğer pazarlama kanalları
+  - Social media marketing
+  - Content marketing
+  - Influencer partnerships
+  - SEO ve organic growth
+
+### 5.10 Maliyet Takibi ve Muhasebe (23 Ocak 2026)
+- [ ] **5.10.1** Proje ile ilgili harcanan maliyetleri ele almak için bir bölüm olmalı
+  - Muhasebe gibi, onları da unutmamak için bir yapı kurmalıyız
+  - Maliyet kategorileri (hosting, AI API'ler, domain, tools, vb.)
+  - Aylık maliyet takibi
+  - Bütçe planlaması
+  - Cost tracking sistemi (spreadsheet veya tool)
+  - ROI analizi
 - [ ] **5.9.1** Product Hunt yayınlama
   - Ürün hazır olup production olduğunda https://www.producthunt.com/ 'da yayınlanması gerekiyor
   - Buradan trafik gelebilir
@@ -1270,6 +1426,18 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Influencer işbirlikleri
   - Email pazarlama
   - Reklam kampanyaları (Google Ads, Facebook Ads)
+- [ ] **5.9.4** Etsy ve Türkiye Pazar Yerleri Araştırması (23 Ocak 2026)
+  - Pazarlama satış için Etsy sitesi araştırılacak
+  - Alternatif yerel Türkiye'de satış yapılabilecek siteler pazar yerleri de araştırılacak
+  - Etsy hesabı açma ve ürün listeleme
+  - Türkiye pazar yerleri: GittiGidiyor, Trendyol, Hepsiburada, vb.
+  - Pazar yeri stratejisi ve fiyatlandırma
+- [ ] **5.9.5** Banner ve Promosyon Materyalleri (23 Ocak 2026)
+  - Ekteki gibi bir banner veya bu tarz bir şey yapılabilir
+  - Reklam ve sitenin ilgili yerlerinde sosyal medya hesaplarında kullanılabilir
+  - Promosyon banner tasarımı (before/after karakter dönüşümü gösterimi)
+  - Social media post templates
+  - Marketing material library
 
 ---
 
@@ -1294,6 +1462,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **6.2.4** Push notification desteği (opsiyonel)
 - [ ] **6.2.5** Share API entegrasyonu (kitap paylaşma)
 - [ ] **6.2.6** Responsive tasarım son kontrolleri
+- [ ] **6.2.7** Çocuk Modu Telefon Kilidi Önleme (23 Ocak 2026)
+  - Çocuk modunda hikaye okunurken uygulama yaparken telefon tuş kilidine girmesin diye bir özellik eklenebilir
+  - Bunu mobil app zamanı bakacağız, acil değil
+  - Screen wake lock API
+  - Keep screen on during reading mode
+  - Battery optimization considerations
 
 ### 6.3 Android (Play Store) - TWA Build
 - [ ] **6.3.1** PWA Builder veya Bubblewrap ile TWA projesi oluştur
@@ -1521,7 +1695,8 @@ Mobile-first design with touch-friendly interactions.
   - Takipçi büyütme stratejileri
   - Hazır takipçi satan yerler var, satın alınabilir (araştırılacak)
   - Sosyal medya uzmanı bir agent yapılacak
-  - Platform yönetimi (Instagram, Facebook, Twitter/X, TikTok, vb.)
+  - Platform yönetimi: Instagram, Facebook, TikTok, Pinterest, Twitter/X
+  - Araştırılıp öneriler varsa onlar da eklenir
   - Engagement analizi ve optimizasyon
 - **İlgili Dosyalar:**
   - `.cursor/rules/social-media-manager.mdc` (oluşturulacak)
