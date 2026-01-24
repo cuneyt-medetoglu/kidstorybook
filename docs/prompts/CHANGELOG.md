@@ -8,6 +8,81 @@
 
 ## Versiyon Geçmişi
 
+### Config (24 Ocak 2026) - Story model default
+- Create Book ve generate-story API varsayılan story modeli **gpt-4o-mini** olarak güncellendi.
+- `app/api/books/route.ts`, `app/api/ai/generate-story/route.ts`, `app/create/step6/page.tsx`. Prompt değişikliği yok.
+
+---
+
+### v1.4.0 (24 Ocak 2026) - Character Ratio & Cover Poster - Image Generation (Scene)
+
+**Hedef:** Karakter oranını ~%50’den %25–35’e çekmek; kapak = "tüm kitabı anlatan" poster, epic wide, dramatic lighting.
+
+**Çözüm:**
+
+#### 1. Karakter oranı (Faz 1)
+- **getCharacterEnvironmentRatio():** "25–35% character, 65–75% environment"; "character must NOT exceed 35% of frame"; "wider shot, character smaller in frame"; "character must not occupy more than half the frame".
+- **getCompositionRules():** "character 25–35% of frame, environment 65–75%".
+
+#### 2. Kapak özelleştirmesi (Faz 2)
+- **COVER bloğu (scene.ts):** "Cover = poster for the entire book; suggest key locations, theme, and journey in one image." "Epic wide or panoramic composition; character(s) as guides into the world, environment shows the world of the story." "Eye-catching, poster-like, movie-poster quality. Reserve clear space for title at top." "Dramatic lighting (e.g. golden hour, sun rays through clouds) where it fits the theme." "Cover: epic wide; character max 30–35% of frame; environment-dominant."
+- **Cover scene description (books route):** Full-book modda `storyData` varken `extractSceneElements` ile sayfalardan unique lokasyonlar çıkarılıyor; "Evoke the full journey: [lokasyonlar]. Key story moments and world of the story in one image." cover metnine enjekte ediliyor. Cover-only modda mevcut fallback (title + theme + customRequests) korunuyor.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.3.0 → v1.4.0
+- `app/api/books/route.ts` - story-based cover description, `extractSceneElements` import
+
+---
+
+### v1.3.0 (24 Ocak 2026) - Sharp Environment & DoF - Image Generation (Scene)
+
+**Sorun:**
+- Balanced/character için "background softly blurred" kullanılıyordu; istenen örnekte arka plan **net ve detaylı**.
+- Karakter–ortam dengesi yetersiz kalıyordu.
+
+**Çözüm:**
+
+#### 1. `getDepthOfFieldDirectives()` (scene.ts)
+- **character** (sadece kapak): "background softly out-of-focus" → "background with subtle atmospheric haze, environment still readable".
+- **balanced**: "background softly blurred" / "bokeh" kaldırıldı. **Deep focus**, 35mm f/5.6, "foreground, midground, background all in sharp detail", "background sharp and detailed, rich environment".
+- **environment**: "background sharp and detailed", "distant background elements fade into atmospheric haze" vurgusu.
+- "no background blur, environment in sharp detail" balanced/environment için eklendi.
+
+#### 2. `generateLayeredComposition()`
+- "focus plane on character, background softly out-of-focus" kaldırıldı.
+- "midground and near background in sharp detail, rich environment", "distant background elements fade into soft mist with atmospheric perspective" eklendi.
+
+#### 3. `getCharacterEnvironmentRatio()`
+- "environment sharp and detailed, not blurred" eklendi.
+
+#### 4. focusPoint
+- Sayfa 1 artık **balanced** (books route). Kapak ayrı akışta **character** olarak kalır.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.2.0 → v1.3.0
+- `app/api/books/route.ts` - focusPoint sayfa 1 → balanced
+
+#### 5. Cover vs First Interior Page (3.5.20) – scene v1.3.0
+- **isCover:** "Cover composition and camera must be distinctly different from the first interior page."
+- **pageNumber === 1 && !isCover:** "FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle, composition, and/or expanded scene detail. Do not repeat the same framing as the cover."
+- "Book cover illustration" → "Book interior illustration" for first interior page.
+
+---
+
+### v1.2.0 (24 Ocak 2026) - Page 1 vs Cover - Story Generation
+
+**Sorun:** Kapak ile ilk iç sayfa (page 1) çıktıları çok benzer (3.5.20).
+
+**Çözüm:**
+- **VISUAL DIVERSITY:** Yeni "## 7. Page 1 vs Cover (MANDATORY)". Page 1 (first interior) must have clearly different scene, composition, or camera from cover. Cover = hero shot; page 1 = different moment, wider environment, or distinct action/setting.
+- **Checklist:** "Page 1 only: Scene/composition/camera DIFFERENT from cover" eklendi.
+- **JSON imagePrompt/sceneDescription:** "Page 1 only: MUST be DIFFERENT from cover" vurgusu eklendi.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - v1.1.0 → v1.2.0
+
+---
+
 ### v1.2.0 (25 Ocak 2026) - Composition & Depth Improvements - Image Generation
 
 **Sorun:**

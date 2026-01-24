@@ -45,7 +45,7 @@ export default function Step6Page() {
   const [isTestingCover, setIsTestingCover] = useState(false)
   
   // Model selection
-  const [storyModel, setStoryModel] = useState<string>("gpt-3.5-turbo") // Default: GPT-3.5 Turbo (Legacy)
+  const [storyModel, setStoryModel] = useState<string>("gpt-4o-mini") // Default: GPT-4o Mini (Önerilen)
   // NOTE: Image model/size/quality are now hardcoded to gpt-image-1.5 / 1024x1536 / low
   
   // Load wizard data from localStorage
@@ -721,8 +721,8 @@ export default function Step6Page() {
                       onChange={(e) => setStoryModel(e.target.value)}
                       className="w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs text-gray-900 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
                     >
-                      <option value="gpt-4o">GPT-4o (Best, Expensive)</option>
-                      <option value="gpt-4o-mini">GPT-4o Mini (Faster, Cheaper)</option>
+                      <option value="gpt-4o-mini">GPT-4o Mini (Önerilen)</option>
+                      <option value="gpt-4o">GPT-4o (En iyi kalite)</option>
                       <option value="gpt-3.5-turbo">GPT-3.5 Turbo (Legacy)</option>
                     </select>
                   </div>

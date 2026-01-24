@@ -41,6 +41,7 @@ docs/
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
 │   ├── IMAGE_EDIT_FEATURE_GUIDE.md # Image edit feature rehberi (ChatGPT-style mask-based editing)
 │   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md # Görsel kompozisyon ve derinlik analizi
+│   ├── SCENE_AND_COVER_IMPROVEMENT_README.md   # Sahne kalitesi, kapak–ilk sayfa benzerliği (3.5.19, 3.5.20) analiz ve ilerleme
 │   ├── EXAMPLES_PAGE_V0_PROMPT.md # Examples sayfası v0.app prompt rehberi (mobil-first tasarım)
 │   └── ...
 │

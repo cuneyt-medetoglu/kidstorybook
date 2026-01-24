@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.2.0',
-  releaseDate: new Date('2026-01-25'),
+  version: '1.4.0',
+  releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -44,6 +44,10 @@ export const VERSION: PromptVersion = {
     'v1.2.0: Enhanced getLightingDescription() - specific lighting techniques, color temperatures, atmospheric particles (25 Ocak 2026)',
     'v1.2.0: Enhanced getEnvironmentDescription() - background details, sky, distant elements (25 Ocak 2026)',
     'v1.2.0: Enhanced generateFullPagePrompt() - new directives integrated, prompt structure reorganized (25 Ocak 2026)',
+    'v1.3.0: DoF balanced/environment - sharp detailed background, blur removed; layered composition - net ortam; getCharacterEnvironmentRatio - ortam netliği (24 Ocak 2026)',
+    'v1.3.0: Cover vs first interior page differentiation - distinct camera/composition (3.5.20) (24 Ocak 2026)',
+    'v1.4.0: Character ratio 25-35%, max 35%, wider shot, character smaller; getCharacterEnvironmentRatio and getCompositionRules (24 Ocak 2026)',
+    'v1.4.0: Cover poster for entire book, epic wide, dramatic lighting, character max 30-35%, environment-dominant (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -378,7 +382,7 @@ function getCompositionRules(
   }
   
   // Character-environment ratio
-  rules.push('character 30-40% of frame, environment 60-70%')
+  rules.push('character 25-35% of frame, environment 65-75%')
   
   // Page-specific
   if (pageNumber === 1) {
@@ -484,22 +488,29 @@ export function getDepthOfFieldDirectives(pageNumber: number, focusPoint: string
   
   // Camera parameters based on focus point
   if (focusPoint === 'character') {
-    // Shallow DoF for character focus (portrait style)
+    // Shallow DoF for cover only (portrait style); background softened but readable
     directives.push('50mm prime lens, f/1.4 aperture')
     directives.push('shallow depth of field')
     directives.push('sharp focus on character\'s eyes and face')
-    directives.push('background softly out-of-focus with creamy bokeh')
+    directives.push('background with subtle atmospheric haze, environment still readable')
+    directives.push('foreground elements may have slight blur for depth')
+    directives.push('middle ground in sharp detail')
+    directives.push('background elements fade into atmospheric haze')
   } else if (focusPoint === 'environment') {
     // Deep focus for environmental shots
     directives.push('24mm wide-angle lens, f/11 aperture')
     directives.push('deep focus throughout frame')
     directives.push('foreground, midground, and background all in sharp detail')
+    directives.push('background sharp and detailed, rich environment')
+    directives.push('distant background elements fade into atmospheric haze')
   } else {
-    // Balanced: medium DoF
-    directives.push('35mm lens, f/4 aperture')
-    directives.push('medium depth of field')
-    directives.push('character in sharp focus, background softly blurred')
-    directives.push('bokeh effect in distant background')
+    // Balanced: deep/medium DoF, sharp detailed background (no blur)
+    directives.push('35mm lens, f/5.6 aperture')
+    directives.push('deep focus throughout frame')
+    directives.push('foreground, midground, and background all in sharp detail')
+    directives.push('background sharp and detailed, rich environment')
+    directives.push('character in sharp focus, environment sharp and detailed')
+    directives.push('distant background elements fade into atmospheric haze')
   }
   
   // Page-specific variations
@@ -509,10 +520,10 @@ export function getDepthOfFieldDirectives(pageNumber: number, focusPoint: string
     directives.push('varied depth of field for visual interest')
   }
   
-  // Focus plane details
-  directives.push('foreground elements may have slight blur for depth')
-  directives.push('middle ground in sharp detail')
-  directives.push('background elements fade into atmospheric haze')
+  // Focus plane: balanced/environment – explicit no-blur
+  if (focusPoint !== 'character') {
+    directives.push('no background blur, environment in sharp detail')
+  }
   
   return directives.join(', ')
 }
@@ -594,14 +605,18 @@ export function getCameraAngleDirectives(
 
 /**
  * Generates character-environment ratio directives for balanced composition
- * Based on 2026 best practices: 30-40% character, 60-70% environment
+ * Based on 2026 best practices: 25-35% character, 65-75% environment (v1.4.0)
  */
 export function getCharacterEnvironmentRatio(): string {
   return [
-    'character occupies 30-40% of frame, environment 60-70%',
+    'character occupies 25-35% of frame, environment 65-75%',
+    'character must NOT exceed 35% of frame',
+    'wider shot, character smaller in frame',
+    'character must not occupy more than half the frame',
     'wide environmental context, character integrated into scene',
     'expansive background with sky, trees, landscape visible',
     'character not dominating frame, balanced with surroundings',
+    'environment sharp and detailed, not blurred',
     'environment provides depth and atmosphere, character is part of the scene'
   ].join(', ')
 }
@@ -633,11 +648,11 @@ export function generateLayeredComposition(
     layers.push(`MIDGROUND: story elements and contextual objects related to the scene, in sharp detail`)
   }
   
-  // BACKGROUND - Environment and atmosphere with atmospheric perspective
+  // BACKGROUND - Environment and atmosphere; sharp detail, rich environment
   layers.push(`BACKGROUND: ${environment}, providing depth and atmosphere`)
-  layers.push('background elements fade into soft mist with atmospheric perspective')
+  layers.push('midground and near background in sharp detail, rich environment')
+  layers.push('distant background elements fade into soft mist with atmospheric perspective')
   layers.push('background colors become lighter and less saturated with distance')
-  layers.push('focus plane on character, background softly out-of-focus')
   
   return layers.join('. ')
 }
@@ -762,10 +777,16 @@ export function generateFullPagePrompt(
     promptParts.push('group composition, balanced arrangement of characters')
   }
   
-  // Cover generation (optimized)
+  // Cover generation (optimized) - v1.4.0: poster, epic wide, dramatic lighting
   if (isCover) {
     const charCount = additionalCharactersCount + 1
     promptParts.push(`COVER: Reference for all pages. Match reference photos exactly (hair/eyes/skin/features). All ${charCount} characters prominent. Professional, print-ready. Adults have adult proportions.`)
+    promptParts.push('Cover = poster for the entire book; suggest key locations, theme, and journey in one image.')
+    promptParts.push('Epic wide or panoramic composition; character(s) as guides into the world, environment shows the world of the story.')
+    promptParts.push('Eye-catching, poster-like, movie-poster quality. Reserve clear space for title at top.')
+    promptParts.push('Dramatic lighting (e.g. golden hour, sun rays through clouds) where it fits the theme.')
+    promptParts.push('Cover: epic wide; character max 30-35% of frame; environment-dominant.')
+    promptParts.push('Cover composition and camera must be distinctly different from the first interior page.')
   }
   
   // Cover reference consistency (optimized)
@@ -774,10 +795,11 @@ export function generateFullPagePrompt(
     promptParts.push(`${charNote} match cover image exactly (hair/eyes/skin/features). Only clothing/pose vary.`)
   }
   
-  // Page 1 legacy support (optimized)
+  // First interior page: must differ from cover (3.5.20)
   if (sceneInput.pageNumber === 1 && !isCover) {
+    promptParts.push('FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition (e.g. rule of thirds, character off-center), and/or expanded scene detail. Do not repeat the same framing as the cover.')
     const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character centered'
-    promptParts.push(`Book cover illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`)
+    promptParts.push(`Book interior illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`)
   }
   
   // Style emphasis (optimized - no duplication)

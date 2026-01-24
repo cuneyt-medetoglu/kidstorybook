@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Story Generation Prompts**
 
-**Version:** 1.0.3  
+**Version:** 1.0.4  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 18 Ocak 2026 (Character Mapping Per Page)  
+**Last Update:** 24 Ocak 2026 (Page 1 vs Cover – Story v1.2.0)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -100,6 +100,7 @@ Return as JSON:
 
 # IMPORTANT NOTES
 - **Page 1 is the BOOK COVER**: Must be designed as a professional book cover with the main character prominently featured, theme elements. **CRITICAL: NO TEXT, NO WRITING, NO LETTERS, NO WORDS, NO TITLES in the image - text will be added separately as a separate layer**
+- **Page 1 vs Cover (v1.2.0 – 3.5.20):** The first interior illustration (page 1 scene) must be **distinctly different** from the cover. When writing imagePrompt and sceneDescription for page 1, ensure they support both a cover "hero" shot and a **different** interior (e.g. wide angle, different composition, expanded environment). See VISUAL DIVERSITY rule 7 (Page 1 vs Cover) in the prompt.
 - Use the character's name ([CHARACTER_NAME]) frequently in the story text
 - Write story text in [STORY_LANGUAGE], but image prompts must be in English
 - Simple and rhythmic language appropriate for [AGE_GROUP] age group

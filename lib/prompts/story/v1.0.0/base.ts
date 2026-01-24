@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.1.0',
-  releaseDate: new Date('2026-01-25'),
+  version: '1.2.0',
+  releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -34,6 +34,7 @@ export const VERSION: PromptVersion = {
     'v1.1.0: Enhanced sensory details emphasis - visual, auditory, tactile, olfactory, gustatory details (25 Ocak 2026)',
     'v1.1.0: Enhanced pacing control - strong hook early, shorter scenes, predictable patterns, scene-by-scene breakdown (25 Ocak 2026)',
     'v1.1.0: Enhanced illustration guidelines - sensory details visualization (25 Ocak 2026)',
+    'v1.2.0: Page 1 vs Cover rule - first interior page must differ from cover (scene, composition, camera) (3.5.20) (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -317,6 +318,12 @@ CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle |
 - Examples: calm introduction → excited discovery → active exploration → curious investigation → determined problem-solving → creative thinking → joyful solution → proud resolution → happy celebration
 - **DO NOT repeat the same action/mood for multiple consecutive pages**
 
+## 7. Page 1 vs Cover (MANDATORY - 3.5.20):
+- **Page 1 (first interior page)** must have a clearly **different** scene, composition, or camera angle from the **cover**.
+- The cover typically shows a "hero" character shot (medium/portrait, character centered). **Page 1** should show a **different moment**, **wider environment**, or **distinct action/setting**.
+- Use a different camera angle (e.g. page 1 = wide shot or low-angle vs cover = medium/portrait), different composition (e.g. rule of thirds, character off-center), or expanded scene detail.
+- **DO NOT** repeat the same framing as the cover. Page 1 imagePrompt and sceneDescription must describe a distinctly different visual.
+
 ## CRITICAL CHECKLIST FOR EACH PAGE:
 Before finalizing each page's imagePrompt, verify ALL of these:
 - ✓ Location is DIFFERENT from previous page (or different part of same location)
@@ -325,6 +332,7 @@ Before finalizing each page's imagePrompt, verify ALL of these:
 - ✓ Perspective/camera angle is DIFFERENT from previous page
 - ✓ Composition is DIFFERENT from previous page
 - ✓ Action/mood is DIFFERENT from previous page
+- ✓ **Page 1 only:** Scene/composition/camera DIFFERENT from cover (see rule 7 above)
 - ✓ Scene description is DETAILED (at least 150-200 characters, NOT just 70-80)
 - ✓ Image prompt is DETAILED (at least 200+ characters with specific visual elements)
 
@@ -457,7 +465,8 @@ Return a valid JSON object with this exact structure:
         - Character consistency (same character as previous pages)
         - Theme elements (${theme})
         - Mood: ${themeConfig.mood}
-        - CRITICAL: This scene MUST be DIFFERENT from previous pages - different location, different time, different composition, different perspective",
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages - different location, different time, different composition, different perspective
+        - **Page 1 only:** MUST be DIFFERENT from cover - different camera angle, composition, or expanded scene (see Page 1 vs Cover rule)",
       "sceneDescription": "DETAILED scene description (MUST be 150+ characters) including:
         - SPECIFIC location (where exactly is this happening? e.g., 'deep in the enchanted forest, near a sparkling stream')
         - SPECIFIC time of day (morning/late morning/noon/afternoon/late afternoon/evening/sunset/dusk/night)
@@ -465,12 +474,13 @@ Return a valid JSON object with this exact structure:
         - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
         - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
         - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
-        - CRITICAL: This scene MUST be DIFFERENT from previous pages",
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages
+        - **Page 1 only:** MUST be DIFFERENT from cover - different angle, composition, or moment (see Page 1 vs Cover rule)",
       "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
       // CRITICAL: ALL ${characters.length} characters (${characters.map(c => c.id).join(', ')}) must appear across all pages
       // Main character (${characterName}) will appear in most pages
       // Family Members (${characters.filter(c => c.type?.group === "Family Members").map(c => c.name || c.type.displayName).join(', ')}) must appear in multiple pages
-      // Example with all 3 characters: "characterIds": ["${characters[0].id}", "${characters[1].id}", "${characters[2]?.id || ''}"]
+      // Example: "characterIds": ["${characters[0]?.id}", "${characters[1]?.id || ''}", "${characters[2]?.id || ''}"] (use only IDs for characters that appear on this page)
     }
     // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
   ],

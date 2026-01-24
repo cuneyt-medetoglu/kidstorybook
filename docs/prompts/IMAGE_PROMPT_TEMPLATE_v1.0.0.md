@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Image Generation Prompts**
 
-**Version:** 1.0.7  
+**Version:** 1.0.9  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 16 Ocak 2026 (Cover Generation & Additional Characters Fixes)  
+**Last Update:** 24 Ocak 2026 (Scene v1.4.0: Character ratio 25-35%, Cover poster, story-based)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -98,6 +98,24 @@ Cover kalitesi **EXTREMELY IMPORTANT** çünkü:
 - **CRITICAL (NEW: v1.0.7):** Age-appropriate physical characteristics - children look like children, adults look like adults
 - Professional, print-ready, high-quality illustration
 - Balanced group composition (çoklu karakter için)
+
+### Cover vs First Interior Page (Scene v1.3.0 – 24 Ocak 2026)
+
+**Amaç (3.5.20):** Kapak ile ilk iç sayfa (page 1) görselleri **açıkça farklı** olmalı.
+
+- **Cover:** Composition ve kamera, first interior page’den **belirgin şekilde farklı** olmalı.
+- **Page 1 (first interior):** Kapaktan **farklı** kamera açısı (örn. kapak = medium/portrait, sayfa 1 = wide veya low-angle), farklı kompozisyon (örn. rule of thirds, karakter off-center) ve/veya genişletilmiş sahne detayı. Aynı çerçeveyi **tekrarlama**.
+
+### Cover Poster & Epic Wide (Scene v1.4.0 – 24 Ocak 2026)
+
+**Amaç:** Kapak = "tüm kitabı anlatan" poster; epic wide, göz alıcı, dramatic lighting.
+
+- **Cover = poster for the entire book;** suggest key locations, theme, and journey in one image.
+- **Epic wide or panoramic** composition; character(s) as **guides into the world**, environment shows **the world of the story**.
+- **Eye-catching, poster-like, movie-poster quality.** Reserve clear space for title at top.
+- **Dramatic lighting** (e.g. golden hour, sun rays through clouds) where it fits the theme.
+- **Cover:** epic wide; character **max 30–35%** of frame; **environment-dominant**.
+- **Story-based cover (books route):** When `storyData` exists (full-book), unique locations from pages are extracted (`extractSceneElements`); "Evoke the full journey: [locations]. Key story moments and world of the story in one image." is injected into cover scene description.
 
 ---
 
@@ -425,9 +443,12 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 
 Her image prompt şimdi cinematic kalite elementleri içerir:
 
-1. **Depth & Layers**
+1. **Depth & Layers** (Scene v1.3.0 / v1.4.0: sharp environment, character ratio)
    - Clear foreground, midground, background separation
-   - Depth of field with atmospheric perspective
+   - **Character ratio (v1.4.0):** **25–35% character, 65–75% environment**; character must NOT exceed 35% of frame; wider shot, character smaller in frame; character must not occupy more than half the frame.
+   - **Balanced/environment:** Deep focus; foreground, midground, background **all in sharp detail**; **no background blur**. Environment sharp and detailed, rich.
+   - **Cover (character focus):** Shallow DoF; background with subtle atmospheric haze, environment still readable.
+   - Atmospheric perspective: distant elements fade into soft mist; near/mid sharp.
    - Sense of three-dimensional space
 
 2. **Composition**
@@ -444,13 +465,13 @@ Her image prompt şimdi cinematic kalite elementleri içerir:
    - Page 1: Hero shot, medium-wide angle
    - Other pages: Varied perspective for visual interest
 
-### Foreground/Midground/Background System
+### Foreground/Midground/Background System (Scene v1.3.0)
 
 **Template Structure:**
 ```
-FOREGROUND: [Character action], main character in clear focus with detailed features visible.
-MIDGROUND: [Story elements and contextual objects].
-BACKGROUND: [Environment with depth and atmosphere].
+FOREGROUND: [Character action], main character in sharp focus with detailed features visible.
+MIDGROUND: [Story elements], in sharp detail.
+BACKGROUND: [Environment], providing depth and atmosphere. Midground and near background in sharp detail; distant elements fade into soft mist with atmospheric perspective.
 ```
 
 **Example:**

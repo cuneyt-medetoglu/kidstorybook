@@ -1,6 +1,6 @@
 # 📊 Prompt Version Sync Status
 
-**Son Kontrol:** 25 Ocak 2026 (Story Safety & Character Usage Updates)  
+**Son Kontrol:** 24 Ocak 2026 (Scene v1.4.0 Character Ratio & Cover Poster)  
 **Sorumlu:** @project-manager
 
 ---
@@ -9,8 +9,8 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.1.0 | v1.1.0 | ✅ Synced | 2026-01-25 | 2026-01-25 |
-| Image | v1.2.0 | v1.2.0 | ✅ Synced | 2026-01-25 | 2026-01-25 |
+| Story | v1.2.0 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Image | v1.4.0 | v1.0.9 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 
 ---
 
@@ -30,6 +30,35 @@
 
 **Kod:** `lib/prompts/story/v1.0.0/base.ts`  
 **Dokümantasyon:** `STORY_PROMPT_TEMPLATE_v1.0.0.md`  
+**Changelog:** `CHANGELOG.md`
+
+### Story Prompts (v1.2.0) - 24 Ocak 2026
+- ✅ Page 1 vs Cover rule - first interior page must differ from cover (VISUAL DIVERSITY ## 7)
+- ✅ Checklist: "Page 1 only: Scene/composition/camera DIFFERENT from cover"
+- ✅ JSON imagePrompt/sceneDescription: "Page 1 only: MUST be DIFFERENT from cover" vurgusu
+
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`  
+**Dokümantasyon:** `STORY_PROMPT_TEMPLATE_v1.0.0.md`  
+**Changelog:** `CHANGELOG.md`
+
+### Image Prompts (v1.4.0) - 24 Ocak 2026
+- ✅ Character ratio 25–35%, max 35%, wider shot, character smaller (getCharacterEnvironmentRatio, getCompositionRules)
+- ✅ Cover: poster for entire book, epic wide, dramatic lighting, character max 30–35%, environment-dominant
+- ✅ Cover scene description: story-based summary (extractSceneElements, evoke full journey) when storyData exists
+
+**Kod:** `lib/prompts/image/v1.0.0/scene.ts`, `app/api/books/route.ts`  
+**Dokümantasyon:** `IMAGE_PROMPT_TEMPLATE_v1.0.0.md`  
+**Changelog:** `CHANGELOG.md`
+
+### Image Prompts (v1.3.0) - 24 Ocak 2026
+- ✅ Sharp environment & DoF - balanced/environment: deep focus, background sharp and detailed; no blur
+- ✅ getDepthOfFieldDirectives() - character: subtle atmospheric haze, environment readable; balanced: deep focus, all planes sharp
+- ✅ generateLayeredComposition() - midground/near background sharp; distant fade into soft mist; no "background softly out-of-focus"
+- ✅ getCharacterEnvironmentRatio() - "environment sharp and detailed, not blurred" added
+- ✅ focusPoint: sayfa 1 → balanced (books route); cover stays character
+
+**Kod:** `lib/prompts/image/v1.0.0/scene.ts`  
+**Dokümantasyon:** `IMAGE_PROMPT_TEMPLATE_v1.0.0.md`  
 **Changelog:** `CHANGELOG.md`
 
 ### Image Prompts (v1.2.0) - 25 Ocak 2026

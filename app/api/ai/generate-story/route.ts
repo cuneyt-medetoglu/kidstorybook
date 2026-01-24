@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
     const languageName = languageNames[language] || 'English'
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o', // or gpt-4o-mini for cheaper option
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -231,7 +231,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         status: 'draft', // Story generated, images not yet
         custom_requests: customRequests,
         generation_metadata: {
-          model: 'gpt-4o',
+          model: 'gpt-4o-mini',
           promptVersion: '1.0.0',
           tokensUsed: completion.usage?.total_tokens || 0,
           generationTime: Date.now() - startTime,

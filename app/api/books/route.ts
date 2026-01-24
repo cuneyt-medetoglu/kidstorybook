@@ -13,7 +13,7 @@ import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/book
 import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
+import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -286,7 +286,7 @@ export interface CreateBookRequest {
   customRequests?: string
   pageCount?: number // Debug: Optional page count override (3-20)
   language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
-  storyModel?: string // Story generation model (default: 'gpt-3.5-turbo')
+  storyModel?: string // Story generation model (default: 'gpt-4o-mini')
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
       customRequests,
       pageCount, // Debug: Optional page count override (0 or undefined = cover only)
       language = 'en',
-      storyModel = 'gpt-3.5-turbo', // Default: GPT-3.5 Turbo (Legacy)
+      storyModel = 'gpt-4o-mini', // Default: GPT-4o Mini (Önerilen)
     } = body
 
     // Image generation defaults (hardcoded - no override)
@@ -746,10 +746,32 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       console.log(`[Create Book] Status updated to 'generating'`)
 
       // Build cover generation request using generateFullPagePrompt (POC style)
-      // Use customRequests if provided to enhance cover scene description
-      const coverSceneDescription = customRequests && customRequests.trim()
-        ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
-        : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+      // Use story-based summary when storyData exists (full-book); otherwise title + theme + customRequests
+      let coverSceneDescription: string
+      if (storyData?.pages?.length) {
+        const locations = new Set<string>()
+        for (const p of storyData.pages) {
+          const desc = p.sceneDescription || p.imagePrompt || ''
+          const text = p.text || ''
+          const extracted = extractSceneElements(desc, text)
+          if (extracted.location) locations.add(extracted.location)
+        }
+        const locationList = [...locations].join(', ')
+        const journeyPhrase = locationList
+          ? ` Evoke the full journey: ${locationList}. Key story moments and world of the story in one image.`
+          : ' Key story moments and world of the story in one image.'
+        const base = customRequests && customRequests.trim()
+          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+        coverSceneDescription = base
+        if (locationList) {
+          console.log('[Create Book] 📍 Story-based cover: locations', locationList)
+        }
+      } else {
+        coverSceneDescription = customRequests && customRequests.trim()
+          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+      }
 
       console.log('[Create Book] 📝 Cover scene description:', coverSceneDescription.substring(0, 150) + '...')
       if (customRequests && customRequests.trim()) {
@@ -1372,11 +1394,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           ? getSafeSceneAlternative(characterActionRaw)
           : characterActionRaw
         
-        // Determine focus point (first page = character focus, last page = balanced, others = balanced)
-        const focusPoint: 'character' | 'environment' | 'balanced' = 
-          pageNumber === 1 ? 'character' : 
-          pageNumber === totalPages ? 'balanced' : 
-          'balanced'
+        // Determine focus point (all pages balanced; cover uses character separately)
+        const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'
         
         // Determine mood from theme or use default
         const mood = themeKey === 'adventure' ? 'exciting' :
