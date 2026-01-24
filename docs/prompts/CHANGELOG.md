@@ -35,6 +35,29 @@
 
 ---
 
+### Story v1.3.2 (24 Ocak 2026) - Theme-Specific Clothing Güçlendirme (Few-Shot Examples)
+
+**Hedef:** GPT-4o-mini'nin tema-uygun clothing üretmesini sağlamak (uzay → astronot kıyafeti, su altı → mayo).
+
+**Sorun:** Story API "mavi ve kırmızı rahat giysiler" gibi genel clothing döndürüyordu; tema-uygun değildi.
+
+**Çözüm:**
+- **getThemeConfig:** Space theme clothing → "astronaut suit / space suit (child-sized space outfit with helmet, space exploration gear)" (önceden "casual futuristic style").
+- **CRITICAL - CHARACTER CLOTHING:** Few-shot examples eklendi (space/underwater/forest için spesifik örnekler).
+- **JSON şeması:** Tema bazlı spesifik örnekler ("space → child-sized astronaut suit with helmet").
+- **CRITICAL REMINDERS:** "mavi ve kırmızı rahat giysiler" yasaklandı; tema-uygun clothing zorunlu.
+- **Few-shot examples:** Her tema için doğru/yanlış örnekler eklendi.
+
+**Web Araştırması (2026 Best Practices):**
+- Few-shot prompting daha etkili (örnekler vermek sadece açıklamaktan daha iyi).
+- Spesifik ve açıklayıcı direktifler gerekiyor.
+- Örnekler göstermek modelin doğru çıktı üretmesini sağlıyor.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - v1.3.1 → v1.3.2
+
+---
+
 ### Story v1.3.1 (24 Ocak 2026) - characterIds ve clothing REQUIRED Enforcement
 
 **Hedef:** Story generation'da `characterIds` ve `clothing` alanlarının her zaman döndürülmesini sağlamak.

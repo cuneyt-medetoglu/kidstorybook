@@ -9,7 +9,7 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.3.1 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Story | v1.3.2 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 | Image | v1.6.0 | v1.0.10 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 | Character | v1.2.0 | - | ✅ Synced | 2026-01-24 | 2026-01-24 |
 
@@ -49,6 +49,16 @@
 - ✅ Cover/Page generation: clothing çıkarıldı (story'den geliyor)
 
 **Kod:** `lib/prompts/image/v1.0.0/character.ts`, `app/api/books/route.ts`  
+**Changelog:** `CHANGELOG.md`
+
+### Story Prompts (v1.3.2) - 24 Ocak 2026 – Theme-Specific Clothing Güçlendirme (Few-Shot Examples)
+- ✅ getThemeConfig: Space clothing → "astronaut suit / space suit" (önceden "casual futuristic")
+- ✅ Few-shot examples: Space/underwater/forest için spesifik örnekler eklendi
+- ✅ "mavi ve kırmızı rahat giysiler" yasaklandı; tema-uygun clothing zorunlu
+- ✅ JSON şemasında tema bazlı spesifik örnekler
+- ✅ Web araştırması: Few-shot prompting best practices (2026)
+
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`  
 **Changelog:** `CHANGELOG.md`
 
 ### Story Prompts (v1.3.1) - 24 Ocak 2026 – characterIds ve clothing REQUIRED enforcement

@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.3.1',
+  version: '1.3.2',
   releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
@@ -37,6 +37,7 @@ export const VERSION: PromptVersion = {
     'v1.2.0: Page 1 vs Cover rule - first interior page must differ from cover (scene, composition, camera) (3.5.20) (24 Ocak 2026)',
     'v1.3.0: Story-driven clothing – "clothing" per page in JSON; CRITICAL CHARACTER CLOTHING updated; imagePrompt/sceneDescription include SPECIFIC clothing; plan: Kapak/Close-up/Kıyafet (24 Ocak 2026)',
     'v1.3.1: characterIds and clothing REQUIRED enforcement – JSON schema "DO NOT OMIT", CRITICAL reminders strengthened, validation added in books route (24 Ocak 2026)',
+    'v1.3.2: Theme-specific clothing güçlendirme – getThemeConfig space → "astronaut suit", few-shot examples eklendi (space/underwater/forest), "mavi ve kırmızı rahat giysiler" yasaklandı, JSON şemasında tema bazlı örnekler (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -282,7 +283,16 @@ Mood: ${themeConfig.mood}, warm, inviting
 Educational Focus: ${getEducationalFocus(ageGroup, theme)}
 Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
 
-CRITICAL - CHARACTER CLOTHING (Story-driven - Plan: Kapak/Close-up/Kıyafet): For EACH page, specify character clothing that matches the scene and story. Examples: space story → astronaut suit / space outfit; underwater → swimwear / beach clothes; forest adventure → outdoor gear; daily life → everyday casual. Clothing MUST be consistent with the story and setting. Use the "clothing" field per page in the JSON output. Reference: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding").
+CRITICAL - CHARACTER CLOTHING (Story-driven - Plan: Kapak/Close-up/Kıyafet): For EACH page, specify character clothing that matches the scene and story. **DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"** - the clothing MUST be theme-specific and scene-appropriate.
+
+**THEME-SPECIFIC CLOTHING EXAMPLES (FEW-SHOT):**
+- **Space theme:** "child-sized astronaut suit with helmet" OR "space exploration outfit" OR "astronaut gear" - NEVER "casual clothes" or "mavi ve kırmızı rahat giysiler"
+- **Underwater theme:** "swimwear" OR "beach clothes" OR "swimsuit" - NEVER "casual clothes"
+- **Forest/Adventure theme:** "outdoor gear" OR "hiking clothes" OR "adventure outfit" - NEVER "casual clothes"
+- **Daily life theme:** "everyday casual clothing" OR "normal kids clothes" - acceptable for this theme only
+- **Sports theme:** "sportswear" OR "athletic clothes" OR "sports outfit" - NEVER "casual clothes"
+
+**CRITICAL RULE:** If the theme is ${themeConfig.name}, the clothing MUST be: ${themeConfig.clothingStyle}. Use the "clothing" field per page in the JSON output. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding").
 
 # CRITICAL - VISUAL DIVERSITY REQUIREMENTS (MANDATORY - NEW: 16 Ocak 2026)
 
@@ -481,7 +491,7 @@ Return a valid JSON object with this exact structure:
         - CRITICAL: This scene MUST be DIFFERENT from previous pages
         - **Page 1 only:** MUST be DIFFERENT from cover - different angle, composition, or moment (see Page 1 vs Cover rule)",
       "characterIds": ["character-id-1", "character-id-2"], // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING) - DO NOT OMIT THIS FIELD
-      "clothing": "scene-appropriate outfit (e.g. astronaut suit, swimwear, outdoor gear) – MUST match story and setting" // REQUIRED: Character clothing for this scene - DO NOT OMIT THIS FIELD
+      "clothing": "theme-specific outfit – MUST match story theme (${themeConfig.name} theme → ${themeConfig.clothingStyle})" // REQUIRED: Character clothing for this scene - DO NOT OMIT THIS FIELD. Examples: space → "child-sized astronaut suit with helmet", underwater → "swimwear", forest → "outdoor gear". NEVER use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"
       // CRITICAL: ALL ${characters.length} characters (${characters.map(c => c.id).join(', ')}) must appear across all pages
       // Main character (${characterName}) will appear in most pages
       // Family Members (${characters.filter(c => c.type?.group === "Family Members").map(c => c.name || c.type.displayName).join(', ')}) must appear in multiple pages
@@ -501,7 +511,14 @@ CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCo
 
 CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section. DO NOT omit this field - the API will reject your response if characterIds is missing.
 
-CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify scene-appropriate clothing (e.g. space story → astronaut suit, underwater → swimwear, forest → outdoor gear). DO NOT omit this field - it is essential for visual consistency with the story.
+CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
+
+**FEW-SHOT EXAMPLES:**
+- Space theme: "child-sized astronaut suit with helmet" (NOT "casual clothes" or "mavi ve kırmızı rahat giysiler")
+- Underwater theme: "swimwear" or "beach clothes" (NOT "casual clothes")
+- Forest/Adventure theme: "outdoor gear" or "hiking clothes" (NOT "casual clothes")
+
+DO NOT omit this field - it is essential for visual consistency with the story. DO NOT use generic clothing descriptions.
 
 # CRITICAL REMINDERS
 
@@ -524,7 +541,12 @@ CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify scene
 ## CHARACTER & STORY:
 - Character must look EXACTLY the same in every image prompt
 - ${characterName} is the hero and main character in EVERY scene
-- **CRITICAL - Character clothing:** The "clothing" field is REQUIRED for each page. You MUST specify scene-appropriate clothing that matches the story setting (e.g. space story → astronaut suit / space outfit, underwater → swimwear / beach clothes, forest adventure → outdoor gear, daily life → everyday casual). DO NOT use generic "casual clothing" - the clothing MUST match the scene. Reference: ${themeConfig.clothingStyle || 'theme-appropriate casual clothing'}. NOT formal wear (suits, ties, dress shoes).
+- **CRITICAL - Character clothing:** The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
+
+**FEW-SHOT EXAMPLES FOR ${themeConfig.name.toUpperCase()} THEME:**
+${themeConfig.name.toLowerCase() === 'space' ? '- Example 1: "child-sized astronaut suit with helmet"\n- Example 2: "space exploration outfit"\n- Example 3: "astronaut gear"\n- ❌ WRONG: "mavi ve kırmızı rahat giysiler" or "casual clothes"' : themeConfig.name.toLowerCase() === 'underwater' ? '- Example 1: "swimwear"\n- Example 2: "beach clothes"\n- Example 3: "swimsuit"\n- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"' : themeConfig.name.toLowerCase() === 'adventure' ? '- Example 1: "outdoor gear"\n- Example 2: "hiking clothes"\n- Example 3: "adventure outfit"\n- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"' : '- Use theme-appropriate clothing matching the story setting'}
+
+DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler" - the clothing MUST be theme-specific. NOT formal wear (suits, ties, dress shoes).
 - Keep it positive, fun, and inspiring
 - Age-appropriate vocabulary and concepts
 - NO scary, violent, or inappropriate content
@@ -754,7 +776,7 @@ function getThemeConfig(theme: string) {
       mood: 'inspiring',
       setting: 'space, planets, or stars',
       commonElements: ['exploration', 'discovery', 'wonder', 'science'],
-      clothingStyle: 'space/exploration-appropriate clothing (casual futuristic style, comfortable adventure clothes)',
+      clothingStyle: 'astronaut suit / space suit (child-sized space outfit with helmet, space exploration gear)',
     },
     underwater: {
       name: 'Underwater',
