@@ -48,6 +48,17 @@ function isPermanentError(status: number): boolean {
 }
 
 /**
+ * Check if error is 400 + moderation_blocked / safety_violations (false positive).
+ * Used to allow 1 retry for cover edits API (24 Ocak 2026).
+ */
+function isModerationBlockedError(error: any): boolean {
+  const status = error?.status
+  const msg = (error?.message || '').toString()
+  if (status !== 400) return false
+  return msg.includes('moderation_blocked') || msg.includes('safety_violations')
+}
+
+/**
  * Retry wrapper for API calls with exponential backoff
  * @param fn - Function to retry
  * @param maxRetries - Maximum number of retries (default: 3)
@@ -136,7 +147,8 @@ async function generateMasterCharacterIllustration(
   console.log('[Master Illustration] ✅ Fixed gender for prompt:', fixedDescription.gender)
   
   // Build optimized prompt for master illustration (single character)
-  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge)
+  // Plan: Kapak/Close-up/Kıyafet - exclude clothing from master (clothing comes from story per page)
+  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge, true) // excludeClothing: true
   
   // Style directive (optimized)
   const styleDirective = illustrationStyle === '3d_animation' 
@@ -557,6 +569,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             }
           }
 
+          // Validate clothing field in each page (REQUIRED - Plan: Kapak/Close-up/Kıyafet)
+          for (const page of generatedStoryData.pages) {
+            if (!page.clothing || typeof page.clothing !== 'string' || page.clothing.trim().length === 0) {
+              throw new Error(`Page ${page.pageNumber} is missing required "clothing" field - clothing must match story setting (e.g. space → astronaut suit)`)
+            }
+          }
+
           // Enforce requested pageCount strictly
           if (pageCount !== undefined && pageCount !== null) {
             const requestedPages = Number(pageCount)
@@ -616,6 +635,15 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       storyData = generatedStoryData
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
+      
+      // Log clothing from story (Plan: Kapak/Close-up/Kıyafet)
+      for (const page of storyData.pages) {
+        if (page.clothing) {
+          console.log(`[Create Book] 👔 Page ${page.pageNumber} clothing: "${page.clothing}"`)
+        } else {
+          console.log(`[Create Book] ⚠️  Page ${page.pageNumber} clothing MISSING - validation should have caught this`)
+        }
+      }
 
       // Create Book in Database
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
@@ -761,16 +789,16 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           ? ` Evoke the full journey: ${locationList}. Key story moments and world of the story in one image.`
           : ' Key story moments and world of the story in one image.'
         const base = customRequests && customRequests.trim()
-          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
-          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story: ${customRequests}.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
         coverSceneDescription = base
         if (locationList) {
           console.log('[Create Book] 📍 Story-based cover: locations', locationList)
         }
       } else {
         coverSceneDescription = customRequests && customRequests.trim()
-          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
-          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be prominently displayed in the center with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
       }
 
       console.log('[Create Book] 📝 Cover scene description:', coverSceneDescription.substring(0, 150) + '...')
@@ -789,9 +817,10 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       }))
 
       // NEW: Use buildMultipleCharactersPrompt if there are additional characters
+      // Plan: Kapak/Close-up/Kıyafet - exclude clothing from character prompt (clothing comes from story)
       const characterPrompt = additionalCharacters.length > 0
-        ? buildMultipleCharactersPrompt(character.description, additionalCharacters)
-        : buildCharacterPrompt(character.description)
+        ? buildMultipleCharactersPrompt(character.description, additionalCharacters, true) // excludeClothing: true
+        : buildCharacterPrompt(character.description, true, true) // includeAge: true, excludeClothing: true
       
       if (additionalCharacters.length > 0) {
         console.log('[Create Book] 👥 Multiple characters detected:', additionalCharacters.length + 1, 'total')
@@ -801,7 +830,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       // Determine age group (default for cover only mode)
       const ageGroup = isCoverOnlyMode ? 'preschool' : (storyData?.metadata?.ageGroup || 'preschool')
       
-      // Create SceneInput for cover (Page 1)
+      // Create SceneInput for cover (Page 1); plan: Kapak/Close-up/Kıyafet – story-driven clothing
       const coverSceneInput = {
         pageNumber: 1, // Cover is always page 1
         sceneDescription: coverSceneDescription,
@@ -811,10 +840,11 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               themeKey === 'space' ? 'inspiring' :
               themeKey === 'sports' ? 'exciting' :
               'happy',
-        characterAction: characters.length > 1 
-          ? `standing together prominently, looking at the viewer with a sense of wonder and adventure`
-          : `standing prominently in the center, looking at the viewer with a sense of wonder and adventure`,
-        focusPoint: 'character' as const, // Cover should focus on character(s)
+        characterAction: characters.length > 1
+          ? `characters integrated into environment as guides into the world; sense of wonder and adventure`
+          : `character integrated into environment as guide into the world; sense of wonder and adventure`,
+        focusPoint: 'balanced' as const, // Cover: poster feel, no "character centered" (plan: Kapak/Close-up/Kıyafet)
+        ...(storyData?.pages?.[0]?.clothing && { clothing: storyData.pages[0].clothing }),
       }
       
       // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
@@ -973,9 +1003,10 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           console.log('[Create Book] 🚀 Calling /v1/images/edits API...')
           console.log('[Create Book] ⏱️  API call started at:', new Date().toISOString())
           
-          try {
+            try {
             // NEW: Retry mechanism for cover edits API (16 Ocak 2026)
             // Retry on temporary errors (502, 503, 504, 429) - max 3 attempts with exponential backoff
+            // NEW (24 Ocak 2026): 400 + moderation_blocked → 1 extra retry (false positive)
             let editsResponse: Response
             try {
               editsResponse = await retryFetch(
@@ -991,25 +1022,49 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
                 'Cover edits API'
               )
             } catch (error: any) {
-              // Retry exhausted or permanent error
-              const errorStatus = error.status || 'unknown'
-              const errorText = error.message || 'Unknown error'
-              console.error('[Create Book] ❌ Cover edits API failed after retries:', {
-                status: errorStatus,
-                error: errorText,
-                isRetryable: errorStatus ? isRetryableError(errorStatus) : false,
-                isPermanent: errorStatus ? isPermanentError(errorStatus) : false
-              })
-              
-              // CRITICAL: Do NOT fallback to generations API - reference images would be lost!
-              // Instead, throw error so user can retry the book generation
-              throw new Error(
-                `Cover image generation failed after retries. ` +
-                `Status: ${errorStatus}. ` +
-                `This is a ${isPermanentError(errorStatus) ? 'permanent' : 'temporary'} error. ` +
-                `Please try creating the book again. ` +
-                `Reference images (character photos) are required for character consistency.`
-              )
+              if (isModerationBlockedError(error)) {
+                console.log('[Create Book] Moderation 400 (false positive), retrying once...')
+                await new Promise((r) => setTimeout(r, 2000))
+                const formData2 = new FormData()
+                formData2.append('model', imageModel)
+                formData2.append('prompt', textPrompt)
+                formData2.append('size', imageSize)
+                formData2.append('quality', imageQuality)
+                formData2.append('input_fidelity', 'high')
+                imageBlobs.forEach(({ blob, filename }) => formData2.append('image[]', blob, filename))
+                const res = await fetch('https://api.openai.com/v1/images/edits', {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${apiKey}` },
+                  body: formData2,
+                })
+                if (!res.ok) {
+                  const errText = await res.text()
+                  const err = new Error(
+                    `Cover image generation failed after retries. Status: ${res.status}. ` +
+                    `This is a permanent error. Please try creating the book again. ` +
+                    `Reference images (character photos) are required for character consistency.`
+                  ) as any
+                  err.status = res.status
+                  throw err
+                }
+                editsResponse = res
+              } else {
+                const errorStatus = error.status || 'unknown'
+                const errorText = error.message || 'Unknown error'
+                console.error('[Create Book] ❌ Cover edits API failed after retries:', {
+                  status: errorStatus,
+                  error: errorText,
+                  isRetryable: errorStatus ? isRetryableError(errorStatus) : false,
+                  isPermanent: errorStatus ? isPermanentError(errorStatus) : false
+                })
+                throw new Error(
+                  `Cover image generation failed after retries. ` +
+                  `Status: ${errorStatus}. ` +
+                  `This is a ${isPermanentError(errorStatus) ? 'permanent' : 'temporary'} error. ` +
+                  `Please try creating the book again. ` +
+                  `Reference images (character photos) are required for character consistency.`
+                )
+              }
             }
 
             // Success - parse response
@@ -1404,7 +1459,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
                      themeKey === 'sports' ? 'exciting' :
                      'happy'
         
-        // Create SceneInput object for generateFullPagePrompt
+        // Create SceneInput object for generateFullPagePrompt (plan: Kapak/Close-up/Kıyafet – story-driven clothing)
         const sceneInput = {
           pageNumber,
           sceneDescription,
@@ -1412,9 +1467,16 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           mood,
           characterAction,
           focusPoint,
-          // Optional: timeOfDay and weather can be extracted from story if available
+          ...(page.clothing && { clothing: page.clothing }),
         }
         
+        // Log clothing from story (Plan: Kapak/Close-up/Kıyafet)
+        if (page.clothing) {
+          console.log(`[Create Book] 👔 Page ${pageNumber} clothing from story: "${page.clothing}"`)
+        } else {
+          console.log(`[Create Book] ⚠️  Page ${pageNumber} clothing MISSING from story - will use theme fallback`)
+        }
+
         console.log(`[Create Book] 📋 Page ${pageNumber} scene input:`, {
           pageNumber,
           theme,
@@ -1423,6 +1485,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           ageGroup,
           focusPoint,
           sceneDescriptionLength: sceneDescription.length,
+          hasClothing: !!sceneInput.clothing,
+          clothing: sceneInput.clothing || '(theme fallback)',
         })
         if (riskAnalysis.hasRisk) {
           console.log(`[Create Book] ⚠️  Page ${pageNumber} risky scene detected:`, riskAnalysis.riskyElements)
@@ -1459,9 +1523,10 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           .filter((char): char is NonNullable<typeof char> => char !== null)
         
         // buildMultipleCharactersPrompt kullan (eğer ek karakter varsa)
+        // Plan: Kapak/Close-up/Kıyafet - exclude clothing from character prompt (clothing comes from story)
         const characterPrompt = pageAdditionalCharacters.length > 0
-          ? buildMultipleCharactersPrompt(mainCharacter.description, pageAdditionalCharacters)
-          : buildCharacterPrompt(mainCharacter.description)
+          ? buildMultipleCharactersPrompt(mainCharacter.description, pageAdditionalCharacters, true) // excludeClothing: true
+          : buildCharacterPrompt(mainCharacter.description, true, true) // includeAge: true, excludeClothing: true
         
         // additionalCharactersCount güncelle (sadece bu page için)
         const additionalCharactersCount = pageAdditionalCharacters.length

@@ -64,6 +64,8 @@ export interface StoryPage {
   imagePrompt: string
   sceneDescription: string
   characterIds: string[] // NEW: Which character(s) appear on this page (character IDs) - REQUIRED
+  /** Story-driven clothing per page (e.g. astronaut suit, swimwear). Plan: Kapak/Close-up/Kıyafet. */
+  clothing?: string
 }
 
 export interface AgeGroupRules {

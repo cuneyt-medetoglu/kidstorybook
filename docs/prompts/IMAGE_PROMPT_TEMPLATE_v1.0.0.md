@@ -2,9 +2,9 @@
 
 **KidStoryBook Platform - Image Generation Prompts**
 
-**Version:** 1.0.9  
+**Version:** 1.0.10  
 **Release Date:** 15 Ocak 2026  
-**Last Update:** 24 Ocak 2026 (Scene v1.4.0: Character ratio 25-35%, Cover poster, story-based)  
+**Last Update:** 24 Ocak 2026 (Scene v1.5.0: Age-agnostic rules, Character NOT centered, Cover softening, Moderation 1-retry)  
 **Status:** ✅ Active  
 **Author:** @prompt-manager  
 **Based on:** POC analysis and quality improvements
@@ -116,6 +116,26 @@ Cover kalitesi **EXTREMELY IMPORTANT** çünkü:
 - **Dramatic lighting** (e.g. golden hour, sun rays through clouds) where it fits the theme.
 - **Cover:** epic wide; character **max 30–35%** of frame; **environment-dominant**.
 - **Story-based cover (books route):** When `storyData` exists (full-book), unique locations from pages are extracted (`extractSceneElements`); "Evoke the full journey: [locations]. Key story moments and world of the story in one image." is injected into cover scene description.
+
+### Age-Agnostic Scene Rules (Scene v1.5.0 – 24 Ocak 2026)
+
+**Amaç:** 1 yaş da 9 yaş da **aynı** görsel kurallarla çizilsin; "simple background" / "clear focal point" kaldırılsın.
+
+- **getAgeAppropriateSceneRules():** Yaştan bağımsız tek set: `rich background`, `detailed environment`, `visually interesting`, `bright colors`, `no scary elements` (elementary benzeri).
+
+### First Interior – Character NOT Centered (Scene v1.5.0 – 24 Ocak 2026)
+
+- **"Character centered" kaldırıldı.** "Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path)." eklendi.
+- Tek karakter: "Character integrated into scene".
+
+### Cover Prompt Softening (Scene v1.5.0 – 24 Ocak 2026)
+
+- **characterAction:** "standing prominently in the center, looking at the viewer" → "character integrated into environment as guide into the world; sense of wonder and adventure".
+- **Cover scene description:** "prominently displayed in the center" → "should be integrated into the scene" (moderation false positive riski azaltma).
+
+### Moderation 400 → 1 Retry (books route v1.5.0)
+
+- Cover edits API: 400 + `moderation_blocked` / `safety_violations` alındığında **1 kez** retry; FormData yeniden oluşturulup ikinci fetch. Yine 400 → throw.
 
 ---
 

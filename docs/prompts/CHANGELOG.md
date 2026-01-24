@@ -14,6 +14,98 @@
 
 ---
 
+### Character Prompts v1.2.0 (24 Ocak 2026) - Master Character Clothing Exclusion (Plan: Kapak/Close-up/Kıyafet)
+
+**Hedef:** Master karakter generation'da clothing'i çıkarmak; clothing story'den per page gelecek.
+
+**Sorun:** Master karakter "casual in blue and red" gibi genel kıyafetle üretiliyordu. Bu master referans olarak kullanıldığında, referans görseldeki kıyafet metin prompt'undaki "Clothing: astronaut suit" direktifini geçersiz kılıyordu.
+
+**Çözüm:**
+- **buildCharacterPrompt:** `excludeClothing?: boolean` parametresi eklendi.
+- **buildMultipleCharactersPrompt:** `excludeClothing?: boolean` parametresi eklendi.
+- **Master character generation:** `excludeClothing: true` kullanılıyor (clothing çıkarıldı).
+- **Cover generation:** `excludeClothing: true` kullanılıyor (clothing story'den geliyor).
+- **Page generation:** `excludeClothing: true` kullanılıyor (clothing story'den geliyor).
+
+**Sonuç:** Master karakter artık sadece yüz/özellikler için referans; clothing story'den per page geliyor ve Image API'ye doğru şekilde aktarılıyor.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/character.ts` - v1.1.0 → v1.2.0
+- `app/api/books/route.ts` - master, cover, page generation'da excludeClothing: true
+
+---
+
+### Story v1.3.1 (24 Ocak 2026) - characterIds ve clothing REQUIRED Enforcement
+
+**Hedef:** Story generation'da `characterIds` ve `clothing` alanlarının her zaman döndürülmesini sağlamak.
+
+**Çözüm:**
+- **JSON şeması:** `characterIds` ve `clothing` alanlarına "DO NOT OMIT THIS FIELD" vurgusu eklendi.
+- **CRITICAL reminders:** Her iki alan için daha güçlü vurgular eklendi; API'nin response'u reject edeceği belirtildi.
+- **CRITICAL REMINDERS / CHARACTER & STORY:** `clothing` için "DO NOT use generic casual clothing - MUST match scene" vurgusu eklendi.
+- **books route validation:** `clothing` alanı için validation eklendi (eksikse retry).
+- **Logging:** Story'den gelen `clothing` değerleri log'lanıyor; eksikse uyarı veriliyor.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - v1.3.0 → v1.3.1
+- `app/api/books/route.ts` - clothing validation, logging
+
+---
+
+### v1.6.0 / Story v1.3.0 (24 Ocak 2026) - Kapak/Close-up/Story-Driven Clothing (Plan: Kapak/Close-up/Kıyafet)
+
+**Hedef:** Kapak poster hissi (character centered kaldır), Sayfa 2+ karakter oranı (close-up kaldır), **hikaye–kıyafet uyumu** (story-driven clothing).
+
+**Çözüm:**
+
+#### 1. Kapak – "character centered" kaldır
+- **books route:** Kapak `focusPoint` **`'balanced'`** yapıldı. "balanced composition" gelir; "character centered, clear face" eklenmez. COVER bloğu aynen kalır.
+
+#### 2. İç sayfalarda close-up kaldır
+- **getCameraAngleDirectives:** `angles` listesinden **close-up** çıkarıldı. Kalan: wide shot, medium shot, low-angle, high-angle, eye-level, bird's-eye.
+- **getPerspectiveForPage:** `perspectives` listesinden **close-up** çıkarıldı.
+
+#### 3. Story-driven clothing
+- **StoryPage (types):** `clothing?: string` eklendi.
+- **SceneInput (scene.ts):** `clothing?: string` eklendi.
+- **Story prompt (base v1.3.0):** CRITICAL – CHARACTER CLOTHING güncellendi; "Her sayfa için clothing belirle" (uzay→astronot, su altı→mayo vb.). JSON şemasına **`clothing`** per page eklendi. imagePrompt/sceneDescription'a "SPECIFIC character clothing" maddesi eklendi.
+- **books route:** Sayfa `sceneInput`'a `page.clothing` geçiriliyor; kapak için `storyData.pages[0].clothing` kullanılıyor (varsa).
+- **generateFullPagePrompt:** `sceneInput.clothing` varsa **Clothing: ${clothing}**; yoksa **getThemeAppropriateClothing(theme)** fallback. "Match story/scene" vurgusu eklendi.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.5.0 → v1.6.0
+- `lib/prompts/story/v1.0.0/base.ts` - v1.2.0 → v1.3.0
+- `lib/prompts/types.ts` - StoryPage.clothing
+- `app/api/books/route.ts` - cover focusPoint, cover/page clothing
+
+---
+
+### v1.5.0 (24 Ocak 2026) - Age-Agnostic Rules, Character Centered Removal, Cover Softening - Image Generation (Scene)
+
+**Hedef:** Analizlere göre yaş kısıtlarını kaldırma, "character centered" kaldırma, kapak prompt yumuşatma (moderation riski).
+
+**Çözüm:**
+
+#### 1. Yaş kısıtları kaldırma (görsel)
+- **getAgeAppropriateSceneRules():** Yaştan bağımsız tek set: `rich background`, `detailed environment`, `visually interesting`, `bright colors`, `no scary elements` (elementary benzeri). "simple background" / "clear focal point" kaldırıldı.
+
+#### 2. İlk iç sayfa – "Character centered" kaldırma
+- **generateFullPagePrompt()** – First interior block: "Character centered" kaldırıldı. "Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path)." eklendi. Tek karakter için "Character integrated into scene".
+
+#### 3. Kapak prompt yumuşatma (moderation)
+- **books route** – `coverSceneInput.characterAction`: "standing prominently in the center, looking at the viewer" → "character integrated into environment as guide into the world; sense of wonder and adventure".
+- **books route** – Cover scene description: "prominently displayed in the center" → "should be integrated into the scene".
+
+#### 4. Moderation 400 → 1 retry (books route)
+- **isModerationBlockedError():** 400 + `moderation_blocked` / `safety_violations` tespiti.
+- Cover edits API: 400 + moderation alındığında **1 kez** retry; FormData yeniden oluşturulup ikinci fetch. Yine 400 → throw.
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/image/v1.0.0/scene.ts` - v1.4.0 → v1.5.0
+- `app/api/books/route.ts` - moderation retry, cover characterAction, cover description
+
+---
+
 ### v1.4.0 (24 Ocak 2026) - Character Ratio & Cover Poster - Image Generation (Scene)
 
 **Hedef:** Karakter oranını ~%50’den %25–35’e çekmek; kapak = "tüm kitabı anlatan" poster, epic wide, dramatic lighting.

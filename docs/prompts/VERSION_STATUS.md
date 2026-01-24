@@ -1,6 +1,6 @@
 # 📊 Prompt Version Sync Status
 
-**Son Kontrol:** 24 Ocak 2026 (Scene v1.4.0 Character Ratio & Cover Poster)  
+**Son Kontrol:** 24 Ocak 2026 (Scene v1.6.0, Story v1.3.0 – Kapak/Close-up/Story-Driven Clothing)  
 **Sorumlu:** @project-manager
 
 ---
@@ -9,8 +9,9 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.2.0 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
-| Image | v1.4.0 | v1.0.9 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Story | v1.3.1 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Image | v1.6.0 | v1.0.10 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Character | v1.2.0 | - | ✅ Synced | 2026-01-24 | 2026-01-24 |
 
 ---
 
@@ -39,6 +40,50 @@
 
 **Kod:** `lib/prompts/story/v1.0.0/base.ts`  
 **Dokümantasyon:** `STORY_PROMPT_TEMPLATE_v1.0.0.md`  
+**Changelog:** `CHANGELOG.md`
+
+### Character Prompts (v1.2.0) - 24 Ocak 2026 – Master Character Clothing Exclusion (Plan: Kapak/Close-up/Kıyafet)
+- ✅ buildCharacterPrompt: `excludeClothing` parametresi eklendi
+- ✅ buildMultipleCharactersPrompt: `excludeClothing` parametresi eklendi
+- ✅ Master character generation: clothing çıkarıldı (sadece yüz/özellikler için referans)
+- ✅ Cover/Page generation: clothing çıkarıldı (story'den geliyor)
+
+**Kod:** `lib/prompts/image/v1.0.0/character.ts`, `app/api/books/route.ts`  
+**Changelog:** `CHANGELOG.md`
+
+### Story Prompts (v1.3.1) - 24 Ocak 2026 – characterIds ve clothing REQUIRED enforcement
+- ✅ JSON şeması: `characterIds` ve `clothing` için "DO NOT OMIT THIS FIELD" vurgusu
+- ✅ CRITICAL reminders: Her iki alan için API rejection uyarısı
+- ✅ CRITICAL REMINDERS: `clothing` için "DO NOT use generic casual clothing - MUST match scene"
+- ✅ books route: `clothing` validation eklendi (eksikse retry)
+- ✅ Logging: Story'den gelen `clothing` değerleri log'lanıyor
+
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`, `app/api/books/route.ts`  
+**Changelog:** `CHANGELOG.md`
+
+### Story Prompts (v1.3.0) - 24 Ocak 2026 – Story-driven clothing (Plan: Kapak/Close-up/Kıyafet)
+- ✅ **clothing** per page in JSON; CRITICAL – CHARACTER CLOTHING updated (scene-appropriate: space→astronot, underwater→swimwear)
+- ✅ imagePrompt/sceneDescription: SPECIFIC character clothing for this scene; CRITICAL REMINDERS: "Use clothing field per page"
+
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`, `lib/prompts/types.ts`  
+**Changelog:** `CHANGELOG.md`
+
+### Image Prompts (v1.6.0) - 24 Ocak 2026 – Kapak/Close-up/Story clothing (Plan: Kapak/Close-up/Kıyafet)
+- ✅ Cover focusPoint → balanced (no "character centered" on cover)
+- ✅ Close-up removed from getCameraAngleDirectives and getPerspectiveForPage
+- ✅ SceneInput.clothing; generateFullPagePrompt uses story clothing when present, else theme; "Match story/scene"
+
+**Kod:** `lib/prompts/image/v1.0.0/scene.ts`, `app/api/books/route.ts`  
+**Changelog:** `CHANGELOG.md`
+
+### Image Prompts (v1.5.0) - 24 Ocak 2026
+- ✅ Age-agnostic scene rules – getAgeAppropriateSceneRules returns rich background for all ages
+- ✅ First interior page – "Character centered" removed; "Character smaller in frame, NOT centered; rule of thirds or leading lines"
+- ✅ Cover prompt softening – "standing prominently/looking at viewer" → "integrated into environment as guide"; "prominently displayed" → "integrated into scene"
+- ✅ Moderation 400 → 1 retry for cover edits API (isModerationBlockedError, FormData rebuild, second fetch)
+
+**Kod:** `lib/prompts/image/v1.0.0/scene.ts`, `app/api/books/route.ts`  
+**Dokümantasyon:** `IMAGE_PROMPT_TEMPLATE_v1.0.0.md`  
 **Changelog:** `CHANGELOG.md`
 
 ### Image Prompts (v1.4.0) - 24 Ocak 2026

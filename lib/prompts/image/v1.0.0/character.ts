@@ -16,8 +16,8 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.1.0',
-  releaseDate: new Date('2026-01-18'),
+  version: '1.2.0',
+  releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -33,6 +33,7 @@ export const VERSION: PromptVersion = {
     'v1.0.5: Enhanced family member descriptions with character names, detailed appearance (hair/eye color, age, features), and critical individual character emphasis (16 Ocak 2026)',
     'v1.0.6: Hands descriptor simplified - research-backed simple directives (18 Ocak 2026)',
     'v1.1.0: Major optimization - buildCharacterPrompt simplified (800→300 chars), buildMultipleCharactersPrompt reduced (1500→500 chars), removed verbose descriptions, minimized CRITICAL/IMPORTANT emphasis, streamlined adult/child distinction (18 Ocak 2026)',
+    'v1.2.0: Clothing excluded from master character and page character prompts - clothing comes from story per page (Plan: Kapak/Close-up/Kıyafet) (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -173,10 +174,13 @@ IMPORTANT: Be extremely detailed. This description will be used for ALL future b
 /**
  * Converts master character description to image prompt
  * This is used for EVERY image generation
+ * 
+ * @param excludeClothing - If true, clothing is excluded (for master character generation - clothing comes from story)
  */
 export function buildCharacterPrompt(
   character: CharacterDescription,
-  includeAge: boolean = true
+  includeAge: boolean = true,
+  excludeClothing: boolean = false // NEW: Plan: Kapak/Close-up/Kıyafet - master character should not have fixed clothing
 ): string {
   const parts: string[] = []
   
@@ -205,8 +209,9 @@ export function buildCharacterPrompt(
     parts.push(character.uniqueFeatures.slice(0, 2).join(', '))
   }
   
-  // Clothing (simplified)
-  if (character.clothingStyle) {
+  // Clothing (simplified) - EXCLUDED for master character (Plan: Kapak/Close-up/Kıyafet)
+  // Master character is reference for features only; clothing comes from story per page
+  if (!excludeClothing && character.clothingStyle) {
     const colors = character.clothingColors?.join(' and ') || 'bright colors'
     parts.push(`${character.clothingStyle} in ${colors}`)
   }
@@ -218,13 +223,16 @@ export function buildCharacterPrompt(
  * Build prompt for multiple characters
  * Main character (with reference image) + additional characters (text description only)
  * ENHANCED: 16 Ocak 2026 - Referans görsel eşleştirme iyileştirmesi
+ * 
+ * @param excludeClothing - If true, clothing is excluded (for story-driven clothing - Plan: Kapak/Close-up/Kıyafet)
  */
 export function buildMultipleCharactersPrompt(
   mainCharacter: CharacterDescription,
   additionalCharacters?: Array<{
     type: { group: string; value: string; displayName: string }
     description?: CharacterDescription
-  }>
+  }>,
+  excludeClothing: boolean = false // NEW: Plan: Kapak/Close-up/Kıyafet
 ): string {
   const parts: string[] = []
 
@@ -233,7 +241,7 @@ export function buildMultipleCharactersPrompt(
   parts.push(`${totalChars} reference images provided (image 1-${totalChars}). Match each character's description with its reference image. Do NOT mix features between characters.\n`)
 
   // Main character
-  parts.push(`CHAR 1: ${buildCharacterPrompt(mainCharacter)}`)
+  parts.push(`CHAR 1: ${buildCharacterPrompt(mainCharacter, true, excludeClothing)}`)
 
   // Additional characters
   if (additionalCharacters && additionalCharacters.length > 0) {
@@ -242,7 +250,7 @@ export function buildMultipleCharactersPrompt(
       const charParts: string[] = [`CHAR ${charNum}:`]
       
       if (char.type.group === "Child" && char.description) {
-        charParts.push(buildCharacterPrompt(char.description))
+        charParts.push(buildCharacterPrompt(char.description, true, excludeClothing))
         charParts.push(`(${char.description.eyeColor} eyes, NOT same as Char 1)`)
       } else if (char.type.group === "Pets") {
         charParts.push(`${char.type.value.toLowerCase()}`)

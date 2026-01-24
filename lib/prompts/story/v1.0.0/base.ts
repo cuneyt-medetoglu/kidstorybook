@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.2.0',
+  version: '1.3.1',
   releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
@@ -35,6 +35,8 @@ export const VERSION: PromptVersion = {
     'v1.1.0: Enhanced pacing control - strong hook early, shorter scenes, predictable patterns, scene-by-scene breakdown (25 Ocak 2026)',
     'v1.1.0: Enhanced illustration guidelines - sensory details visualization (25 Ocak 2026)',
     'v1.2.0: Page 1 vs Cover rule - first interior page must differ from cover (scene, composition, camera) (3.5.20) (24 Ocak 2026)',
+    'v1.3.0: Story-driven clothing – "clothing" per page in JSON; CRITICAL CHARACTER CLOTHING updated; imagePrompt/sceneDescription include SPECIFIC clothing; plan: Kapak/Close-up/Kıyafet (24 Ocak 2026)',
+    'v1.3.1: characterIds and clothing REQUIRED enforcement – JSON schema "DO NOT OMIT", CRITICAL reminders strengthened, validation added in books route (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -280,7 +282,7 @@ Mood: ${themeConfig.mood}, warm, inviting
 Educational Focus: ${getEducationalFocus(ageGroup, theme)}
 Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
 
-CRITICAL - CHARACTER CLOTHING: Character must wear ${themeConfig.clothingStyle || 'age-appropriate casual clothing'} throughout the story. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding"). Clothing must be appropriate for the theme and setting (e.g., camping → outdoor/casual clothes, NOT formal wear).
+CRITICAL - CHARACTER CLOTHING (Story-driven - Plan: Kapak/Close-up/Kıyafet): For EACH page, specify character clothing that matches the scene and story. Examples: space story → astronaut suit / space outfit; underwater → swimwear / beach clothes; forest adventure → outdoor gear; daily life → everyday casual. Clothing MUST be consistent with the story and setting. Use the "clothing" field per page in the JSON output. Reference: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding").
 
 # CRITICAL - VISUAL DIVERSITY REQUIREMENTS (MANDATORY - NEW: 16 Ocak 2026)
 
@@ -462,6 +464,7 @@ Return a valid JSON object with this exact structure:
         - SPECIFIC composition (e.g., 'character on left side, environment on right, balanced framing')
         - SPECIFIC character action and pose (e.g., 'character kneeling, examining something on the ground with curious expression')
         - SPECIFIC environmental details (e.g., 'fallen leaves, mushrooms, small insects, dappled sunlight')
+        - SPECIFIC character clothing for this scene (e.g. space suit, swimwear, outdoor gear) – MUST match story and setting
         - Character consistency (same character as previous pages)
         - Theme elements (${theme})
         - Mood: ${themeConfig.mood}
@@ -473,10 +476,12 @@ Return a valid JSON object with this exact structure:
         - SPECIFIC weather/atmosphere (sunny/partly cloudy/cloudy/windy/light rain/snowy - if appropriate)
         - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
         - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
+        - SPECIFIC character clothing for this moment (match story/setting; e.g. astronaut suit, swimwear, outdoor gear)
         - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
         - CRITICAL: This scene MUST be DIFFERENT from previous pages
         - **Page 1 only:** MUST be DIFFERENT from cover - different angle, composition, or moment (see Page 1 vs Cover rule)",
-      "characterIds": ["character-id-1", "character-id-2"] // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING)
+      "characterIds": ["character-id-1", "character-id-2"], // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING) - DO NOT OMIT THIS FIELD
+      "clothing": "scene-appropriate outfit (e.g. astronaut suit, swimwear, outdoor gear) – MUST match story and setting" // REQUIRED: Character clothing for this scene - DO NOT OMIT THIS FIELD
       // CRITICAL: ALL ${characters.length} characters (${characters.map(c => c.id).join(', ')}) must appear across all pages
       // Main character (${characterName}) will appear in most pages
       // Family Members (${characters.filter(c => c.type?.group === "Family Members").map(c => c.name || c.type.displayName).join(', ')}) must appear in multiple pages
@@ -494,7 +499,9 @@ Return a valid JSON object with this exact structure:
 
 CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
 
-CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section.
+CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section. DO NOT omit this field - the API will reject your response if characterIds is missing.
+
+CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify scene-appropriate clothing (e.g. space story → astronaut suit, underwater → swimwear, forest → outdoor gear). DO NOT omit this field - it is essential for visual consistency with the story.
 
 # CRITICAL REMINDERS
 
@@ -517,7 +524,7 @@ CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include i
 ## CHARACTER & STORY:
 - Character must look EXACTLY the same in every image prompt
 - ${characterName} is the hero and main character in EVERY scene
-- Character must wear ${themeConfig.clothingStyle || 'theme-appropriate casual clothing'} (NOT formal wear like suits, ties, dress shoes)
+- **CRITICAL - Character clothing:** The "clothing" field is REQUIRED for each page. You MUST specify scene-appropriate clothing that matches the story setting (e.g. space story → astronaut suit / space outfit, underwater → swimwear / beach clothes, forest adventure → outdoor gear, daily life → everyday casual). DO NOT use generic "casual clothing" - the clothing MUST match the scene. Reference: ${themeConfig.clothingStyle || 'theme-appropriate casual clothing'}. NOT formal wear (suits, ties, dress shoes).
 - Keep it positive, fun, and inspiring
 - Age-appropriate vocabulary and concepts
 - NO scary, violent, or inappropriate content

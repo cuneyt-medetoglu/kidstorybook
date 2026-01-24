@@ -16,7 +16,7 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.4.0',
+  version: '1.6.0',
   releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
@@ -48,6 +48,12 @@ export const VERSION: PromptVersion = {
     'v1.3.0: Cover vs first interior page differentiation - distinct camera/composition (3.5.20) (24 Ocak 2026)',
     'v1.4.0: Character ratio 25-35%, max 35%, wider shot, character smaller; getCharacterEnvironmentRatio and getCompositionRules (24 Ocak 2026)',
     'v1.4.0: Cover poster for entire book, epic wide, dramatic lighting, character max 30-35%, environment-dominant (24 Ocak 2026)',
+    'v1.5.0: Age-agnostic scene rules - getAgeAppropriateSceneRules returns rich background for all ages (24 Ocak 2026)',
+    'v1.5.0: First interior page - "Character centered" removed; "Character smaller in frame, NOT centered; rule of thirds or leading lines" (24 Ocak 2026)',
+    'v1.5.0: Cover prompt softening - "standing prominently/looking at viewer" → "integrated into environment as guide"; "prominently displayed" → "integrated into scene" (24 Ocak 2026)',
+    'v1.6.0: Cover focusPoint → balanced (plan: Kapak/Close-up/Kıyafet); no "character centered" on cover (24 Ocak 2026)',
+    'v1.6.0: Close-up removed from getCameraAngleDirectives and getPerspectiveForPage – "character 25–35%" alignment (24 Ocak 2026)',
+    'v1.6.0: Story-driven clothing – SceneInput.clothing; generateFullPagePrompt uses story clothing when present, else theme (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -65,6 +71,8 @@ export interface SceneInput {
   weather?: 'sunny' | 'cloudy' | 'rainy' | 'snowy'
   characterAction: string // What character is doing
   focusPoint: 'character' | 'environment' | 'balanced'
+  /** Story-driven clothing (e.g. astronaut suit, swimwear). Plan: Kapak/Close-up/Kıyafet. */
+  clothing?: string
 }
 
 // NEW: Scene Diversity Analysis (16 Ocak 2026)
@@ -395,18 +403,22 @@ function getCompositionRules(
 }
 
 // ============================================================================
-// Age-Appropriate Scene Rules
+// Age-Appropriate Scene Rules (v1.5.0: age-agnostic for images)
 // ============================================================================
 
-export function getAgeAppropriateSceneRules(ageGroup: string): string[] {
-  const rules: Record<string, string[]> = {
-    toddler: ['simple background', 'bright colors', 'no scary elements'],
-    preschool: ['clear focal point', 'bright colors', 'friendly'],
-    'early-elementary': ['detailed background', 'varied colors', 'engaging'],
-    elementary: ['rich background', 'sophisticated palette', 'visually interesting'],
-    'pre-teen': ['complex composition', 'mature style', 'subtle details'],
-  }
-  return rules[ageGroup] || rules['preschool']
+/**
+ * Returns scene rules for image prompts.
+ * v1.5.0: Age-agnostic – all ages use same "rich environment" rules (elementary-like).
+ * Removes "simple background" / "clear focal point" that made character dominant.
+ */
+export function getAgeAppropriateSceneRules(_ageGroup: string): string[] {
+  return [
+    'rich background',
+    'detailed environment',
+    'visually interesting',
+    'bright colors',
+    'no scary elements',
+  ]
 }
 
 // ============================================================================
@@ -559,10 +571,10 @@ export function getCameraAngleDirectives(
   pageNumber: number,
   previousScenes?: SceneDiversityAnalysis[]
 ): string {
+  // v1.6.0: close-up removed – contradicts "character 25–35%" (plan: Kapak/Close-up/Kıyafet)
   const angles: string[] = [
     'wide shot',
     'medium shot',
-    'close-up',
     'low-angle view (child\'s perspective)',
     'high-angle view',
     'eye-level view',
@@ -795,10 +807,11 @@ export function generateFullPagePrompt(
     promptParts.push(`${charNote} match cover image exactly (hair/eyes/skin/features). Only clothing/pose vary.`)
   }
   
-  // First interior page: must differ from cover (3.5.20)
+  // First interior page: must differ from cover (3.5.20); v1.5.0: no "character centered", rule of thirds
   if (sceneInput.pageNumber === 1 && !isCover) {
     promptParts.push('FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition (e.g. rule of thirds, character off-center), and/or expanded scene detail. Do not repeat the same framing as the cover.')
-    const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character centered'
+    promptParts.push('Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path).')
+    const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character integrated into scene'
     promptParts.push(`Book interior illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`)
   }
   
@@ -816,14 +829,15 @@ export function generateFullPagePrompt(
     }
   }
   
-  // Clothing consistency (optimized)
+  // Clothing consistency (optimized); v1.6.0: story-driven clothing (plan: Kapak/Close-up/Kıyafet)
   const themeClothing = getThemeAppropriateClothing(sceneInput.theme)
+  const clothingDesc = sceneInput.clothing?.trim() || themeClothing
   if (isCover) {
-    promptParts.push(`Clothing: ${themeClothing} (reference for all pages). No formal wear.`)
+    promptParts.push(`Clothing: ${clothingDesc} (reference for all pages). No formal wear. Match story/scene.`)
   } else if (useCoverReference) {
     promptParts.push('Clothing: Match cover exactly. No formal wear.')
   } else {
-    promptParts.push(`Clothing: ${themeClothing}. No formal wear.`)
+    promptParts.push(`Clothing: ${clothingDesc}. No formal wear. Match story/scene.`)
   }
   
   // No text in images
@@ -945,8 +959,9 @@ export function getPerspectiveForPage(
   pageNumber: number,
   previousPerspectives: string[]
 ): SceneDiversityAnalysis['perspective'] {
+  // v1.6.0: close-up removed – contradicts "character 25–35%" (plan: Kapak/Close-up/Kıyafet)
   const perspectives: SceneDiversityAnalysis['perspective'][] = [
-    'wide', 'medium', 'close-up', 'bird-eye', 'low-angle', 'high-angle', 'eye-level'
+    'wide', 'medium', 'bird-eye', 'low-angle', 'high-angle', 'eye-level'
   ]
   
   // Get last perspective

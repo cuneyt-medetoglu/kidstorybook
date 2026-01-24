@@ -144,6 +144,7 @@
 - [x] [3.5.14 AI provider seçimi](#35-ai-entegrasyonu)
 - [x] [3.5.15 Prompt Kalite İyileştirmesi](#35-ai-entegrasyonu)
 - [x] [3.5.16 Image Edit Feature](#35-ai-entegrasyonu)
+- [ ] [3.5.24 Kitap oluşturma – Herhangi bir hata → tüm kitap fail](#35-ai-entegrasyonu)
 - [x] [3.6.1 POST /api/books/:id/generate-pdf](#36-pdf-generation)
 - [x] [3.6.2 PDF template tasarımı](#36-pdf-generation)
 - [x] [3.6.3 Supabase Storage'a kaydet](#36-pdf-generation)
@@ -1020,6 +1021,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - ✅ Anatomik hatalar minimize edildi
   - **İlham:** Magical Children's Book örnekleri analizi
   - **Durum:** Production'da aktif ✅
+- [ ] **3.5.24** Kitap oluşturma – Herhangi bir hata durumunda tüm kitap fail (24 Ocak 2026)
+  - **Özet:** Story, master illüstrasyon, kapak veya sayfa görsellerinden **herhangi biri** hata verirse kitap **tamamen** fail sayılacak; **partial success** (örn. kapak yok ama sayfalar "completed") olmayacak.
+  - **Süreç (tanım, implementasyon "daha sonra"):**
+    - Story fail → zaten kitap oluşturulmuyor; mevcut davranış yeterli.
+    - Master illüstrasyon fail → cover/page'e geçilmez; kitap fail.
+    - **Cover fail** → **page images** üretimine **hiç geçilmez**; kitap `status: 'failed'`, client'a hata dönülür. (Mevcut: cover catch'te `failed` set edilip throw yok; akış page images'a devam ediyor.)
+    - Page image(s) fail → kitap `failed`; partial sayfa görselleriyle "completed" **asla** işaretlenmez. Gerekirse ilk sayfa hatasında batch abort vs. kurallar sonra netleştirilecek.
+  - **Implementasyon:** `app/api/books/route.ts` – cover fail durumunda **throw** (page images'a geçmeme); genel hata akışının "tüm kitap fail" ile uyumlu olması.
+  - **Not:** Bu madde ROADMAP'e eklenir; detaylı implementasyon **daha sonra** yapılır.
 - [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
   - [x] Database migration (`011_add_image_edit_feature.sql`)
     - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns
