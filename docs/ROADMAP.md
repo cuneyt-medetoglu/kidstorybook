@@ -144,6 +144,7 @@
 - [x] [3.5.14 AI provider seçimi](#35-ai-entegrasyonu)
 - [x] [3.5.15 Prompt Kalite İyileştirmesi](#35-ai-entegrasyonu)
 - [x] [3.5.16 Image Edit Feature](#35-ai-entegrasyonu)
+- [x] [3.5.25 Story API Refactor - Modülerleştirme](#35-ai-entegrasyonu)
 - [ ] [3.5.24 Kitap oluşturma – Herhangi bir hata → tüm kitap fail](#35-ai-entegrasyonu)
 - [x] [3.6.1 POST /api/books/:id/generate-pdf](#36-pdf-generation)
 - [x] [3.6.2 PDF template tasarımı](#36-pdf-generation)
@@ -1030,6 +1031,23 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Page image(s) fail → kitap `failed`; partial sayfa görselleriyle "completed" **asla** işaretlenmez. Gerekirse ilk sayfa hatasında batch abort vs. kurallar sonra netleştirilecek.
   - **Implementasyon:** `app/api/books/route.ts` – cover fail durumunda **throw** (page images'a geçmeme); genel hata akışının "tüm kitap fail" ile uyumlu olması.
   - **Not:** Bu madde ROADMAP'e eklenir; detaylı implementasyon **daha sonra** yapılır.
+- [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
+  - **Özet:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
+  - **Faz 1: Clothing Direktiflerini Modülerleştir ✅**
+    - `getClothingDirectives()` fonksiyonu oluşturuldu - tüm clothing direktiflerini tek yerden yönetiyor
+    - `getClothingFewShotExamples()` helper fonksiyonu oluşturuldu - tema bazlı few-shot examples
+    - Prompt içinde 7 farklı yerdeki clothing direktifleri yeni fonksiyonlarla değiştirildi
+  - **Faz 2: Prompt'u Bölümlere Ayır ✅**
+    - 11 builder fonksiyonu oluşturuldu (buildCharacterSection, buildStoryRequirementsSection, vb.)
+    - `generateStoryPrompt()` fonksiyonu güncellendi - 700+ satırlık template literal yerine modüler bölümler
+    - Prompt içeriği korundu, sadece organizasyon iyileştirildi
+  - **Faz 3: Theme-Specific Logic'i Merkezileştir ✅**
+    - `getThemeConfig()` fonksiyonuna `clothingExamples` eklendi (7 tema)
+    - `getClothingFewShotExamples()` fonksiyonu güncellendi - artık `themeConfig.clothingExamples` kullanıyor
+  - **Sonuç:** Kod daha modüler ve bakımı kolay, her bölüm bağımsız test edilebilir, clothing direktifleri tek yerden yönetiliyor
+  - **Version:** Story prompt v1.3.2 → v1.4.0
+  - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/CHANGELOG.md`, `docs/prompts/VERSION_STATUS.md`
+  - **Test:** ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
 - [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
   - [x] Database migration (`011_add_image_edit_feature.sql`)
     - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns
@@ -2390,7 +2408,7 @@ Response: {
 | Faz 2.5 | ✅ Tamamlandı | 10 | 10 | 100% |
 | Faz 2.6 | ✅ Tamamlandı | 6 | 6 | 100% |
 | Faz 3 | ✅ Tamamlandı | 26 | 27 | 96% ✅ MVP için gerekli tüm özellikler tamamlandı (3.2.5 opsiyonel) |
-| Faz 3.5 | ✅ Tamamlandı | 14 | 14 | 100% ✅ Cover/page images entegrasyonu tamamlandı |
+| Faz 3.5 | ✅ Tamamlandı | 15 | 15 | 100% ✅ Cover/page images entegrasyonu tamamlandı, Story API Refactor (v1.4.0) |
 | Faz 3.6 | ✅ Tamamlandı | 4 | 4 | 100% |
 | Faz 4 | 🔵 Bekliyor | 0 | 20 | 0% (Webhook'lar Faz 3.7'den taşındı: 4.1.6 ve 4.2.5) |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
@@ -2437,6 +2455,13 @@ Response: {
   - Frontend ve backend'de tutarlı gender validation
 
 **Son Yapılanlar (24 Ocak 2026):**
+- ✅ **Story API Refactor (v1.4.0):** Story API modülerleştirildi - 3 fazlı refactor tamamlandı
+  - Faz 1: Clothing direktiflerini modülerleştir (getClothingDirectives, getClothingFewShotExamples)
+  - Faz 2: Prompt'u 11 bölüme ayır (builder fonksiyonları)
+  - Faz 3: Theme-specific logic'i merkezileştir (getThemeConfig.clothingExamples)
+  - Kod daha modüler ve bakımı kolay, her bölüm bağımsız test edilebilir
+  - Test sonucu: ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
+  - Dokümantasyon: `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`
 - ✅ **Dil Seçimi Özelliği:** Step 3'e dil seçimi eklendi (8 dil: tr, en, de, fr, es, zh, pt, ru)
 - ✅ **Dil Karışıklığı Çözümü:** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
   - Story prompt'a "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi

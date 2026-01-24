@@ -35,6 +35,47 @@
 
 ---
 
+### Story v1.4.0 (24 Ocak 2026) - Story API Refactor (Modülerleştirme)
+
+**Hedef:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek. Mevcut prompt yapısı korunacak, sadece organizasyon iyileştirilecek.
+
+**3 Fazlı Refactor:**
+
+#### Faz 1: Clothing Direktiflerini Modülerleştir
+- **getClothingDirectives():** Tüm clothing direktiflerini tek yerden yöneten fonksiyon eklendi
+- **getClothingFewShotExamples():** Tema bazlı few-shot examples helper fonksiyonu eklendi
+- **Prompt'ta kullanım:** 7 farklı yerdeki clothing direktifleri yeni fonksiyonlarla değiştirildi
+- **Fayda:** Clothing direktifleri tek yerden yönetilir, tutarlılık sağlanır, güncelleme kolaylaşır
+
+#### Faz 2: Prompt'u Bölümlere Ayır
+- **11 builder fonksiyonu eklendi:**
+  - `buildCharacterSection()`
+  - `buildStoryRequirementsSection()`
+  - `buildLanguageSection()`
+  - `buildAgeAppropriateSection()`
+  - `buildStoryStructureSection()`
+  - `buildThemeSpecificSection()`
+  - `buildVisualDiversitySection()`
+  - `buildWritingStyleSection()`
+  - `buildSafetySection()`
+  - `buildIllustrationSection()`
+  - `buildOutputFormatSection()`
+  - `buildCriticalRemindersSection()`
+- **generateStoryPrompt() güncellendi:** 700+ satırlık template literal yerine modüler bölümler kullanılıyor
+- **Fayda:** Okunabilirlik artar, her bölüm bağımsız test edilebilir, bakım kolaylaşır
+
+#### Faz 3: Theme-Specific Logic'i Merkezileştir
+- **getThemeConfig() güncellendi:** Her tema için `clothingExamples` eklendi (7 tema: adventure, sports, fantasy, animals, daily-life, space, underwater)
+- **getClothingFewShotExamples() güncellendi:** Artık `themeConfig.clothingExamples` kullanıyor (hardcoded değil)
+- **Fayda:** Yeni tema eklemek kolaylaşır (sadece `getThemeConfig`'e ekle), tutarlılık sağlanır, few-shot examples dinamik hale gelir
+
+**Etkilenen Dosyalar:**
+- `lib/prompts/story/v1.0.0/base.ts` - v1.3.2 → v1.4.0
+
+**Not:** Geriye dönük uyumluluk önemli değil - eski story'ler silinebilir. Önemli olan yeni story halinin daha iyi olması.
+
+---
+
 ### Story v1.3.2 (24 Ocak 2026) - Theme-Specific Clothing Güçlendirme (Few-Shot Examples)
 
 **Hedef:** GPT-4o-mini'nin tema-uygun clothing üretmesini sağlamak (uzay → astronot kıyafeti, su altı → mayo).

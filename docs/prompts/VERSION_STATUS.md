@@ -1,6 +1,6 @@
 # 📊 Prompt Version Sync Status
 
-**Son Kontrol:** 24 Ocak 2026 (Scene v1.6.0, Story v1.3.0 – Kapak/Close-up/Story-Driven Clothing)  
+**Son Kontrol:** 24 Ocak 2026 (Scene v1.6.0, Story v1.4.0 – Story API Refactor)  
 **Sorumlu:** @project-manager
 
 ---
@@ -9,13 +9,23 @@
 
 | Module | Code Version | Doc Version | Status | Last Code Update | Last Doc Update |
 |--------|-------------|-------------|--------|------------------|-----------------|
-| Story | v1.3.2 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
+| Story | v1.4.0 | v1.0.4 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 | Image | v1.6.0 | v1.0.10 | ✅ Synced | 2026-01-24 | 2026-01-24 |
 | Character | v1.2.0 | - | ✅ Synced | 2026-01-24 | 2026-01-24 |
 
 ---
 
 ## 📝 Son Değişiklikler
+
+### Story Prompts (v1.4.0) - 24 Ocak 2026 – Story API Refactor (Modülerleştirme)
+- ✅ Faz 1: Clothing direktiflerini modülerleştir - getClothingDirectives(), getClothingFewShotExamples()
+- ✅ Faz 2: Prompt'u 11 bölüme ayır - builder fonksiyonları (buildCharacterSection, buildStoryRequirementsSection, vb.)
+- ✅ Faz 3: Theme-specific logic'i merkezileştir - getThemeConfig.clothingExamples (7 tema)
+- ✅ generateStoryPrompt() güncellendi - 700+ satırlık template literal yerine modüler bölümler
+- ✅ Okunabilirlik artırıldı, her bölüm bağımsız test edilebilir, bakım kolaylaştı
+
+**Kod:** `lib/prompts/story/v1.0.0/base.ts`  
+**Changelog:** `CHANGELOG.md`
 
 ### Story Prompts (v1.1.0) - 25 Ocak 2026
 - ✅ Story quality enhancements - example text, show-don't-tell, sensory details, pacing control

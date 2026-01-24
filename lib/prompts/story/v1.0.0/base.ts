@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.3.2',
+  version: '1.4.0',
   releaseDate: new Date('2026-01-24'),
   status: 'active',
   changelog: [
@@ -38,6 +38,7 @@ export const VERSION: PromptVersion = {
     'v1.3.0: Story-driven clothing – "clothing" per page in JSON; CRITICAL CHARACTER CLOTHING updated; imagePrompt/sceneDescription include SPECIFIC clothing; plan: Kapak/Close-up/Kıyafet (24 Ocak 2026)',
     'v1.3.1: characterIds and clothing REQUIRED enforcement – JSON schema "DO NOT OMIT", CRITICAL reminders strengthened, validation added in books route (24 Ocak 2026)',
     'v1.3.2: Theme-specific clothing güçlendirme – getThemeConfig space → "astronaut suit", few-shot examples eklendi (space/underwater/forest), "mavi ve kırmızı rahat giysiler" yasaklandı, JSON şemasında tema bazlı örnekler (24 Ocak 2026)',
+    'v1.4.0: Story API Refactor – Faz 1: Clothing direktiflerini modülerleştir (getClothingDirectives, getClothingFewShotExamples), Faz 2: Prompt\'u 11 bölüme ayır (builder fonksiyonları), Faz 3: Theme-specific logic\'i merkezileştir (getThemeConfig.clothingExamples) (24 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -65,6 +66,9 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
   const ageGroup = getAgeGroup(characterAge)
   const safetyRules = getSafetyRules(ageGroup)
   const themeConfig = getThemeConfig(theme)
+  
+  // Faz 1: Clothing direktiflerini modülerleştir
+  const clothingDirectives = getClothingDirectives(theme, themeConfig)
 
   // Build character description (use Step 1 data if available, otherwise use analysis)
   let characterDesc = buildCharacterDescription(
@@ -176,412 +180,27 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${characters[0].id}"]`
   }
 
-  // Main prompt
-  const prompt = `
-You are a professional children's book author. Create a magical, age-appropriate story.
-
-# CHARACTER${characters && characters.length > 1 ? 'S' : ''}
-${characterDesc}
-
-# STORY REQUIREMENTS
-- Theme: ${themeConfig.name} (${themeConfig.mood} mood)
-- Target Age: ${characterAge} years old (${ageGroup} age group)
-- Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
-- Language: ${getLanguageName(language)}
-- Illustration Style: ${illustrationStyle}
-- Special Requests: ${customRequests || 'None'}
-
-# CRITICAL - LANGUAGE REQUIREMENT (MANDATORY - NO EXCEPTIONS)
-**YOU MUST WRITE THE ENTIRE STORY IN ${getLanguageName(language).toUpperCase()} ONLY.**
-
-- **ONLY use ${getLanguageName(language)} words and sentences**
-- **DO NOT use ANY English words, phrases, or sentences**
-- **DO NOT mix languages - use ${getLanguageName(language)} exclusively**
-- **Every single word in the story text MUST be in ${getLanguageName(language)}**
-- **Character names can remain as provided, but all dialogue and narration MUST be in ${getLanguageName(language)}**
-- **If you use any English words, the story will be REJECTED**
-
-**Examples of what is FORBIDDEN:**
-- Using English words like "hello", "yes", "no", "okay", "good", "bad", "happy", "sad" in a ${getLanguageName(language)} story
-- Mixing languages: "Merhaba hello" or "Güzel good"
-- Using English phrases or expressions
-
-**Examples of what is CORRECT:**
-- If language is Turkish: Use ONLY Turkish words like "merhaba", "evet", "hayır", "güzel", "mutlu", "üzgün"
-- If language is German: Use ONLY German words like "hallo", "ja", "nein", "schön", "glücklich", "traurig"
-- If language is French: Use ONLY French words like "bonjour", "oui", "non", "beau", "heureux", "triste"
-- If language is Spanish: Use ONLY Spanish words like "hola", "sí", "no", "hermoso", "feliz", "triste"
-- If language is Chinese: Use ONLY Chinese characters and words
-- If language is Portuguese: Use ONLY Portuguese words like "olá", "sim", "não", "bonito", "feliz", "triste"
-- If language is Russian: Use ONLY Russian words like "привет", "да", "нет", "красивый", "счастливый", "грустный"
-
-**VERIFICATION:** Before returning the JSON, check EVERY word in EVERY page text. If you find ANY English word, replace it with the ${getLanguageName(language)} equivalent.
-
-# AGE-APPROPRIATE GUIDELINES
-- Vocabulary: ${getVocabularyLevel(ageGroup)}
-- Sentence Length: ${getSentenceLength(ageGroup)}
-- Complexity: ${getComplexityLevel(ageGroup)}
-- Reading Time: ${getReadingTime(ageGroup)} minutes per page
-
-# STORY STRUCTURE - DETAILED PAGE-BY-PAGE REQUIREMENTS (NEW: 16 Ocak 2026)
-
-**CRITICAL:** Each page MUST have a UNIQUE, DISTINCT scene. NO REPEATING SCENES or SIMILAR COMPOSITIONS.
-
-**PACING CONTROL (NEW: 25 Ocak 2026):**
-- **Strong hook early:** First 2 sentences must grab attention and create interest
-- **Shorter scenes:** Each page should be a complete mini-scene, not dragging on
-- **Predictable patterns:** For younger ages, use repetition and patterns (e.g., "First they tried X, then Y, then Z")
-- **Scene-by-scene breakdown:** Each page should have clear beginning, middle, and end
-- **Pacing variety:** Mix fast-paced action scenes with slower, contemplative moments
-- **Page transitions:** Smooth transitions between pages, but each page should feel complete
-
-## Page-by-Page Structure:
-
-**Page 1 (Cover):**
-- Professional book cover illustration
-- Main character prominently featured with ${characters && characters.length > 1 ? 'all companions' : 'theme elements'}
-- Visually striking, colorful, professional
-- Different from all subsequent pages (unique composition)
-
-**Page 2 (Introduction):**
-- Introduction scene - DIFFERENT location/setting from cover
-- DIFFERENT time of day or weather from cover
-- DIFFERENT composition (e.g., wide shot if cover is close-up)
-- Introduce ${characterName} and setting
-
-**Pages 3-5 (Adventure Begins):**
-Each page MUST have DIFFERENT scenes:
-- **Page 3 (Discovery):** New location, different perspective (e.g., close-up if previous was wide), ${characterName} discovers something interesting
-- **Page 4 (Action):** Different location, different composition (e.g., dynamic angle), active exploration or action scene
-- **Page 5 (Exploration):** Different location, different time of day (e.g., afternoon if previous was morning), deeper exploration
-
-**Pages 6-8 (Challenge & Problem-Solving):**
-Each page MUST have DIFFERENT scenes:
-- **Page 6 (Problem):** Different location, different mood, introduce age-appropriate challenge
-- **Page 7 (Attempt):** Different location, different perspective, ${characterName} attempts to solve the problem
-- **Page 8 (Solution):** Different location, different composition, creative solution emerges
-
-**Pages 9-10 (Resolution & Ending):**
-Each page MUST have DIFFERENT scenes:
-- **Page 9 (Resolution):** Different location, different time of day (e.g., evening), problem resolved with valuable lesson
-- **Page 10 (Happy Ending):** Different location, different composition (e.g., wide shot with ${characters && characters.length > 1 ? 'all characters' : 'full scene'}), return home or celebration
-
-**LOCATION VARIETY REQUIREMENT:**
-- Each page should be in a DIFFERENT location OR show a DIFFERENT part of the same location
-- Example progression: home → forest entrance → deep forest → clearing → mountain → cave → river → summit → returning home → home (celebration)
-- DO NOT repeat the same location on consecutive pages
-
-**TIME PROGRESSION REQUIREMENT:**
-- Vary time of day across pages to show story progression
-- Example progression: morning → late morning → noon → afternoon → late afternoon → evening → sunset → dusk → night or next morning
-- DO NOT use the same time of day for multiple consecutive pages
-
-# THEME-SPECIFIC ELEMENTS
-Setting: ${themeConfig.setting}
-Include: ${themeConfig.commonElements.join(', ')}
-Mood: ${themeConfig.mood}, warm, inviting
-Educational Focus: ${getEducationalFocus(ageGroup, theme)}
-Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
-
-CRITICAL - CHARACTER CLOTHING (Story-driven - Plan: Kapak/Close-up/Kıyafet): For EACH page, specify character clothing that matches the scene and story. **DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"** - the clothing MUST be theme-specific and scene-appropriate.
-
-**THEME-SPECIFIC CLOTHING EXAMPLES (FEW-SHOT):**
-- **Space theme:** "child-sized astronaut suit with helmet" OR "space exploration outfit" OR "astronaut gear" - NEVER "casual clothes" or "mavi ve kırmızı rahat giysiler"
-- **Underwater theme:** "swimwear" OR "beach clothes" OR "swimsuit" - NEVER "casual clothes"
-- **Forest/Adventure theme:** "outdoor gear" OR "hiking clothes" OR "adventure outfit" - NEVER "casual clothes"
-- **Daily life theme:** "everyday casual clothing" OR "normal kids clothes" - acceptable for this theme only
-- **Sports theme:** "sportswear" OR "athletic clothes" OR "sports outfit" - NEVER "casual clothes"
-
-**CRITICAL RULE:** If the theme is ${themeConfig.name}, the clothing MUST be: ${themeConfig.clothingStyle}. Use the "clothing" field per page in the JSON output. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding").
-
-# CRITICAL - VISUAL DIVERSITY REQUIREMENTS (MANDATORY - NEW: 16 Ocak 2026)
-
-**EACH PAGE MUST HAVE A UNIQUE, DISTINCT SCENE - NO REPEATING SCENES:**
-
-## 1. Location Variety (MANDATORY):
-- Each page should be in a DIFFERENT location or show a DIFFERENT part of the same location
-- Examples: Page 2 (home), Page 3 (forest entrance), Page 4 (deep forest), Page 5 (clearing), Page 6 (mountain), Page 7 (cave), Page 8 (river), Page 9 (summit), Page 10 (returning home)
-- **DO NOT repeat the same location on consecutive pages**
-
-## 2. Time of Day Variety (MANDATORY):
-- Vary time of day across pages to show story progression
-- Examples: Page 2 (morning), Page 3 (late morning), Page 4 (noon), Page 5 (afternoon), Page 6 (late afternoon), Page 7 (evening), Page 8 (sunset), Page 9 (dusk), Page 10 (night or next morning)
-- **DO NOT use the same time of day for multiple consecutive pages**
-
-## 3. Weather/Atmosphere Variety:
-- Vary weather or atmospheric conditions when appropriate for the story
-- Examples: sunny → partly cloudy → windy → sunny → cloudy → light rain → clearing → beautiful weather
-- Use weather changes to enhance mood and story progression
-
-## 4. Perspective/Camera Angle Variety (MANDATORY):
-- Vary camera angles and perspectives for visual interest
-- Options: wide shot, medium shot, close-up, bird's eye view, low angle, high angle, eye level
-- Examples: Page 2 (wide shot), Page 3 (medium shot), Page 4 (close-up), Page 5 (bird's eye view), Page 6 (low angle)
-- **DO NOT use the same perspective for multiple consecutive pages**
-
-## 5. Composition Variety (MANDATORY):
-- Vary composition and framing for visual diversity
-- Options: character centered, character left (environment right), character right (action left), balanced, diagonal, symmetrical, group composition
-- Examples: Page 2 (character centered), Page 3 (character left), Page 4 (diagonal composition), Page 5 (balanced)
-- **DO NOT repeat the same composition for multiple consecutive pages**
-
-## 6. Action/Mood Variety (MANDATORY):
-- Vary character actions and emotional tones across pages
-- Examples: calm introduction → excited discovery → active exploration → curious investigation → determined problem-solving → creative thinking → joyful solution → proud resolution → happy celebration
-- **DO NOT repeat the same action/mood for multiple consecutive pages**
-
-## 7. Page 1 vs Cover (MANDATORY - 3.5.20):
-- **Page 1 (first interior page)** must have a clearly **different** scene, composition, or camera angle from the **cover**.
-- The cover typically shows a "hero" character shot (medium/portrait, character centered). **Page 1** should show a **different moment**, **wider environment**, or **distinct action/setting**.
-- Use a different camera angle (e.g. page 1 = wide shot or low-angle vs cover = medium/portrait), different composition (e.g. rule of thirds, character off-center), or expanded scene detail.
-- **DO NOT** repeat the same framing as the cover. Page 1 imagePrompt and sceneDescription must describe a distinctly different visual.
-
-## CRITICAL CHECKLIST FOR EACH PAGE:
-Before finalizing each page's imagePrompt, verify ALL of these:
-- ✓ Location is DIFFERENT from previous page (or different part of same location)
-- ✓ Time of day is DIFFERENT from previous page (or clearly progressing)
-- ✓ Weather/atmosphere is DIFFERENT from previous page (or clearly changing) - if appropriate
-- ✓ Perspective/camera angle is DIFFERENT from previous page
-- ✓ Composition is DIFFERENT from previous page
-- ✓ Action/mood is DIFFERENT from previous page
-- ✓ **Page 1 only:** Scene/composition/camera DIFFERENT from cover (see rule 7 above)
-- ✓ Scene description is DETAILED (at least 150-200 characters, NOT just 70-80)
-- ✓ Image prompt is DETAILED (at least 200+ characters with specific visual elements)
-
-# WRITING STYLE REQUIREMENTS (CRITICAL - NEW: 15 Ocak 2026)
-
-**TEXT LENGTH REQUIREMENT:** Each page MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE). This means detailed, rich text - NOT short, simple sentences.
-
-1. **Include dialogue between characters** (use quotation marks)
-   - Characters should talk to each other naturally
-   - Include character actions with dialogue (e.g., "Look!" ${characterName} said, pointing)
-   - Use dialogue to show personality and emotions
-   - Balance dialogue with descriptive narration
-   - **Dialogue adds length and richness - use it!**
-   
-2. **Describe emotions and feelings with sensory details**
-   - Show character's internal thoughts and emotional responses
-   - Use ALL sensory details (what they see, hear, feel, smell, taste)
-   - **Visual:** What they see - colors, lighting, textures, shapes, movements
-   - **Auditory:** What they hear - sounds, music, nature sounds, voices, silence
-   - **Tactile:** What they feel - textures, temperature, wind, surfaces, objects
-   - **Olfactory:** What they smell - flowers, food, nature scents, fresh air
-   - **Gustatory:** What they taste (if applicable) - food, drinks, fresh air
-   - Example: "${characterName} felt proud and warm, even as the evening air grew cooler. The golden sunset painted everything in orange and pink. ${characterName} could hear birds singing and smell the sweet scent of wildflowers. The soft grass felt ticklish under ${characterName}'s feet."
-   - **Detailed emotions with sensory details add word count - be descriptive!**
-   
-3. **Use descriptive language for atmosphere and setting**
-   - Paint a vivid picture with words
-   - Describe lighting, colors, textures, sounds
-   - Create immersive scenes
-   - Example: "As the sun began to set, the sky turned orange and pink and purple, painting everything with magical colors"
-   - **Atmospheric descriptions are essential for reaching ${getWordCount(ageGroup)} words**
-   
-4. **Show, don't just tell**
-   
-   **BAD (TOO SHORT - DO NOT DO THIS):**
-   "${characterName} went to the forest. She saw trash. She cleaned it."
-   - Only 3 sentences, ~15 words - TOO SHORT!
-   - No dialogue, no sensory details, no atmosphere
-   - Just tells what happened, doesn't show it
-   - Boring and flat
-   
-   **GOOD (${getWordCount(ageGroup)} words - DO THIS):**
-   "As ${characterName} walked along the forest path, the morning sun filtered through the tall trees, creating dappled patterns on the ground. 'What's that?' ${characterName} asked, stopping to look at something colorful on the path. ${characterName} could hear birds chirping overhead and smell the fresh, earthy scent of the forest. The air felt cool and refreshing. ${characterName} bent down and picked up a piece of colorful paper. 'This doesn't belong here,' ${characterName} said thoughtfully. ${characterName} looked around and saw more trash scattered nearby. 'I should clean this up,' ${characterName} decided, feeling determined. With a smile, ${characterName} began collecting the trash, feeling proud to help the forest."
-   - Multiple sentences with dialogue
-   - Sensory details: see (sun, trees, patterns), hear (birds), smell (forest), feel (cool air)
-   - Shows emotions and thoughts
-   - Creates atmosphere and immersion
-   - **IMPORTANT:** All examples in this prompt are in English for instruction purposes, but YOUR story text MUST be written entirely in ${getLanguageName(language)}
-   
-5. **Page structure** (each page should include ALL of these to reach ${getWordCount(ageGroup)} words):
-   - Opening description (setting the scene atmospherically - 2-3 sentences)
-   - Character action or dialogue (2-3 sentences with dialogue)
-   - Emotional response or internal thought (1-2 sentences)
-   - Transition or scene continuation (1-2 sentences)
-   - **Total: 6-10 sentences per page = ${getWordCount(ageGroup)} words**
-   
-6. **Example of quality writing structure (${getWordCount(ageGroup)} words):**
-   
-   Here's how I like it - example text for ${ageGroup} age group (${getLanguageName(language)}):
-   
-   ${getExampleText(ageGroup, characterName, language, characters)}
-   
-   **CRITICAL:** All text in your story MUST be in ${getLanguageName(language)} - the example above is in ${getLanguageName(language)} to show you the style. Write your story in the same language, with the same level of detail, dialogue, and sensory richness.
-
-# SAFETY RULES (CRITICAL - MUST FOLLOW)
-## MUST INCLUDE:
-${safetyRules.mustInclude.map(rule => `- ${rule}`).join('\n')}
-
-## ABSOLUTELY AVOID:
-${safetyRules.mustAvoid.map(rule => `- ${rule}`).join('\n')}
-
-# ILLUSTRATION GUIDELINES
-For each page, provide:
-1. Scene description (what's happening)
-2. Detailed image prompt for ${illustrationStyle} illustration
-3. Character appearance (consistent across all pages)
-4. Setting details (colors, lighting, mood)
-5. Composition (what's in focus, perspective)
-6. **Sensory details visualization (NEW: 25 Ocak 2026):** Include visual elements that represent the sensory details from the story text:
-   - Visual: Show the colors, lighting, textures mentioned in the text
-   - Auditory: Show elements that suggest sounds (birds, rustling leaves, flowing water)
-   - Tactile: Show textures and surfaces that characters interact with
-   - Olfactory: Show flowers, food, or nature elements that suggest scents
-
-# VISUAL SAFETY GUIDELINES (CRITICAL - NEW: 18 Ocak 2026)
-**To avoid anatomical errors in generated images, follow these guidelines:**
-
-## AVOID RISKY HAND INTERACTIONS:
-- **DO NOT** have characters holding hands
-- **DO NOT** have characters holding detailed objects (books, toys, tools)
-- **DO NOT** have complex hand gestures (pointing with fingers, thumbs up, peace signs)
-- **DO NOT** have hands overlapping between characters
-- **DO NOT** have detailed hand-to-object interactions
-
-## PREFER SAFE HAND POSES:
-- **DO** keep hands at sides in natural relaxed poses
-- **DO** use simple raised hand for waving (open palm)
-- **DO** use arms spread wide for joy/excitement
-- **DO** use hands behind back
-- **DO** use hands on hips
-- **DO** describe hands as "in natural relaxed pose" without specifics
-
-## SAFE CHARACTER INTERACTIONS:
-- Characters can stand together, but keep hands separate
-- Characters can talk to each other, but avoid hand contact
-- If story requires "giving" something, describe it verbally without showing detailed hand interaction
-- Focus on character facial expressions and body language rather than complex hand poses
-
-**EXAMPLE - BAD (Risky):** "${characterName} and ${characters && characters.length > 1 ? characters[1].name || characters[1].type.displayName : 'friend'} holding hands, walking together through the forest"
-**EXAMPLE - GOOD (Safe):** "${characterName} and ${characters && characters.length > 1 ? characters[1].name || characters[1].type.displayName : 'friend'} walking together through the forest, hands at their sides, smiling at each other"
-
-**REMEMBER:** Simple, clear poses = better anatomical accuracy. Complex hand interactions = higher error rate.
-
-# OUTPUT FORMAT (JSON)
-Return a valid JSON object with this exact structure:
-{
-  "title": "Story title",
-  "pages": [
-    {
-      "pageNumber": 1,
-      "text": "Page text (CRITICAL: Must be ${getWordCount(ageGroup)} words - this is the AVERAGE, write detailed text with dialogue and descriptions)",
-      "imagePrompt": "DETAILED ${illustrationStyle} illustration prompt (MUST be 200+ characters) with:
-        - SPECIFIC location description (e.g., 'in a sunny forest clearing with tall oak trees, wildflowers, and a babbling brook')
-        - SPECIFIC time of day (e.g., 'late afternoon with golden sunlight filtering through leaves')
-        - SPECIFIC weather/atmosphere (e.g., 'partly cloudy sky with gentle breeze')
-        - SPECIFIC perspective/camera angle (e.g., 'medium shot from eye level, character in foreground')
-        - SPECIFIC composition (e.g., 'character on left side, environment on right, balanced framing')
-        - SPECIFIC character action and pose (e.g., 'character kneeling, examining something on the ground with curious expression')
-        - SPECIFIC environmental details (e.g., 'fallen leaves, mushrooms, small insects, dappled sunlight')
-        - SPECIFIC character clothing for this scene (e.g. space suit, swimwear, outdoor gear) – MUST match story and setting
-        - Character consistency (same character as previous pages)
-        - Theme elements (${theme})
-        - Mood: ${themeConfig.mood}
-        - CRITICAL: This scene MUST be DIFFERENT from previous pages - different location, different time, different composition, different perspective
-        - **Page 1 only:** MUST be DIFFERENT from cover - different camera angle, composition, or expanded scene (see Page 1 vs Cover rule)",
-      "sceneDescription": "DETAILED scene description (MUST be 150+ characters) including:
-        - SPECIFIC location (where exactly is this happening? e.g., 'deep in the enchanted forest, near a sparkling stream')
-        - SPECIFIC time of day (morning/late morning/noon/afternoon/late afternoon/evening/sunset/dusk/night)
-        - SPECIFIC weather/atmosphere (sunny/partly cloudy/cloudy/windy/light rain/snowy - if appropriate)
-        - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
-        - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
-        - SPECIFIC character clothing for this moment (match story/setting; e.g. astronaut suit, swimwear, outdoor gear)
-        - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
-        - CRITICAL: This scene MUST be DIFFERENT from previous pages
-        - **Page 1 only:** MUST be DIFFERENT from cover - different angle, composition, or moment (see Page 1 vs Cover rule)",
-      "characterIds": ["character-id-1", "character-id-2"], // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING) - DO NOT OMIT THIS FIELD
-      "clothing": "theme-specific outfit – MUST match story theme (${themeConfig.name} theme → ${themeConfig.clothingStyle})" // REQUIRED: Character clothing for this scene - DO NOT OMIT THIS FIELD. Examples: space → "child-sized astronaut suit with helmet", underwater → "swimwear", forest → "outdoor gear". NEVER use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"
-      // CRITICAL: ALL ${characters.length} characters (${characters.map(c => c.id).join(', ')}) must appear across all pages
-      // Main character (${characterName}) will appear in most pages
-      // Family Members (${characters.filter(c => c.type?.group === "Family Members").map(c => c.name || c.type.displayName).join(', ')}) must appear in multiple pages
-      // Example: "characterIds": ["${characters[0]?.id}", "${characters[1]?.id || ''}", "${characters[2]?.id || ''}"] (use only IDs for characters that appear on this page)
-    }
-    // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
-  ],
-  "metadata": {
-    "ageGroup": "${ageGroup}",
-    "theme": "${theme}",
-    "educationalThemes": ["theme1", "theme2"],
-    "safetyChecked": true
-  }
-}
-
-CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
-
-CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section. DO NOT omit this field - the API will reject your response if characterIds is missing.
-
-CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
-
-**FEW-SHOT EXAMPLES:**
-- Space theme: "child-sized astronaut suit with helmet" (NOT "casual clothes" or "mavi ve kırmızı rahat giysiler")
-- Underwater theme: "swimwear" or "beach clothes" (NOT "casual clothes")
-- Forest/Adventure theme: "outdoor gear" or "hiking clothes" (NOT "casual clothes")
-
-DO NOT omit this field - it is essential for visual consistency with the story. DO NOT use generic clothing descriptions.
-
-# CRITICAL REMINDERS
-
-## TEXT LENGTH (VERY IMPORTANT):
-- **Each page text MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE)**
-- **DO NOT write short, simple sentences like "Lisa went to forest. She saw trash. She cleaned it."**
-- **INSTEAD, write detailed, rich text with:**
-  - Dialogue between characters (use quotation marks)
-  - Atmospheric descriptions (setting the scene)
-  - Character emotions and feelings
-  - Sensory details (what they see, hear, feel)
-  - Multiple sentences per page (NOT just 2-3 sentences)
-- **Example of GOOD text structure (${getWordCount(ageGroup)} words):**
-  Write detailed, descriptive text with dialogue, emotions, and sensory details - ALL in ${getLanguageName(language)}
-- **Example of BAD text (TOO SHORT - DO NOT DO THIS):**
-  Short, simple sentences without detail
-- **CRITICAL REMINDER:** All examples in this prompt are in English for instruction, but YOUR story MUST be written entirely in ${getLanguageName(language)}. Do NOT copy English words from examples.
-- **Target: ${getWordCount(ageGroup)} words per page - write DETAILED, DESCRIPTIVE text with dialogue and atmosphere**
-
-## CHARACTER & STORY:
-- Character must look EXACTLY the same in every image prompt
-- ${characterName} is the hero and main character in EVERY scene
-- **CRITICAL - Character clothing:** The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
-
-**FEW-SHOT EXAMPLES FOR ${themeConfig.name.toUpperCase()} THEME:**
-${themeConfig.name.toLowerCase() === 'space' ? '- Example 1: "child-sized astronaut suit with helmet"\n- Example 2: "space exploration outfit"\n- Example 3: "astronaut gear"\n- ❌ WRONG: "mavi ve kırmızı rahat giysiler" or "casual clothes"' : themeConfig.name.toLowerCase() === 'underwater' ? '- Example 1: "swimwear"\n- Example 2: "beach clothes"\n- Example 3: "swimsuit"\n- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"' : themeConfig.name.toLowerCase() === 'adventure' ? '- Example 1: "outdoor gear"\n- Example 2: "hiking clothes"\n- Example 3: "adventure outfit"\n- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"' : '- Use theme-appropriate clothing matching the story setting'}
-
-DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler" - the clothing MUST be theme-specific. NOT formal wear (suits, ties, dress shoes).
-- Keep it positive, fun, and inspiring
-- Age-appropriate vocabulary and concepts
-- NO scary, violent, or inappropriate content
-- Include subtle educational value
-- Make it engaging and memorable
-
-## SAFETY & AGE-APPROPRIATE ACTIONS (CRITICAL - NEW: 25 Ocak 2026):
-- **AVOID ambiguous actions that could trigger safety filters:**
-  - DO NOT use "dans etmek" (dancing) for adult characters in certain contexts - use "hareket etmek" (moving), "neşeli şarkılar söylemek" (singing happy songs), "coşkuyla eğlenmek" (joyfully celebrating) instead
-  - DO NOT use "sarılmak" (hugging) in ways that could be misinterpreted - use "kucaklaşmak" (embracing), "sevecen bir şekilde yaklaşmak" (approaching warmly) instead
-  - DO NOT use physical interactions that could be ambiguous - keep all interactions clearly family-friendly and age-appropriate
-- **PREFER clear, innocent actions:**
-  - "el ele tutuşmak" (holding hands), "birlikte yürümek" (walking together), "birlikte oynamak" (playing together)
-  - "gülmek" (laughing), "gülümsemek" (smiling), "neşelenmek" (being cheerful)
-  - "şarkı söylemek" (singing), "müzik dinlemek" (listening to music), "şarkı mırıldanmak" (humming songs)
-- **ALWAYS ensure actions are clearly innocent and family-safe**
-- If unsure about an action, use a safer alternative that conveys the same positive emotion
-
-- **MOST IMPORTANT: You MUST return EXACTLY ${getPageCount(ageGroup, pageCount)} pages in the "pages" array. Count them before returning!**
-
-## LANGUAGE COMPLIANCE (CRITICAL - FINAL CHECK):
-Before submitting your response, perform this final check:
-1. Read EVERY word in EVERY page's "text" field
-2. If you find ANY English word (like "hello", "yes", "good", "happy", "sad", "beautiful", "amazing", etc.), REPLACE it immediately with the ${getLanguageName(language)} equivalent
-3. Ensure ALL dialogue is in ${getLanguageName(language)}
-4. Ensure ALL narration is in ${getLanguageName(language)}
-5. The ONLY exception: Character name "${characterName}" can remain as is
-6. If you cannot write a word in ${getLanguageName(language)}, use a ${getLanguageName(language)} synonym instead - NEVER use English
-
-**REMEMBER: A single English word in a ${getLanguageName(language)} story is a CRITICAL ERROR. Check every word before returning.**
-
-Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.
-`
-
-  return prompt.trim()
+  // Faz 2: Prompt bölümlerini oluştur
+  const sections = [
+    'You are a professional children\'s book author. Create a magical, age-appropriate story.',
+    '',
+    buildCharacterSection(characterDesc, characters),
+    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount, language, illustrationStyle, customRequests),
+    buildLanguageSection(language),
+    buildAgeAppropriateSection(ageGroup),
+    buildStoryStructureSection(characterName, ageGroup, pageCount, characters),
+    buildThemeSpecificSection(themeConfig, ageGroup, theme, clothingDirectives),
+    buildVisualDiversitySection(),
+    buildWritingStyleSection(ageGroup, language, characterName, characters),
+    buildSafetySection(ageGroup),
+    buildIllustrationSection(illustrationStyle, characterName, characters),
+    buildOutputFormatSection(ageGroup, pageCount, illustrationStyle, theme, themeConfig, characters || [], characterName, clothingDirectives),
+    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount, language, clothingDirectives),
+    '',
+    `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
+  ]
+  
+  return sections.join('\n\n').trim()
 }
 
 // ============================================================================
@@ -742,6 +361,17 @@ function getThemeConfig(theme: string) {
       setting: 'outdoor exploration (forest, mountain, beach)',
       commonElements: ['discovery', 'nature', 'exploration', 'teamwork'],
       clothingStyle: 'comfortable outdoor clothing appropriate for adventure (casual pants/shorts, t-shirts, sneakers, outdoor gear)',
+      clothingExamples: {
+        correct: [
+          'outdoor gear',
+          'hiking clothes',
+          'adventure outfit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
     },
     sports: {
       name: 'Sports & Activities',
@@ -749,6 +379,17 @@ function getThemeConfig(theme: string) {
       setting: 'playground, sports field, or indoor activity space',
       commonElements: ['movement', 'teamwork', 'practice', 'friendly competition', 'having fun'],
       clothingStyle: 'sportswear (athletic clothes, sports shoes, comfortable activewear)',
+      clothingExamples: {
+        correct: [
+          'sportswear',
+          'athletic clothes',
+          'sports outfit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
     },
     fantasy: {
       name: 'Fantasy',
@@ -756,6 +397,18 @@ function getThemeConfig(theme: string) {
       setting: 'magical world or enchanted place',
       commonElements: ['magic', 'wonder', 'imagination', 'friendly creatures'],
       clothingStyle: 'fantasy-appropriate clothing (adventure-style casual, magical themes, not formal)',
+      clothingExamples: {
+        correct: [
+          'fantasy adventure outfit',
+          'magical adventure clothes',
+          'enchanted explorer clothing'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler',
+          'formal wear'
+        ]
+      }
     },
     animals: {
       name: 'Animals',
@@ -763,6 +416,17 @@ function getThemeConfig(theme: string) {
       setting: 'farm, zoo, or natural habitat',
       commonElements: ['animal friends', 'nature', 'care', 'learning'],
       clothingStyle: 'casual comfortable clothing appropriate for nature/outdoors (jeans, t-shirts, casual shoes)',
+      clothingExamples: {
+        correct: [
+          'casual comfortable clothing',
+          'outdoor casual clothes',
+          'nature-appropriate outfit'
+        ],
+        wrong: [
+          'formal wear',
+          'dress clothes'
+        ]
+      }
     },
     'daily-life': {
       name: 'Daily Life',
@@ -770,6 +434,13 @@ function getThemeConfig(theme: string) {
       setting: 'home, school, or neighborhood',
       commonElements: ['family', 'friends', 'everyday activities', 'growth'],
       clothingStyle: 'everyday casual clothing (normal kids clothes, casual outfits)',
+      clothingExamples: {
+        correct: [
+          'everyday casual clothing',
+          'normal kids clothes'
+        ],
+        wrong: [] // Bu tema için kabul edilebilir
+      }
     },
     space: {
       name: 'Space',
@@ -777,6 +448,18 @@ function getThemeConfig(theme: string) {
       setting: 'space, planets, or stars',
       commonElements: ['exploration', 'discovery', 'wonder', 'science'],
       clothingStyle: 'astronaut suit / space suit (child-sized space outfit with helmet, space exploration gear)',
+      clothingExamples: {
+        correct: [
+          'child-sized astronaut suit with helmet',
+          'space exploration outfit',
+          'astronaut gear'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler',
+          'everyday casual clothing'
+        ]
+      }
     },
     underwater: {
       name: 'Underwater',
@@ -784,10 +467,202 @@ function getThemeConfig(theme: string) {
       setting: 'ocean, sea, or underwater world',
       commonElements: ['sea creatures', 'exploration', 'discovery', 'beauty'],
       clothingStyle: 'swimwear or beach-appropriate clothing (swimsuit, beach clothes, casual summer wear)',
+      clothingExamples: {
+        correct: [
+          'swimwear',
+          'beach clothes',
+          'swimsuit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
     },
   }
   
   return configs[normalizedTheme] || configs['adventure']
+}
+
+// ============================================================================
+// Clothing Directives Helper Functions (Faz 1: Modülerleştirme)
+// ============================================================================
+
+interface ClothingDirectives {
+  criticalSection: string        // CRITICAL - CHARACTER CLOTHING bölümü
+  fewShotExamples: string        // THEME-SPECIFIC CLOTHING EXAMPLES
+  jsonSchemaImagePrompt: string  // imagePrompt içindeki clothing direktifi
+  jsonSchemaSceneDesc: string    // sceneDescription içindeki clothing direktifi
+  jsonSchemaClothing: string     // clothing field örneği
+  criticalReminders: string      // CRITICAL reminders clothing kısmı
+  characterStoryReminder: string // CHARACTER & STORY clothing kısmı
+}
+
+/**
+ * Get theme-specific clothing few-shot examples
+ * Faz 1: Modülerleştirme - clothing examples'ları tek yerden yönet
+ */
+function getClothingFewShotExamples(theme: string): {
+  correct: string[]
+  wrong: string[]
+  formatted: string  // Markdown formatında few-shot examples
+} {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t === 'forest' || t === 'adventure'
+      ? 'adventure'
+      : t
+
+  const examples: Record<string, { correct: string[]; wrong: string[] }> = {
+    space: {
+      correct: [
+        'child-sized astronaut suit with helmet',
+        'space exploration outfit',
+        'astronaut gear'
+      ],
+      wrong: [
+        'casual clothes',
+        'mavi ve kırmızı rahat giysiler',
+        'everyday casual clothing'
+      ]
+    },
+    underwater: {
+      correct: [
+        'swimwear',
+        'beach clothes',
+        'swimsuit'
+      ],
+      wrong: [
+        'casual clothes',
+        'mavi ve kırmızı rahat giysiler'
+      ]
+    },
+    adventure: {
+      correct: [
+        'outdoor gear',
+        'hiking clothes',
+        'adventure outfit'
+      ],
+      wrong: [
+        'casual clothes',
+        'mavi ve kırmızı rahat giysiler'
+      ]
+    },
+    'daily-life': {
+      correct: [
+        'everyday casual clothing',
+        'normal kids clothes'
+      ],
+      wrong: [] // Bu tema için kabul edilebilir
+    },
+    sports: {
+      correct: [
+        'sportswear',
+        'athletic clothes',
+        'sports outfit'
+      ],
+      wrong: [
+        'casual clothes',
+        'mavi ve kırmızı rahat giysiler'
+      ]
+    },
+  }
+
+  const themeExamples = examples[normalizedTheme] || {
+    correct: ['theme-appropriate clothing'],
+    wrong: ['casual clothes', 'mavi ve kırmızı rahat giysiler']
+  }
+
+  // Format few-shot examples string
+  const themeName = normalizedTheme === 'space' ? 'Space' :
+                    normalizedTheme === 'underwater' ? 'Underwater' :
+                    normalizedTheme === 'adventure' ? 'Forest/Adventure' :
+                    normalizedTheme === 'daily-life' ? 'Daily life' :
+                    normalizedTheme === 'sports' ? 'Sports' : 'Theme'
+
+  let formatted = `- **${themeName} theme:** ${themeExamples.correct.map(e => `"${e}"`).join(' OR ')}`
+  if (themeExamples.wrong.length > 0) {
+    formatted += ` - NEVER ${themeExamples.wrong.map(e => `"${e}"`).join(' or ')}`
+  }
+
+  return {
+    correct: themeExamples.correct,
+    wrong: themeExamples.wrong,
+    formatted
+  }
+}
+
+/**
+ * Get all clothing directives for the prompt
+ * Faz 1: Modülerleştirme - tüm clothing direktiflerini tek yerden yönet
+ */
+function getClothingDirectives(
+  theme: string,
+  themeConfig: ReturnType<typeof getThemeConfig>
+): ClothingDirectives {
+  const fewShotExamples = getClothingFewShotExamples(theme, themeConfig)
+  
+  // CRITICAL - CHARACTER CLOTHING bölümü
+  const criticalSection = `CRITICAL - CHARACTER CLOTHING (Story-driven - Plan: Kapak/Close-up/Kıyafet): For EACH page, specify character clothing that matches the scene and story. **DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"** - the clothing MUST be theme-specific and scene-appropriate.
+
+**THEME-SPECIFIC CLOTHING EXAMPLES (FEW-SHOT):**
+${fewShotExamples.formatted}
+
+**CRITICAL RULE:** If the theme is ${themeConfig.name}, the clothing MUST be: ${themeConfig.clothingStyle}. Use the "clothing" field per page in the JSON output. DO NOT use formal wear (suits, ties, dress shoes) unless the story explicitly requires it (e.g., "going to a wedding").`
+
+  // JSON şeması imagePrompt içindeki clothing direktifi
+  const jsonSchemaImagePrompt = `- SPECIFIC character clothing for this scene (e.g. space suit, swimwear, outdoor gear) – MUST match story and setting`
+
+  // JSON şeması sceneDescription içindeki clothing direktifi
+  const jsonSchemaSceneDesc = `- SPECIFIC character clothing for this moment (match story/setting; e.g. astronaut suit, swimwear, outdoor gear)`
+
+  // JSON şeması clothing field örneği
+  const jsonSchemaClothing = `"clothing": "theme-specific outfit – MUST match story theme (${themeConfig.name} theme → ${themeConfig.clothingStyle})" // REQUIRED: Character clothing for this scene - DO NOT OMIT THIS FIELD. Examples: space → "child-sized astronaut suit with helmet", underwater → "swimwear", forest → "outdoor gear". NEVER use generic "casual clothing" or "mavi ve kırmızı rahat giysiler"`
+
+  // CRITICAL reminders clothing kısmı
+  const criticalReminders = `CRITICAL: The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
+
+**FEW-SHOT EXAMPLES:**
+${fewShotExamples.formatted}
+
+DO NOT omit this field - it is essential for visual consistency with the story. DO NOT use generic clothing descriptions.`
+
+  // CHARACTER & STORY clothing kısmı
+  const themeExamplesFormatted = themeConfig.name.toLowerCase() === 'space' 
+    ? `- Example 1: "child-sized astronaut suit with helmet"
+- Example 2: "space exploration outfit"
+- Example 3: "astronaut gear"
+- ❌ WRONG: "mavi ve kırmızı rahat giysiler" or "casual clothes"`
+    : themeConfig.name.toLowerCase() === 'underwater'
+    ? `- Example 1: "swimwear"
+- Example 2: "beach clothes"
+- Example 3: "swimsuit"
+- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"`
+    : themeConfig.name.toLowerCase() === 'adventure'
+    ? `- Example 1: "outdoor gear"
+- Example 2: "hiking clothes"
+- Example 3: "adventure outfit"
+- ❌ WRONG: "casual clothes" or "mavi ve kırmızı rahat giysiler"`
+    : `- Use theme-appropriate clothing matching the story setting`
+
+  const characterStoryReminder = `**CRITICAL - Character clothing:** The "clothing" field is REQUIRED for each page. You MUST specify theme-specific clothing that matches the story theme (${themeConfig.name} → ${themeConfig.clothingStyle}). 
+
+**FEW-SHOT EXAMPLES FOR ${themeConfig.name.toUpperCase()} THEME:**
+${themeExamplesFormatted}
+
+DO NOT use generic "casual clothing" or "mavi ve kırmızı rahat giysiler" - the clothing MUST be theme-specific. NOT formal wear (suits, ties, dress shoes).`
+
+  return {
+    criticalSection,
+    fewShotExamples: fewShotExamples.formatted,
+    jsonSchemaImagePrompt,
+    jsonSchemaSceneDesc,
+    jsonSchemaClothing,
+    criticalReminders,
+    characterStoryReminder
+  }
 }
 
 function getEducationalFocus(ageGroup: string, theme: string): string {
@@ -932,6 +807,467 @@ function buildCharacterDescription(
   }
   
   return desc
+}
+
+// ============================================================================
+// Prompt Section Builder Functions (Faz 2: Bölümlere Ayırma)
+// ============================================================================
+
+function buildCharacterSection(
+  characterDesc: string,
+  characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
+): string {
+  return `# CHARACTER${characters && characters.length > 1 ? 'S' : ''}
+${characterDesc}`
+}
+
+function buildStoryRequirementsSection(
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  characterAge: number,
+  ageGroup: string,
+  pageCount: number,
+  language: string,
+  illustrationStyle: string,
+  customRequests?: string
+): string {
+  return `# STORY REQUIREMENTS
+- Theme: ${themeConfig.name} (${themeConfig.mood} mood)
+- Target Age: ${characterAge} years old (${ageGroup} age group)
+- Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
+- Language: ${getLanguageName(language)}
+- Illustration Style: ${illustrationStyle}
+- Special Requests: ${customRequests || 'None'}`
+}
+
+function buildLanguageSection(language: string): string {
+  const langName = getLanguageName(language)
+  return `# CRITICAL - LANGUAGE REQUIREMENT (MANDATORY - NO EXCEPTIONS)
+**YOU MUST WRITE THE ENTIRE STORY IN ${langName.toUpperCase()} ONLY.**
+
+- **ONLY use ${langName} words and sentences**
+- **DO NOT use ANY English words, phrases, or sentences**
+- **DO NOT mix languages - use ${langName} exclusively**
+- **Every single word in the story text MUST be in ${langName}**
+- **Character names can remain as provided, but all dialogue and narration MUST be in ${langName}**
+- **If you use any English words, the story will be REJECTED**
+
+**Examples of what is FORBIDDEN:**
+- Using English words like "hello", "yes", "no", "okay", "good", "bad", "happy", "sad" in a ${langName} story
+- Mixing languages: "Merhaba hello" or "Güzel good"
+- Using English phrases or expressions
+
+**Examples of what is CORRECT:**
+- If language is Turkish: Use ONLY Turkish words like "merhaba", "evet", "hayır", "güzel", "mutlu", "üzgün"
+- If language is German: Use ONLY German words like "hallo", "ja", "nein", "schön", "glücklich", "traurig"
+- If language is French: Use ONLY French words like "bonjour", "oui", "non", "beau", "heureux", "triste"
+- If language is Spanish: Use ONLY Spanish words like "hola", "sí", "no", "hermoso", "feliz", "triste"
+- If language is Chinese: Use ONLY Chinese characters and words
+- If language is Portuguese: Use ONLY Portuguese words like "olá", "sim", "não", "bonito", "feliz", "triste"
+- If language is Russian: Use ONLY Russian words like "привет", "да", "нет", "красивый", "счастливый", "грустный"
+
+**VERIFICATION:** Before returning the JSON, check EVERY word in EVERY page text. If you find ANY English word, replace it with the ${langName} equivalent.`
+}
+
+function buildAgeAppropriateSection(ageGroup: string): string {
+  return `# AGE-APPROPRIATE GUIDELINES
+- Vocabulary: ${getVocabularyLevel(ageGroup)}
+- Sentence Length: ${getSentenceLength(ageGroup)}
+- Complexity: ${getComplexityLevel(ageGroup)}
+- Reading Time: ${getReadingTime(ageGroup)} minutes per page`
+}
+
+function buildStoryStructureSection(
+  characterName: string,
+  ageGroup: string,
+  pageCount: number,
+  characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
+): string {
+  return `# STORY STRUCTURE - DETAILED PAGE-BY-PAGE REQUIREMENTS (NEW: 16 Ocak 2026)
+
+**CRITICAL:** Each page MUST have a UNIQUE, DISTINCT scene. NO REPEATING SCENES or SIMILAR COMPOSITIONS.
+
+**PACING CONTROL (NEW: 25 Ocak 2026):**
+- **Strong hook early:** First 2 sentences must grab attention and create interest
+- **Shorter scenes:** Each page should be a complete mini-scene, not dragging on
+- **Predictable patterns:** For younger ages, use repetition and patterns (e.g., "First they tried X, then Y, then Z")
+- **Scene-by-scene breakdown:** Each page should have clear beginning, middle, and end
+- **Pacing variety:** Mix fast-paced action scenes with slower, contemplative moments
+- **Page transitions:** Smooth transitions between pages, but each page should feel complete
+
+## Page-by-Page Structure:
+
+**Page 1 (Cover):**
+- Professional book cover illustration
+- Main character prominently featured with ${characters && characters.length > 1 ? 'all companions' : 'theme elements'}
+- Visually striking, colorful, professional
+- Different from all subsequent pages (unique composition)
+
+**Page 2 (Introduction):**
+- Introduction scene - DIFFERENT location/setting from cover
+- DIFFERENT time of day or weather from cover
+- DIFFERENT composition (e.g., wide shot if cover is close-up)
+- Introduce ${characterName} and setting
+
+**Pages 3-5 (Adventure Begins):**
+Each page MUST have DIFFERENT scenes:
+- **Page 3 (Discovery):** New location, different perspective (e.g., close-up if previous was wide), ${characterName} discovers something interesting
+- **Page 4 (Action):** Different location, different composition (e.g., dynamic angle), active exploration or action scene
+- **Page 5 (Exploration):** Different location, different time of day (e.g., afternoon if previous was morning), deeper exploration
+
+**Pages 6-8 (Challenge & Problem-Solving):**
+Each page MUST have DIFFERENT scenes:
+- **Page 6 (Problem):** Different location, different mood, introduce age-appropriate challenge
+- **Page 7 (Attempt):** Different location, different perspective, ${characterName} attempts to solve the problem
+- **Page 8 (Solution):** Different location, different composition, creative solution emerges
+
+**Pages 9-10 (Resolution & Ending):**
+Each page MUST have DIFFERENT scenes:
+- **Page 9 (Resolution):** Different location, different time of day (e.g., evening), problem resolved with valuable lesson
+- **Page 10 (Happy Ending):** Different location, different composition (e.g., wide shot with ${characters && characters.length > 1 ? 'all characters' : 'full scene'}), return home or celebration
+
+**LOCATION VARIETY REQUIREMENT:**
+- Each page should be in a DIFFERENT location OR show a DIFFERENT part of the same location
+- Example progression: home → forest entrance → deep forest → clearing → mountain → cave → river → summit → returning home → home (celebration)
+- DO NOT repeat the same location on consecutive pages
+
+**TIME PROGRESSION REQUIREMENT:**
+- Vary time of day across pages to show story progression
+- Example progression: morning → late morning → noon → afternoon → late afternoon → evening → sunset → dusk → night or next morning
+- DO NOT use the same time of day for multiple consecutive pages`
+}
+
+function buildThemeSpecificSection(
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  ageGroup: string,
+  theme: string,
+  clothingDirectives: ClothingDirectives
+): string {
+  return `# THEME-SPECIFIC ELEMENTS
+Setting: ${themeConfig.setting}
+Include: ${themeConfig.commonElements.join(', ')}
+Mood: ${themeConfig.mood}, warm, inviting
+Educational Focus: ${getEducationalFocus(ageGroup, theme)}
+Clothing Style: ${themeConfig.clothingStyle || 'age-appropriate casual clothing'}
+
+${clothingDirectives.criticalSection}`
+}
+
+function buildVisualDiversitySection(): string {
+  return `# CRITICAL - VISUAL DIVERSITY REQUIREMENTS (MANDATORY - NEW: 16 Ocak 2026)
+
+**EACH PAGE MUST HAVE A UNIQUE, DISTINCT SCENE - NO REPEATING SCENES:**
+
+## 1. Location Variety (MANDATORY):
+- Each page should be in a DIFFERENT location or show a DIFFERENT part of the same location
+- Examples: Page 2 (home), Page 3 (forest entrance), Page 4 (deep forest), Page 5 (clearing), Page 6 (mountain), Page 7 (cave), Page 8 (river), Page 9 (summit), Page 10 (returning home)
+- **DO NOT repeat the same location on consecutive pages**
+
+## 2. Time of Day Variety (MANDATORY):
+- Vary time of day across pages to show story progression
+- Examples: Page 2 (morning), Page 3 (late morning), Page 4 (noon), Page 5 (afternoon), Page 6 (late afternoon), Page 7 (evening), Page 8 (sunset), Page 9 (dusk), Page 10 (night or next morning)
+- **DO NOT use the same time of day for multiple consecutive pages**
+
+## 3. Weather/Atmosphere Variety:
+- Vary weather or atmospheric conditions when appropriate for the story
+- Examples: sunny → partly cloudy → windy → sunny → cloudy → light rain → clearing → beautiful weather
+- Use weather changes to enhance mood and story progression
+
+## 4. Perspective/Camera Angle Variety (MANDATORY):
+- Vary camera angles and perspectives for visual interest
+- Options: wide shot, medium shot, close-up, bird's eye view, low angle, high angle, eye level
+- Examples: Page 2 (wide shot), Page 3 (medium shot), Page 4 (close-up), Page 5 (bird's eye view), Page 6 (low angle)
+- **DO NOT use the same perspective for multiple consecutive pages**
+
+## 5. Composition Variety (MANDATORY):
+- Vary composition and framing for visual diversity
+- Options: character centered, character left (environment right), character right (action left), balanced, diagonal, symmetrical, group composition
+- Examples: Page 2 (character centered), Page 3 (character left), Page 4 (diagonal composition), Page 5 (balanced)
+- **DO NOT repeat the same composition for multiple consecutive pages**
+
+## 6. Action/Mood Variety (MANDATORY):
+- Vary character actions and emotional tones across pages
+- Examples: calm introduction → excited discovery → active exploration → curious investigation → determined problem-solving → creative thinking → joyful solution → proud resolution → happy celebration
+- **DO NOT repeat the same action/mood for multiple consecutive pages**
+
+## 7. Page 1 vs Cover (MANDATORY - 3.5.20):
+- **Page 1 (first interior page)** must have a clearly **different** scene, composition, or camera angle from the **cover**.
+- The cover typically shows a "hero" character shot (medium/portrait, character centered). **Page 1** should show a **different moment**, **wider environment**, or **distinct action/setting**.
+- Use a different camera angle (e.g. page 1 = wide shot or low-angle vs cover = medium/portrait), different composition (e.g. rule of thirds, character off-center), or expanded scene detail.
+- **DO NOT** repeat the same framing as the cover. Page 1 imagePrompt and sceneDescription must describe a distinctly different visual.
+
+## CRITICAL CHECKLIST FOR EACH PAGE:
+Before finalizing each page's imagePrompt, verify ALL of these:
+- ✓ Location is DIFFERENT from previous page (or different part of same location)
+- ✓ Time of day is DIFFERENT from previous page (or clearly progressing)
+- ✓ Weather/atmosphere is DIFFERENT from previous page (or clearly changing) - if appropriate
+- ✓ Perspective/camera angle is DIFFERENT from previous page
+- ✓ Composition is DIFFERENT from previous page
+- ✓ Action/mood is DIFFERENT from previous page
+- ✓ **Page 1 only:** Scene/composition/camera DIFFERENT from cover (see rule 7 above)
+- ✓ Scene description is DETAILED (at least 150-200 characters, NOT just 70-80)
+- ✓ Image prompt is DETAILED (at least 200+ characters with specific visual elements)`
+}
+
+function buildWritingStyleSection(
+  ageGroup: string,
+  language: string,
+  characterName: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  return `# WRITING STYLE REQUIREMENTS (CRITICAL - NEW: 15 Ocak 2026)
+
+**TEXT LENGTH REQUIREMENT:** Each page MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE). This means detailed, rich text - NOT short, simple sentences.
+
+1. **Include dialogue between characters** (use quotation marks)
+   - Characters should talk to each other naturally
+   - Include character actions with dialogue (e.g., "Look!" ${characterName} said, pointing)
+   - Use dialogue to show personality and emotions
+   - Balance dialogue with descriptive narration
+   - **Dialogue adds length and richness - use it!**
+   
+2. **Describe emotions and feelings with sensory details**
+   - Show character's internal thoughts and emotional responses
+   - Use ALL sensory details (what they see, hear, feel, smell, taste)
+   - **Visual:** What they see - colors, lighting, textures, shapes, movements
+   - **Auditory:** What they hear - sounds, music, nature sounds, voices, silence
+   - **Tactile:** What they feel - textures, temperature, wind, surfaces, objects
+   - **Olfactory:** What they smell - flowers, food, nature scents, fresh air
+   - **Gustatory:** What they taste (if applicable) - food, drinks, fresh air
+   - Example: "${characterName} felt proud and warm, even as the evening air grew cooler. The golden sunset painted everything in orange and pink. ${characterName} could hear birds singing and smell the sweet scent of wildflowers. The soft grass felt ticklish under ${characterName}'s feet."
+   - **Detailed emotions with sensory details add word count - be descriptive!**
+   
+3. **Use descriptive language for atmosphere and setting**
+   - Paint a vivid picture with words
+   - Describe lighting, colors, textures, sounds
+   - Create immersive scenes
+   - Example: "As the sun began to set, the sky turned orange and pink and purple, painting everything with magical colors"
+   - **Atmospheric descriptions are essential for reaching ${getWordCount(ageGroup)} words**
+   
+4. **Show, don't just tell**
+   
+   **BAD (TOO SHORT - DO NOT DO THIS):**
+   "${characterName} went to the forest. She saw trash. She cleaned it."
+   - Only 3 sentences, ~15 words - TOO SHORT!
+   - No dialogue, no sensory details, no atmosphere
+   - Just tells what happened, doesn't show it
+   - Boring and flat
+   
+   **GOOD (${getWordCount(ageGroup)} words - DO THIS):**
+   "As ${characterName} walked along the forest path, the morning sun filtered through the tall trees, creating dappled patterns on the ground. 'What's that?' ${characterName} asked, stopping to look at something colorful on the path. ${characterName} could hear birds chirping overhead and smell the fresh, earthy scent of the forest. The air felt cool and refreshing. ${characterName} bent down and picked up a piece of colorful paper. 'This doesn't belong here,' ${characterName} said thoughtfully. ${characterName} looked around and saw more trash scattered nearby. 'I should clean this up,' ${characterName} decided, feeling determined. With a smile, ${characterName} began collecting the trash, feeling proud to help the forest."
+   - Multiple sentences with dialogue
+   - Sensory details: see (sun, trees, patterns), hear (birds), smell (forest), feel (cool air)
+   - Shows emotions and thoughts
+   - Creates atmosphere and immersion
+   - **IMPORTANT:** All examples in this prompt are in English for instruction purposes, but YOUR story text MUST be written entirely in ${getLanguageName(language)}
+   
+5. **Page structure** (each page should include ALL of these to reach ${getWordCount(ageGroup)} words):
+   - Opening description (setting the scene atmospherically - 2-3 sentences)
+   - Character action or dialogue (2-3 sentences with dialogue)
+   - Emotional response or internal thought (1-2 sentences)
+   - Transition or scene continuation (1-2 sentences)
+   - **Total: 6-10 sentences per page = ${getWordCount(ageGroup)} words**
+   
+6. **Example of quality writing structure (${getWordCount(ageGroup)} words):**
+   
+   Here's how I like it - example text for ${ageGroup} age group (${getLanguageName(language)}):
+   
+   ${getExampleText(ageGroup, characterName, language, characters)}
+   
+   **CRITICAL:** All text in your story MUST be in ${getLanguageName(language)} - the example above is in ${getLanguageName(language)} to show you the style. Write your story in the same language, with the same level of detail, dialogue, and sensory richness.`
+}
+
+function buildSafetySection(ageGroup: string): string {
+  const safetyRules = getSafetyRules(ageGroup)
+  return `# SAFETY RULES (CRITICAL - MUST FOLLOW)
+## MUST INCLUDE:
+${safetyRules.mustInclude.map(rule => `- ${rule}`).join('\n')}
+
+## ABSOLUTELY AVOID:
+${safetyRules.mustAvoid.map(rule => `- ${rule}`).join('\n')}`
+}
+
+function buildIllustrationSection(
+  illustrationStyle: string,
+  characterName: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  const companionName = characters && characters.length > 1 
+    ? (characters[1].name || characters[1].type.displayName)
+    : 'friend'
+  
+  return `# ILLUSTRATION GUIDELINES
+For each page, provide:
+1. Scene description (what's happening)
+2. Detailed image prompt for ${illustrationStyle} illustration
+3. Character appearance (consistent across all pages)
+4. Setting details (colors, lighting, mood)
+5. Composition (what's in focus, perspective)
+6. **Sensory details visualization (NEW: 25 Ocak 2026):** Include visual elements that represent the sensory details from the story text:
+   - Visual: Show the colors, lighting, textures mentioned in the text
+   - Auditory: Show elements that suggest sounds (birds, rustling leaves, flowing water)
+   - Tactile: Show textures and surfaces that characters interact with
+   - Olfactory: Show flowers, food, or nature elements that suggest scents
+
+# VISUAL SAFETY GUIDELINES (CRITICAL - NEW: 18 Ocak 2026)
+**To avoid anatomical errors in generated images, follow these guidelines:**
+
+## AVOID RISKY HAND INTERACTIONS:
+- **DO NOT** have characters holding hands
+- **DO NOT** have characters holding detailed objects (books, toys, tools)
+- **DO NOT** have complex hand gestures (pointing with fingers, thumbs up, peace signs)
+- **DO NOT** have hands overlapping between characters
+- **DO NOT** have detailed hand-to-object interactions
+
+## PREFER SAFE HAND POSES:
+- **DO** keep hands at sides in natural relaxed poses
+- **DO** use simple raised hand for waving (open palm)
+- **DO** use arms spread wide for joy/excitement
+- **DO** use hands behind back
+- **DO** use hands on hips
+- **DO** describe hands as "in natural relaxed pose" without specifics
+
+## SAFE CHARACTER INTERACTIONS:
+- Characters can stand together, but keep hands separate
+- Characters can talk to each other, but avoid hand contact
+- If story requires "giving" something, describe it verbally without showing detailed hand interaction
+- Focus on character facial expressions and body language rather than complex hand poses
+
+**EXAMPLE - BAD (Risky):** "${characterName} and ${companionName} holding hands, walking together through the forest"
+**EXAMPLE - GOOD (Safe):** "${characterName} and ${companionName} walking together through the forest, hands at their sides, smiling at each other"
+
+**REMEMBER:** Simple, clear poses = better anatomical accuracy. Complex hand interactions = higher error rate.`
+}
+
+function buildOutputFormatSection(
+  ageGroup: string,
+  pageCount: number,
+  illustrationStyle: string,
+  theme: string,
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  characters: Array<{ id: string; name?: string; type: { displayName: string; group?: string } }>,
+  characterName: string,
+  clothingDirectives: ClothingDirectives
+): string {
+  const characterIdsList = characters.map(c => c.id).join(', ')
+  const familyMembers = characters.filter(c => c.type?.group === "Family Members")
+  const familyMembersList = familyMembers.map(c => c.name || c.type.displayName).join(', ')
+  
+  return `# OUTPUT FORMAT (JSON)
+Return a valid JSON object with this exact structure:
+{
+  "title": "Story title",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "Page text (CRITICAL: Must be ${getWordCount(ageGroup)} words - this is the AVERAGE, write detailed text with dialogue and descriptions)",
+      "imagePrompt": "DETAILED ${illustrationStyle} illustration prompt (MUST be 200+ characters) with:
+        - SPECIFIC location description (e.g., 'in a sunny forest clearing with tall oak trees, wildflowers, and a babbling brook')
+        - SPECIFIC time of day (e.g., 'late afternoon with golden sunlight filtering through leaves')
+        - SPECIFIC weather/atmosphere (e.g., 'partly cloudy sky with gentle breeze')
+        - SPECIFIC perspective/camera angle (e.g., 'medium shot from eye level, character in foreground')
+        - SPECIFIC composition (e.g., 'character on left side, environment on right, balanced framing')
+        - SPECIFIC character action and pose (e.g., 'character kneeling, examining something on the ground with curious expression')
+        - SPECIFIC environmental details (e.g., 'fallen leaves, mushrooms, small insects, dappled sunlight')
+        - ${clothingDirectives.jsonSchemaImagePrompt}
+        - Character consistency (same character as previous pages)
+        - Theme elements (${theme})
+        - Mood: ${themeConfig.mood}
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages - different location, different time, different composition, different perspective
+        - **Page 1 only:** MUST be DIFFERENT from cover - different camera angle, composition, or expanded scene (see Page 1 vs Cover rule)",
+      "sceneDescription": "DETAILED scene description (MUST be 150+ characters) including:
+        - SPECIFIC location (where exactly is this happening? e.g., 'deep in the enchanted forest, near a sparkling stream')
+        - SPECIFIC time of day (morning/late morning/noon/afternoon/late afternoon/evening/sunset/dusk/night)
+        - SPECIFIC weather/atmosphere (sunny/partly cloudy/cloudy/windy/light rain/snowy - if appropriate)
+        - SPECIFIC character action (what is the character doing exactly? e.g., 'kneeling down to examine colorful mushrooms')
+        - SPECIFIC environmental details (what objects, animals, plants, or features are visible? e.g., 'tall oak trees, wildflowers, butterflies, moss-covered rocks')
+        - ${clothingDirectives.jsonSchemaSceneDesc}
+        - SPECIFIC emotional tone (how does the character feel? what's the mood? e.g., 'curious and excited, with a sense of wonder')
+        - CRITICAL: This scene MUST be DIFFERENT from previous pages
+        - **Page 1 only:** MUST be DIFFERENT from cover - different angle, composition, or moment (see Page 1 vs Cover rule)",
+      "characterIds": ["character-id-1", "character-id-2"], // REQUIRED: Which characters appear on this page (use IDs from CHARACTER MAPPING) - DO NOT OMIT THIS FIELD
+      ${clothingDirectives.jsonSchemaClothing}
+      // CRITICAL: ALL ${characters.length} characters (${characterIdsList}) must appear across all pages
+      // Main character (${characterName}) will appear in most pages
+      ${familyMembers.length > 0 ? `// Family Members (${familyMembersList}) must appear in multiple pages` : ''}
+      // Example: "characterIds": ["${characters[0]?.id}", "${characters[1]?.id || ''}", "${characters[2]?.id || ''}"] (use only IDs for characters that appear on this page)
+    }
+    // ... continue for EXACTLY ${getPageCount(ageGroup, pageCount)} pages total
+  ],
+  "metadata": {
+    "ageGroup": "${ageGroup}",
+    "theme": "${theme}",
+    "educationalThemes": ["theme1", "theme2"],
+    "safetyChecked": true
+  }
+}
+
+CRITICAL: The "pages" array MUST contain EXACTLY ${getPageCount(ageGroup, pageCount)} items. Count them carefully before returning.
+
+CRITICAL: The "characterIds" field is REQUIRED for each page. You MUST include it for every page using the character IDs from the CHARACTER MAPPING section. DO NOT omit this field - the API will reject your response if characterIds is missing.
+
+${clothingDirectives.criticalReminders}`
+}
+
+function buildCriticalRemindersSection(
+  ageGroup: string,
+  characterName: string,
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  pageCount: number,
+  language: string,
+  clothingDirectives: ClothingDirectives
+): string {
+  return `# CRITICAL REMINDERS
+
+## TEXT LENGTH (VERY IMPORTANT):
+- **Each page text MUST be approximately ${getWordCount(ageGroup)} words (AVERAGE)**
+- **DO NOT write short, simple sentences like "Lisa went to forest. She saw trash. She cleaned it."**
+- **INSTEAD, write detailed, rich text with:**
+  - Dialogue between characters (use quotation marks)
+  - Atmospheric descriptions (setting the scene)
+  - Character emotions and feelings
+  - Sensory details (what they see, hear, feel)
+  - Multiple sentences per page (NOT just 2-3 sentences)
+- **Example of GOOD text structure (${getWordCount(ageGroup)} words):**
+  Write detailed, descriptive text with dialogue, emotions, and sensory details - ALL in ${getLanguageName(language)}
+- **Example of BAD text (TOO SHORT - DO NOT DO THIS):**
+  Short, simple sentences without detail
+- **CRITICAL REMINDER:** All examples in this prompt are in English for instruction, but YOUR story MUST be written entirely in ${getLanguageName(language)}. Do NOT copy English words from examples.
+- **Target: ${getWordCount(ageGroup)} words per page - write DETAILED, DESCRIPTIVE text with dialogue and atmosphere**
+
+## CHARACTER & STORY:
+- Character must look EXACTLY the same in every image prompt
+- ${characterName} is the hero and main character in EVERY scene
+${clothingDirectives.characterStoryReminder}
+- Keep it positive, fun, and inspiring
+- Age-appropriate vocabulary and concepts
+- NO scary, violent, or inappropriate content
+- Include subtle educational value
+- Make it engaging and memorable
+
+## SAFETY & AGE-APPROPRIATE ACTIONS (CRITICAL - NEW: 25 Ocak 2026):
+- **AVOID ambiguous actions that could trigger safety filters:**
+  - DO NOT use "dans etmek" (dancing) for adult characters in certain contexts - use "hareket etmek" (moving), "neşeli şarkılar söylemek" (singing happy songs), "coşkuyla eğlenmek" (joyfully celebrating) instead
+  - DO NOT use "sarılmak" (hugging) in ways that could be misinterpreted - use "kucaklaşmak" (embracing), "sevecen bir şekilde yaklaşmak" (approaching warmly) instead
+  - DO NOT use physical interactions that could be ambiguous - keep all interactions clearly family-friendly and age-appropriate
+- **PREFER clear, innocent actions:**
+  - "el ele tutuşmak" (holding hands), "birlikte yürümek" (walking together), "birlikte oynamak" (playing together)
+  - "gülmek" (laughing), "gülümsemek" (smiling), "neşelenmek" (being cheerful)
+  - "şarkı söylemek" (singing), "müzik dinlemek" (listening to music), "şarkı mırıldanmak" (humming songs)
+- **ALWAYS ensure actions are clearly innocent and family-safe**
+- If unsure about an action, use a safer alternative that conveys the same positive emotion
+
+- **MOST IMPORTANT: You MUST return EXACTLY ${getPageCount(ageGroup, pageCount)} pages in the "pages" array. Count them before returning!**
+
+## LANGUAGE COMPLIANCE (CRITICAL - FINAL CHECK):
+Before submitting your response, perform this final check:
+1. Read EVERY word in EVERY page's "text" field
+2. If you find ANY English word (like "hello", "yes", "good", "happy", "sad", "beautiful", "amazing", etc.), REPLACE it immediately with the ${getLanguageName(language)} equivalent
+3. Ensure ALL dialogue is in ${getLanguageName(language)}
+4. Ensure ALL narration is in ${getLanguageName(language)}
+5. The ONLY exception: Character name "${characterName}" can remain as is
+6. If you cannot write a word in ${getLanguageName(language)}, use a ${getLanguageName(language)} synonym instead - NEVER use English
+
+**REMEMBER: A single English word in a ${getLanguageName(language)} story is a CRITICAL ERROR. Check every word before returning.**`
 }
 
 // ============================================================================
