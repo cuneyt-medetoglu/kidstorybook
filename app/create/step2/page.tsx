@@ -892,8 +892,8 @@ export default function Step2Page() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Child">Child</SelectItem>
-                            <SelectItem value="Pets">Pets</SelectItem>
                             <SelectItem value="Family Members">Family Members</SelectItem>
+                            <SelectItem value="Pets">Pets</SelectItem>
                             <SelectItem value="Toys">Toys</SelectItem>
                             <SelectItem value="Other">Other</SelectItem>
                           </SelectContent>

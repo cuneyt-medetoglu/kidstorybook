@@ -1959,6 +1959,19 @@ Mobile-first design with touch-friendly interactions.
     - Adetlere göre özel fiyatlandırma
     - Şirket dashboard'u (oluşturulan kitapları görüntüleme)
 
+### Yasal ve Uyumluluk (Production Sonrası)
+- [ ] **ETBİS Kayıt İşlemi** - ETBİS sistemine kayıt olunması gerekiyor
+  - **Tarih:** 24 Ocak 2026
+  - **Kategori:** Post-MVP / Production Sonrası
+  - **Öncelik:** 🔴 Kritik (Production sonrası)
+  - **Açıklama:** ETBİS (Elektronik Ticaret Bilgi Sistemi) sistemine kayıt olunması gerekiyor. Bu, Türkiye'de e-ticaret yapan işletmeler için yasal bir gerekliliktir.
+  - **Not:** Production'a geçmeden önce veya hemen sonrasında bu işlem tamamlanmalıdır.
+  - **Araştırılacaklar:**
+    - ETBİS kayıt süreci ve gereksinimleri
+    - Gerekli belgeler ve bilgiler
+    - Kayıt süresi ve maliyeti
+    - Kayıt sonrası yükümlülükler
+
 ### Referans Siteden (magicalchildrensbook.com) Eksik Özellikler
 
 #### MVP'ye Eklenmeli (Önemli)
