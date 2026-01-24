@@ -1797,6 +1797,31 @@ Mobile-first design with touch-friendly interactions.
   - İlgili Faz: Faz 6+
   - Notlar: Training time 5-15 dk, GPU cost, storage per user
 
+### Hardcopy Basım Ekranı - "Appearance of the Book" (24 Ocak 2026)
+- **Kategori:** UI/UX Fikirleri / Hardcopy / Print-on-Demand
+- **Öncelik:** 🟡 Önemli (Post-MVP)
+- **Tarih:** 24 Ocak 2026
+- **Açıklama:** Hardcopy basım için örnek bilgiler içeren bir ekran ve yer ayırmalıyız. Kullanıcılar basılı kitap siparişi vermeden önce kitabın fiziksel özelliklerini görebilmeli.
+- **Ekran İçeriği:**
+  - **Başlık:** "Appearance of the Book"
+  - **Giriş Metni:** "Do you want to hold your own story in your hands? Then consider printing your book and bringing your creation to life!"
+  - **Kitap Önizlemesi:**
+    - Sol tarafta kitap illüstrasyonu
+    - Boyutlar: 11.69 inches (yükseklik) x 8.27 inches (genişlik)
+  - **Kalite ve Detaylar (Quality and Details):**
+    - 📐 **Large A4 Format (8.27 x 11.69 inches):** Perfect for colorful illustrations and an optimal reading experience.
+    - 📖 **Durable Hardcover Finish:** Remains beautiful, even after countless page turns.
+    - 🎨 **Premium Color Quality:** Brilliant and vibrant colors bring the story to life.
+    - 📄 **High-Quality Coated Paper:** For a luxurious appearance and extra protection against stains.
+    - ✨ **24 Pages Full of Magic:** Enough space for a beautiful story and enchanting images.
+    - 🖌️ **Matte or Glossy Cover:** Choose the desired finish for the hardcover cover yourself.
+- **İlgili Faz:** Faz 5+ (Post-MVP - Print-on-Demand)
+- **Notlar:**
+  - Bu ekran hardcopy sipariş akışının bir parçası olacak
+  - Kullanıcılar kitabın fiziksel özelliklerini görerek sipariş kararı verebilecek
+  - Görsel referans: Ekte paylaşılan tasarım örneği
+  - Print-on-Demand özelliği MVP'ye dahil değil, gelecek fazlarda eklenecek
+
 ### Bekleyen Kararlar
 - [ ] Domain adı belirlenmedi
 - [ ] Fiyatlar netleştirilmedi (TL/USD)
