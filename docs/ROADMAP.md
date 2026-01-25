@@ -440,6 +440,10 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi
+  - [ ] **2.2.4.1** Sesli Hikaye Özelliği Vurgusu (26 Ocak 2026)
+    - Ana sayfadaki özellikler bölümünde sesli hikaye (TTS) özelliği öne çıkarılmalı
+    - "Interactive Audio Stories" veya "Listen Along" gibi vurgular eklenmeli
+    - Sesli okuma özelliğinin çocuklar için faydaları (okuma öğrenme, telaffuz, vb.) belirtilmeli
 - [x] **2.2.5** Fiyatlandırma özeti - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.6** FAQ bölümü - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.7** Kampanya banner'ları (free shipping, indirimler) - ✅ v0.app'den alındı ve entegre edildi
@@ -648,6 +652,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme
 - [x] **2.5.3.8** TTS Cache mekanizması - ✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026
 - [ ] **2.5.3.9** TTS Cache temizleme (hikaye değişikliğinde) - ⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur
+- [ ] **2.5.3.10** Sesli Hikaye Özelliği Pazarlama Vurgusu (26 Ocak 2026)
+  - Ebook viewer'da sesli hikaye özelliği daha görünür hale getirilmeli
+  - İlk açılışta veya onboarding'de sesli okuma özelliği tanıtılmalı
+  - "Listen to your story" veya "Audio narration available" gibi prominent call-to-action'lar eklenmeli
+  - Sesli okuma özelliğinin faydaları (okuma öğrenme, telaffuz, bağımsız okuma) kullanıcıya gösterilmeli
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
 - [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi
@@ -1330,6 +1339,13 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Hardcopy butonları (My Library, Sepet, vb.) TR dışı kullanıcılar için disabled olmalı veya bilgilendirme mesajı gösterilmeli
     - "Hardcopy is currently only available in Turkey. We're working on expanding to more countries soon!" gibi bir mesaj eklenmeli
     - Diğer ülkelerde zamanla hardcopy desteği eklenecek, bu bilgi UI'da belirtilmeli
+- [ ] **4.4.7** Gelato.com Entegrasyonu - TR Dışı Hardcopy Baskı (26 Ocak 2026)
+  - **Gelato.com Print-on-Demand Entegrasyonu:** https://www.gelato.com/ üzerinden TR dışındaki bazı ülkelerde hardcopy baskı alıp satış yapabilme
+  - Gelato.com API entegrasyonu araştırılacak ve implementasyon planı yapılacak
+  - Desteklenen ülkeler listesi ve fiyatlandırma stratejisi belirlenecek
+  - Gelato.com üzerinden sipariş akışı tasarlanacak (kullanıcı sipariş verir → Gelato'ya yönlendirilir veya otomatik sipariş oluşturulur)
+  - Gelato.com ile entegrasyon sonrası TR dışı ülkeler için hardcopy satışı aktif hale gelecek
+  - UI'da ülkeye göre hardcopy kullanılabilirliği gösterilecek (TR: yerel baskı, diğer ülkeler: Gelato.com)
 
 ---
 
@@ -1629,6 +1645,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Content marketing
   - Influencer partnerships
   - SEO ve organic growth
+- [ ] **5.9.6** Ürün Değer Önerisi ve Pazarlama Mesajları (26 Ocak 2026)
+  - **Evergreen/Kalıcı Değer Vurgusu:** Ürünün "trend" olmaktan ziyade kalıcı/evergreen olduğu vurgulanmalı
+  - **Hediye + Hatıra Değeri:** Ürünün hediye ve hatıra değeri öne çıkarılmalı
+  - **Sürdürülebilir Talep:** Bu özellikler nedeniyle talebin sürdürülebilir olduğu pazarlama mesajlarında vurgulanmalı
+  - Ana sayfa, pricing sayfası, sosyal medya içeriklerinde bu mesajlar kullanılmalı
+  - Marketing materyallerinde "Timeless Gift" ve "Lasting Memories" vurguları yapılmalı
 
 ### 5.10 Maliyet Takibi ve Muhasebe (23 Ocak 2026)
 - [ ] **5.10.1** Proje ile ilgili harcanan maliyetleri ele almak için bir bölüm olmalı
@@ -1664,6 +1686,18 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Promosyon banner tasarımı (before/after karakter dönüşümü gösterimi)
   - Social media post templates
   - Marketing material library
+- [ ] **5.9.7** Sesli Hikaye Özelliği Pazarlama ve İletişim (26 Ocak 2026)
+  - **Ana Sayfa Vurgusu:** Ana sayfada sesli hikaye özelliği öne çıkarılmalı (özellikler bölümünde)
+  - **Ebook Viewer Vurgusu:** Ebook görünümünde sesli hikaye özelliği daha prominent gösterilmeli
+  - **Pazarlama Mesajları:** "Interactive Audio Stories", "Listen Along", "Narrated Adventures" gibi mesajlar kullanılmalı
+  - **Fayda Odaklı İletişim:** Sesli okuma özelliğinin çocuklar için faydaları vurgulanmalı:
+    - Okuma öğrenme desteği
+    - Telaffuz geliştirme
+    - Bağımsız okuma deneyimi
+    - Çok dilli öğrenme (8 dil desteği)
+  - **Sosyal Medya İçerikleri:** Sesli hikaye özelliğini gösteren demo videoları ve görseller
+  - **Email Pazarlama:** Yeni kullanıcılara sesli hikaye özelliği tanıtımı
+  - **Product Hunt:** Launch sırasında sesli hikaye özelliği öne çıkarılmalı
 
 ---
 
@@ -1945,6 +1979,9 @@ Mobile-first design with touch-friendly interactions.
   - ✅ Product Hunt yayınlama planı
   - ✅ There's an AI for That yayınlama planı
   - ✅ Diğer pazarlama kanalları listesi
+  - ✅ Ürün Değer Önerisi ve Pazarlama Mesajları (26 Ocak 2026) - Evergreen/kalıcı değer vurgusu
+  - ✅ Sesli Hikaye Özelliği Pazarlama ve İletişim (26 Ocak 2026)
+  - ✅ Gelato.com Entegrasyonu - TR Dışı Hardcopy Baskı (26 Ocak 2026)
 - **Not:** Detaylı pazarlama stratejisi Faz 5.9 bölümünde yer alıyor.
 
 ### Product Manager Agent (23 Ocak 2026)
