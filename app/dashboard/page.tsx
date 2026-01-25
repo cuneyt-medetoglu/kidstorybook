@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2 } from "lucide-react"
+import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2, ShoppingCart, CheckSquare, Square } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -13,7 +13,9 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Empty } from "@/components/ui/empty"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
+import { useCart } from "@/contexts/CartContext"
 
 type Book = {
   id: string
@@ -56,6 +58,7 @@ const statusConfig = {
 export default function LibraryPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { addToCart } = useCart()
   const [books, setBooks] = useState<Book[]>([])
   const [filter, setFilter] = useState<string>("all")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
@@ -64,6 +67,10 @@ export default function LibraryPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [downloadingBookId, setDownloadingBookId] = useState<string | null>(null)
+  
+  // Bulk selection state
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([])
+  const [isSelectMode, setIsSelectMode] = useState(false)
 
   // Check authentication and fetch books
   useEffect(() => {
@@ -275,6 +282,8 @@ export default function LibraryPage() {
 
       // Remove book from local state
       setBooks(books.filter(book => book.id !== bookId))
+      // Remove from selected if selected
+      setSelectedBooks(selectedBooks.filter(id => id !== bookId))
 
       toast({
         title: "Book Deleted",
@@ -290,6 +299,168 @@ export default function LibraryPage() {
     }
   }
 
+  // Bulk selection handlers
+  const handleSelectAll = () => {
+    if (selectedBooks.length === filteredBooks.length) {
+      setSelectedBooks([])
+    } else {
+      setSelectedBooks(filteredBooks.map(book => book.id))
+    }
+  }
+
+  const handleBookSelect = (bookId: string) => {
+    setSelectedBooks(prev => 
+      prev.includes(bookId) 
+        ? prev.filter(id => id !== bookId)
+        : [...prev, bookId]
+    )
+  }
+
+  const handleAddSelectedToCart = async () => {
+    if (selectedBooks.length === 0) {
+      toast({
+        title: "No Books Selected",
+        description: "Please select at least one book to add to cart.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Only allow completed books (purchased E-Books)
+    const completedBooks = filteredBooks.filter(
+      book => selectedBooks.includes(book.id) && book.status === "completed"
+    )
+
+    if (completedBooks.length === 0) {
+      toast({
+        title: "No Valid Books",
+        description: "Only completed (purchased) E-Books can be converted to hardcopy.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (completedBooks.length < selectedBooks.length) {
+      toast({
+        title: "Some Books Skipped",
+        description: "Only completed books were added to cart. Draft or in-progress books cannot be converted to hardcopy.",
+      })
+    }
+
+    try {
+      // Validate books via API
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "add",
+          book_ids: completedBooks.map(book => book.id),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to add books to cart")
+      }
+
+      // Add to cart context
+      completedBooks.forEach(book => {
+        addToCart({
+          type: "hardcopy",
+          bookId: book.id,
+          bookTitle: book.title,
+          coverImage: book.coverImage,
+          price: 34.99,
+          quantity: 1,
+        })
+      })
+
+      toast({
+        title: "Added to Cart",
+        description: `${completedBooks.length} book(s) added to cart successfully.`,
+      })
+
+      // Clear selection
+      setSelectedBooks([])
+      setIsSelectMode(false)
+
+      // Navigate to cart
+      router.push("/cart")
+    } catch (error) {
+      console.error("[Dashboard] Error adding to cart:", error)
+      toast({
+        title: "Failed to Add to Cart",
+        description: error instanceof Error ? error.message : "Failed to add books to cart. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleAddSingleToCart = async (bookId: string) => {
+    const book = books.find(b => b.id === bookId)
+    if (!book) return
+
+    if (book.status !== "completed") {
+      toast({
+        title: "Cannot Add to Cart",
+        description: "Only completed (purchased) E-Books can be converted to hardcopy.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      // Validate book via API
+      const response = await fetch("/api/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "add",
+          book_ids: [bookId],
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to add book to cart")
+      }
+
+      // Add to cart context
+      addToCart({
+        type: "hardcopy",
+        bookId: book.id,
+        bookTitle: book.title,
+        coverImage: book.coverImage,
+        price: 34.99,
+        quantity: 1,
+      })
+
+      toast({
+        title: "Added to Cart",
+        description: `${book.title} added to cart successfully.`,
+      })
+
+      // Navigate to cart
+      router.push("/cart")
+    } catch (error) {
+      console.error("[Dashboard] Error adding to cart:", error)
+      toast({
+        title: "Failed to Add to Cart",
+        description: error instanceof Error ? error.message : "Failed to add book to cart. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const HARDCOPY_PRICE = 34.99
+  const selectedTotal = selectedBooks.length * HARDCOPY_PRICE
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-background dark:from-slate-900 dark:to-slate-950">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -301,6 +472,61 @@ export default function LibraryPage() {
               {books.length}
             </Badge>
           </div>
+
+          {/* Bulk Actions Bar */}
+          {(isSelectMode || selectedBooks.length > 0) && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20"
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={selectedBooks.length === filteredBooks.length && filteredBooks.length > 0}
+                      onCheckedChange={handleSelectAll}
+                      className="h-5 w-5"
+                    />
+                    <span className="text-sm font-medium text-slate-900 dark:text-white">
+                      Select All
+                    </span>
+                  </div>
+                  {selectedBooks.length > 0 && (
+                    <Badge variant="secondary" className="text-base px-3 py-1">
+                      {selectedBooks.length} selected
+                    </Badge>
+                  )}
+                  {selectedBooks.length > 0 && (
+                    <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                      Total: ${selectedTotal.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setIsSelectMode(false)
+                      setSelectedBooks([])
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleAddSelectedToCart}
+                    disabled={selectedBooks.length === 0}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                  >
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add Selected to Cart ({selectedBooks.length})
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Filters and Controls */}
           <div className="space-y-4">
@@ -315,15 +541,29 @@ export default function LibraryPage() {
                 </TabsList>
               </Tabs>
 
-              <Button
-                size="lg"
-                onClick={handleCreateBook}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full sm:w-auto shrink-0 text-white text-sm sm:text-base"
-              >
-                <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="hidden sm:inline">Create New Book</span>
-                <span className="sm:hidden">Create Book</span>
-              </Button>
+              <div className="flex items-center gap-2">
+                {!isSelectMode && (
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setIsSelectMode(true)}
+                    className="w-full sm:w-auto shrink-0 text-sm sm:text-base"
+                  >
+                    <CheckSquare className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="hidden sm:inline">Select Books</span>
+                    <span className="sm:hidden">Select</span>
+                  </Button>
+                )}
+                <Button
+                  size="lg"
+                  onClick={handleCreateBook}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full sm:w-auto shrink-0 text-white text-sm sm:text-base"
+                >
+                  <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline">Create New Book</span>
+                  <span className="sm:hidden">Create Book</span>
+                </Button>
+              </div>
             </div>
 
             {/* Bottom Row: Search, View Toggle, Sort */}
@@ -420,8 +660,21 @@ export default function LibraryPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <Card className={`group relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+                  selectedBooks.includes(book.id) ? "ring-2 ring-purple-500 dark:ring-purple-400" : ""
+                }`}>
                   <CardContent className="p-4">
+                    {/* Checkbox (when in select mode) */}
+                    {(isSelectMode || selectedBooks.length > 0) && (
+                      <div className="absolute top-4 left-4 z-10">
+                        <Checkbox
+                          checked={selectedBooks.includes(book.id)}
+                          onCheckedChange={() => handleBookSelect(book.id)}
+                          className="h-5 w-5 bg-white dark:bg-slate-800 border-2"
+                        />
+                      </div>
+                    )}
+
                     {/* Book Cover */}
                     <div className="relative mb-4 overflow-hidden rounded-lg aspect-[3/4] bg-muted">
                       {book.coverImage ? (
@@ -440,11 +693,18 @@ export default function LibraryPage() {
                     {/* Book Info */}
                     <div className="space-y-2 mb-4">
                       <h3 className="font-semibold text-lg line-clamp-2 text-foreground">{book.title}</h3>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         <p className="text-xs text-muted-foreground">Created {book.createdDate}</p>
-                        <Badge variant="secondary" className={statusConfig[book.status].color}>
-                          {statusConfig[book.status].label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          {book.status === "completed" && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                              E-Book
+                            </Badge>
+                          )}
+                          <Badge variant="secondary" className={statusConfig[book.status].color}>
+                            {statusConfig[book.status].label}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
 
@@ -462,6 +722,21 @@ export default function LibraryPage() {
                         Edit
                       </Button>
                     </div>
+
+                    {/* Hardcopy Button (only for completed books) */}
+                    {book.status === "completed" && (
+                      <div className="mt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAddSingleToCart(book.id)}
+                          className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Add to Cart (Hardcopy)
+                        </Button>
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-1 mt-2">
                       <Button

@@ -2,52 +2,55 @@
 
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Check, Star, Download, BookOpen, Truck } from "lucide-react"
-
-const pricingPlans = [
-  {
-    id: "ebook",
-    name: "E-Book",
-    subtitle: "Digital",
-    price: "$7.99",
-    priceAlt: "₺250-300",
-    popular: false,
-    icon: Download,
-    features: [
-      "Instant download (2 hours)",
-      "PDF format",
-      "Unlimited downloads",
-      "High-quality illustrations",
-      "Personalized story",
-      "Share with family",
-    ],
-    cta: "Get Started",
-    gradient: "from-purple-500 to-pink-500",
-  },
-  {
-    id: "printed",
-    name: "Printed Book",
-    subtitle: "Physical",
-    price: "$34.99",
-    priceAlt: "₺1,000-1,200",
-    popular: true,
-    icon: BookOpen,
-    features: [
-      "Hardcover book",
-      "A4 format (21x29.7 cm)",
-      "High-quality printing",
-      "3-5 weeks delivery",
-      "Free shipping",
-      "Includes e-book version",
-    ],
-    cta: "Order Now",
-    gradient: "from-purple-500 to-pink-500",
-  },
-]
+import { Badge } from "@/components/ui/badge"
+import { Check, Download, BookOpen, Info } from "lucide-react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import type { CurrencyConfig } from "@/lib/currency"
 
 export function PricingSection() {
+  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>({
+    currency: "USD",
+    symbol: "$",
+    price: "$7.99",
+  })
+  const [isLoadingCurrency, setIsLoadingCurrency] = useState(true)
+
+  // Detect currency on mount
+  useEffect(() => {
+    const fetchCurrency = async () => {
+      try {
+        const response = await fetch("/api/currency")
+        const data = await response.json()
+        
+        if (data.success) {
+          setCurrencyConfig({
+            currency: data.currency,
+            symbol: data.symbol,
+            price: data.price,
+          })
+        }
+      } catch (error) {
+        console.error("[PricingSection] Error fetching currency:", error)
+        // Keep default USD
+      } finally {
+        setIsLoadingCurrency(false)
+      }
+    }
+
+    fetchCurrency()
+  }, [])
+
+  // Compact features for E-book (4 items)
+  const ebookFeatures = [
+    "Instant download",
+    "PDF format",
+    "High-quality illustrations",
+    "Personalized story",
+  ]
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-white py-16 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 md:py-24">
+    <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-white py-8 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 md:py-24">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -right-20 top-20 h-64 w-64 rounded-full bg-purple-200/30 blur-3xl dark:bg-purple-500/10" />
@@ -61,80 +64,67 @@ export function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-12 text-center md:mb-16"
+          className="mb-6 text-center md:mb-12"
         >
-          <h2 className="mb-4 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-4xl font-bold leading-normal pb-1 text-transparent dark:from-purple-400 dark:to-pink-400 md:text-5xl md:leading-normal">
+          <h2 className="mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold leading-tight pb-1 text-transparent dark:from-purple-400 dark:to-pink-400 md:mb-4 md:text-5xl md:leading-normal">
             Pricing
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+          <p className="mx-auto max-w-2xl text-base text-slate-600 dark:text-slate-300 md:text-lg">
             Choose the perfect option for your child
           </p>
         </motion.div>
 
-        {/* Pricing cards */}
-        <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-2">
-          {pricingPlans.map((plan, index) => (
+        {/* Pricing Layout: E-book (main) + Printed Book (info card) */}
+        <div className="mx-auto max-w-5xl">
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:gap-8">
+            {/* E-Book Card (Main) */}
             <motion.div
-              key={plan.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{
-                duration: 0.5,
-                delay: index * 0.1,
-              }}
-              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.01 }}
               className="relative"
             >
-              {/* Most Popular Badge */}
-              {plan.popular && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  animate={{
-                    scale: [1, 1.05, 1],
-                  }}
-                  className="absolute -top-4 left-1/2 z-10 -translate-x-1/2"
-                >
-                  <div className="flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1.5 text-sm font-semibold text-white shadow-lg">
-                    <Star className="h-4 w-4 fill-current" />
-                    Most Popular
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Card */}
-              <div
-                className={`relative h-full rounded-3xl bg-white p-8 shadow-xl transition-shadow duration-300 hover:shadow-2xl dark:bg-slate-900 ${
-                  plan.popular ? "border-2 border-purple-200 dark:border-purple-500/30" : ""
-                }`}
-              >
+              <div className="relative h-full rounded-3xl bg-white p-4 shadow-xl transition-shadow duration-300 hover:shadow-2xl dark:bg-slate-900 md:p-8">
                 {/* Plan icon */}
-                <div className="mb-6 flex items-center justify-center">
-                  <div className="rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-4 dark:from-purple-900/30 dark:to-pink-900/30">
-                    <plan.icon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                <div className="mb-2 flex items-center justify-center md:mb-6">
+                  <div className="rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-2 dark:from-purple-900/30 dark:to-pink-900/30 md:p-4">
+                    <Download className="h-5 w-5 text-purple-600 dark:text-purple-400 md:h-8 md:w-8" />
                   </div>
                 </div>
 
                 {/* Plan name */}
-                <div className="mb-2 text-center">
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{plan.name}</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{plan.subtitle}</p>
+                <div className="mb-2 text-center md:mb-4">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white md:text-2xl">
+                    E-Book
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 md:text-sm">Digital</p>
                 </div>
 
                 {/* Price */}
-                <div className="mb-6 text-center">
-                  <div className="mb-1 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-5xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400">
-                    {plan.price}
+                <div className="mb-2 text-center md:mb-4">
+                  {isLoadingCurrency ? (
+                    <div className="mb-1 h-10 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-700 md:h-16" />
+                  ) : (
+                    <div className="mb-1 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400 md:text-5xl">
+                      {currencyConfig.price}
+                    </div>
+                  )}
+                  {/* Pages badge */}
+                  <div className="mt-1.5 flex justify-center md:mt-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-100 text-xs text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 md:text-sm"
+                    >
+                      12 pages
+                    </Badge>
                   </div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{plan.priceAlt}</p>
                 </div>
 
-                {/* Features list */}
-                <ul className="mb-8 space-y-4">
-                  {plan.features.map((feature, featureIndex) => (
+                {/* Features list - Compact (4 items, 2 columns on mobile and desktop) */}
+                <ul className="mb-4 grid grid-cols-2 gap-1.5 md:mb-6 md:gap-3">
+                  {ebookFeatures.map((feature, featureIndex) => (
                     <motion.li
                       key={featureIndex}
                       initial={{ opacity: 0, x: -10 }}
@@ -142,36 +132,108 @@ export function PricingSection() {
                       viewport={{ once: true }}
                       transition={{
                         duration: 0.3,
-                        delay: index * 0.1 + featureIndex * 0.05,
+                        delay: featureIndex * 0.05,
                       }}
-                      className="flex items-start gap-3"
+                      className="flex items-start gap-1.5"
                     >
-                      <div className="mt-0.5 flex-shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900/30">
-                        <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      <div className="mt-0.5 flex-shrink-0 rounded-full bg-green-100 p-0.5 dark:bg-green-900/30">
+                        <Check className="h-3 w-3 text-green-600 dark:text-green-400 md:h-4 md:w-4" />
                       </div>
-                      <span className="text-slate-700 dark:text-slate-300">{feature}</span>
+                      <span className="text-xs text-slate-700 dark:text-slate-300 md:text-base">
+                        {feature}
+                      </span>
                     </motion.li>
                   ))}
                 </ul>
 
                 {/* CTA Button */}
-                <Button
-                  size="lg"
-                  className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600"
-                >
-                  {plan.cta}
-                </Button>
-
-                {/* Free shipping badge for printed book */}
-                {plan.id === "printed" && (
-                  <div className="mt-4 flex items-center justify-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <Truck className="h-4 w-4" />
-                    <span>Free shipping included</span>
-                  </div>
-                )}
+                <Link href="/create/step1">
+                  <Button
+                    size="lg"
+                    className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600 md:py-6 md:text-lg"
+                  >
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             </motion.div>
-          ))}
+
+            {/* Printed Book Info Card (Compact) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative"
+            >
+              <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-7 shadow-lg dark:from-purple-900/20 dark:to-pink-900/20 md:p-6">
+                {/* Icon */}
+                <div className="mb-5 flex items-center justify-center md:mb-3">
+                  <div className="rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 p-3 dark:from-purple-900/30 dark:to-pink-900/30 md:p-2">
+                    <BookOpen className="h-7 w-7 text-purple-600 dark:text-purple-400 md:h-6 md:w-6" />
+                  </div>
+                </div>
+
+                {/* Title */}
+                <div className="mb-4 text-center md:mb-2">
+                  <h4 className="text-2xl font-bold text-slate-900 dark:text-white md:text-xl">
+                    Printed Book
+                  </h4>
+                  <p className="text-base text-slate-600 dark:text-slate-400 md:text-xs">Physical</p>
+                </div>
+
+                {/* Price */}
+                <div className="mb-5 text-center md:mb-3">
+                  <div className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-4xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400 md:text-3xl">
+                    $34.99
+                  </div>
+                </div>
+
+                {/* Compact features (3 key points) */}
+                <ul className="mb-6 space-y-3 md:mb-4 md:space-y-2">
+                  {[
+                    "Hardcover book",
+                    "A4 format",
+                    "Free shipping",
+                  ].map((feature, index) => (
+                    <li key={index} className="flex items-start gap-3 md:gap-2">
+                      <div className="mt-0.5 flex-shrink-0 rounded-full bg-green-100 p-0.5 dark:bg-green-900/30">
+                        <Check className="h-5 w-5 text-green-600 dark:text-green-400 md:h-3 md:w-3" />
+                      </div>
+                      <span className="text-base text-slate-700 dark:text-slate-300 md:text-xs">
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Info message */}
+                <div className="rounded-lg bg-white/60 p-3.5 dark:bg-slate-800/60 md:p-3">
+                  <div className="mb-2 flex flex-col items-center gap-1.5 md:mb-1 md:flex-row md:gap-1.5">
+                    <Info className="h-4 w-4 flex-shrink-0 text-purple-600 dark:text-purple-400 md:h-3 md:w-3" />
+                    <span className="text-center text-sm font-semibold text-slate-900 dark:text-white md:text-left md:text-xs">
+                      Available in My Library
+                    </span>
+                  </div>
+                  <p className="text-center text-sm leading-relaxed text-slate-600 dark:text-slate-400 md:text-left md:text-xs">
+                    Convert your{" "}
+                    <span className="whitespace-nowrap">E-Books</span> to hardcover
+                  </p>
+                </div>
+
+                {/* CTA Link */}
+                <Link href="/dashboard" className="mt-5 block md:mt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full rounded-lg border-purple-200 bg-transparent text-base text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/20 md:text-xs"
+                  >
+                    View in Library
+                  </Button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Trust indicators */}
@@ -180,7 +242,7 @@ export function PricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-12 text-center"
+          className="mt-8 text-center md:mt-12"
         >
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Secure payment • Money-back guarantee • Trusted by thousands of parents

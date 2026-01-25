@@ -43,6 +43,10 @@ docs/
 │   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md # Görsel kompozisyon ve derinlik analizi
 │   ├── SCENE_AND_COVER_IMPROVEMENT_README.md   # Sahne kalitesi, kapak–ilk sayfa benzerliği (3.5.19, 3.5.20) analiz ve ilerleme
 │   ├── EXAMPLES_PAGE_V0_PROMPT.md # Examples sayfası v0.app prompt rehberi (mobil-first tasarım)
+│   ├── PRICING_PAGE_V0_PROMPT.md # Pricing sayfası v0.app prompt rehberi
+│   ├── MY_LIBRARY_HARDCOPY_V0_PROMPT.md # My Library hardcopy özellikleri v0.app prompt rehberi
+│   ├── CART_PAGE_V0_PROMPT.md # Sepet sayfası v0.app prompt rehberi
+│   ├── CURRENCY_DETECTION.md # Currency detection sistemi dokümantasyonu
 │   └── ...
 │
 ├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
@@ -254,7 +258,7 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 23 Ocak 2026
+**Son Güncelleme:** 25 Ocak 2026
 
 - **23 Ocak 2026:**
   - **ROADMAP CSV Sistemi eklendi:**
@@ -275,6 +279,20 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - Wave separator: Mobilde How It Works section'ın bir parçası, badge'lerin altında görünüyor. Tablet/web'de Hero section'ın altında.
     - "24 Pages" badge'i kaldırıldı (HeroBookTransformation ve PricingSection'dan).
     - HeroBookTransformation: Badge'lerin altına margin eklendi (`mb-20` mobil, `sm:mb-6`) - wave separator ile boşluk için.
+
+- **25 Ocak 2026:**
+  - **Pricing Sayfası ve Hardcopy Satın Alma Sistemi tamamlandı:**
+    - Pricing sayfası (`/pricing`) oluşturuldu - Sadece E-Book satışı
+    - Currency detection sistemi (IP-based geolocation) eklendi
+    - Sepet sistemi (CartContext, API endpoints, Cart page) tamamlandı
+    - My Library'ye hardcopy satın alma özellikleri eklendi (bulk selection, sepete ekleme)
+    - Step 6'ya email input eklendi (unauthenticated users için)
+    - Rate limiting API eklendi (bot koruması)
+    - `docs/guides/PRICING_PAGE_V0_PROMPT.md` - Pricing sayfası v0.app prompt rehberi
+    - `docs/guides/MY_LIBRARY_HARDCOPY_V0_PROMPT.md` - My Library hardcopy v0.app prompt rehberi
+    - `docs/guides/CART_PAGE_V0_PROMPT.md` - Sepet sayfası v0.app prompt rehberi
+    - `docs/guides/CURRENCY_DETECTION.md` - Currency detection dokümantasyonu
+    - Ana sayfa PricingSection güncellendi (E-Book + Printed Book info card)
 
 - **17 Ocak 2026:**
   - Image Edit Feature tamamlandı

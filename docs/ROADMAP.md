@@ -1,7 +1,7 @@
 # 🗺️ KidStoryBook - Proje Yol Haritası ve İş Listesi
 
-**Doküman Versiyonu:** 1.0  
-**Tarih:** 4 Ocak 2026  
+**Doküman Versiyonu:** 1.1  
+**Tarih:** 25 Ocak 2026  
 **Durum:** AKTİF - Sürekli Güncelleniyor
 
 ---
@@ -46,7 +46,11 @@
 - [x] [2.1.2 Responsive tasarım](#21-layout-ve-navigasyon)
 - [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon)
 - [ ] [2.1.4 Loading states](#21-layout-ve-navigasyon)
-- [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon)
+- [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon) - ✅ Currency detection sistemi eklendi (25 Ocak 2026)
+  - [x] IP-based geolocation ile otomatik currency tespiti ✅
+  - [x] Vercel header desteği (X-Vercel-IP-Country) ✅
+  - [x] Fallback mekanizmaları (Cloudflare, Accept-Language) ✅
+  - [x] Currency mapping (TR→TRY, US→USD, EU→EUR, GB→GBP) ✅
 - [x] [2.1.6 Sepet ikonu](#21-layout-ve-navigasyon)
 - [x] [2.1.7 Create book butonu](#21-layout-ve-navigasyon)
 - [x] [2.1.8 Dark/Light mode toggle](#21-layout-ve-navigasyon)
@@ -535,6 +539,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Uygulama dili ne ise otomatik o dili algılar
   - Düşünülecek: Nasıl yapılabilir? (Dil algılama, çeviri, prompt'a dil bilgisi ekleme)
 - [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Email input eklendi (unauthenticated users için) ✅ (25 Ocak 2026)
+    - [x] Login olmamış kullanıcılar için email input gösterimi
+    - [x] Email validation (format kontrolü)
+    - [x] Email API'ye gönderiliyor (cover ve marketing için)
+    - [x] Create Book butonu email olmadan disabled
 - [ ] **2.4.11** Wizard adımlarını kısaltma (UX iyileştirme) - Şu an 6 adım var, daha kolay bir UX için adımlar birleştirilebilir veya kısaltılabilir. Düşünülecek.
   - ✅ Debug mode eklendi (prompt preview, API test butonları)
   - ✅ Story prompt gösterimi ve test butonu eklendi
@@ -683,6 +692,12 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons)
 - [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing)
 - [x] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı) - ✅ Free Cover Status section (status badge, used date, info box)
+- [x] **2.6.9** Hardcopy Satın Alma Özellikleri (25 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Checkbox'lar (her kitap kartında) ✅
+  - [x] Bulk actions bar (Select All, Add Selected to Cart) ✅
+  - [x] Hardcopy butonları (sadece completed kitaplar için) ✅
+  - [x] Sepet entegrasyonu ✅
+  - [x] Toplam fiyat gösterimi ✅
 - [ ] **2.6.7** Characters tab (karakter yönetimi) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
   - [ ] Tab navigation (Books, Characters)
   - [ ] Characters grid layout (karakter kartları)
@@ -709,7 +724,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 
 ### 2.7 Statik Sayfalar
 - [ ] **2.7.1** Özellikler (Features) sayfası
-- [ ] **2.7.2** Fiyatlandırma sayfası | 🔴 DO
+- [x] **2.7.2** Fiyatlandırma sayfası | 🔴 DO - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] v0.app prompt hazırlandı ✅ (`docs/guides/PRICING_PAGE_V0_PROMPT.md`)
+  - [x] Pricing sayfası oluşturuldu ✅ (`app/pricing/page.tsx`)
+  - [x] Currency detection sistemi (IP-based geolocation) ✅ (`lib/currency.ts`, `app/api/currency/route.ts`)
+  - [x] Pricing'e özel FAQ section ✅ (`components/sections/PricingFAQSection.tsx`)
+  - [x] Appearance of the Book section ✅ (hardcopy bilgileri)
+  - [x] Info section (hardcover conversion) ✅
+  - [x] Trust indicators ✅
 - [ ] **2.7.4** İletişim sayfası
 - [ ] **2.7.5** Gizlilik Politikası
 - [ ] **2.7.6** Kullanım Şartları
@@ -1196,19 +1218,22 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 4.3 Sipariş Yönetimi
 - [ ] **4.3.1** Checkout sayfası
 - [ ] **4.3.2** Sipariş özeti component
-- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ** | 🔴 DO
-  - Sepet konusuna bakmamız lazım
-  - Hem ebook olarak satın alma sepet atma hem de hardcopy olarak sepet durumunu yapmalıyız
-  - Birden fazla ürün ekleme vs.
-  - Sepet component'i (add to cart, remove, quantity update)
-  - Ebook ve hardcopy ayrımı
-  - Multi-item cart support
-  - Cart persistence (localStorage veya session)
-  - **Sepete Ürün Ekleme Mantığı:**
-    - Ebook: "Add to Cart" butonu → Sepete ebook ekle
-    - Hardcopy: "Add to Cart" butonu → Sepete hardcopy ekle (ebook kontrolü yapılacak)
-    - Sepet icon'unda item sayısı gösterimi
-    - Sepet dropdown/sidebar (ürün listesi, fiyat, remove butonu)
+- [x] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ** | 🔴 DO - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] Sepet state management (Context API) ✅ (`contexts/CartContext.tsx`)
+  - [x] Sepet sayfası (`/cart`) ✅ (`app/cart/page.tsx`)
+  - [x] Sepet API endpoints ✅ (`app/api/cart/route.ts`)
+    - [x] GET /api/cart - Sepeti getir
+    - [x] POST /api/cart - Sepete ekle (validation, ebook dependency kontrolü)
+    - [x] DELETE /api/cart - Sepetten çıkar
+  - [x] Cart persistence (localStorage) ✅
+  - [x] Multi-item cart support ✅
+  - [x] **Sepete Ürün Ekleme Mantığı:**
+    - [x] Hardcopy: "Add to Cart" butonu → Sepete hardcopy ekle (ebook kontrolü yapılıyor) ✅
+    - [x] Sepet icon'unda item sayısı gösterimi ✅ (Header'da gerçek state)
+    - [x] Sepet sayfası (ürün listesi, fiyat, remove butonu) ✅
+    - [x] Cart summary (subtotal, shipping, total) ✅
+    - [x] Empty state ✅
+  - [ ] Ebook sepete ekleme (sonraki faz - pricing sayfasından)
 - [ ] **4.3.4** Ödeme başarılı sayfası
 - [ ] **4.3.5** Sipariş durumu takibi (kullanıcı tarafı)
 - [ ] **4.3.6** Email bildirimleri
@@ -1239,6 +1264,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [ ] **4.4.2** E-book vs Basılı kitap fiyatları
 - [ ] **4.4.3** İndirim kodu sistemi (gelecekte)
 - [ ] **4.4.4** Ücretsiz kapak hakkı takibi
+- [ ] **4.4.10** Bot Koruması - CAPTCHA Entegrasyonu (25 Ocak 2026)
+  - [ ] hCaptcha veya reCAPTCHA entegrasyonu
+  - [ ] Cover generation öncesi CAPTCHA kontrolü
+  - [ ] Rate limiting ile birlikte çalışacak şekilde yapılandırma
+  - [ ] Unauthenticated users için zorunlu, authenticated users için opsiyonel
 - [ ] **4.4.7** Yurtdışı Şirket Kurulumu (23 Ocak 2026)
   - Ürünü yurtdışında satabilmek için TR dışında bir yerde şirket olmalı
   - Stripe Atlas diye bizim için şirket açan yapısı var
@@ -1265,32 +1295,31 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ne noktada para isteyeceğiz? (Düşünülecek)
   - Hem ebook satış hem de ebook almış kullanıcıya hardcopy satış
   - Sepet sistemi ve ödeme akışı tasarlanmalı
-- [ ] **4.4.9** Ürün Satın Alma Akışı (25 Ocak 2026) | 🔴 DO
-  - **Akış Adımları:**
-    1. **Free Cover Oluşturma:** Kullanıcı ücretsiz olarak sadece kapak oluşturur (draft status)
-    2. **Ebook Satın Alma:** Kullanıcı beğenirse "Add to Cart (Ebook)" butonuna tıklar
-       - Sepete ebook eklenir
-       - Checkout sayfasında ebook fiyatı gösterilir
-       - Ödeme tamamlandığında kalan sayfalar generate edilir (cover zaten var)
-       - Kitap status: `draft` → `generating` → `completed`
-    3. **Hardcopy Satın Alma:** Ebook satın aldıktan sonra "Add to Cart (Hardcopy)" butonu aktif olur
-       - Ebook satın alınmamışsa hardcopy butonu disabled veya görünmez
-       - Sepete hardcopy eklenir (ebook kontrolü yapılır)
-       - Checkout sayfasında hardcopy fiyatı gösterilir
-       - Ödeme tamamlandığında print-on-demand süreci başlar
-  - **Kurallar:**
-    - Ebook olmadan hardcopy satın alınamaz
-    - Hardcopy butonu sadece ebook satın alındıktan sonra aktif
-    - Sepet kontrolü: Hardcopy eklenirken ebook kontrolü yapılmalı
-    - Backend kontrolü: API'de hardcopy order oluşturulurken ebook order kontrolü
-  - **UI/UX:**
-    - Dashboard'da kitap kartında "Buy Ebook" ve "Buy Hardcopy" butonları
-    - Ebook satın alınmamışsa hardcopy butonu disabled + tooltip: "Önce ebook satın almalısınız"
-    - Sepet sayfasında hardcopy item'ı için ebook dependency gösterimi
-  - **Backend:**
-    - `POST /api/cart/add` - Sepete ürün ekleme (ebook/hardcopy)
-    - `POST /api/orders` - Sipariş oluşturma (ebook dependency kontrolü)
-    - `GET /api/books/:id/purchase-status` - Kitap satın alma durumu (ebook var mı?)
+- [x] **4.4.9** Ürün Satın Alma Akışı (25 Ocak 2026) | 🔴 DO - ✅ **KISMEN TAMAMLANDI (25 Ocak 2026)**
+  - [x] **Hardcopy Satın Alma Akışı:** ✅
+    - [x] My Library'de hardcopy butonu (sadece completed ebook'lar için) ✅
+    - [x] Toplu seçim ve sepete ekleme ✅ (checkbox'lar, bulk actions bar)
+    - [x] Tek kitap sepete ekleme ✅
+    - [x] Sepete hardcopy ekleme (ebook kontrolü yapılıyor) ✅
+    - [x] Sepet sayfasında hardcopy item'ları ✅
+    - [x] `POST /api/cart` - Sepete ürün ekleme (hardcopy) ✅
+    - [x] Backend kontrolü: API'de hardcopy eklenirken ebook kontrolü ✅
+  - [ ] **Ebook Satın Alma Akışı:** (Sonraki faz)
+    - [ ] Pricing sayfasından sepete ebook ekleme
+    - [ ] Checkout sayfası
+    - [ ] Ödeme entegrasyonu
+  - [ ] **Free Cover Oluşturma:** (Sonraki faz)
+    - [ ] Ücretsiz kapak oluşturma
+    - [ ] Draft status
+    - [ ] Satın alma sonrası kalan sayfalar generate
+  - [x] **Kurallar:** ✅
+    - [x] Ebook olmadan hardcopy satın alınamaz ✅ (API validation)
+    - [x] Hardcopy butonu sadece completed ebook'lar için görünür ✅
+    - [x] Sepet kontrolü: Hardcopy eklenirken ebook kontrolü yapılıyor ✅
+  - [x] **UI/UX:** ✅
+    - [x] Dashboard'da kitap kartında "Add to Cart (Hardcopy)" butonu ✅
+    - [x] Sadece completed kitaplar için buton gösterimi ✅
+    - [x] Toplu seçim için checkbox'lar ve bulk actions bar ✅
 - [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026)
   - Hardcopy şu an için sadece Türkiye'de var
   - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
@@ -2627,16 +2656,16 @@ Response: {
 | Faz 3 | ✅ Tamamlandı | 26 | 27 | 96% ✅ MVP için gerekli tüm özellikler tamamlandı (3.2.5 opsiyonel) |
 | Faz 3.5 | ✅ Tamamlandı | 16 | 16 | 100% ✅ Cover/page images entegrasyonu tamamlandı, Story API Refactor (v1.4.0), Image API Refactor (v1.7.0) |
 | Faz 3.6 | ✅ Tamamlandı | 4 | 4 | 100% |
-| Faz 4 | 🔵 Bekliyor | 0 | 20 | 0% (Webhook'lar Faz 3.7'den taşındı: 4.1.6 ve 4.2.5) |
+| Faz 4 | 🟡 Devam Ediyor | 3 | 20 | 15% (Pricing sayfası, Sepet sistemi, My Library hardcopy özellikleri tamamlandı) |
 | Faz 5 | 🔵 Bekliyor | 0 | 22 | 0% |
 | Faz 6 | 🔵 Bekliyor | 0 | 24 | 0% |
-| **TOPLAM** | **🟡** | **101** | **172** | **59%** |
+| **TOPLAM** | **🟡** | **104** | **172** | **60%** |
 
 ---
 
-**Son Güncelleme:** 24 Ocak 2026  
+**Son Güncelleme:** 25 Ocak 2026  
 **Güncelleyen:** @project-manager agent  
-**Son Eklenen:** Dil Seçimi Özelliği ve Dil Karışıklığı Çözümü - 24 Ocak 2026
+**Son Eklenen:** Pricing Sayfası, Sepet Sistemi ve My Library Hardcopy Özellikleri - 25 Ocak 2026
 
 **Not:** 
 - Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)
@@ -2654,22 +2683,34 @@ Response: {
   - Stripe webhook handler → Faz 4.1.6
   - İyzico webhook handler → Faz 4.2.5
 - 🎉 **FAZ 3 TAMAMLANDI (%96 - MVP için %100):** MVP için gerekli tüm backend ve AI entegrasyonları tamamlandı ✅
-- 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (webhook'lar dahil)
+- 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (Checkout sayfası, ödeme entegrasyonu)
+- ✅ **Faz 4 İlerleme:** Pricing sayfası, Sepet sistemi ve My Library hardcopy özellikleri tamamlandı (25 Ocak 2026)
 
 **Son Yapılanlar (25 Ocak 2026):**
-- ✅ **AI Analysis for Non-Child Characters:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
-  - Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
-  - User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
-  - Master karakter oluşturma için detaylı description kullanımı
-- ✅ **Toys Character Group:** Step 2'ye Toys karakter grubu eklendi
-  - 10 popüler oyuncak seçeneği: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal
-  - "Other Toy" custom input desteği
-  - Gender-neutral validation (Toys için gender gerekmiyor)
-  - Story generation'da Toys desteği eklendi
-- ✅ **Gender Validation Improvements:** Character type'a göre otomatik gender düzeltme
-  - Family Members için otomatik gender (Dad → boy, Mom → girl, Uncle → boy, etc.)
-  - "Other Family" için displayName'e göre gender belirleme
-  - Frontend ve backend'de tutarlı gender validation
+- ✅ **Pricing Sayfası Implementasyonu:** 
+  - Pricing sayfası oluşturuldu (`/pricing`) ✅
+  - Currency detection sistemi (IP-based geolocation) ✅
+  - Pricing'e özel FAQ section ✅
+  - Appearance of the Book section (hardcopy bilgileri) ✅
+  - Info section (hardcover conversion) ✅
+- ✅ **Sepet Sistemi:**
+  - CartContext (Context API + localStorage) ✅
+  - Cart API endpoints (GET, POST, DELETE) ✅
+  - Cart page (`/cart`) ✅
+  - Header cart icon entegrasyonu ✅
+- ✅ **My Library Hardcopy Özellikleri:**
+  - Checkbox'lar (bulk selection) ✅
+  - Bulk actions bar (Select All, Add Selected to Cart) ✅
+  - Hardcopy butonları (sadece completed kitaplar için) ✅
+  - Sepet entegrasyonu ✅
+- ✅ **Step 6 Email Input:**
+  - Unauthenticated users için email input ✅
+  - Email validation ✅
+  - API'ye email gönderimi ✅
+- ✅ **Bot Koruması:**
+  - Rate limiting API (`/api/rate-limit`) ✅
+  - IP-based rate limiting (1 free cover/IP/24h) ✅
+  - Authenticated users için sınırsız ✅
 
 **Son Yapılanlar (24 Ocak 2026):**
 - ✅ **Image API Refactor (v1.7.0):** Image Generation API modülerleştirildi - 3 fazlı refactor tamamlandı

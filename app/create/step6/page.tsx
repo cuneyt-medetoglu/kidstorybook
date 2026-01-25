@@ -29,6 +29,10 @@ import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
 import { generateStoryPrompt } from "@/lib/prompts/story/v1.0.0/base"
 import { buildDetailedCharacterPrompt } from "@/lib/prompts/image/v1.0.0/character"
+import { createClient } from "@/lib/supabase/client"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Mail } from "lucide-react"
 
 export default function Step6Page() {
   const router = useRouter()
@@ -44,10 +48,27 @@ export default function Step6Page() {
   const [isTestingStory, setIsTestingStory] = useState(false)
   const [isTestingCover, setIsTestingCover] = useState(false)
   
+  // Auth and email state
+  const [user, setUser] = useState<any>(null)
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true)
+  const [email, setEmail] = useState<string>("")
+  const [emailError, setEmailError] = useState<string>("")
+  
   // Model selection
   const [storyModel, setStoryModel] = useState<string>("gpt-4o-mini") // Default: GPT-4o Mini (Önerilen)
   // NOTE: Image model/size/quality are now hardcoded to gpt-image-1.5 / 1024x1536 / low
   
+  // Check auth state
+  useEffect(() => {
+    const checkAuth = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setIsLoadingAuth(false)
+    }
+    checkAuth()
+  }, [])
+
   // Load wizard data from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("kidstorybook_wizard")
@@ -62,6 +83,21 @@ export default function Step6Page() {
       }
     }
   }, [])
+  
+  // Email validation
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+  
+  const handleEmailChange = (value: string) => {
+    setEmail(value)
+    if (value && !validateEmail(value)) {
+      setEmailError("Please enter a valid email address")
+    } else {
+      setEmailError("")
+    }
+  }
 
   // Mock user data - Faz 3'te Supabase'den gelecek
   const userData = {
@@ -1105,6 +1141,37 @@ export default function Step6Page() {
                 </div>
               </motion.div>
 
+              {/* Email Input (if not authenticated) */}
+              {!isLoadingAuth && !user && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.85, duration: 0.4 }}
+                  className="mb-4 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-6 dark:border-purple-800 dark:bg-purple-900/20"
+                >
+                  <div className="mb-4 flex items-center gap-2">
+                    <Mail className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <Label htmlFor="email" className="text-base font-semibold text-gray-900 dark:text-slate-50">
+                      Email Address
+                    </Label>
+                  </div>
+                  <p className="mb-3 text-sm text-gray-600 dark:text-slate-400">
+                    We need your email to send you the cover image and marketing updates.
+                  </p>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    className={`w-full ${emailError ? "border-red-500" : ""}`}
+                  />
+                  {emailError && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400">{emailError}</p>
+                  )}
+                </motion.div>
+              )}
+
               {/* Regular Navigation Buttons */}
               <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
                 <Link href="/create/step5" className="w-full sm:w-auto">
@@ -1124,8 +1191,29 @@ export default function Step6Page() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }} className="w-full sm:w-auto">
                   <Button
                     type="button"
-                    disabled={isCreating}
+                    disabled={isCreating || (!user && (!email || !!emailError))}
                     onClick={async () => {
+                      // Email validation for unauthenticated users
+                      if (!user) {
+                        if (!email) {
+                          setEmailError("Email address is required")
+                          toast({
+                            title: "Email Required",
+                            description: "Please enter your email address to continue.",
+                            variant: "destructive",
+                          })
+                          return
+                        }
+                        if (!validateEmail(email)) {
+                          setEmailError("Please enter a valid email address")
+                          toast({
+                            title: "Invalid Email",
+                            description: "Please enter a valid email address.",
+                            variant: "destructive",
+                          })
+                          return
+                        }
+                      }
                       setIsCreating(true)
                       try {
                         // TODO: Step 2'de karakter oluşturulmalı, burada characterId alınmalı
@@ -1172,6 +1260,7 @@ export default function Step6Page() {
                           language: (wizardData?.step3?.language?.id || formData.language.id) as any,
                           storyModel: storyModel, // Use debug mode selection
                           // NOTE: imageModel/imageSize are hardcoded in API (gpt-image-1.5 / 1024x1536 / low)
+                          email: !user ? email : undefined, // Include email if user is not authenticated
                         }
 
                         console.log("[Step 6] Creating book with data:", requestBody)

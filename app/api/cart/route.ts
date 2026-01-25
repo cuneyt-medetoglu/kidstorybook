@@ -1,0 +1,174 @@
+import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
+
+/**
+ * Cart API Routes
+ * 
+ * GET /api/cart - Get user's cart
+ * POST /api/cart/add - Add items to cart
+ * DELETE /api/cart/remove - Remove item from cart
+ * POST /api/cart/clear - Clear cart
+ */
+
+const HARDCOPY_PRICE = 34.99 // $34.99 per hardcopy
+
+export async function GET(request: NextRequest) {
+  try {
+    const supabase = await createClient(request)
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    // For now, cart is stored in localStorage on client-side
+    // In the future, we can store it in database
+    // This endpoint can be used to sync client cart with server
+    
+    return NextResponse.json({
+      success: true,
+      items: [], // Empty for now, client manages cart
+      message: "Cart retrieved successfully",
+    })
+  } catch (error) {
+    console.error("[Cart API] GET Error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient(request)
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json()
+    const { action, book_ids } = body
+
+    if (action === "add") {
+      if (!book_ids || !Array.isArray(book_ids) || book_ids.length === 0) {
+        return NextResponse.json(
+          { error: "book_ids array is required" },
+          { status: 400 }
+        )
+      }
+
+      // Validate that books exist and belong to user
+      // Check if books are purchased E-Books (required for hardcopy)
+      const { data: books, error: booksError } = await supabase
+        .from("books")
+        .select("id, title, cover_image_url, status")
+        .in("id", book_ids)
+        .eq("user_id", user.id)
+
+      if (booksError) {
+        console.error("[Cart API] Error fetching books:", booksError)
+        return NextResponse.json(
+          { error: "Failed to fetch books" },
+          { status: 500 }
+        )
+      }
+
+      if (books.length !== book_ids.length) {
+        return NextResponse.json(
+          { error: "Some books not found or don't belong to you" },
+          { status: 404 }
+        )
+      }
+
+      // Check if all books are purchased (status: 'completed')
+      const unpurchasedBooks = books.filter((book) => book.status !== "completed")
+      if (unpurchasedBooks.length > 0) {
+        return NextResponse.json(
+          {
+            error: "Only purchased E-Books can be converted to hardcopy",
+            unpurchased_books: unpurchasedBooks.map((b) => b.id),
+          },
+          { status: 400 }
+        )
+      }
+
+      // Return cart items (client will add them to cart)
+      const cartItems = books.map((book) => ({
+        bookId: book.id,
+        bookTitle: book.title || "Untitled Book",
+        coverImage: book.cover_image_url || "",
+        price: HARDCOPY_PRICE,
+        type: "hardcopy" as const,
+      }))
+
+      return NextResponse.json({
+        success: true,
+        items: cartItems,
+        message: "Items validated and ready to add to cart",
+      })
+    }
+
+    if (action === "clear") {
+      // Cart is managed client-side, this is just for validation
+      return NextResponse.json({
+        success: true,
+        message: "Cart cleared",
+      })
+    }
+
+    return NextResponse.json(
+      { error: "Invalid action" },
+      { status: 400 }
+    )
+  } catch (error) {
+    console.error("[Cart API] POST Error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient(request)
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
+    }
+
+    const body = await request.json()
+    const { item_id } = body
+
+    if (!item_id) {
+      return NextResponse.json(
+        { error: "item_id is required" },
+        { status: 400 }
+      )
+    }
+
+    // Cart is managed client-side, this is just for validation
+    return NextResponse.json({
+      success: true,
+      message: "Item removed from cart",
+    })
+  } catch (error) {
+    console.error("[Cart API] DELETE Error:", error)
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    )
+  }
+}

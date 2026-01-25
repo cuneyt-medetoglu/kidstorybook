@@ -29,6 +29,7 @@ import {
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { useCart } from "@/contexts/CartContext"
 
 const countries = [
   { code: "US", flag: "🇺🇸", currency: "USD" },
@@ -48,12 +49,12 @@ export function Header() {
   const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(countries[0])
-  const [cartCount, setCartCount] = useState(0)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [prevCartCount, setPrevCartCount] = useState(0)
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const { getCartCount } = useCart()
+  const cartCount = getCartCount()
 
   // Check auth state
   useEffect(() => {
@@ -96,12 +97,6 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Simulate cart count change for demo
-  useEffect(() => {
-    if (cartCount !== prevCartCount) {
-      setPrevCartCount(cartCount)
-    }
-  }, [cartCount, prevCartCount])
 
   return (
     <motion.header
@@ -180,27 +175,28 @@ export function Header() {
           </DropdownMenu>
 
           {/* Shopping Cart */}
-          <motion.button
-            className="relative"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setCartCount((prev) => prev + 1)}
-          >
-            <ShoppingCart className="h-6 w-6 text-gray-800 dark:text-slate-100" />
-            <AnimatePresence>
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-orange-400 text-xs font-bold text-white dark:bg-orange-300"
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </motion.button>
+          <Link href="/cart">
+            <motion.button
+              className="relative"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ShoppingCart className="h-6 w-6 text-gray-800 dark:text-slate-100" />
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span
+                    key={cartCount}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    exit={{ scale: 0 }}
+                    className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-orange-400 text-xs font-bold text-white dark:bg-orange-300"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
+          </Link>
 
           {/* Theme Toggle */}
           {mounted && (
@@ -366,22 +362,24 @@ export function Header() {
 
                 <div className="mt-auto space-y-4 border-t border-gray-200 pt-6 dark:border-slate-700">
                   {/* Shopping Cart Display */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex items-center justify-between rounded-xl bg-white/60 px-4 py-3 dark:bg-slate-800/60"
-                  >
-                    <span className="text-sm font-medium text-gray-800 dark:text-slate-100">
-                      Shopping Cart
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <ShoppingCart className="h-5 w-5 text-purple-500 dark:text-purple-400" />
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-400 text-xs font-bold text-white dark:bg-orange-300">
-                        {cartCount}
+                  <Link href="/cart" onClick={() => setIsMobileMenuOpen(false)}>
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="flex items-center justify-between rounded-xl bg-white/60 px-4 py-3 transition-colors hover:bg-white/80 dark:bg-slate-800/60 dark:hover:bg-slate-800/80"
+                    >
+                      <span className="text-sm font-medium text-gray-800 dark:text-slate-100">
+                        Shopping Cart
                       </span>
-                    </div>
-                  </motion.div>
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-400 text-xs font-bold text-white dark:bg-orange-300">
+                          {cartCount}
+                        </span>
+                      </div>
+                    </motion.div>
+                  </Link>
 
                   {/* Country Selector */}
                   <motion.div

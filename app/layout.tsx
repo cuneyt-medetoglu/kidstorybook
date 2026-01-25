@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { CartProvider } from '@/contexts/CartContext'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,10 +28,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-          <CookieConsentBanner />
+          <CartProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            <Footer />
+            <CookieConsentBanner />
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>
