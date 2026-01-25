@@ -258,6 +258,34 @@
       color: #065f46;
     }
 
+    .eisenhower-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .eisenhower-badge.do {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .eisenhower-badge.plan {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .eisenhower-badge.delegate {
+      background: #fed7aa;
+      color: #9a3412;
+    }
+
+    .eisenhower-badge.eliminate {
+      background: #e5e7eb;
+      color: #4b5563;
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -351,6 +379,17 @@
       </div>
 
       <div class="control-group">
+        <label>Eisenhower Matrisi</label>
+        <select id="filterEisenhower">
+          <option value="">Tümü</option>
+          <option value="DO">🔴 DO (Acil ve Önemli)</option>
+          <option value="PLAN">🟡 PLAN (Acil Değil ama Önemli)</option>
+          <option value="DELEGATE">🟠 DELEGATE (Acil ama Önemli Değil)</option>
+          <option value="ELIMINATE">⚪ ELIMINATE (Acil Değil ve Önemli Değil)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
         <label>Arama</label>
         <input type="text" id="searchInput" placeholder="Başlık veya notlarda ara..." />
       </div>
@@ -386,6 +425,7 @@
             <th data-sort="durum">Durum</th>
             <th data-sort="oncelik">Öncelik</th>
             <th data-sort="kategori">Kategori</th>
+            <th data-sort="eisenhower">Eisenhower</th>
             <th data-sort="notlar">Notlar</th>
             <th data-sort="tarih">Tarih</th>
             <th>Link</th>
@@ -393,7 +433,7 @@
         </thead>
         <tbody id="tableBody">
           <tr>
-            <td colspan="10">
+            <td colspan="11">
               <div class="empty-state">
                 <h3>📁 CSV Dosyası Yükle</h3>
                 <p>Yukarıdaki "CSV Yükle" butonuna tıklayarak roadmap.csv dosyasını yükleyin</p>
@@ -479,7 +519,7 @@
       if (data.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="10">
+            <td colspan="11">
               <div class="empty-state">
                 <h3>🔍 Sonuç Bulunamadı</h3>
                 <p>Filtreleri değiştirerek tekrar deneyin</p>
@@ -495,6 +535,12 @@
                            row.Durum === 'Draft' ? 'draft' : 'pending';
         const priorityClass = row.Öncelik === 'Kritik' ? 'critical' :
                              row.Öncelik === 'Önemli' ? 'important' : 'low';
+        
+        // Eisenhower kategorisini parse et
+        const eisenhower = extractEisenhowerCategory(row.Priority || row.Notlar || '');
+        const eisenhowerBadge = eisenhower ? 
+          `<span class="eisenhower-badge ${eisenhower.toLowerCase()}">${getEisenhowerLabel(eisenhower)}</span>` : 
+          '<span style="color: #999;">-</span>';
 
         return `
           <tr>
@@ -505,6 +551,7 @@
             <td><span class="status-badge ${statusClass}">${row.Durum || ''}</span></td>
             <td><span class="priority-badge ${priorityClass}">${row.Öncelik || ''}</span></td>
             <td>${row.Kategori || ''}</td>
+            <td>${eisenhowerBadge}</td>
             <td>${row.Notlar || ''}</td>
             <td>${row.Tarih || ''}</td>
             <td>${row.Link || ''}</td>
@@ -563,12 +610,43 @@
       }
     }
 
+    // Eisenhower kategorisini çıkar
+    function extractEisenhowerCategory(text) {
+      if (!text) return null;
+      
+      // Priority kolonundan veya Notlar kolonundan çıkar
+      if (text.includes('[x]') && text.includes('DO')) return 'DO';
+      if (text.includes('[x]') && text.includes('PLAN')) return 'PLAN';
+      if (text.includes('[x]') && text.includes('DELEGATE')) return 'DELEGATE';
+      if (text.includes('[x]') && text.includes('ELIMINATE')) return 'ELIMINATE';
+      
+      // Emoji kontrolü
+      if (text.includes('🔴') && text.includes('DO')) return 'DO';
+      if (text.includes('🟡') && text.includes('PLAN')) return 'PLAN';
+      if (text.includes('🟠') && text.includes('DELEGATE')) return 'DELEGATE';
+      if (text.includes('⚪') && text.includes('ELIMINATE')) return 'ELIMINATE';
+      
+      return null;
+    }
+
+    // Eisenhower etiketi
+    function getEisenhowerLabel(category) {
+      const labels = {
+        'DO': '🔴 DO',
+        'PLAN': '🟡 PLAN',
+        'DELEGATE': '🟠 DELEGATE',
+        'ELIMINATE': '⚪ ELIMINATE'
+      };
+      return labels[category] || category;
+    }
+
     // Filtreleme
     function applyFilters() {
       const statusFilter = document.getElementById('filterStatus').value;
       const priorityFilter = document.getElementById('filterPriority').value;
       const fazFilter = document.getElementById('filterFaz').value;
       const categoryFilter = document.getElementById('filterCategory').value;
+      const eisenhowerFilter = document.getElementById('filterEisenhower').value;
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
       // Faz başlığını güncelle
@@ -579,6 +657,14 @@
         if (priorityFilter && row.Öncelik !== priorityFilter) return false;
         if (fazFilter && row.Faz !== fazFilter) return false;
         if (categoryFilter && row.Kategori !== categoryFilter) return false;
+        
+        // Eisenhower filtreleme
+        if (eisenhowerFilter) {
+          const priorityText = (row.Priority || row.Notlar || '');
+          const eisenhower = extractEisenhowerCategory(priorityText);
+          if (eisenhower !== eisenhowerFilter) return false;
+        }
+        
         if (searchTerm) {
           const searchText = (row.Başlık || '') + ' ' + (row.Notlar || '');
           if (!searchText.toLowerCase().includes(searchTerm)) return false;
@@ -596,8 +682,19 @@
       if (!sortColumn) return;
 
       filteredData.sort((a, b) => {
-        const aVal = a[sortColumn] || '';
-        const bVal = b[sortColumn] || '';
+        let aVal, bVal;
+        
+        // Eisenhower için özel sıralama
+        if (sortColumn === 'Eisenhower') {
+          const aEisenhower = extractEisenhowerCategory(a.Priority || a.Notlar || '');
+          const bEisenhower = extractEisenhowerCategory(b.Priority || b.Notlar || '');
+          const order = { 'DO': 1, 'PLAN': 2, 'DELEGATE': 3, 'ELIMINATE': 4 };
+          aVal = aEisenhower ? order[aEisenhower] || 99 : 99;
+          bVal = bEisenhower ? order[bEisenhower] || 99 : 99;
+        } else {
+          aVal = a[sortColumn] || '';
+          bVal = b[sortColumn] || '';
+        }
         
         if (sortDirection === 'asc') {
           return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
@@ -621,6 +718,7 @@
           'durum': 'Durum',
           'oncelik': 'Öncelik',
           'kategori': 'Kategori',
+          'eisenhower': 'Eisenhower',
           'notlar': 'Notlar',
           'tarih': 'Tarih'
         };
@@ -663,6 +761,7 @@
     document.getElementById('filterPriority').addEventListener('change', applyFilters);
     document.getElementById('filterFaz').addEventListener('change', applyFilters);
     document.getElementById('filterCategory').addEventListener('change', applyFilters);
+    document.getElementById('filterEisenhower').addEventListener('change', applyFilters);
     document.getElementById('searchInput').addEventListener('input', applyFilters);
 
     // Varsayılan CSV'yi yükle (eğer varsa - aynı klasörde)
