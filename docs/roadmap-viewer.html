@@ -536,8 +536,8 @@
         const priorityClass = row.Öncelik === 'Kritik' ? 'critical' :
                              row.Öncelik === 'Önemli' ? 'important' : 'low';
         
-        // Eisenhower kategorisini parse et
-        const eisenhower = extractEisenhowerCategory(row.Priority || row.Notlar || '');
+        // Eisenhower kategorisini Priority kolonundan al (eğer varsa)
+        const eisenhower = (row.Priority && row.Priority.trim()) ? row.Priority.trim() : null;
         const eisenhowerBadge = eisenhower ? 
           `<span class="eisenhower-badge ${eisenhower.toLowerCase()}">${getEisenhowerLabel(eisenhower)}</span>` : 
           '<span style="color: #999;">-</span>';
@@ -610,21 +610,15 @@
       }
     }
 
-    // Eisenhower kategorisini çıkar
-    function extractEisenhowerCategory(text) {
-      if (!text) return null;
+    // Eisenhower kategorisini Priority kolonundan al
+    function extractEisenhowerCategory(priorityValue) {
+      if (!priorityValue || !priorityValue.trim()) return null;
       
-      // Priority kolonundan veya Notlar kolonundan çıkar
-      if (text.includes('[x]') && text.includes('DO')) return 'DO';
-      if (text.includes('[x]') && text.includes('PLAN')) return 'PLAN';
-      if (text.includes('[x]') && text.includes('DELEGATE')) return 'DELEGATE';
-      if (text.includes('[x]') && text.includes('ELIMINATE')) return 'ELIMINATE';
-      
-      // Emoji kontrolü
-      if (text.includes('🔴') && text.includes('DO')) return 'DO';
-      if (text.includes('🟡') && text.includes('PLAN')) return 'PLAN';
-      if (text.includes('🟠') && text.includes('DELEGATE')) return 'DELEGATE';
-      if (text.includes('⚪') && text.includes('ELIMINATE')) return 'ELIMINATE';
+      const priority = priorityValue.trim().toUpperCase();
+      if (priority === 'DO') return 'DO';
+      if (priority === 'PLAN') return 'PLAN';
+      if (priority === 'DELEGATE') return 'DELEGATE';
+      if (priority === 'ELIMINATE') return 'ELIMINATE';
       
       return null;
     }
@@ -660,8 +654,8 @@
         
         // Eisenhower filtreleme
         if (eisenhowerFilter) {
-          const priorityText = (row.Priority || row.Notlar || '');
-          const eisenhower = extractEisenhowerCategory(priorityText);
+          const priorityValue = (row.Priority || '').trim();
+          const eisenhower = extractEisenhowerCategory(priorityValue);
           if (eisenhower !== eisenhowerFilter) return false;
         }
         
@@ -686,8 +680,8 @@
         
         // Eisenhower için özel sıralama
         if (sortColumn === 'Eisenhower') {
-          const aEisenhower = extractEisenhowerCategory(a.Priority || a.Notlar || '');
-          const bEisenhower = extractEisenhowerCategory(b.Priority || b.Notlar || '');
+          const aEisenhower = extractEisenhowerCategory((a.Priority || '').trim());
+          const bEisenhower = extractEisenhowerCategory((b.Priority || '').trim());
           const order = { 'DO': 1, 'PLAN': 2, 'DELEGATE': 3, 'ELIMINATE': 4 };
           aVal = aEisenhower ? order[aEisenhower] || 99 : 99;
           bVal = bEisenhower ? order[bEisenhower] || 99 : 99;

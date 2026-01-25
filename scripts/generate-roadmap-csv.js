@@ -145,14 +145,29 @@ function parseRoadmap() {
       
       // Başlıktan notları ayır (varsa " - " ile ayrılmış)
       const titleParts = title.trim().split(/\s+-\s+(.+)/);
-      const cleanTitle = titleParts[0].trim();
-      const notes = titleParts[1] ? titleParts[1].trim() : '';
+      let cleanTitle = titleParts[0].trim();
+      let notes = titleParts[1] ? titleParts[1].trim() : '';
+      
+      // Priority bilgisini satırdan çıkar (eğer varsa)
+      // Priority: [x] 🔴 DO formatını ara
+      let priority = '';
+      const priorityMatch = line.match(/Priority:\s*\[x\]\s*(🔴\s*DO|🟡\s*PLAN|🟠\s*DELEGATE|⚪\s*ELIMINATE)/);
+      if (priorityMatch) {
+        if (priorityMatch[1].includes('DO')) priority = 'DO';
+        else if (priorityMatch[1].includes('PLAN')) priority = 'PLAN';
+        else if (priorityMatch[1].includes('DELEGATE')) priority = 'DELEGATE';
+        else if (priorityMatch[1].includes('ELIMINATE')) priority = 'ELIMINATE';
+      }
+      
+      // Başlıktan Priority kısmını temizle (eğer varsa)
+      cleanTitle = cleanTitle.replace(/\s*\|\s*Priority:.*$/, '').trim();
       
       // Mevcut task'ı bul ve güncelle
       const existingTask = tasks.find(t => t.id === id);
       if (existingTask) {
         existingTask.notlar = notes;
         if (currentPriority) existingTask.oncelik = currentPriority;
+        if (priority) existingTask.priority = priority;
       } else {
         // Yeni task ekle
         tasks.push({
@@ -163,6 +178,7 @@ function parseRoadmap() {
           durum: status === 'x' ? 'Tamamlandı' : 'Bekliyor',
           oncelik: currentPriority || 'Önemli',
           kategori: getCategory(faz, altFaz, currentAltFaz),
+          priority: priority, // Eisenhower Matrisi - varsayılan boş
           notlar: notes,
           tarih: '',
           link: currentAltFaz ? `#${currentAltFaz.toLowerCase().replace(/\s+/g, '-')}` : '',
@@ -172,6 +188,25 @@ function parseRoadmap() {
   }
   
   return tasks;
+}
+
+// Priority bilgisini ROADMAP.md'den parse et
+function extractPriorityFromLine(line) {
+  // Priority: [x] 🔴 DO formatını ara
+  const doMatch = line.match(/\[x\]\s*🔴\s*DO/);
+  if (doMatch) return 'DO';
+  
+  const planMatch = line.match(/\[x\]\s*🟡\s*PLAN/);
+  if (planMatch) return 'PLAN';
+  
+  const delegateMatch = line.match(/\[x\]\s*🟠\s*DELEGATE/);
+  if (delegateMatch) return 'DELEGATE';
+  
+  const eliminateMatch = line.match(/\[x\]\s*⚪\s*ELIMINATE/);
+  if (eliminateMatch) return 'ELIMINATE';
+  
+  // Hiçbiri seçilmemişse boş döndür
+  return '';
 }
 
 function generateCSV(tasks) {
@@ -184,6 +219,7 @@ function generateCSV(tasks) {
     'Durum',
     'Öncelik',
     'Kategori',
+    'Priority',
     'Notlar',
     'Tarih',
     'Link',
@@ -196,6 +232,9 @@ function generateCSV(tasks) {
     // Alternatif: ="1.1.1" formatı da çalışır ama tab daha temiz
     const idValue = `\t${task.id}`;
     
+    // Priority bilgisi task objesinde yoksa boş bırak
+    const priority = task.priority || '';
+    
     return [
       idValue,
       task.faz,
@@ -204,6 +243,7 @@ function generateCSV(tasks) {
       task.durum,
       task.oncelik,
       task.kategori,
+      priority, // Priority kolonu (Eisenhower Matrisi)
       `"${task.notlar.replace(/"/g, '""')}"`,
       task.tarih,
       task.link,

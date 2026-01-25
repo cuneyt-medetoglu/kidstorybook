@@ -26,234 +26,234 @@
 **Bu bölüm tüm işlerin özet listesidir. Detaylar için ilgili faz bölümlerine bakın.**
 
 ### Faz 1: Temel Altyapı ✅
-- [x] [1.1.1 Next.js 14 projesi oluştur](#11-proje-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.1.2 Tailwind CSS kur](#11-proje-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.1.3 shadcn/ui kur](#11-proje-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.1.4 ESLint + Prettier ayarla](#11-proje-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.1.5 Git repo kurulumu](#11-proje-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.2.1 Supabase projesi oluştur](#12-supabase-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.2.2 Veritabanı şeması](#12-supabase-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.2.3 Supabase Auth entegrasyonu](#12-supabase-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.2.4 Storage bucket'ları](#12-supabase-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.2.5 RLS kuralları](#12-supabase-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.3.1 Environment dosyası](#13-environment-ve-yapılandırma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.3.2 API key'leri ekle](#13-environment-ve-yapılandırma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.3.3 Vercel environment variables](#13-environment-ve-yapılandırma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [1.3.4 Development/Production config](#13-environment-ve-yapılandırma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] [1.1.1 Next.js 14 projesi oluştur](#11-proje-kurulumu)
+- [x] [1.1.2 Tailwind CSS kur](#11-proje-kurulumu)
+- [x] [1.1.3 shadcn/ui kur](#11-proje-kurulumu)
+- [x] [1.1.4 ESLint + Prettier ayarla](#11-proje-kurulumu)
+- [x] [1.1.5 Git repo kurulumu](#11-proje-kurulumu)
+- [x] [1.2.1 Supabase projesi oluştur](#12-supabase-kurulumu)
+- [x] [1.2.2 Veritabanı şeması](#12-supabase-kurulumu)
+- [x] [1.2.3 Supabase Auth entegrasyonu](#12-supabase-kurulumu)
+- [x] [1.2.4 Storage bucket'ları](#12-supabase-kurulumu)
+- [x] [1.2.5 RLS kuralları](#12-supabase-kurulumu)
+- [x] [1.3.1 Environment dosyası](#13-environment-ve-yapılandırma)
+- [x] [1.3.2 API key'leri ekle](#13-environment-ve-yapılandırma)
+- [x] [1.3.3 Vercel environment variables](#13-environment-ve-yapılandırma)
+- [x] [1.3.4 Development/Production config](#13-environment-ve-yapılandırma)
 
 ### Faz 2: Frontend Geliştirme ✅
-- [x] [2.1.1 Ana layout component](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.1.2 Responsive tasarım](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.1.4 Loading states](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.1.6 Sepet ikonu](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.1.7 Create book butonu](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.1.8 Dark/Light mode toggle](#21-layout-ve-navigasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.1 Hero section](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.2 Nasıl Çalışır bölümü](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.3 Örnek kitaplar carousel](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.4 Özellikler özeti](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.5 Fiyatlandırma özeti](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.6 FAQ bölümü](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.7 Kampanya banner'ları](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.2.8 Cookie banner](#22-ana-sayfa-homepage) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.1 Giriş sayfası](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.2 Kayıt sayfası](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.3 Şifre sıfırlama](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.4 Google OAuth](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.5 Facebook OAuth](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.3.6 Instagram OAuth](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.7 Email doğrulama](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.3.8 OAuth callback sayfaları](#23-auth-sayfaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.1 Step 1: Karakter bilgileri](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.2 Step 2: Referans görsel](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.3 Step 3: Tema ve yaş grubu](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.4 Step 4: Illustration style](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.5 Step 5: Özel istekler](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.6 Step 6: Önizleme ve onay](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.7 Progress indicator](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.8 Form validasyonu](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.9 Ücretsiz kapak hakkı kontrolü](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.4.10 Ücretsiz kapak butonu](#24-kitap-oluşturma-wizard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.1 Temel görüntüleme](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.2 Mobil ve responsive](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.3 Sesli okuma (TTS)](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.4 Otomatik oynatma](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.5 UX iyileştirmeleri](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.5.6 Görsel ve animasyonlar](#25-e-book-viewer-) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.1 Kitaplık sayfası](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.2 Kitap kartı component](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.3 Filtreleme ve sıralama](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.4 Sipariş geçmişi](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.5 Profil ayarları](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.6.6 Ücretsiz kapak hakkı göstergesi](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.6.7 Characters tab](#26-kullanıcı-dashboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.1 Özellikler sayfası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.2 Fiyatlandırma sayfası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.4 İletişim sayfası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.5 Gizlilik Politikası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.6 Kullanım Şartları](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.7 KVKK Aydınlatma Metni](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.7.8 Examples sayfası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.9 Ideas sayfası](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.10 Tema kartları görsel gösterimi](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [2.7.11 Used Photos gösterimi](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [2.7.12 View All Examples linkleri](#27-statik-sayfalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] [2.1.1 Ana layout component](#21-layout-ve-navigasyon)
+- [x] [2.1.2 Responsive tasarım](#21-layout-ve-navigasyon)
+- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon)
+- [ ] [2.1.4 Loading states](#21-layout-ve-navigasyon)
+- [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon)
+- [x] [2.1.6 Sepet ikonu](#21-layout-ve-navigasyon)
+- [x] [2.1.7 Create book butonu](#21-layout-ve-navigasyon)
+- [x] [2.1.8 Dark/Light mode toggle](#21-layout-ve-navigasyon)
+- [x] [2.2.1 Hero section](#22-ana-sayfa-homepage)
+- [x] [2.2.2 Nasıl Çalışır bölümü](#22-ana-sayfa-homepage)
+- [x] [2.2.3 Örnek kitaplar carousel](#22-ana-sayfa-homepage)
+- [x] [2.2.4 Özellikler özeti](#22-ana-sayfa-homepage)
+- [x] [2.2.5 Fiyatlandırma özeti](#22-ana-sayfa-homepage)
+- [x] [2.2.6 FAQ bölümü](#22-ana-sayfa-homepage)
+- [x] [2.2.7 Kampanya banner'ları](#22-ana-sayfa-homepage)
+- [x] [2.2.8 Cookie banner](#22-ana-sayfa-homepage)
+- [x] [2.3.1 Giriş sayfası](#23-auth-sayfaları)
+- [x] [2.3.2 Kayıt sayfası](#23-auth-sayfaları)
+- [x] [2.3.3 Şifre sıfırlama](#23-auth-sayfaları)
+- [x] [2.3.4 Google OAuth](#23-auth-sayfaları)
+- [x] [2.3.5 Facebook OAuth](#23-auth-sayfaları)
+- [ ] [2.3.6 Instagram OAuth](#23-auth-sayfaları)
+- [x] [2.3.7 Email doğrulama](#23-auth-sayfaları)
+- [x] [2.3.8 OAuth callback sayfaları](#23-auth-sayfaları)
+- [x] [2.4.1 Step 1: Karakter bilgileri](#24-kitap-oluşturma-wizard)
+- [x] [2.4.2 Step 2: Referans görsel](#24-kitap-oluşturma-wizard)
+- [x] [2.4.3 Step 3: Tema ve yaş grubu](#24-kitap-oluşturma-wizard)
+- [x] [2.4.4 Step 4: Illustration style](#24-kitap-oluşturma-wizard)
+- [x] [2.4.5 Step 5: Özel istekler](#24-kitap-oluşturma-wizard)
+- [x] [2.4.6 Step 6: Önizleme ve onay](#24-kitap-oluşturma-wizard)
+- [x] [2.4.7 Progress indicator](#24-kitap-oluşturma-wizard)
+- [x] [2.4.8 Form validasyonu](#24-kitap-oluşturma-wizard)
+- [x] [2.4.9 Ücretsiz kapak hakkı kontrolü](#24-kitap-oluşturma-wizard)
+- [x] [2.4.10 Ücretsiz kapak butonu](#24-kitap-oluşturma-wizard)
+- [x] [2.5.1 Temel görüntüleme](#25-e-book-viewer-)
+- [x] [2.5.2 Mobil ve responsive](#25-e-book-viewer-)
+- [x] [2.5.3 Sesli okuma (TTS)](#25-e-book-viewer-)
+- [x] [2.5.4 Otomatik oynatma](#25-e-book-viewer-)
+- [x] [2.5.5 UX iyileştirmeleri](#25-e-book-viewer-)
+- [x] [2.5.6 Görsel ve animasyonlar](#25-e-book-viewer-)
+- [x] [2.6.1 Kitaplık sayfası](#26-kullanıcı-dashboard)
+- [x] [2.6.2 Kitap kartı component](#26-kullanıcı-dashboard)
+- [x] [2.6.3 Filtreleme ve sıralama](#26-kullanıcı-dashboard)
+- [x] [2.6.4 Sipariş geçmişi](#26-kullanıcı-dashboard)
+- [x] [2.6.5 Profil ayarları](#26-kullanıcı-dashboard)
+- [x] [2.6.6 Ücretsiz kapak hakkı göstergesi](#26-kullanıcı-dashboard)
+- [ ] [2.6.7 Characters tab](#26-kullanıcı-dashboard)
+- [ ] [2.7.1 Özellikler sayfası](#27-statik-sayfalar)
+- [ ] [2.7.2 Fiyatlandırma sayfası](#27-statik-sayfalar)
+- [ ] [2.7.4 İletişim sayfası](#27-statik-sayfalar)
+- [ ] [2.7.5 Gizlilik Politikası](#27-statik-sayfalar)
+- [ ] [2.7.6 Kullanım Şartları](#27-statik-sayfalar)
+- [ ] [2.7.7 KVKK Aydınlatma Metni](#27-statik-sayfalar)
+- [x] [2.7.8 Examples sayfası](#27-statik-sayfalar)
+- [ ] [2.7.9 Ideas sayfası](#27-statik-sayfalar)
+- [ ] [2.7.10 Tema kartları görsel gösterimi](#27-statik-sayfalar)
+- [x] [2.7.11 Used Photos gösterimi](#27-statik-sayfalar)
+- [ ] [2.7.12 View All Examples linkleri](#27-statik-sayfalar)
 
 ### Faz 3: Backend ve AI Entegrasyonu ✅
-- [x] [3.1.1 API klasör yapısı](#31-api-routes-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.1.2 Middleware](#31-api-routes-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.1.3 API response formatı](#31-api-routes-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.1 Register endpoint](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.2 Login endpoint](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.3 Logout endpoint](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.4 GET /api/users/me](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.2.5 PATCH /api/users/me](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.6 Google OAuth callback](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.2.7 Facebook OAuth callback](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.2.8 Instagram OAuth callback](#32-kullanıcı-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.1 POST /api/characters/analyze](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.2 GET /api/characters](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.3 GET /api/characters/:id](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.4 PATCH /api/characters/:id](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.5 DELETE /api/characters/:id](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.6 POST /api/characters/:id/set-default](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.4.7 POST /api/characters (Non-Child)](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.4.8 POST /api/characters/upload-photo](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.4.9 API iyileştirmeleri](#34-karakter-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.1 Books database helpers](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.2 POST /api/books](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.3 GET /api/books](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.4 GET /api/books/:id](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.5 PATCH /api/books/:id](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.6 DELETE /api/books/:id](#36-kitap-apileri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.1 Prompt Management System](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.2 Story Generation Prompts](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.3 Image Generation Prompts](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.4 Character Consistency System](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.5 POST /api/ai/generate-story](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.6 POST /api/ai/generate-images](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.7 POST /api/ai/generate-cover](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.8 Prompt template'leri](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.9 Create Book'da cover generation](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.10 Create Book'da page images](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.11 Book status management](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.5.12 Queue sistemi](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.5.13 Retry ve hata yönetimi](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.14 AI provider seçimi](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.15 Prompt Kalite İyileştirmesi](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.16 Image Edit Feature](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.26 Image API Refactor - Modülerleştirme](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.5.25 Story API Refactor - Modülerleştirme](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.5.24 Kitap oluşturma – Herhangi bir hata → tüm kitap fail](#35-ai-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.1 POST /api/books/:id/generate-pdf](#36-pdf-generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.2 PDF template tasarımı](#36-pdf-generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.3 Supabase Storage'a kaydet](#36-pdf-generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [3.6.4 İndirme linki oluştur](#36-pdf-generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.7.1 Stripe webhook handler](#37-webhooklar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [3.7.2 İyzico webhook handler](#37-webhooklar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] [3.1.1 API klasör yapısı](#31-api-routes-kurulumu)
+- [x] [3.1.2 Middleware](#31-api-routes-kurulumu)
+- [x] [3.1.3 API response formatı](#31-api-routes-kurulumu)
+- [x] [3.2.1 Register endpoint](#32-kullanıcı-apileri)
+- [x] [3.2.2 Login endpoint](#32-kullanıcı-apileri)
+- [x] [3.2.3 Logout endpoint](#32-kullanıcı-apileri)
+- [x] [3.2.4 GET /api/users/me](#32-kullanıcı-apileri)
+- [ ] [3.2.5 PATCH /api/users/me](#32-kullanıcı-apileri)
+- [x] [3.2.6 Google OAuth callback](#32-kullanıcı-apileri)
+- [x] [3.2.7 Facebook OAuth callback](#32-kullanıcı-apileri)
+- [ ] [3.2.8 Instagram OAuth callback](#32-kullanıcı-apileri)
+- [x] [3.4.1 POST /api/characters/analyze](#34-karakter-apileri)
+- [x] [3.4.2 GET /api/characters](#34-karakter-apileri)
+- [x] [3.4.3 GET /api/characters/:id](#34-karakter-apileri)
+- [x] [3.4.4 PATCH /api/characters/:id](#34-karakter-apileri)
+- [x] [3.4.5 DELETE /api/characters/:id](#34-karakter-apileri)
+- [x] [3.4.6 POST /api/characters/:id/set-default](#34-karakter-apileri)
+- [x] [3.4.7 POST /api/characters (Non-Child)](#34-karakter-apileri)
+- [ ] [3.4.8 POST /api/characters/upload-photo](#34-karakter-apileri)
+- [ ] [3.4.9 API iyileştirmeleri](#34-karakter-apileri)
+- [x] [3.6.1 Books database helpers](#36-kitap-apileri)
+- [x] [3.6.2 POST /api/books](#36-kitap-apileri)
+- [x] [3.6.3 GET /api/books](#36-kitap-apileri)
+- [x] [3.6.4 GET /api/books/:id](#36-kitap-apileri)
+- [x] [3.6.5 PATCH /api/books/:id](#36-kitap-apileri)
+- [x] [3.6.6 DELETE /api/books/:id](#36-kitap-apileri)
+- [x] [3.5.1 Prompt Management System](#35-ai-entegrasyonu)
+- [x] [3.5.2 Story Generation Prompts](#35-ai-entegrasyonu)
+- [x] [3.5.3 Image Generation Prompts](#35-ai-entegrasyonu)
+- [x] [3.5.4 Character Consistency System](#35-ai-entegrasyonu)
+- [x] [3.5.5 POST /api/ai/generate-story](#35-ai-entegrasyonu)
+- [x] [3.5.6 POST /api/ai/generate-images](#35-ai-entegrasyonu)
+- [x] [3.5.7 POST /api/ai/generate-cover](#35-ai-entegrasyonu)
+- [x] [3.5.8 Prompt template'leri](#35-ai-entegrasyonu)
+- [x] [3.5.9 Create Book'da cover generation](#35-ai-entegrasyonu)
+- [x] [3.5.10 Create Book'da page images](#35-ai-entegrasyonu)
+- [x] [3.5.11 Book status management](#35-ai-entegrasyonu)
+- [ ] [3.5.12 Queue sistemi](#35-ai-entegrasyonu)
+- [ ] [3.5.13 Retry ve hata yönetimi](#35-ai-entegrasyonu)
+- [x] [3.5.14 AI provider seçimi](#35-ai-entegrasyonu)
+- [x] [3.5.15 Prompt Kalite İyileştirmesi](#35-ai-entegrasyonu)
+- [x] [3.5.16 Image Edit Feature](#35-ai-entegrasyonu)
+- [x] [3.5.26 Image API Refactor - Modülerleştirme](#35-ai-entegrasyonu)
+- [x] [3.5.25 Story API Refactor - Modülerleştirme](#35-ai-entegrasyonu)
+- [ ] [3.5.24 Kitap oluşturma – Herhangi bir hata → tüm kitap fail](#35-ai-entegrasyonu)
+- [x] [3.6.1 POST /api/books/:id/generate-pdf](#36-pdf-generation)
+- [x] [3.6.2 PDF template tasarımı](#36-pdf-generation)
+- [x] [3.6.3 Supabase Storage'a kaydet](#36-pdf-generation)
+- [x] [3.6.4 İndirme linki oluştur](#36-pdf-generation)
+- [ ] [3.7.1 Stripe webhook handler](#37-webhooklar)
+- [ ] [3.7.2 İyzico webhook handler](#37-webhooklar)
 
 ### Faz 4: E-ticaret ve Ödeme
-- [ ] [4.1.1 Stripe hesabı oluştur](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.2 Stripe SDK kurulumu](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.3 Ürünler ve fiyatlar](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.4 Checkout session](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.5 Payment intent flow](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.6 Stripe webhook handler](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.1.7 Test modu](#41-stripe-entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.1 İyzico hesabı oluştur](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.2 İyzico SDK kurulumu](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.3 Ödeme formu entegrasyonu](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.4 3D Secure desteği](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.5 İyzico webhook handler](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.6 Callback handler](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.2.7 Test modu](#42-iyzico-entegrasyonu-türkiye) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.3.1 Checkout sayfası](#43-sipariş-yönetimi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.3.2 Sipariş özeti component](#43-sipariş-yönetimi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.3.3 Ödeme başarılı sayfası](#43-sipariş-yönetimi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.3.4 Sipariş durumu takibi](#43-sipariş-yönetimi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.3.5 Email bildirimleri](#43-sipariş-yönetimi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.4.1 Sayfa sayısına göre fiyatlandırma](#44-fiyatlandırma-sistemi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.4.2 E-book vs Basılı kitap fiyatları](#44-fiyatlandırma-sistemi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.4.3 İndirim kodu sistemi](#44-fiyatlandırma-sistemi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [4.4.4 Ücretsiz kapak hakkı takibi](#44-fiyatlandırma-sistemi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] [4.1.1 Stripe hesabı oluştur](#41-stripe-entegrasyonu)
+- [ ] [4.1.2 Stripe SDK kurulumu](#41-stripe-entegrasyonu)
+- [ ] [4.1.3 Ürünler ve fiyatlar](#41-stripe-entegrasyonu)
+- [ ] [4.1.4 Checkout session](#41-stripe-entegrasyonu)
+- [ ] [4.1.5 Payment intent flow](#41-stripe-entegrasyonu)
+- [ ] [4.1.6 Stripe webhook handler](#41-stripe-entegrasyonu)
+- [ ] [4.1.7 Test modu](#41-stripe-entegrasyonu)
+- [ ] [4.2.1 İyzico hesabı oluştur](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.2 İyzico SDK kurulumu](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.3 Ödeme formu entegrasyonu](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.4 3D Secure desteği](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.5 İyzico webhook handler](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.6 Callback handler](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.2.7 Test modu](#42-iyzico-entegrasyonu-türkiye)
+- [ ] [4.3.1 Checkout sayfası](#43-sipariş-yönetimi)
+- [ ] [4.3.2 Sipariş özeti component](#43-sipariş-yönetimi)
+- [ ] [4.3.3 Ödeme başarılı sayfası](#43-sipariş-yönetimi)
+- [ ] [4.3.4 Sipariş durumu takibi](#43-sipariş-yönetimi)
+- [ ] [4.3.5 Email bildirimleri](#43-sipariş-yönetimi)
+- [ ] [4.4.1 Sayfa sayısına göre fiyatlandırma](#44-fiyatlandırma-sistemi)
+- [ ] [4.4.2 E-book vs Basılı kitap fiyatları](#44-fiyatlandırma-sistemi)
+- [ ] [4.4.3 İndirim kodu sistemi](#44-fiyatlandırma-sistemi)
+- [ ] [4.4.4 Ücretsiz kapak hakkı takibi](#44-fiyatlandırma-sistemi)
 
 ### Faz 5: Polish ve Lansman
-- [ ] [5.1.1 Meta tags ve Open Graph](#51-seo-optimizasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.1.2 Sitemap.xml](#51-seo-optimizasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.1.3 robots.txt](#51-seo-optimizasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.1.4 Structured data](#51-seo-optimizasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.1.5 Performance optimizasyonu](#51-seo-optimizasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.2.1 Google Analytics 4](#52-analytics) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.2.2 Event tracking](#52-analytics) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.2.3 Conversion tracking](#52-analytics) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.2.4 Custom dashboard](#52-analytics) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.3.1 HTTPS sertifikası](#53-güvenlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.3.2 Rate limiting](#53-güvenlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.3.3 Input validasyonu](#53-güvenlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.3.4 CSRF protection](#53-güvenlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.3.5 GDPR/KVKK uyumluluk](#53-güvenlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.4.1 Manuel test](#54-test) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.4.2 Mobil test](#54-test) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.4.3 Cross-browser test](#54-test) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.4.4 Ödeme testleri](#54-test) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.5.1 Vercel production deployment](#55-deployment) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.5.2 Domain bağlantısı](#55-deployment) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.5.3 SSL sertifikası](#55-deployment) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.5.4 Monitoring kurulumu](#55-deployment) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.5.5 Error tracking](#55-deployment) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.6.1 Örnek kitaplar oluştur](#56-lansman-hazırlıkları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.6.2 Sosyal medya hesapları](#56-lansman-hazırlıkları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.6.3 Landing page son kontrolü](#56-lansman-hazırlıkları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.6.4 Beta kullanıcılar ile test](#56-lansman-hazırlıkları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [5.7.1 Profesyonel PDF template](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.7.2 PDF preview özelliği](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.7.3 PDF customization seçenekleri](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.7.4 Arka plan desenleri](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [5.7.5 PDF boyut optimizasyonu](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] [5.7.6 Cover Page İyileştirmeleri](#57-pdf-tasarım-iyileştirmesi) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] [5.1.1 Meta tags ve Open Graph](#51-seo-optimizasyonu)
+- [ ] [5.1.2 Sitemap.xml](#51-seo-optimizasyonu)
+- [ ] [5.1.3 robots.txt](#51-seo-optimizasyonu)
+- [ ] [5.1.4 Structured data](#51-seo-optimizasyonu)
+- [ ] [5.1.5 Performance optimizasyonu](#51-seo-optimizasyonu)
+- [ ] [5.2.1 Google Analytics 4](#52-analytics)
+- [ ] [5.2.2 Event tracking](#52-analytics)
+- [ ] [5.2.3 Conversion tracking](#52-analytics)
+- [ ] [5.2.4 Custom dashboard](#52-analytics)
+- [ ] [5.3.1 HTTPS sertifikası](#53-güvenlik)
+- [ ] [5.3.2 Rate limiting](#53-güvenlik)
+- [ ] [5.3.3 Input validasyonu](#53-güvenlik)
+- [ ] [5.3.4 CSRF protection](#53-güvenlik)
+- [ ] [5.3.5 GDPR/KVKK uyumluluk](#53-güvenlik)
+- [ ] [5.4.1 Manuel test](#54-test)
+- [ ] [5.4.2 Mobil test](#54-test)
+- [ ] [5.4.3 Cross-browser test](#54-test)
+- [ ] [5.4.4 Ödeme testleri](#54-test)
+- [ ] [5.5.1 Vercel production deployment](#55-deployment)
+- [ ] [5.5.2 Domain bağlantısı](#55-deployment)
+- [ ] [5.5.3 SSL sertifikası](#55-deployment)
+- [ ] [5.5.4 Monitoring kurulumu](#55-deployment)
+- [ ] [5.5.5 Error tracking](#55-deployment)
+- [ ] [5.6.1 Örnek kitaplar oluştur](#56-lansman-hazırlıkları)
+- [ ] [5.6.2 Sosyal medya hesapları](#56-lansman-hazırlıkları)
+- [ ] [5.6.3 Landing page son kontrolü](#56-lansman-hazırlıkları)
+- [ ] [5.6.4 Beta kullanıcılar ile test](#56-lansman-hazırlıkları)
+- [x] [5.7.1 Profesyonel PDF template](#57-pdf-tasarım-iyileştirmesi)
+- [ ] [5.7.2 PDF preview özelliği](#57-pdf-tasarım-iyileştirmesi)
+- [ ] [5.7.3 PDF customization seçenekleri](#57-pdf-tasarım-iyileştirmesi)
+- [ ] [5.7.4 Arka plan desenleri](#57-pdf-tasarım-iyileştirmesi)
+- [ ] [5.7.5 PDF boyut optimizasyonu](#57-pdf-tasarım-iyileştirmesi)
+- [x] [5.7.6 Cover Page İyileştirmeleri](#57-pdf-tasarım-iyileştirmesi)
 
 ### Faz 6: Mobil Uygulama (PWA)
-- [ ] [6.1.1 next-pwa paketi](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.2 Manifest.json](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.3 Service Worker](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.4 App icon'ları](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.5 Splash screen](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.6 Offline desteği](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.1.7 Install prompt](#61-pwa-temel-kurulumu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.1 Touch gesture desteği](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.2 Mobil navigasyon](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.3 Fotoğraf yükleme optimizasyonu](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.4 Push notification](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.5 Share API entegrasyonu](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.2.6 Responsive tasarım son kontrolleri](#62-mobil-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.1 TWA projesi oluştur](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.2 Android manifest](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.3 APK/AAB build](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.4 Google Play Console](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.5 Store listing](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.6 Play Store'a yükleme](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.3.7 Test ve inceleme](#63-android-play-store---twa-build) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.1 Capacitor kurulumu](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.2 iOS platform ekleme](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.3 iOS native wrapper](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.4 Xcode projesi](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.5 Apple Developer hesabı](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.6 App Store Connect](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.7 Store listing](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.8 App Store'a yükleme](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.4.9 Test ve inceleme](#64-ios-app-store---capacitor-wrapper) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.1 PWA test](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.2 Android cihazlarda test](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.3 iOS cihazlarda test](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.4 Performance optimizasyonu](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.5 Offline functionality test](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.5.6 Store'larda görünürlük testi](#65-test-ve-optimizasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.6.1 OTA güncelleme stratejisi](#66-güncelleme-ve-bakım) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.6.2 Store güncelleme süreci](#66-güncelleme-ve-bakım) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.6.3 Kullanıcı geri bildirimi](#66-güncelleme-ve-bakım) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] [6.6.4 Crash reporting](#66-güncelleme-ve-bakım) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] [6.1.1 next-pwa paketi](#61-pwa-temel-kurulumu)
+- [ ] [6.1.2 Manifest.json](#61-pwa-temel-kurulumu)
+- [ ] [6.1.3 Service Worker](#61-pwa-temel-kurulumu)
+- [ ] [6.1.4 App icon'ları](#61-pwa-temel-kurulumu)
+- [ ] [6.1.5 Splash screen](#61-pwa-temel-kurulumu)
+- [ ] [6.1.6 Offline desteği](#61-pwa-temel-kurulumu)
+- [ ] [6.1.7 Install prompt](#61-pwa-temel-kurulumu)
+- [ ] [6.2.1 Touch gesture desteği](#62-mobil-optimizasyon)
+- [ ] [6.2.2 Mobil navigasyon](#62-mobil-optimizasyon)
+- [ ] [6.2.3 Fotoğraf yükleme optimizasyonu](#62-mobil-optimizasyon)
+- [ ] [6.2.4 Push notification](#62-mobil-optimizasyon)
+- [ ] [6.2.5 Share API entegrasyonu](#62-mobil-optimizasyon)
+- [ ] [6.2.6 Responsive tasarım son kontrolleri](#62-mobil-optimizasyon)
+- [ ] [6.3.1 TWA projesi oluştur](#63-android-play-store---twa-build)
+- [ ] [6.3.2 Android manifest](#63-android-play-store---twa-build)
+- [ ] [6.3.3 APK/AAB build](#63-android-play-store---twa-build)
+- [ ] [6.3.4 Google Play Console](#63-android-play-store---twa-build)
+- [ ] [6.3.5 Store listing](#63-android-play-store---twa-build)
+- [ ] [6.3.6 Play Store'a yükleme](#63-android-play-store---twa-build)
+- [ ] [6.3.7 Test ve inceleme](#63-android-play-store---twa-build)
+- [ ] [6.4.1 Capacitor kurulumu](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.2 iOS platform ekleme](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.3 iOS native wrapper](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.4 Xcode projesi](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.5 Apple Developer hesabı](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.6 App Store Connect](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.7 Store listing](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.8 App Store'a yükleme](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.4.9 Test ve inceleme](#64-ios-app-store---capacitor-wrapper)
+- [ ] [6.5.1 PWA test](#65-test-ve-optimizasyon)
+- [ ] [6.5.2 Android cihazlarda test](#65-test-ve-optimizasyon)
+- [ ] [6.5.3 iOS cihazlarda test](#65-test-ve-optimizasyon)
+- [ ] [6.5.4 Performance optimizasyonu](#65-test-ve-optimizasyon)
+- [ ] [6.5.5 Offline functionality test](#65-test-ve-optimizasyon)
+- [ ] [6.5.6 Store'larda görünürlük testi](#65-test-ve-optimizasyon)
+- [ ] [6.6.1 OTA güncelleme stratejisi](#66-güncelleme-ve-bakım)
+- [ ] [6.6.2 Store güncelleme süreci](#66-güncelleme-ve-bakım)
+- [ ] [6.6.3 Kullanıcı geri bildirimi](#66-güncelleme-ve-bakım)
+- [ ] [6.6.4 Crash reporting](#66-güncelleme-ve-bakım)
 
 ---
 
@@ -303,15 +303,15 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Öncelik:** 🔴 Kritik
 
 ### 1.1 Proje Kurulumu ✅
-- [x] **1.1.1** Next.js 14 projesi oluştur (App Router) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.1.2** Tailwind CSS kur ve yapılandır | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.1.3** shadcn/ui kur ve tema ayarla | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.1.4** ESLint + Prettier ayarla | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.1.5** Git repo ve branch stratejisi belirle | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **1.1.1** Next.js 14 projesi oluştur (App Router)
+- [x] **1.1.2** Tailwind CSS kur ve yapılandır
+- [x] **1.1.3** shadcn/ui kur ve tema ayarla
+- [x] **1.1.4** ESLint + Prettier ayarla
+- [x] **1.1.5** Git repo ve branch stratejisi belirle
 
 ### 1.2 Supabase Kurulumu ✅
-- [x] **1.2.1** Supabase projesi oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.2.2** Veritabanı şeması tasarla ve oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **1.2.1** Supabase projesi oluştur
+- [x] **1.2.2** Veritabanı şeması tasarla ve oluştur
   - users (kullanıcılar)
     - id (UUID, primary key)
     - email (string, unique)
@@ -355,10 +355,10 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - books (kitaplar)
   - orders (siparişler)
   - payments (ödemeler)
-- [x] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth) - Client setup tamamlandı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.2.5** Row Level Security (RLS) kuralları - Migration'da hazır | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **1.2.6** Supabase vs AWS Değerlendirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth) - Client setup tamamlandı
+- [x] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers)
+- [x] **1.2.5** Row Level Security (RLS) kuralları - Migration'da hazır
+- [ ] **1.2.6** Supabase vs AWS Değerlendirmesi (23 Ocak 2026)
   - Supabase kullanmak yerine AWS'de bir makine açıp mı devam etmeliyiz değerlendirilecek
   - Supabase limitlerine göre hareket edilecek
   - Supabase dashboard anlaşılacak
@@ -366,7 +366,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Supabase limitleri analizi (storage, bandwidth, database size, vb.)
   - AWS alternatifi maliyet analizi
   - Migration planı (eğer gerekirse)
-- [ ] **1.2.7** Database Backup Sistemi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **1.2.7** Database Backup Sistemi (23 Ocak 2026)
   - Şimdilik Supabase'de olduğumuz için nedir ve nasıl açacağız
   - Supabase backup özellikleri araştırılacak
   - Otomatik backup ayarları
@@ -374,11 +374,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Backup stratejisi ve retention policy
 
 ### 1.3 Environment ve Yapılandırma ✅
-- [x] **1.3.1** `.env.local` dosyası oluştur - ✅ Kontrol edildi ve optimize edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.3.2** Tüm API key'leri ekle (OpenAI, Groq, Supabase) - ✅ `.env.example` template hazır | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.3.3** Vercel environment variables ayarla - ✅ Dokümante edildi (`docs/guides/ENVIRONMENT_SETUP.md`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **1.3.4** Development/Production config ayrımı - ✅ `lib/config.ts` oluşturuldu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **1.3.5** Log Yapısı (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **1.3.1** `.env.local` dosyası oluştur - ✅ Kontrol edildi ve optimize edildi
+- [x] **1.3.2** Tüm API key'leri ekle (OpenAI, Groq, Supabase) - ✅ `.env.example` template hazır
+- [x] **1.3.3** Vercel environment variables ayarla - ✅ Dokümante edildi (`docs/guides/ENVIRONMENT_SETUP.md`)
+- [x] **1.3.4** Development/Production config ayrımı - ✅ `lib/config.ts` oluşturuldu
+- [ ] **1.3.5** Log Yapısı (23 Ocak 2026)
   - Sunucuda çalışırken log yapısı ayarlanmalı
   - Log açılıp kapatılabilmeli gibi
   - Veya bir log yapısı nasıl olması gerekiyor ise o profesyonellikte ve önerilen gibi bir log yapısı olmalı
@@ -396,19 +396,19 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **İlerleme:** 32/61 iş tamamlandı (52%)
 
 ### 2.1 Layout ve Navigasyon
-- [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.1.3** Tema sistemi (renk paleti, typography) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.) - ⏸️ **Ertelendi (Faz 2.2 sonrası)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.1.4** Loading states ve error boundaries - ⏸️ **Ertelendi (Faz 2.2 sonrası)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.1.5** Header'da ülke/para birimi seçici - ✅ DropdownMenu ile entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
+- [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut)
+- [ ] **2.1.3** Tema sistemi (renk paleti, typography)
+  - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
+  - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
+  - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor)
+  - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.) - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
+- [ ] **2.1.4** Loading states ve error boundaries - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
+- [x] **2.1.5** Header'da ülke/para birimi seçici - ✅ DropdownMenu ile entegre edildi
+- [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
+- [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
+- [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
+- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)
   - Genel olarak sitenin renkler ve teması ile ilgili dark ve light için gözden geçirmeliyiz
   - Şu anki kullanılan renkler AI ile site yapanların hepsindeki gibi mor renk ağırlıklı
   - Daha çocuklara uyan bir şeye dönmeliyiz
@@ -419,47 +419,47 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Color psychology for children
 
 ### 2.2 Ana Sayfa (Homepage)
-- [x] **2.2.1** Hero section (başlık, CTA, görsel) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.2.1** Hero section (başlık, CTA, görsel) - ✅ v0.app'den alındı ve entegre edildi
   - ✅ **Hero Transformation Component Güncellendi (25 Ocak 2026):** Yeni side-by-side layout ile fotoğraftan karaktere dönüşüm gösterimi eklendi. Magic arrow, theme selector, auto-cycle özellikleri eklendi. Responsive tasarım (mobil: dikey, desktop: yatay layout). `HeroBookTransformation.tsx` component'i entegre edildi.
-- [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.5** Fiyatlandırma özeti - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.6** FAQ bölümü - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.7** Kampanya banner'ları (free shipping, indirimler) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.2.9** Ana Ekrana Video Çizgi Film Örneği (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.5** Fiyatlandırma özeti - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.6** FAQ bölümü - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.7** Kampanya banner'ları (free shipping, indirimler) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.2.8** Cookie banner (GDPR/KVKK uyumluluk) - ✅ v0.app'den alındı ve entegre edildi
+- [ ] **2.2.9** Ana Ekrana Video Çizgi Film Örneği (23 Ocak 2026)
   - Ana ekrana video çizgi film içeriğimizden bir örnek eklenebilir
   - Video showcase section
   - Video player entegrasyonu
 
 ### 2.3 Auth Sayfaları
-- [x] **2.3.1** Giriş sayfası (email/şifre) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.2** Kayıt sayfası - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.3** Şifre sıfırlama - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.4** Google OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.5** Facebook OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.3.6** Instagram OAuth butonu ve entegrasyonu (opsiyonel) - ⏳ İleride eklenecek | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.7** Email doğrulama sayfası - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.3.8** OAuth callback sayfaları - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.3.1** Giriş sayfası (email/şifre) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.3.2** Kayıt sayfası - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.3.3** Şifre sıfırlama - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.3.4** Google OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [x] **2.3.5** Facebook OAuth butonu ve entegrasyonu - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [ ] **2.3.6** Instagram OAuth butonu ve entegrasyonu (opsiyonel) - ⏳ İleride eklenecek
+- [x] **2.3.7** Email doğrulama sayfası - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+- [x] **2.3.8** OAuth callback sayfaları - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
 
 ### 2.4 Kitap Oluşturma Wizard
-- [x] **2.4.1** Step 1: Karakter bilgileri formu - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Çocuğun adı (text input) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Yaş (number input, 0-12) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cinsiyet (radio: Erkek/Kız) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Saç rengi (dropdown: Açık Kumral, Kumral, Koyu Kumral, Siyah, Kahverengi, Kızıl) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Göz rengi (dropdown: Mavi, Yeşil, Kahverengi, Siyah, Ela) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Özel özellikler (checkbox: gözlüklü, çilli, dimples, vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.2** Step 2: Referans görsel yükleme (çocuk fotoğrafı) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Drag & drop veya file picker | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Fotoğraf önizleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Fotoğraf kırpma/crop (opsiyonel) - ⏸️ MVP'de basit tutuldu, Faz 3'te detaylı implement edilebilir | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Maksimum dosya boyutu kontrolü (5MB) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Format kontrolü (JPG, PNG) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **2.4.2.1** Fotoğraf yükleme sistemi iyileştirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.4.1** Step 1: Karakter bilgileri formu - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Çocuğun adı (text input)
+  - [x] Yaş (number input, 0-12)
+  - [x] Cinsiyet (radio: Erkek/Kız)
+  - [x] Saç rengi (dropdown: Açık Kumral, Kumral, Koyu Kumral, Siyah, Kahverengi, Kızıl)
+  - [x] Göz rengi (dropdown: Mavi, Yeşil, Kahverengi, Siyah, Ela)
+  - [x] Özel özellikler (checkbox: gözlüklü, çilli, dimples, vb.)
+- [x] **2.4.2** Step 2: Referans görsel yükleme (çocuk fotoğrafı) - ✅ v0.app'den alındı ve entegre edildi
+  - [x] Drag & drop veya file picker
+  - [x] Fotoğraf önizleme
+  - [ ] Fotoğraf kırpma/crop (opsiyonel) - ⏸️ MVP'de basit tutuldu, Faz 3'te detaylı implement edilebilir
+  - [x] Maksimum dosya boyutu kontrolü (5MB)
+  - [x] Format kontrolü (JPG, PNG)
+  - [x] AI analiz butonu (fotoğrafı analiz et) - ✅ UI tamamlandı (Faz 3'te backend entegrasyonu yapılacak)
+  - [x] Analiz sonuçları gösterimi (saç uzunluğu, stili, vb.) - ✅ UI tamamlandı (simulated, Faz 3'te gerçek)
+  - [ ] **2.4.2.1** Fotoğraf yükleme sistemi iyileştirmesi (23 Ocak 2026)
     - Nasıl bir fotoğraf sisteme yüklenmesi gerekiyor belirtilmeli
     - Yüklendikten sonra sadece kafayı crop gibi yapabilmeli
     - Belki otomatik crop gibi bir UX ile yönlendirme yapabiliriz
@@ -467,35 +467,35 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Fotoğraf yükleme talimatları (format, boyut, kalite)
     - Otomatik yüz algılama ve crop özelliği
     - Manuel crop düzenleme seçeneği
-  - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Pets grubu: Dog, Cat, Rabbit, Bird, Other Pet (custom input) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Uncle, Aunt, Other Family (custom input) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Toys grubu: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal, Other Toy (custom input) - ✅ **EKLENDI (25 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Other: Custom text input | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] "Add Character" butonu (maksimum 3 karakter) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Her karakter için ayrı upload alanı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel) - ⏸️ Ertelendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Karakter silme butonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] localStorage: characters array (characterPhoto → characters) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Her karakter için ayrı API çağrısı (/api/characters) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Story generation: Birden fazla karakter desteği | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Image generation: Ana karakter reference + diğerleri text prompt | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Books API: characterIds array desteği (backward compatible) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Step 6: Çoklu karakter gönderme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Geriye dönük uyumluluk (eski characterPhoto formatı destekleniyor) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Ücretsiz özellik (MVP'de dahil) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] **İmplementasyon Takip:** `docs/implementation/FAZ2_4_KARAKTER_GRUPLAMA_IMPLEMENTATION.md` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Mevcut karakter seçimi (Character Library entegrasyonu)** - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Step 2'de kullanıcının karakterleri varsa karakter seçimi bölümü göster | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] "Select Character" section (karakter listesi grid/cards) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] "Upload New Photo" butonu (yeni karakter için) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Karakter seçildiğinde Step 1 verilerini otomatik doldur (name, age, gender) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Kullanıcı isterse Step 1 verilerini edit edebilir (karakter de güncellenir) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Seçilen karakter bilgisi localStorage'a kaydet | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Empty state (karakter yoksa mevcut flow devam eder) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)**
+    - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other)
+    - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input
+    - [x] Pets grubu: Dog, Cat, Rabbit, Bird, Other Pet (custom input)
+    - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Uncle, Aunt, Other Family (custom input)
+    - [x] Toys grubu: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal, Other Toy (custom input) - ✅ **EKLENDI (25 Ocak 2026)**
+    - [x] Other: Custom text input
+    - [x] "Add Character" butonu (maksimum 3 karakter)
+    - [x] Her karakter için ayrı upload alanı
+    - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel) - ⏸️ Ertelendi
+    - [x] Karakter silme butonu
+    - [x] localStorage: characters array (characterPhoto → characters)
+    - [x] Her karakter için ayrı API çağrısı (/api/characters)
+    - [x] Story generation: Birden fazla karakter desteği
+    - [x] Image generation: Ana karakter reference + diğerleri text prompt
+    - [x] Books API: characterIds array desteği (backward compatible)
+    - [x] Step 6: Çoklu karakter gönderme
+    - [x] Geriye dönük uyumluluk (eski characterPhoto formatı destekleniyor)
+    - [x] Ücretsiz özellik (MVP'de dahil)
+    - [x] **İmplementasyon Takip:** `docs/implementation/FAZ2_4_KARAKTER_GRUPLAMA_IMPLEMENTATION.md`
+  - [ ] **Mevcut karakter seçimi (Character Library entegrasyonu)** - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+    - [ ] Step 2'de kullanıcının karakterleri varsa karakter seçimi bölümü göster
+    - [ ] "Select Character" section (karakter listesi grid/cards)
+    - [ ] "Upload New Photo" butonu (yeni karakter için)
+    - [ ] Karakter seçildiğinde Step 1 verilerini otomatik doldur (name, age, gender)
+    - [ ] Kullanıcı isterse Step 1 verilerini edit edebilir (karakter de güncellenir)
+    - [ ] Seçilen karakter bilgisi localStorage'a kaydet
+    - [ ] Empty state (karakter yoksa mevcut flow devam eder)
+- [x] **2.4.3** Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9) - ✅ v0.app'den alındı ve entegre edildi
   - ✅ **Dil Seçimi Özelliği Eklendi (24 Ocak 2026):** Step 3'e dil seçimi bölümü eklendi
   - ✅ 8 dil desteği: Türkçe (tr), İngilizce (en), Almanca (de), Fransızca (fr), İspanyolca (es), Çince (zh), Portekizce (pt), Rusça (ru)
   - ✅ Dil seçimi UI kartları eklendi (2x4 grid layout)
@@ -504,26 +504,26 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ✅ Step 6'da dil bilgisi review'da gösteriliyor
   - ✅ Book creation request'inde dil parametresi gönderiliyor
   - ✅ **Dil Karışıklığı Sorunu Çözüldü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi, İngilizce kelime kullanımı yasaklandı
-  - [ ] **2.4.3.1** Custom Theme Seçeneği (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [ ] **2.4.3.1** Custom Theme Seçeneği (23 Ocak 2026)
     - Choose a Theme bölümünde 1 tanesini diğerlerinin içine alıp "Other" diye bölüm eklenmeli
     - Örneğin doğum günü temalı bir şey istiyorum, mevcut Theme'lerde ona uygun kategori yok
     - Bu durumda custom story gibi bir akışa gidebilmek için gerekli
     - Bu seçim yapılınca Custom Requests zorunlu olmalı ve detay girilmeli
     - "Other" seçildiğinde custom request alanı zorunlu hale gelir
     - Validation: Other seçildiyse custom request boş olamaz
-- [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **2.4.5.1** Custom request örnekleri ekleme (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.4.4** Step 4: Illustration style seçimi (görsel önizleme) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.4.5** Step 5: Özel istekler - ✅ v0.app'den alındı ve entegre edildi
+  - [ ] **2.4.5.1** Custom request örnekleri ekleme (23 Ocak 2026)
     - Seçilen kategoriye göre örnek custom request'ler gösterilebilir
     - Kullanıcıya fikir vermek için örnek metinler
     - Örnek: "Adventure" kategorisi için "Add a magical forest with talking animals"
-- [ ] **2.4.5.2** Custom request dil desteği (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.4.5.2** Custom request dil desteği (23 Ocak 2026)
   - Şu an custom request'te sadece İngilizce mi yazılıyor bilinmiyor
   - Her dilde verilebilmeli
   - Uygulama dili ne ise otomatik o dili algılar
   - Düşünülecek: Nasıl yapılabilir? (Dil algılama, çeviri, prompt'a dil bilgisi ekleme)
-- [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.4.11** Wizard adımlarını kısaltma (UX iyileştirme) - Şu an 6 adım var, daha kolay bir UX için adımlar birleştirilebilir veya kısaltılabilir. Düşünülecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.4.6** Step 6: Önizleme ve onay - ✅ v0.app'den alındı ve entegre edildi
+- [ ] **2.4.11** Wizard adımlarını kısaltma (UX iyileştirme) - Şu an 6 adım var, daha kolay bir UX için adımlar birleştirilebilir veya kısaltılabilir. Düşünülecek.
   - ✅ Debug mode eklendi (prompt preview, API test butonları)
   - ✅ Story prompt gösterimi ve test butonu eklendi
   - ✅ Story generation testi tamamlandı ✅ (API response başarılı, 10 sayfa)
@@ -550,13 +550,13 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ⏳ Character consistency test (benzerlik değerlendirmesi)
   - ✅ Create Book butonu aktif edildi ✅ (10 Ocak 2026)
   - ✅ Debug: Sayfa sayısı override eklendi (Step 5) ✅ (10 Ocak 2026)
-  - [x] Karakter tanımı özeti (kullanıcı girdileri + AI analizi) - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek data) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Referans görsel önizleme - ✅ UI tamamlandı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.7** Progress indicator - ✅ Tüm step'lerde (1-6) mevcut, her step'te "Step X of 6" ve progress bar gösteriliyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.8** Form validasyonu (Zod + React Hook Form) - ✅ Tüm step'lerde mevcut (Step 1,3,4,5: Zod + RHF, Step 2: Custom file validation, Step 6: Preview sayfası) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.4.12** Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [x] Karakter tanımı özeti (kullanıcı girdileri + AI analizi) - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek data)
+  - [x] Referans görsel önizleme - ✅ UI tamamlandı
+- [x] **2.4.7** Progress indicator - ✅ Tüm step'lerde (1-6) mevcut, her step'te "Step X of 6" ve progress bar gösteriliyor
+- [x] **2.4.8** Form validasyonu (Zod + React Hook Form) - ✅ Tüm step'lerde mevcut (Step 1,3,4,5: Zod + RHF, Step 2: Custom file validation, Step 6: Preview sayfası)
+- [x] **2.4.9** Ücretsiz kapak hakkı kontrolü ve gösterimi - ✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)
+- [x] **2.4.10** "Ücretsiz Kapak Oluştur" butonu (hakkı varsa) - ✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)
+- [ ] **2.4.12** Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026)
   - Kitap oluştur adımından sonra tatlı bir animasyon ve loading gösterilmeli
   - Tahmini süre gibi bilgiler eklenmeli
   - Beklerken kapatabilir, hazır olunca bilgi gelecek (notification, email, vb.)
@@ -580,24 +580,24 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - ✅ Görsel ve animasyonlar (6 animasyon tipi, 3 hız seçeneği, shadow/depth effects)
 
 #### 2.5.1 Temel Görüntüleme ve Navigasyon
-- [x] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi - ✅ Framer Motion ile custom implementation seçildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.1.2** Flipbook animasyonu (sayfa çevirme efekti) - ✅ v0.app'den alındı ve entegre edildi (Flip, Slide, Fade animasyonları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.1.3** Sayfa navigasyonu (ileri, geri, sayfa atlama) - ✅ Buttons, keyboard, swipe, mouse click desteği | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.1.4** Progress indicator (hangi sayfa/toplam sayfa) - ✅ Header'da progress bar ve sayfa numarası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.1.5** Page thumbnails / mini map (tüm sayfaları küçük gösterme) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.1.6** Tam ekran modu (fullscreen) - ✅ Fullscreen toggle button ve keyboard shortcut (F) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma) - ⏳ Sonraki adım | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.1.8** Loading states ve skeleton screens - ⏳ Sonraki adım | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.1.9** PDF link paylaşma (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.1.1** react-pageflip veya alternatif library araştırması ve seçimi - ✅ Framer Motion ile custom implementation seçildi
+- [x] **2.5.1.2** Flipbook animasyonu (sayfa çevirme efekti) - ✅ v0.app'den alındı ve entegre edildi (Flip, Slide, Fade animasyonları)
+- [x] **2.5.1.3** Sayfa navigasyonu (ileri, geri, sayfa atlama) - ✅ Buttons, keyboard, swipe, mouse click desteği
+- [x] **2.5.1.4** Progress indicator (hangi sayfa/toplam sayfa) - ✅ Header'da progress bar ve sayfa numarası
+- [x] **2.5.1.5** Page thumbnails / mini map (tüm sayfaları küçük gösterme) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.1.6** Tam ekran modu (fullscreen) - ✅ Fullscreen toggle button ve keyboard shortcut (F)
+- [ ] **2.5.1.7** Zoom in/out (görselleri yakınlaştırma) - ⏳ Sonraki adım
+- [ ] **2.5.1.8** Loading states ve skeleton screens - ⏳ Sonraki adım
+- [ ] **2.5.1.9** PDF link paylaşma (23 Ocak 2026)
   - Oluşturulan PDF'i link olarak paylaşma özelliği
   - Paylaşılabilir link oluşturma
   - Link üzerinden PDF indirme
-- [ ] **2.5.1.10** Hikaye link paylaşma (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.5.1.10** Hikaye link paylaşma (23 Ocak 2026)
   - Oluşturulan hikayeyi link olarak paylaşma
   - Login olmadan ebook olarak açılabilecek bir link oluşturma
   - Public/private link seçenekleri
   - Link expiration (opsiyonel)
-- [ ] **2.5.1.11** E-book ve PDF Paragraf Formatlaması (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.5.1.11** E-book ve PDF Paragraf Formatlaması (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - Hikayelerde ebook formatında ve PDF export'ta paragraflar olsun
   - Yaş grubuna göre 2-3-4 tane paragraf olacak içerik ayarlamamız lazım
   - Story generation prompt'unda paragraf yapısı direktifleri
@@ -605,127 +605,127 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Yaş gruplarına göre paragraf sayısı: 0-2 yaş: 2 paragraf, 3-5 yaş: 3 paragraf, 6-9 yaş: 4 paragraf
 
 #### 2.5.2 Mobil ve Responsive Özellikler
-- [x] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma) - ✅ useSwipeGesture hook ile entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.2.2** Hikaye sayfası tasarımı iyileştirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.2.1** Mobil swipe desteği (sağa/sola kaydırma) - ✅ useSwipeGesture hook ile entegre edildi
+- [ ] **2.5.2.2** Hikaye sayfası tasarımı iyileştirmesi (23 Ocak 2026)
   - Özellikle telefon ile tek sayfada hem metin hem görsel olamıyor
   - Bu biraz zorluyor, nasıl yapılabilir düşünülecek
   - Şu an flip yapılmış, bakılacak
   - Alternatif yaklaşımlar: Split view, overlay, accordion, scroll-based layout
-- [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.) - ⏳ Sonraki adım (zoom ile birlikte) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey) - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı - ✅ v0.app'den alındı ve entegre edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.2.5** Screen orientation detection ve otomatik layout değişimi - ✅ window.innerWidth/innerHeight ile otomatik detection | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.) - ⏳ Faz 6'da yapılacak | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.5.2.2** Touch gestures (pinch to zoom, double tap, vb.) - ⏳ Sonraki adım (zoom ile birlikte)
+- [x] **2.5.2.3** Portrait mode: Tek sayfa gösterimi (dikey) - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.2.4** Landscape mode: Çift sayfa gösterimi (yatay) - bir taraf görsel, bir taraf yazı - ✅ v0.app'den alındı ve entegre edildi
+- [x] **2.5.2.5** Screen orientation detection ve otomatik layout değişimi - ✅ window.innerWidth/innerHeight ile otomatik detection
+- [ ] **2.5.2.6** PWA optimizasyonu (offline okuma, vb.) - ⏳ Faz 6'da yapılacak
 
 #### 2.5.3 Sesli Okuma (Text-to-Speech)
-- [x] **2.5.3.1** Text-to-Speech entegrasyonu (Gemini Pro TTS) - ✅ Backend API ve frontend hook oluşturuldu, WaveNet/Standard sesler kaldırıldı (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.3.2** Ses seçeneği (Achernar - Gemini Pro TTS) - ✅ Settings dropdown'da Achernar sesi mevcut, eski sesler kaldırıldı (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.3.4** Volume kontrolü - ⏳ Hook'ta mevcut, UI'da henüz yok | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.3.5** Play/Pause/Stop butonları - ✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence) - ⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.3.8** TTS Cache mekanizması - ✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026 | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.3.9** TTS Cache temizleme (hikaye değişikliğinde) - ⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.3.1** Text-to-Speech entegrasyonu (Gemini Pro TTS) - ✅ Backend API ve frontend hook oluşturuldu, WaveNet/Standard sesler kaldırıldı (15 Ocak 2026)
+- [x] **2.5.3.2** Ses seçeneği (Achernar - Gemini Pro TTS) - ✅ Settings dropdown'da Achernar sesi mevcut, eski sesler kaldırıldı (15 Ocak 2026)
+- [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x)
+- [ ] **2.5.3.4** Volume kontrolü - ⏳ Hook'ta mevcut, UI'da henüz yok
+- [x] **2.5.3.5** Play/Pause/Stop butonları - ✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok
+- [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence) - ⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli
+- [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme
+- [x] **2.5.3.8** TTS Cache mekanizması - ✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026
+- [ ] **2.5.3.9** TTS Cache temizleme (hikaye değişikliğinde) - ⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
-- [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye) - ✅ 5s, 10s, 15s, 20s seçenekleri Settings'te | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme - ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam (onEnded callback ile) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma) - ✅ Ekrana dokunarak TTS pause/resume, Timed mode countdown ile sayfa geçişi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi
+- [x] **2.5.4.2** Autoplay hızı ayarı (sayfa başına kaç saniye) - ✅ 5s, 10s, 15s, 20s seçenekleri Settings'te
+- [x] **2.5.4.3** Sesli okuma ile senkronize otomatik ilerleme - ✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam (onEnded callback ile)
+- [x] **2.5.4.4** Autoplay pause/resume (dokunarak durdurma) - ✅ Ekrana dokunarak TTS pause/resume, Timed mode countdown ile sayfa geçişi
 - ✅ **Bug Fix:** TTS auto-advance sorunu çözüldü, closure sorunu düzeltildi, icon'lar iyileştirildi (RotateCcw/Square)
 
 #### 2.5.5 Kullanıcı Deneyimi İyileştirmeleri
-- [x] **2.5.5.1** Bookmark/favori sayfa işaretleme - ✅ localStorage ile bookmark sistemi, her sayfa için ayrı bookmark | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.5.2** Reading progress save (nerede kaldı, otomatik kaydetme) - ✅ localStorage ile otomatik kaydetme, kitap açıldığında kaldığı yerden devam | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.5.3** Share butonu (kitabı/sayfayı paylaşma) - ✅ navigator.share API ile paylaşma (fallback: clipboard) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.5.4** Download as PDF butonu - ⏳ Post-MVP | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.5.5** Print options - ⏳ Post-MVP | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.) - ✅ 11 farklı klavye kısayolu eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support) - ⏳ Post-MVP | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.5.8** Settings UI iyileştirmesi - ⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.5.1** Bookmark/favori sayfa işaretleme - ✅ localStorage ile bookmark sistemi, her sayfa için ayrı bookmark
+- [x] **2.5.5.2** Reading progress save (nerede kaldı, otomatik kaydetme) - ✅ localStorage ile otomatik kaydetme, kitap açıldığında kaldığı yerden devam
+- [x] **2.5.5.3** Share butonu (kitabı/sayfayı paylaşma) - ✅ navigator.share API ile paylaşma (fallback: clipboard)
+- [ ] **2.5.5.4** Download as PDF butonu - ⏳ Post-MVP
+- [ ] **2.5.5.5** Print options - ⏳ Post-MVP
+- [x] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.) - ✅ 11 farklı klavye kısayolu eklendi
+- [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support) - ⏳ Post-MVP
+- [ ] **2.5.5.8** Settings UI iyileştirmesi - ⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım)
 
 #### 2.5.6 Görsel ve Animasyonlar
-- [x] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.) - ✅ 6 farklı animasyon tipi: Flip (3D), Slide, Fade, Page Curl, Zoom, None (Instant) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.6.2** Animasyon hızı/stili seçenekleri - ✅ Settings'te 3 hız seçeneği: Slow, Normal, Fast (configurable) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.6.3** Smooth transitions - ✅ Spring ve tween animasyonları, easeInOut/easeOut transitions | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.6.4** Page curl effect (sayfa kıvrılma efekti) - ✅ 3D rotateX/rotateY ile page curl animasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.5.6.5** Shadow ve depth effects (3D görünüm) - ✅ Shadow-2xl, drop-shadow, depth effects (z-index) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.) - ✅ 6 farklı animasyon tipi: Flip (3D), Slide, Fade, Page Curl, Zoom, None (Instant)
+- [x] **2.5.6.2** Animasyon hızı/stili seçenekleri - ✅ Settings'te 3 hız seçeneği: Slow, Normal, Fast (configurable)
+- [x] **2.5.6.3** Smooth transitions - ✅ Spring ve tween animasyonları, easeInOut/easeOut transitions
+- [x] **2.5.6.4** Page curl effect (sayfa kıvrılma efekti) - ✅ 3D rotateX/rotateY ile page curl animasyonu
+- [x] **2.5.6.5** Shadow ve depth effects (3D görünüm) - ✅ Shadow-2xl, drop-shadow, depth effects (z-index)
 
 #### 2.5.7 Gelecek Özellikler (Post-MVP)
-- [ ] **2.5.8** Çocuk Modu (Kids Mode) (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.5.8** Çocuk Modu (Kids Mode) (23 Ocak 2026)
   - Tablet veya telefondan hikayeleri okuyup/dinlerken ayrı bir çocuk modu olabilir
   - Bu moda nasıl girilip çıkılır? Düşünülecek
   - Basitleştirilmiş UI, büyük butonlar, otomatik oynatma
   - Erişim kontrolü (ebeveyn kilidi gibi)
-- [ ] **2.5.7.1** Notes/annotations (sayfaya not alma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.7.2** Search in book (kitap içinde arama) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.7.3** Multi-language subtitle support (sesli okuma için altyazı) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.7.4** Background music (opsiyonel arka plan müziği) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.5.7.5** Reading statistics (ne kadar süre okudu, hangi sayfaları okudu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.5.7.1** Notes/annotations (sayfaya not alma)
+- [ ] **2.5.7.2** Search in book (kitap içinde arama)
+- [ ] **2.5.7.3** Multi-language subtitle support (sesli okuma için altyazı)
+- [ ] **2.5.7.4** Background music (opsiyonel arka plan müziği)
+- [ ] **2.5.7.5** Reading statistics (ne kadar süre okudu, hangi sayfaları okudu)
 
 ### 2.6 Kullanıcı Dashboard
-- [x] **2.6.1** Kitaplık sayfası (tüm kitaplar grid) - ✅ Dashboard sayfası oluşturuldu, grid/list view toggle | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.6.2** Kitap kartı component - ✅ Book card component (cover, title, status, actions) - Character bilgisi kaldırıldı (26 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.6.3** Filtreleme ve sıralama - ✅ Filter tabs (All, Completed, In Progress, Drafts), Sort dropdown (Date, Title), Search bar | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı) - ✅ Free Cover Status section (status badge, used date, info box) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.6.7** Characters tab (karakter yönetimi) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Tab navigation (Books, Characters) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Characters grid layout (karakter kartları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Character card component (thumbnail, name, age, book count, actions) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] "Create New Character" butonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] "Set as Default" butonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] "Edit Character" modal/page | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] "Delete Character" (confirmation modal) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Empty state (karakter yoksa) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Loading states ve error handling | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **2.6.1** Kitaplık sayfası (tüm kitaplar grid) - ✅ Dashboard sayfası oluşturuldu, grid/list view toggle
+- [x] **2.6.2** Kitap kartı component - ✅ Book card component (cover, title, status, actions) - Character bilgisi kaldırıldı (26 Ocak 2026)
+- [x] **2.6.3** Filtreleme ve sıralama - ✅ Filter tabs (All, Completed, In Progress, Drafts), Sort dropdown (Date, Title), Search bar
+- [x] **2.6.4** Sipariş geçmişi - ✅ Order History section (table with orders, download/view buttons)
+- [x] **2.6.5** Profil ayarları - ✅ Profile Settings page (6 sections: Profile, Account, Orders, Free Cover, Notifications, Billing)
+- [x] **2.6.6** Ücretsiz kapak hakkı göstergesi (kullanıldı/kullanılmadı) - ✅ Free Cover Status section (status badge, used date, info box)
+- [ ] **2.6.7** Characters tab (karakter yönetimi) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+  - [ ] Tab navigation (Books, Characters)
+  - [ ] Characters grid layout (karakter kartları)
+  - [ ] Character card component (thumbnail, name, age, book count, actions)
+  - [ ] "Create New Character" butonu
+  - [ ] "Set as Default" butonu
+  - [ ] "Edit Character" modal/page
+  - [ ] "Delete Character" (confirmation modal)
+  - [ ] Empty state (karakter yoksa)
+  - [ ] Loading states ve error handling
 
 ### 2.7 Statik Sayfalar
-- [ ] **2.7.1** Özellikler (Features) sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.2** Fiyatlandırma sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.4** İletişim sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.5** Gizlilik Politikası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.6** Kullanım Şartları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.7** KVKK Aydınlatma Metni | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **2.7.8** Examples sayfası (tüm örnek kitaplar, "View Example" butonları) - ✅ **TAMAMLANDI (25 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] v0.app prompt hazırlandı ✅ (`docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] v0.app'den component'ler oluşturuldu ve entegre edildi ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Mobil-first responsive tasarım (1/2/3/4 sütun grid) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Yaş grubu filtreleme (flex-wrap mobilde, justify-center, responsive padding) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Kitap kartları (cover image, badges, used photos, action buttons) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] "Used Photos" gösterimi (thumbnail grid + modal) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] "View Example" butonu (UI hazır, route gelecek fazda eklenecek) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] "Create Your Own" butonu (wizard'a yönlendirme çalışıyor) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Empty state component ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Loading skeleton component ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Mock data entegrasyonu ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Görseller public klasörüne kopyalandı ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Image fallback mekanizması eklendi ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Tüm metinler İngilizceye çevrildi ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Pagination sistemi eklendi ✅ (25 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Responsive items per page: 4 (mobil), 6 (tablet), 8 (desktop/large desktop) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Pagination component entegrasyonu (shadcn/ui) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Sayfa değişiminde scroll to top | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Ellipsis gösterimi (çok sayfa varsa) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Test için 24 kitap mock data eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek). | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.7.1** Özellikler (Features) sayfası
+- [ ] **2.7.2** Fiyatlandırma sayfası
+- [ ] **2.7.4** İletişim sayfası
+- [ ] **2.7.5** Gizlilik Politikası
+- [ ] **2.7.6** Kullanım Şartları
+- [ ] **2.7.7** KVKK Aydınlatma Metni
+- [x] **2.7.8** Examples sayfası (tüm örnek kitaplar, "View Example" butonları) - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] v0.app prompt hazırlandı ✅ (`docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`)
+  - [x] v0.app'den component'ler oluşturuldu ve entegre edildi ✅
+  - [x] Mobil-first responsive tasarım (1/2/3/4 sütun grid) ✅
+  - [x] Yaş grubu filtreleme (flex-wrap mobilde, justify-center, responsive padding) ✅
+  - [x] Kitap kartları (cover image, badges, used photos, action buttons) ✅
+  - [x] "Used Photos" gösterimi (thumbnail grid + modal) ✅
+  - [x] "View Example" butonu (UI hazır, route gelecek fazda eklenecek)
+  - [x] "Create Your Own" butonu (wizard'a yönlendirme çalışıyor) ✅
+  - [x] Empty state component ✅
+  - [x] Loading skeleton component ✅
+  - [x] Mock data entegrasyonu ✅
+  - [x] Görseller public klasörüne kopyalandı ✅
+  - [x] Image fallback mekanizması eklendi ✅
+  - [x] Tüm metinler İngilizceye çevrildi ✅
+  - [x] Pagination sistemi eklendi ✅ (25 Ocak 2026)
+    - [x] Responsive items per page: 4 (mobil), 6 (tablet), 8 (desktop/large desktop)
+    - [x] Pagination component entegrasyonu (shadcn/ui)
+    - [x] Sayfa değişiminde scroll to top
+    - [x] Ellipsis gösterimi (çok sayfa varsa)
+    - [x] Test için 24 kitap mock data eklendi
+  - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek.
+  - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek).
+  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli.
   - **Detaylı Plan:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
-- [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.12** "View All Examples" ve "View All Themes" linkleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.7.13** "Sizden Gelenler" bölümü (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
+- [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)
+- [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8)
+- [ ] **2.7.12** "View All Examples" ve "View All Themes" linkleri
+- [ ] **2.7.13** "Sizden Gelenler" bölümü (23 Ocak 2026)
   - Kullanıcıların gönderdiği görselleri ve paylaşımları gösterebileceğimiz bir bölüm
   - Sektöre göre düşünüp nasıl olması gerekiyor ise analiz yapılıp ona göre yapılacak
   - User-generated content showcase
   - Onay mekanizması (moderation)
   - Privacy ve izin kontrolü
-- [ ] **2.7.14** Blog Sayfası (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.7.14** Blog Sayfası (23 Ocak 2026)
   - Blog sayfası yapılabilir
   - Blog için hazır bir şey mi olacak
   - Blog dediğimiz nedir ve nasıl yapılıyor
@@ -742,14 +742,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Önemli Not (25 Ocak 2026):** Examples sayfası başlangıçta Türkçe yapılmıştı, İngilizceye çevrildi. Gelecekte localization sistemi eklendiğinde tüm sayfalar (Examples dahil) otomatik olarak çok dilli destek alacak.
 
 **Planlanan Özellikler:**
-- [ ] **2.8.1** i18n library seçimi (next-intl önerilir - Next.js App Router ile mükemmel entegrasyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.2** Dil seçici component (header'da, dropdown veya flag icons) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.3** Tüm UI metinlerinin çeviri dosyalarına taşınması (JSON veya TypeScript object format) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.4** Dinamik dil değiştirme (sayfa yenilenmeden) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.5** URL-based dil routing (/tr/, /en/, vb.) - SEO dostu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.6** Cookie/localStorage ile dil tercihi saklama (kullanıcı tercihi hatırlansın) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.7** TR çevirileri (tüm UI metinleri için) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **2.8.8** Gelecekte 25+ dil desteği (Almanca, Fransızca, İspanyolca, vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **2.8.1** i18n library seçimi (next-intl önerilir - Next.js App Router ile mükemmel entegrasyon)
+- [ ] **2.8.2** Dil seçici component (header'da, dropdown veya flag icons)
+- [ ] **2.8.3** Tüm UI metinlerinin çeviri dosyalarına taşınması (JSON veya TypeScript object format)
+- [ ] **2.8.4** Dinamik dil değiştirme (sayfa yenilenmeden)
+- [ ] **2.8.5** URL-based dil routing (/tr/, /en/, vb.) - SEO dostu
+- [ ] **2.8.6** Cookie/localStorage ile dil tercihi saklama (kullanıcı tercihi hatırlansın)
+- [ ] **2.8.7** TR çevirileri (tüm UI metinleri için)
+- [ ] **2.8.8** Gelecekte 25+ dil desteği (Almanca, Fransızca, İspanyolca, vb.)
 
 **Teknik Yaklaşım:**
 - **Library:** next-intl (Next.js 14 App Router ile native entegrasyon)
@@ -766,53 +766,53 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Öncelik:** 🔴 Kritik
 
 ### 3.1 API Routes Kurulumu ✅
-- [x] **3.1.1** API klasör yapısı oluştur - ✅ `app/api/` yapısı mevcut | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.1.2** Middleware (auth, rate limiting, error handling) - ✅ Tamamlandı (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.1.1** API klasör yapısı oluştur - ✅ `app/api/` yapısı mevcut
+- [x] **3.1.2** Middleware (auth, rate limiting, error handling) - ✅ Tamamlandı (15 Ocak 2026)
   - ✅ Auth middleware: `middleware.ts` (Supabase Auth middleware)
   - ✅ Error handling: `lib/api/response.ts` ile standardize edildi
   - ✅ Rate limiting: Vercel'de mevcut (built-in)
-- [x] **3.1.3** API response formatı standardize et - ✅ `lib/api/response.ts` ile standardize edildi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.1.3** API response formatı standardize et - ✅ `lib/api/response.ts` ile standardize edildi
 
 ### 3.2 Kullanıcı API'leri ✅
-- [x] **3.2.1** `POST /api/auth/register` - Kayıt - ✅ Supabase Auth kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.2.2** `POST /api/auth/login` - Giriş - ✅ Supabase Auth kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.2.3** `POST /api/auth/logout` - Çıkış - ✅ Supabase Auth kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.2.4** `GET /api/users/me` - Kullanıcı bilgileri - ✅ Supabase Auth `getUser()` kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.2.5** `PATCH /api/users/me` - Profil güncelleme - ⏸️ **MVP için gerekli değil** (Supabase Auth profile update yeterli) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.2.6** `GET /api/auth/google` - Google OAuth callback - ✅ Supabase Auth OAuth kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.2.7** `GET /api/auth/facebook` - Facebook OAuth callback - ✅ Supabase Auth OAuth kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.2.8** `GET /api/auth/instagram` - Instagram OAuth callback - ⏸️ **Opsiyonel, MVP'de gerekli değil** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.2.1** `POST /api/auth/register` - Kayıt - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.2** `POST /api/auth/login` - Giriş - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.3** `POST /api/auth/logout` - Çıkış - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.4** `GET /api/users/me` - Kullanıcı bilgileri - ✅ Supabase Auth `getUser()` kullanılıyor
+- [ ] **3.2.5** `PATCH /api/users/me` - Profil güncelleme - ⏸️ **MVP için gerekli değil** (Supabase Auth profile update yeterli)
+- [x] **3.2.6** `GET /api/auth/google` - Google OAuth callback - ✅ Supabase Auth OAuth kullanılıyor
+- [x] **3.2.7** `GET /api/auth/facebook` - Facebook OAuth callback - ✅ Supabase Auth OAuth kullanılıyor
+- [ ] **3.2.8** `GET /api/auth/instagram` - Instagram OAuth callback - ⏸️ **Opsiyonel, MVP'de gerekli değil**
 
 ### 3.4 Karakter API'leri ✅
-- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Kullanıcı girdilerini doğrula | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Fotoğraf analizi (OpenAI Vision API) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Master Character olarak database'e kaydet | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.3** `GET /api/characters/:id` - Karakter detayları - ✅ Single character API | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Toys için gender-neutral validation | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] `GET /api/characters` response'a `total_books` ekle (her karakter için) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] `GET /api/characters` response'a `last_used_at` ekle | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Book oluşturulduğunda `last_used_at` güncelleme (trigger) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Character selection için optimize edilmiş response (thumbnail, summary) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu
+  - [x] Kullanıcı girdilerini doğrula
+  - [x] Fotoğraf analizi (OpenAI Vision API)
+  - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.)
+  - [x] Master Character olarak database'e kaydet
+- [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API
+- [x] **3.4.3** `GET /api/characters/:id` - Karakter detayları - ✅ Single character API
+- [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API
+- [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
+- [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
+- [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi
+  - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+  - [x] User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+  - [x] Toys için gender-neutral validation
+- [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
+- [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+  - [ ] `GET /api/characters` response'a `total_books` ekle (her karakter için)
+  - [ ] `GET /api/characters` response'a `last_used_at` ekle
+  - [ ] Book oluşturulduğunda `last_used_at` güncelleme (trigger)
+  - [ ] Character selection için optimize edilmiş response (thumbnail, summary)
 
 ### 3.6 Kitap API'leri ✅
-- [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.2** `POST /api/books` - Yeni kitap başlat - ✅ Story generation API ile entegre (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ✅ Pagination, filtering support (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.4** `GET /api/books/:id` - Kitap detay - ✅ View count increment, ownership check (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ✅ Favorite, status, images update (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.6.7** Hikaye edit özelliği (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites)
+- [x] **3.6.2** `POST /api/books` - Yeni kitap başlat - ✅ Story generation API ile entegre (10 Ocak 2026)
+- [x] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ✅ Pagination, filtering support (10 Ocak 2026)
+- [x] **3.6.4** `GET /api/books/:id` - Kitap detay - ✅ View count increment, ownership check (10 Ocak 2026)
+- [x] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ✅ Favorite, status, images update (10 Ocak 2026)
+- [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026)
+- [ ] **3.6.7** Hikaye edit özelliği (23 Ocak 2026)
   - Hikayeleri edit yapabilme özelliği eklenmeli
   - Eğer bir hikaye içeriği edit yapıldı ise download PDF mevcut cache'i silip tekrar oluşturmalı
   - PDF indirilmek istenirse yani
@@ -820,55 +820,55 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - PDF cache invalidation mekanizması
 
 ### 3.5 AI Entegrasyonu ✅
-- [x] **3.5.10** Karakter Tutarlılığı İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Göz rengi (hazel) prompt iyileştirmesi: "hazel (brown-green mix, not pure green)" açıklaması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Elbise tutarlılığı: Cover'daki elbiseler sayfalarda da aynı olmalı - prompt vurgusu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] /api/books route'unda cover image'ı page generation'da referans olarak kullan | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Log iyileştirmeleri: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.10** Karakter Tutarlılığı İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Göz rengi (hazel) prompt iyileştirmesi: "hazel (brown-green mix, not pure green)" açıklaması
+  - [x] Elbise tutarlılığı: Cover'daki elbiseler sayfalarda da aynı olmalı - prompt vurgusu
+  - [x] /api/books route'unda cover image'ı page generation'da referans olarak kullan
+  - [x] Log iyileştirmeleri: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri
   - **Detaylar:**
     - `lib/prompts/image/v1.0.0/character.ts`: Hazel göz rengi için açıklama eklendi
     - `lib/prompts/image/v1.0.0/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
     - `app/api/books/route.ts`: Cover image page generation'da referans olarak kullanılıyor (pages 2+)
     - Log'lar: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri eklendi
-- [x] **3.5.11** Karakter Tutarlılığı İyileştirmeleri - Part 2 (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.12** Cover Generation ve Additional Characters İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover generation'da `isCover=true` parametresi eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Family Members için saç stili detayları eklendi (hairStyle, hairLength, hairTexture) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Yaş/fiziksel özellikler vurgusu güçlendirildi (adult vurgusu, NOT a child) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Dokümantasyon güncellemeleri (CHANGELOG, IMAGE_PROMPT_TEMPLATE) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Page 1'de cover reference kullanımı: `isCoverPage` mantığı düzeltildi, tüm sayfalarda (1-10) cover reference kullanılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.13** Sahne Çeşitliliği ve Görsel Varyasyon İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.14** Retry Mekanizması ve Hata Yönetimi İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.15** El Ele Tutuşma Yasağı (16 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Anatomical correctness directives'a el ele tutuşma yasağı eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Negative prompts'a el ele tutuşma terimleri eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.10, ANATOMICAL_ISSUES_GUIDE v1.0.1) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Retry wrapper fonksiyonları eklendi (max 3 retry, exponential backoff) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Hata kategorileri (geçici vs kalıcı) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Edits API retry mekanizması (cover + page generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Fallback stratejisi değiştirildi (retry başarısız olursa hata fırlat, fallback'e geçme) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Detaylı logging (retry attempts, error types) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.9) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Story generation prompt'unda detaylı page-by-page structure (her sayfa için özel gereksinimler) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Visual diversity directives (location, time, weather, perspective, composition variety) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Image prompt requirements güçlendirildi (200+ karakter, detaylı sahne açıklamaları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Scene description requirements güçlendirildi (150+ karakter, detaylı açıklamalar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Scene diversity analysis fonksiyonları (`analyzeSceneDiversity`, `extractSceneElements`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Perspective variety logic (`getPerspectiveForPage` - 7 farklı perspektif) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Composition variety logic (`getCompositionForPage` - 7 farklı kompozisyon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Time/location extraction (Türkçe/İngilizce destekli) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] `generateFullPagePrompt()` fonksiyonuna scene diversity tracking eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] API integration: Scene diversity tracking ve previous scenes passing | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.8, STORY_PROMPT_TEMPLATE v1.0.2) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Göz rengi (blue) prompt iyileştirmesi: "bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)" vurgusu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Geometric stil açıklaması güçlendirildi: "flat design", "minimalist", "angular", "vector art", "geometric abstraction", "low-poly" terimleri eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.11** Karakter Tutarlılığı İyileştirmeleri - Part 2 (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.12** Cover Generation ve Additional Characters İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Cover generation'da `isCover=true` parametresi eklendi
+  - [x] Family Members için saç stili detayları eklendi (hairStyle, hairLength, hairTexture)
+  - [x] Yaş/fiziksel özellikler vurgusu güçlendirildi (adult vurgusu, NOT a child)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG, IMAGE_PROMPT_TEMPLATE)
+  - [x] Page 1'de cover reference kullanımı: `isCoverPage` mantığı düzeltildi, tüm sayfalarda (1-10) cover reference kullanılıyor
+- [x] **3.5.13** Sahne Çeşitliliği ve Görsel Varyasyon İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.14** Retry Mekanizması ve Hata Yönetimi İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.15** El Ele Tutuşma Yasağı (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Anatomical correctness directives'a el ele tutuşma yasağı eklendi
+  - [x] Negative prompts'a el ele tutuşma terimleri eklendi
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.10, ANATOMICAL_ISSUES_GUIDE v1.0.1)
+  - [x] Retry wrapper fonksiyonları eklendi (max 3 retry, exponential backoff)
+  - [x] Hata kategorileri (geçici vs kalıcı)
+  - [x] Edits API retry mekanizması (cover + page generation)
+  - [x] Fallback stratejisi değiştirildi (retry başarısız olursa hata fırlat, fallback'e geçme)
+  - [x] Detaylı logging (retry attempts, error types)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.9)
+  - [x] Story generation prompt'unda detaylı page-by-page structure (her sayfa için özel gereksinimler)
+  - [x] Visual diversity directives (location, time, weather, perspective, composition variety)
+  - [x] Image prompt requirements güçlendirildi (200+ karakter, detaylı sahne açıklamaları)
+  - [x] Scene description requirements güçlendirildi (150+ karakter, detaylı açıklamalar)
+  - [x] Scene diversity analysis fonksiyonları (`analyzeSceneDiversity`, `extractSceneElements`)
+  - [x] Perspective variety logic (`getPerspectiveForPage` - 7 farklı perspektif)
+  - [x] Composition variety logic (`getCompositionForPage` - 7 farklı kompozisyon)
+  - [x] Time/location extraction (Türkçe/İngilizce destekli)
+  - [x] `generateFullPagePrompt()` fonksiyonuna scene diversity tracking eklendi
+  - [x] API integration: Scene diversity tracking ve previous scenes passing
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.8, STORY_PROMPT_TEMPLATE v1.0.2)
+  - [x] Göz rengi (blue) prompt iyileştirmesi: "bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)" vurgusu
+  - [x] Geometric stil açıklaması güçlendirildi: "flat design", "minimalist", "angular", "vector art", "geometric abstraction", "low-poly" terimleri eklendi
   - **Detaylar:**
     - `app/api/books/route.ts`: Page 1'de de cover reference kullanılıyor (isCoverPage mantığı düzeltildi)
     - `lib/prompts/image/v1.0.0/character.ts`: Blue göz rengi için özel vurgu eklendi (main character + family members)
     - `lib/prompts/image/v1.0.0/style-descriptions.ts`: Geometric stil açıklaması güçlendirildi
     - `lib/prompts/image/v1.0.0/scene.ts`: Geometric stil direktifleri güçlendirildi
-- [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
+- [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
   - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça
   - ✅ **Dil Karışıklığı Çözümü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
     - "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi
@@ -876,117 +876,117 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - "DO NOT use ANY English words" yasağı
     - Final check mekanizması eklendi
     - System message'a dil talimatı eklendi
-- [x] **3.5.3** Image Generation Prompts v1.0.0 - ✅ Character consistency, scene generation, negative prompts | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.4** Character Consistency System - ✅ Master Character concept, multi-book tutarlılığı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.5** `POST /api/ai/generate-story` - Hikaye üret - ✅ GPT-4o entegrasyonu, Master Character kullanımı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] OpenAI GPT-4o entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Google Gemini Pro entegrasyonu - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Groq (Llama) entegrasyonu - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Claude entegrasyonu (opsiyonel) - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ GPT-image API'ye geçildi (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Reference image support (master character photo) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] **Multiple reference images support** (cover + pages için tüm karakterlerin reference image'ları) ✅ (16 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Master Character description kullanarak tutarlı görsel üret | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Size selection (1024x1024, 1024x1792, 1792x1024) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Supabase Storage'a otomatik upload | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.3** Image Generation Prompts v1.0.0 - ✅ Character consistency, scene generation, negative prompts
+- [x] **3.5.4** Character Consistency System - ✅ Master Character concept, multi-book tutarlılığı
+- [x] **3.5.5** `POST /api/ai/generate-story` - Hikaye üret - ✅ GPT-4o entegrasyonu, Master Character kullanımı
+  - [x] OpenAI GPT-4o entegrasyonu
+  - [ ] Google Gemini Pro entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Groq (Llama) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Claude entegrasyonu (opsiyonel) - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ GPT-image API'ye geçildi (15 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Reference image support (master character photo)
+  - [x] **Multiple reference images support** (cover + pages için tüm karakterlerin reference image'ları) ✅ (16 Ocak 2026)
+  - [x] Master Character description kullanarak tutarlı görsel üret
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
+  - [x] Supabase Storage'a otomatik upload
   - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
-  - [ ] Gemini Banana (Imagen 3) entegrasyonu - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Stable Diffusion entegrasyonu - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ✅ API endpoint oluşturuldu (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅ (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Multimodal input (text + reference image via FormData) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Base64 → Blob conversion (data URL support) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Size selection (1024x1024, 1024x1792, 1792x1024) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Free cover credit kontrolü | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Supabase Storage'a upload | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Test butonu eklendi (Step 6) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [ ] Gemini Banana (Imagen 3) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Stable Diffusion entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ✅ API endpoint oluşturuldu (10 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅ (15 Ocak 2026)
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Multimodal input (text + reference image via FormData)
+  - [x] Base64 → Blob conversion (data URL support)
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
+  - [x] Free cover credit kontrolü
+  - [x] Supabase Storage'a upload
+  - [x] Test butonu eklendi (Step 6)
   - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
   - 🎯 **Status:** API hazır, organization verification sonrası test edilecek
-- [x] **3.5.8** Prompt template'leri - ✅ POC'tan taşındı ve geliştirildi (`lib/prompts/`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.9** Create Book'da cover generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover generation API Create Book'da otomatik çağrılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover image URL database'e kaydediliyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Status: `generating` olarak güncelleniyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.8** Prompt template'leri - ✅ POC'tan taşındı ve geliştirildi (`lib/prompts/`)
+- [x] **3.5.9** Create Book'da cover generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Cover generation API Create Book'da otomatik çağrılıyor
+  - [x] Cover image URL database'e kaydediliyor
+  - [x] Status: `generating` olarak güncelleniyor
   - **Implementasyon:** `app/api/books/route.ts` - Cover generation story generation'dan sonra otomatik çağrılıyor
   - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
-- [x] **3.5.10** Create Book'da page images generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Page images generation API Create Book'da otomatik çağrılıyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Her sayfa için image URL `story_data.pages[].imageUrl`'a kaydediliyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Status: `completed` olarak güncelleniyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Illustration style düzeltildi (generateFullPagePrompt parametreleri) ✅ (11 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] b64_json response desteği eklendi (cover ve page images için) ✅ (11 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Sayfa sayısı enforcement (kullanıcı 3 sayfa istediğinde 3 sayfa oluşturuluyor) ✅ (11 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Detaylı log'lar eklendi (API call timing, response structure) ✅ (11 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.10** Create Book'da page images generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Page images generation API Create Book'da otomatik çağrılıyor
+  - [x] Her sayfa için image URL `story_data.pages[].imageUrl`'a kaydediliyor
+  - [x] Status: `completed` olarak güncelleniyor
+  - [x] Illustration style düzeltildi (generateFullPagePrompt parametreleri) ✅ (11 Ocak 2026)
+  - [x] b64_json response desteği eklendi (cover ve page images için) ✅ (11 Ocak 2026)
+  - [x] Sayfa sayısı enforcement (kullanıcı 3 sayfa istediğinde 3 sayfa oluşturuluyor) ✅ (11 Ocak 2026)
+  - [x] Detaylı log'lar eklendi (API call timing, response structure) ✅ (11 Ocak 2026)
   - **Implementasyon:** `app/api/books/route.ts` - Page images generation cover generation'dan sonra otomatik çağrılıyor
   - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
-- [x] **3.5.11** Book status management (draft → generating → completed) - ✅ **TAMAMLANDI** (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Status workflow: `draft` → `generating` → `completed` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Create Book'da: `draft` (story oluşturuldu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover generation başladığında: `generating` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Tüm görseller hazır olduğunda: `completed` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Hata durumunda: `failed` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover-only mode desteği (pageCount = 0) ✅ (11 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.11** Book status management (draft → generating → completed) - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Status workflow: `draft` → `generating` → `completed`
+  - [x] Create Book'da: `draft` (story oluşturuldu)
+  - [x] Cover generation başladığında: `generating`
+  - [x] Tüm görseller hazır olduğunda: `completed`
+  - [x] Hata durumunda: `failed`
+  - [x] Cover-only mode desteği (pageCount = 0) ✅ (11 Ocak 2026)
   - **Implementasyon:** `app/api/books/route.ts` - Status workflow tam olarak implement edildi
   - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
-- [ ] **3.5.12** Queue sistemi (uzun işlemler için) (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.12** Queue sistemi (uzun işlemler için) (23 Ocak 2026)
   - Aynı anda birden çok kullanıcı kitap oluşturmak isterse API alt yapımız bu durumda ne yapıyor?
   - Nasıl bir queue yapısı var?
   - Mevcut durum analizi gerekli
   - Queue sistemi tasarımı ve implementasyonu
   - Priority queue (ücretli kullanıcılar öncelikli)
   - Rate limiting ve throttling
-- [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
   - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
   - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
   - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
   - Version control sistemi (prompt versiyonları)
   - A/B testing için farklı prompt versiyonları
   - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
-- [x] **3.5.14** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.5.15** Prompt Kalite İyileştirmesi v2.0 - ✅ **TAMAMLANDI** (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.14** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing)
+- [x] **3.5.15** Prompt Kalite İyileştirmesi v2.0 - ✅ **TAMAMLANDI** (15 Ocak 2026)
   - **Hedef:** Magical Children's Book kalitesini yakalamak
   - **Story Prompts:**
-    - [x] Word count güncelleme (yaş gruplarına göre ORTALAMA değerler: 40/60/90/120) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Diyalog ve detaylı anlatım direktifleri eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Writing style requirements (show don't tell, atmospheric description) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Page structure template (opening, action, emotion, transition) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [x] Word count güncelleme (yaş gruplarına göre ORTALAMA değerler: 40/60/90/120)
+    - [x] Diyalog ve detaylı anlatım direktifleri eklendi
+    - [x] Writing style requirements (show don't tell, atmospheric description)
+    - [x] Page structure template (opening, action, emotion, transition)
   - **Image Prompts:**
-    - [x] Cinematic composition elements (lighting, depth, camera angle) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] 3-level environment descriptions (general → detailed → cinematic) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Hybrid prompt system (cinematic + descriptive combination) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Foreground/Midground/Background layer system | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Clothing consistency system (same outfit unless story changes it) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Anatomical error prevention (100+ negative prompts for hands, fingers, limbs) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Anatomical correctness directives (5 fingers, 2 hands, proper proportions) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [x] Cinematic composition elements (lighting, depth, camera angle)
+    - [x] 3-level environment descriptions (general → detailed → cinematic)
+    - [x] Hybrid prompt system (cinematic + descriptive combination)
+    - [x] Foreground/Midground/Background layer system
+    - [x] Clothing consistency system (same outfit unless story changes it)
+    - [x] Anatomical error prevention (100+ negative prompts for hands, fingers, limbs)
+    - [x] Anatomical correctness directives (5 fingers, 2 hands, proper proportions)
   - **Documentation:**
-    - [x] `STORY_PROMPT_TEMPLATE_v1.0.0.md` güncellendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `IMAGE_PROMPT_TEMPLATE_v1.0.0.md` güncellendi (v1.0.1 features) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [x] `STORY_PROMPT_TEMPLATE_v1.0.0.md` güncellendi
+    - [x] `IMAGE_PROMPT_TEMPLATE_v1.0.0.md` güncellendi (v1.0.1 features)
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
   - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
   - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
   - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
   - Version control sistemi (prompt versiyonları)
   - A/B testing için farklı prompt versiyonları
   - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
-- [ ] **3.5.18** Gemini Banana Model Entegrasyonu (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.18** Gemini Banana Model Entegrasyonu (23 Ocak 2026)
   - İleriye dönük Gemini Banana model eklenmesi düşünülecek
   - Deneme konusu iyi yada kötü mü olur bilinmiyor
   - Maliyetler de belli değil
   - Araştırma ve test gerekli
-- [ ] **3.5.19** Görsel Kompozisyon İyileştirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.19** Görsel Kompozisyon İyileştirmesi (23 Ocak 2026)
   - Hikayelerdeki görsellere sahne ve derinlik kompozisyon ekledik
   - Biraz düzelme oldu ama daha da geliştirme yapılabilir
   - Üzerine düşünülebilir, sırası geldiğinde bakılacak
   - Kompozisyon kuralları iyileştirmesi
   - Depth perception artırma
   - Scene composition guidelines
-- [ ] **3.5.20** Kapak ve İlk Sayfa Benzerliği Düzeltmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.20** Kapak ve İlk Sayfa Benzerliği Düzeltmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - Şu anda kapak görseli ile 1. ve 2. sayfa genelde çok benzer oluyor
   - Özellikle hikaye oluştururken ki prompt'u düzeltmek lazım
   - Her sayfa farklı bir kompozisyon içermeli
@@ -994,19 +994,19 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Bu konu öncelikli, ilk bakılacaklar arasında
   - Prompt'ta sayfa farklılığı direktifleri
   - Composition variety enforcement
-- [ ] **3.5.21** Paragraf Yapısı İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.21** Paragraf Yapısı İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - Hikayelerde ebook formatında ve PDF export'ta paragraflar olsun
   - Yaş grubuna göre 2-3-4 tane paragraf olacak içerik ayarlamamız lazım
   - Story generation prompt'unda paragraf yapısı direktifleri
   - PDF export'ta paragraf formatlaması
   - Yaş gruplarına göre paragraf sayısı: 0-2 yaş: 2 paragraf, 3-5 yaş: 3 paragraf, 6-9 yaş: 4 paragraf
-- [ ] **3.5.22** Çocuk Boyları Prompt İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.22** Çocuk Boyları Prompt İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - Çocukların boylarını yaşlara göre biraz ayarlamak lazım
   - Bazen olduğundan uzun gösterebiliyor
   - Prompt iyileştirmesi gerekli
   - Yaş-boy oranı direktifleri eklenmeli
   - Anatomical proportions yaş gruplarına göre
-- [ ] **3.5.23** AI Maliyet Optimizasyonu (23 Ocak 2026) - 🔴 **ACİL - ÖNEMLİ** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.23** AI Maliyet Optimizasyonu (23 Ocak 2026) - 🔴 **ACİL - ÖNEMLİ**
   - Şu an AI ile image üretimi flow'umuz maliyeti fazla
   - Bu maliyetleri nasıl düşürebiliriz diye araştırma yapılacak
   - Hem hikaye hem görsel ayrıntılı düşünülecek
@@ -1023,7 +1023,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - ✅ Anatomik hatalar minimize edildi
   - **İlham:** Magical Children's Book örnekleri analizi
   - **Durum:** Production'da aktif ✅
-- [ ] **3.5.24** Kitap oluşturma – Herhangi bir hata durumunda tüm kitap fail (24 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.24** Kitap oluşturma – Herhangi bir hata durumunda tüm kitap fail (24 Ocak 2026)
   - **Özet:** Story, master illüstrasyon, kapak veya sayfa görsellerinden **herhangi biri** hata verirse kitap **tamamen** fail sayılacak; **partial success** (örn. kapak yok ama sayfalar "completed") olmayacak.
   - **Süreç (tanım, implementasyon "daha sonra"):**
     - Story fail → zaten kitap oluşturulmuyor; mevcut davranış yeterli.
@@ -1032,7 +1032,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Page image(s) fail → kitap `failed`; partial sayfa görselleriyle "completed" **asla** işaretlenmez. Gerekirse ilk sayfa hatasında batch abort vs. kurallar sonra netleştirilecek.
   - **Implementasyon:** `app/api/books/route.ts` – cover fail durumunda **throw** (page images'a geçmeme); genel hata akışının "tüm kitap fail" ile uyumlu olması.
   - **Not:** Bu madde ROADMAP'e eklenir; detaylı implementasyon **daha sonra** yapılır.
-- [x] **3.5.26** Image API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.26** Image API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
   - **Özet:** Image Generation API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
   - **Faz 1: Inline Direktifleri Modülerleştir ✅**
     - `buildCoverDirectives()` fonksiyonu oluşturuldu - cover generation direktiflerini yönetiyor
@@ -1053,7 +1053,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - **Kod:** `lib/prompts/image/v1.0.0/scene.ts`
   - **Dokümantasyon:** `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`, `docs/prompts/CHANGELOG.md`
 
-- [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
   - **Özet:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
   - **Faz 1: Clothing Direktiflerini Modülerleştir ✅**
     - `getClothingDirectives()` fonksiyonu oluşturuldu - tüm clothing direktiflerini tek yerden yönetiyor
@@ -1070,48 +1070,48 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - **Version:** Story prompt v1.3.2 → v1.4.0
   - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/CHANGELOG.md`, `docs/prompts/VERSION_STATUS.md`
   - **Test:** ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
-- [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Database migration (`011_add_image_edit_feature.sql`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `image_edit_history` table (version tracking) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] RLS policies ve SQL functions | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] API Endpoints: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `POST /api/ai/edit-image` - OpenAI Image Edit API entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `GET /api/books/[id]/edit-history` - Edit history endpoint | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `POST /api/books/[id]/revert-image` - Version revert endpoint | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Frontend Components: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `ImageEditModal` - Canvas-based mask drawing (ChatGPT-style) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `EditHistoryPanel` - Version history viewer | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `BookSettingsPage` - Parent-only edit interface | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Features: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Mask-based editing (transparent = edit, opaque = preserve) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] 3 edits per book quota system | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Full version history tracking | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Revert to previous versions | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Parent-only access (separated from child-safe Book Viewer) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] OpenAI API Integration: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Model: `gpt-image-1.5` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Size: `1024x1536` (portrait) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Quality: `low` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] `input_fidelity: high` (preserve original image) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Mask inversion logic (painted areas → transparent = edit zone) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Bug Fixes: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Mask logic inversion (transparent = edit, opaque = preserve) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Response format (b64_json only, no URL) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Logging optimization (no base64 dumps) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Variable name conflicts resolved | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Version 0 (Original) Support: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Original images shown in edit history | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Revert to original version (version 0) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] UI improvements (Original badge, proper labeling) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Prompt Security Enhancements: | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Positive prompt with anatomical correctness directives | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Negative prompt integration (from main image generation) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Safety constraints to prevent unwanted edits | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Age-group, style, and theme-specific restrictions | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
+  - [x] Database migration (`011_add_image_edit_feature.sql`)
+    - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns
+    - [x] `image_edit_history` table (version tracking)
+    - [x] RLS policies ve SQL functions
+  - [x] API Endpoints:
+    - [x] `POST /api/ai/edit-image` - OpenAI Image Edit API entegrasyonu
+    - [x] `GET /api/books/[id]/edit-history` - Edit history endpoint
+    - [x] `POST /api/books/[id]/revert-image` - Version revert endpoint
+  - [x] Frontend Components:
+    - [x] `ImageEditModal` - Canvas-based mask drawing (ChatGPT-style)
+    - [x] `EditHistoryPanel` - Version history viewer
+    - [x] `BookSettingsPage` - Parent-only edit interface
+  - [x] Features:
+    - [x] Mask-based editing (transparent = edit, opaque = preserve)
+    - [x] 3 edits per book quota system
+    - [x] Full version history tracking
+    - [x] Revert to previous versions
+    - [x] Parent-only access (separated from child-safe Book Viewer)
+  - [x] OpenAI API Integration:
+    - [x] Model: `gpt-image-1.5`
+    - [x] Size: `1024x1536` (portrait)
+    - [x] Quality: `low`
+    - [x] `input_fidelity: high` (preserve original image)
+    - [x] Mask inversion logic (painted areas → transparent = edit zone)
+  - [x] Bug Fixes:
+    - [x] Mask logic inversion (transparent = edit, opaque = preserve)
+    - [x] Response format (b64_json only, no URL)
+    - [x] Logging optimization (no base64 dumps)
+    - [x] Variable name conflicts resolved
+  - [x] Version 0 (Original) Support:
+    - [x] Original images shown in edit history
+    - [x] Revert to original version (version 0)
+    - [x] UI improvements (Original badge, proper labeling)
+  - [x] Prompt Security Enhancements:
+    - [x] Positive prompt with anatomical correctness directives
+    - [x] Negative prompt integration (from main image generation)
+    - [x] Safety constraints to prevent unwanted edits
+    - [x] Age-group, style, and theme-specific restrictions
   - **Documentation:** `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md`
   - **Status:** ✅ Production ready, tested and working
-- [ ] **3.5.17** Görsel Revize UX İyileştirmesi (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.5.17** Görsel Revize UX İyileştirmesi (23 Ocak 2026)
   - Ebeveynlerin 3 kere revize verebilecekleri alan mevcut (Image Edit Feature)
   - Bu özelliği güzel bir UX ile sunmak gerekiyor
   - Düşünülmesi gereken bir konu: Nasıl daha kullanıcı dostu hale getirilebilir?
@@ -1119,10 +1119,10 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - İyileştirmeler: Daha görsel, daha anlaşılır, daha kolay kullanım
 
 ### 3.6 PDF Generation ✅
-- [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.2** PDF template tasarımı ✅ (10 Ocak 2026) - **Not:** Temel tasarım tamamlandı, profesyonel tasarım iyileştirmesi Faz 5'te yapılacak | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.3** Supabase Storage'a kaydet ✅ (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **3.6.4** İndirme linki oluştur ✅ (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
+- [x] **3.6.2** PDF template tasarımı ✅ (10 Ocak 2026) - **Not:** Temel tasarım tamamlandı, profesyonel tasarım iyileştirmesi Faz 5'te yapılacak
+- [x] **3.6.3** Supabase Storage'a kaydet ✅ (10 Ocak 2026)
+- [x] **3.6.4** İndirme linki oluştur ✅ (10 Ocak 2026)
   - ✅ jsPDF kütüphanesi kuruldu
   - ✅ Database migration eklendi (pdf_url, pdf_path columns)
   - ✅ PDF Generator Helper oluşturuldu (`lib/pdf/generator.ts`)
@@ -1134,8 +1134,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - ⏳ Testing - Test book ile PDF oluştur (sırada)
 
 ### 3.7 Webhook'lar
-- [ ] **3.7.1** Stripe webhook handler | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **3.7.2** İyzico webhook handler | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **3.7.1** Stripe webhook handler
+- [ ] **3.7.2** İyzico webhook handler
 
 ---
 
@@ -1143,35 +1143,35 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Öncelik:** 🔴 Kritik
 
 ### 4.1 Stripe Entegrasyonu
-- [ ] **4.1.1** Stripe hesabı oluştur ve yapılandır | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.2** Stripe SDK kurulumu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.3** Ürünler ve fiyatlar oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.4** Checkout session oluşturma | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.5** Payment intent flow | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.6** Stripe webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/stripe`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Webhook signature doğrulama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Payment success/failure event handling | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Order status güncelleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.1.7** Test modu ile test et | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.1.1** Stripe hesabı oluştur ve yapılandır
+- [ ] **4.1.2** Stripe SDK kurulumu
+- [ ] **4.1.3** Ürünler ve fiyatlar oluştur
+- [ ] **4.1.4** Checkout session oluşturma
+- [ ] **4.1.5** Payment intent flow
+- [ ] **4.1.6** Stripe webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026)
+  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/stripe`)
+  - [ ] Webhook signature doğrulama
+  - [ ] Payment success/failure event handling
+  - [ ] Order status güncelleme
+- [ ] **4.1.7** Test modu ile test et
 
 ### 4.2 İyzico Entegrasyonu (Türkiye)
-- [ ] **4.2.1** İyzico hesabı oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.2** İyzico SDK kurulumu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.3** Ödeme formu entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.4** 3D Secure desteği | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.5** İyzico webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/iyzico`) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Webhook signature doğrulama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Payment success/failure event handling | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Order status güncelleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.6** Callback handler (3D Secure sonrası) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.2.7** Test modu ile test et | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.2.1** İyzico hesabı oluştur
+- [ ] **4.2.2** İyzico SDK kurulumu
+- [ ] **4.2.3** Ödeme formu entegrasyonu
+- [ ] **4.2.4** 3D Secure desteği
+- [ ] **4.2.5** İyzico webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026)
+  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/iyzico`)
+  - [ ] Webhook signature doğrulama
+  - [ ] Payment success/failure event handling
+  - [ ] Order status güncelleme
+- [ ] **4.2.6** Callback handler (3D Secure sonrası)
+- [ ] **4.2.7** Test modu ile test et
 
 ### 4.3 Sipariş Yönetimi
-- [ ] **4.3.1** Checkout sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.3.2** Sipariş özeti component | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.3.1** Checkout sayfası
+- [ ] **4.3.2** Sipariş özeti component
+- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ**
   - Sepet konusuna bakmamız lazım
   - Hem ebook olarak satın alma sepet atma hem de hardcopy olarak sepet durumunu yapmalıyız
   - Birden fazla ürün ekleme vs.
@@ -1179,16 +1179,16 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ebook ve hardcopy ayrımı
   - Multi-item cart support
   - Cart persistence (localStorage veya session)
-- [ ] **4.3.3** Ödeme başarılı sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.3.4** Sipariş durumu takibi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.3.5** Email bildirimleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.3.3** Ödeme başarılı sayfası
+- [ ] **4.3.4** Sipariş durumu takibi
+- [ ] **4.3.5** Email bildirimleri
 
 ### 4.4 Fiyatlandırma Sistemi
-- [ ] **4.4.1** Sayfa sayısına göre fiyatlandırma (10/15/20 sayfa) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.4.2** E-book vs Basılı kitap fiyatları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.4.3** İndirim kodu sistemi (gelecekte) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.4.4** Ücretsiz kapak hakkı takibi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **4.4.7** Yurtdışı Şirket Kurulumu (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.4.1** Sayfa sayısına göre fiyatlandırma (10/15/20 sayfa)
+- [ ] **4.4.2** E-book vs Basılı kitap fiyatları
+- [ ] **4.4.3** İndirim kodu sistemi (gelecekte)
+- [ ] **4.4.4** Ücretsiz kapak hakkı takibi
+- [ ] **4.4.7** Yurtdışı Şirket Kurulumu (23 Ocak 2026)
   - Ürünü yurtdışında satabilmek için TR dışında bir yerde şirket olmalı
   - Stripe Atlas diye bizim için şirket açan yapısı var
   - Başvuru hazırlanacak ve bakılacak
@@ -1196,7 +1196,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Hangisi olursa olsun, yurtdışı şirket kurulumu gerekli
   - **Kategori:** Yasal / İş Geliştirme
   - **Öncelik:** 🟡 Önemli
-- [ ] **4.4.8** Abonelik Modeli Araştırması (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.4.8** Abonelik Modeli Araştırması (23 Ocak 2026)
   - Abonelik modeli ile satış düşünülecek
   - Nasıl bir şekilde entegre edilebilir
   - Abone olanlara aylık x adet kitap gibi mi yada daha farklı bir şey gibi düşünülecek
@@ -1206,7 +1206,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Fiyatlandırma stratejisi
   - Stripe Subscription entegrasyonu
   - Subscription management UI
-- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026)
   - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
   - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
   - Örneğin 10 sayfa lazımsa, zaten karakter ve kapak yaptıysak aslında 8 sayfa daha yapacağız gibi
@@ -1214,7 +1214,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ne noktada para isteyeceğiz? (Düşünülecek)
   - Hem ebook satış hem de ebook almış kullanıcıya hardcopy satış
   - Sepet sistemi ve ödeme akışı tasarlanmalı
-- [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026)
   - Hardcopy şu an için sadece Türkiye'de var
   - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
   - Ebook alabilir ama baskı alamaz - satın alma sırasında bu bilgi verilmeli
@@ -1226,40 +1226,40 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Öncelik:** 🟡 Önemli
 
 ### 5.1 SEO Optimizasyonu
-- [ ] **5.1.1** Meta tags ve Open Graph | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.1.2** Sitemap.xml | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.1.3** robots.txt | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.1.4** Structured data (JSON-LD) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.1.5** Performance optimizasyonu (Lighthouse) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.1.1** Meta tags ve Open Graph
+- [ ] **5.1.2** Sitemap.xml
+- [ ] **5.1.3** robots.txt
+- [ ] **5.1.4** Structured data (JSON-LD)
+- [ ] **5.1.5** Performance optimizasyonu (Lighthouse)
 
 ### 5.2 Analytics
-- [ ] **5.2.1** Google Analytics 4 kurulumu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.2.2** Event tracking (kitap oluşturma, satın alma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.2.3** Conversion tracking | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.2.4** Custom dashboard (opsiyonel) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.2.1** Google Analytics 4 kurulumu
+- [ ] **5.2.2** Event tracking (kitap oluşturma, satın alma)
+- [ ] **5.2.3** Conversion tracking
+- [ ] **5.2.4** Custom dashboard (opsiyonel)
 
 ### 5.8 Admin Panel / Dashboard (23 Ocak 2026)
-- [ ] **5.8.1** Admin panel oluşturma | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.8.1** Admin panel oluşturma
   - Dashboard içeride her şey olacak
   - Kullanıcılar ne yapmış, kim kaç kitap almış gibi istatistikler
   - Sistem yönetimi için hayal edilebilecek tüm özellikler
-- [ ] **5.8.2** UI Kit seçimi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.8.2** UI Kit seçimi
   - Hazır bir UI kit kullanılabilir (v0.app'den UI yaptırılabilir)
   - Veya hazır bir admin panel çözümü (analytics filan da olur içinde)
   - Örnek: shadcn/ui + v0.app, veya Retool, AdminJS gibi hazır çözümler
-- [ ] **5.8.3** Analytics entegrasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.8.3** Analytics entegrasyonu
   - Kullanıcı istatistikleri
   - Kitap oluşturma metrikleri
   - Satış analizi
   - Kullanıcı davranış analizi
 
 ### 5.3 Güvenlik
-- [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.3.2** Rate limiting | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.3.3** Input validasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.3.4** CSRF protection | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.3.5** GDPR/KVKK uyumluluk kontrolü | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.3.6** GDPR/KVKK Veri Silme ve Hesap Silme (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik)
+- [ ] **5.3.2** Rate limiting
+- [ ] **5.3.3** Input validasyonu
+- [ ] **5.3.4** CSRF protection
+- [ ] **5.3.5** GDPR/KVKK uyumluluk kontrolü
+- [ ] **5.3.6** GDPR/KVKK Veri Silme ve Hesap Silme (23 Ocak 2026)
   - Kullanıcıların "verilerimi sil", "hesabımı sil" gibi yerlere GDPR ve KVKK gizlilik konularında ne gerekiyorsa araştırılmalı
   - Her şey kurallara uygun ilerlemeli
   - Konular nedir bilinmiyor, araştırma yapılıp ona göre işler yapılmalı
@@ -1267,14 +1267,14 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Hesap silme akışı
   - Veri export özelliği (GDPR right to data portability)
   - Onay mekanizmaları
-- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026)
   - Aynı IP üzerinden bir şekilde attack gibi durumlar olursa algılamak ve alarm üretmek
   - Engellemek vs.
   - Rate limiting per IP
   - Suspicious activity detection
   - Alert system (email, Slack, vb.)
   - IP blocking mekanizması
-- [ ] **5.3.8** Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.3.8** Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026)
   - Supabase'deki güvenlik ve dosya erişim konusu ele alınacak
   - Örneğin kişisel bilgiler ve fotoğraflar olduğu için kullanıcıların birbirlerinin içeriğini görmemesi
   - Bir hack durumunun önüne geçilecek önlemlerin alındığından emin olmalıyız
@@ -1283,7 +1283,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - File access permissions
   - Data isolation testleri
   - Security audit
-- [ ] **5.3.9** API Key Güvenliği (23 Ocak 2026) - 🔴 **KRİTİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.3.9** API Key Güvenliği (23 Ocak 2026) - 🔴 **KRİTİK**
   - API key güncelliğini gözden geçirmeliyiz
   - Siteye girenlerin attack yaparak erişememesi gerekiyor
   - Keylerimiz çok önemli
@@ -1294,47 +1294,47 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Server-side only API calls (client-side'da key'ler olmamalı)
 
 ### 5.4 Test
-- [ ] **5.4.1** Manuel test (tüm akışlar) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.4.2** Mobil test | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.4.3** Cross-browser test | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.4.4** Ödeme testleri (sandbox) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.4.1** Manuel test (tüm akışlar)
+- [ ] **5.4.2** Mobil test
+- [ ] **5.4.3** Cross-browser test
+- [ ] **5.4.4** Ödeme testleri (sandbox)
 
 ### 5.5 Deployment
-- [ ] **5.5.1** Vercel production deployment | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.5.2** Domain bağlantısı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.5.3** SSL sertifikası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.5.4** Monitoring kurulumu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.5.5** Error tracking (Sentry) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.5.1** Vercel production deployment
+- [ ] **5.5.2** Domain bağlantısı
+- [ ] **5.5.3** SSL sertifikası
+- [ ] **5.5.4** Monitoring kurulumu
+- [ ] **5.5.5** Error tracking (Sentry)
 
 ### 5.7 PDF Tasarım İyileştirmesi
-- [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Cover page tasarımı (daha çekici, çocuk kitabına uygun) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Sayfa layout iyileştirmesi (görsel + metin düzeni) - A4 landscape, double-page spread | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Font seçimi (çocuk dostu, okunabilir) - Başlık: Fredoka (Bold), Metin: Alegreya (Regular), 18pt font, 1.8 line height | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Renk şeması ve tema uyumu - #fef9f3 arka plan rengi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Sayfa numaraları ve footer tasarımı - Sağ altta, sadece metin sayfalarına | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Görsel kalitesi optimizasyonu - 1024x1536 aspect ratio korunuyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] **Puppeteer + HTML/CSS yaklaşımına geçiş** ✅ (17 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] jsPDF yerine Puppeteer kullanımı (daha iyi kalite) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] HTML/CSS template sistemi (profesyonel layout) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Double-page spread layout (A4 landscape, her yarı A5 dikey) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Alternatif görsel-metin pattern | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)
+  - [x] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
+  - [x] Sayfa layout iyileştirmesi (görsel + metin düzeni) - A4 landscape, double-page spread
+  - [x] Font seçimi (çocuk dostu, okunabilir) - Başlık: Fredoka (Bold), Metin: Alegreya (Regular), 18pt font, 1.8 line height
+  - [x] Renk şeması ve tema uyumu - #fef9f3 arka plan rengi
+  - [x] Sayfa numaraları ve footer tasarımı - Sağ altta, sadece metin sayfalarına
+  - [x] Görsel kalitesi optimizasyonu - 1024x1536 aspect ratio korunuyor
+  - [x] **Puppeteer + HTML/CSS yaklaşımına geçiş** ✅ (17 Ocak 2026)
+    - [x] jsPDF yerine Puppeteer kullanımı (daha iyi kalite)
+    - [x] HTML/CSS template sistemi (profesyonel layout)
+    - [x] Double-page spread layout (A4 landscape, her yarı A5 dikey)
+    - [x] Alternatif görsel-metin pattern
     - **Not:** jsPDF yaklaşımından vazgeçildi, Puppeteer ile HTML/CSS template kullanılıyor
-- [x] **5.7.1.1** PDF Layout İyileştirmeleri ✅ (25 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] A5 dikey sayfa düzeni (her yarı 148.5mm x 210mm) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Görsel hizalama: Sol sayfa sola, sağ sayfa sağa hizalı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Metin hizalama: Sol yaslı, dikey ortalı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] 4 köşe pattern: Text sayfalarında SVG pattern (her köşe rotate edilmiş) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Kesik çizgi ayırıcı: Sayfa ortasında dashed border | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Pattern sadece text sayfalarında (image sayfalarında yok) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.7.3** PDF customization seçenekleri (opsiyonel) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Farklı sayfa boyutları (A4, Letter, Square) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Farklı layout seçenekleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] Temel 4 köşe pattern sistemi ✅ (25 Ocak 2026) - `public/pdf-backgrounds/children-pattern.svg` | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik) - `public/pdf-backgrounds/` klasörüne eklenebilir | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.7.5** PDF Title Font Türkçe Karakter Desteği (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **5.7.1.1** PDF Layout İyileştirmeleri ✅ (25 Ocak 2026)
+  - [x] A5 dikey sayfa düzeni (her yarı 148.5mm x 210mm)
+  - [x] Görsel hizalama: Sol sayfa sola, sağ sayfa sağa hizalı
+  - [x] Metin hizalama: Sol yaslı, dikey ortalı
+  - [x] 4 köşe pattern: Text sayfalarında SVG pattern (her köşe rotate edilmiş)
+  - [x] Kesik çizgi ayırıcı: Sayfa ortasında dashed border
+  - [x] Pattern sadece text sayfalarında (image sayfalarında yok)
+- [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme)
+- [ ] **5.7.3** PDF customization seçenekleri (opsiyonel)
+  - [ ] Farklı sayfa boyutları (A4, Letter, Square)
+  - [ ] Farklı layout seçenekleri
+- [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri
+  - [x] Temel 4 köşe pattern sistemi ✅ (25 Ocak 2026) - `public/pdf-backgrounds/children-pattern.svg`
+  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik) - `public/pdf-backgrounds/` klasörüne eklenebilir
+- [ ] **5.7.5** PDF Title Font Türkçe Karakter Desteği (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - PDF oluşturduğumuz ilk sayfadaki title'daki font Türkçe karakter desteklemiyor
   - Bunu değiştirmek yada düzeltmek lazım
   - Mevcut text'teki font'un kalın olanını yazabiliriz
@@ -1342,7 +1342,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ayrıca font konusunu daha sonra kullanıcının seçim yapabileceği hale de getirebiliriz
   - Türkçe karakter desteği olan font seçimi (ğ, ı, ş, ü, ö, ç)
   - Font fallback sistemi
-- [ ] **5.7.6** PDF Kapak Sayfası A5 Dikey Format (23 Ocak 2026) - 🔴 **ACİL - YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.7.6** PDF Kapak Sayfası A5 Dikey Format (23 Ocak 2026) - 🔴 **ACİL - YÜKSEK ÖNCELİK**
   - PDF'in ilk sayfası şu an yan dönmüş A4 gibi
   - Sadece ilk kapak sayfaya ve son arka kapağa özel tek ortalı A5 dikey yapabilir miyiz?
   - Örnekteki gibi tek ortalı A5 dikey format
@@ -1350,7 +1350,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Back cover: A5 portrait, centered
   - Internal pages: Mevcut double-page spread layout korunur
   - Bu konu acil ve yüksek öncelik
-- [ ] **5.7.7** Arka Kapak Tasarımı (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.7.7** Arka Kapak Tasarımı (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
   - Arka kapak şu an yok ve eklenmeli
   - Arka kapağa özel bir tasarım yapılmalı
   - Örneğin farklı kitaplar içinde önceden hazırladığımız kişisel birkaç kitap kapağı olabilir
@@ -1358,30 +1358,30 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Back cover template tasarımı
   - Örnek back cover tasarımları
   - PDF generation'a back cover ekleme
-  - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Tema bazlı desenler (deniz, orman, uzay vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Hikaye Temasına Göre Arka Plan Rengi:** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Otomatik renk seçimi (macera: mavi tonları, orman: yeşil tonları, vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Kullanıcı arka plan rengi seçimi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Tema bazlı renk paletleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.7.5** PDF boyut optimizasyonu (gelecek iyileştirme) (17 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Daha agresif compression teknikleri (SLOW mode vs MEDIUM) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Görsel boyutlarını daha da küçültme (70-75% seviyesine) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] PDF boyut hedefi: 5-6 MB altı (10 sayfalık kitap için) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Kalite vs boyut dengesi testleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında)
+  - [ ] Tema bazlı desenler (deniz, orman, uzay vb.)
+  - [ ] **Hikaye Temasına Göre Arka Plan Rengi:**
+    - [ ] Otomatik renk seçimi (macera: mavi tonları, orman: yeşil tonları, vb.)
+    - [ ] Kullanıcı arka plan rengi seçimi
+    - [ ] Tema bazlı renk paletleri
+- [ ] **5.7.5** PDF boyut optimizasyonu (gelecek iyileştirme) (17 Ocak 2026)
+  - [ ] Daha agresif compression teknikleri (SLOW mode vs MEDIUM)
+  - [ ] Görsel boyutlarını daha da küçültme (70-75% seviyesine)
+  - [ ] PDF boyut hedefi: 5-6 MB altı (10 sayfalık kitap için)
+  - [ ] Kalite vs boyut dengesi testleri
   - **Not:** Şu an `pdfs` bucket (50 MB limit) kullanılıyor, optimizasyon opsiyonel
-- [x] **5.7.6** Cover Page İyileştirmeleri ✅ (25 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Double-page spread layout (sol: görsel, sağ: başlık) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Diğer sayfalardaki görsel hizalaması ile aynı mantık | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Şirket Bilgisi Ekleme:** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Logo ve şirket bilgileri yerleşimi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Footer veya alt kısımda şirket bilgisi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [x] **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] "adventure • collage" gibi seçilen bilgilerin yer aldığı bölümün kapaktan kaldırılması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [x] Sadece başlık ve görsel kalacak şekilde sadeleştirme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **5.7.6** Cover Page İyileştirmeleri ✅ (25 Ocak 2026)
+  - [x] **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026)
+    - [x] Double-page spread layout (sol: görsel, sağ: başlık)
+    - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
+    - [x] Diğer sayfalardaki görsel hizalaması ile aynı mantık
+  - [ ] **Şirket Bilgisi Ekleme:**
+    - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi
+    - [ ] Logo ve şirket bilgileri yerleşimi
+    - [ ] Footer veya alt kısımda şirket bilgisi
+  - [x] **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026)
+    - [x] "adventure • collage" gibi seçilen bilgilerin yer aldığı bölümün kapaktan kaldırılması
+    - [x] Sadece başlık ve görsel kalacak şekilde sadeleştirme
 - **Not:** Temel PDF generation çalışıyor ✅ (11 Ocak 2026), Tasarım iyileştirmesi tamamlandı ✅ (17 Ocak 2026), Layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Cover page layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Bucket `pdfs` (50 MB) olarak güncellendi ✅ (17 Ocak 2026), Puppeteer + HTML/CSS yaklaşımına geçildi ✅ (17 Ocak 2026)
   - **Teknoloji:** Puppeteer + HTML/CSS Template (jsPDF'den geçildi)
   - **Format:** A4 landscape, double-page spread (her yarı A5 dikey: 148.5mm x 210mm)
@@ -1440,49 +1440,49 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
 
 ### 5.6 Lansman Hazırlıkları
-- [ ] **5.6.1** Örnek kitaplar oluştur (demo) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.6.2** Sosyal medya hesapları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.6.3** Landing page son kontrolü | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.6.4** Beta kullanıcılar ile test | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.6.1** Örnek kitaplar oluştur (demo)
+- [ ] **5.6.2** Sosyal medya hesapları
+- [ ] **5.6.3** Landing page son kontrolü
+- [ ] **5.6.4** Beta kullanıcılar ile test
 
 ### 5.9 Pazarlama ve Marketing (23 Ocak 2026)
-- [ ] **5.9.1** Product Hunt yayınlama planı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.9.2** "There's an AI for That" yayınlama planı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **5.9.3** Diğer pazarlama kanalları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.1** Product Hunt yayınlama planı
+- [ ] **5.9.2** "There's an AI for That" yayınlama planı
+- [ ] **5.9.3** Diğer pazarlama kanalları
   - Social media marketing
   - Content marketing
   - Influencer partnerships
   - SEO ve organic growth
 
 ### 5.10 Maliyet Takibi ve Muhasebe (23 Ocak 2026)
-- [ ] **5.10.1** Proje ile ilgili harcanan maliyetleri ele almak için bir bölüm olmalı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.10.1** Proje ile ilgili harcanan maliyetleri ele almak için bir bölüm olmalı
   - Muhasebe gibi, onları da unutmamak için bir yapı kurmalıyız
   - Maliyet kategorileri (hosting, AI API'ler, domain, tools, vb.)
   - Aylık maliyet takibi
   - Bütçe planlaması
   - Cost tracking sistemi (spreadsheet veya tool)
   - ROI analizi
-- [ ] **5.9.1** Product Hunt yayınlama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.1** Product Hunt yayınlama
   - Ürün hazır olup production olduğunda https://www.producthunt.com/ 'da yayınlanması gerekiyor
   - Buradan trafik gelebilir
   - Launch stratejisi hazırlanmalı
-- [ ] **5.9.2** There's an AI for That yayınlama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.2** There's an AI for That yayınlama
   - https://theresanaiforthat.com/ sitesinde yayınlanması gerekiyor
   - AI kategorisinde listelenmeli
   - Buradan da trafik gelebilir
-- [ ] **5.9.3** Diğer pazarlama kanalları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.3** Diğer pazarlama kanalları
   - SEO optimizasyonu
   - İçerik pazarlama (blog, sosyal medya)
   - Influencer işbirlikleri
   - Email pazarlama
   - Reklam kampanyaları (Google Ads, Facebook Ads)
-- [ ] **5.9.4** Etsy ve Türkiye Pazar Yerleri Araştırması (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.4** Etsy ve Türkiye Pazar Yerleri Araştırması (23 Ocak 2026)
   - Pazarlama satış için Etsy sitesi araştırılacak
   - Alternatif yerel Türkiye'de satış yapılabilecek siteler pazar yerleri de araştırılacak
   - Etsy hesabı açma ve ürün listeleme
   - Türkiye pazar yerleri: GittiGidiyor, Trendyol, Hepsiburada, vb.
   - Pazar yeri stratejisi ve fiyatlandırma
-- [ ] **5.9.5** Banner ve Promosyon Materyalleri (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **5.9.5** Banner ve Promosyon Materyalleri (23 Ocak 2026)
   - Ekteki gibi bir banner veya bu tarz bir şey yapılabilir
   - Reklam ve sitenin ilgili yerlerinde sosyal medya hesaplarında kullanılabilir
   - Promosyon banner tasarımı (before/after karakter dönüşümü gösterimi)
@@ -1497,22 +1497,22 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 **Not:** Şu an odağımız web uygulamasını tamamlamak. Mobil uygulama web tamamlandıktan sonra geliştirilecek.
 
 ### 6.1 PWA Temel Kurulumu
-- [ ] **6.1.1** next-pwa paketi kurulumu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.2** Manifest.json oluşturma (app name, icons, theme color) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.3** Service Worker yapılandırması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.4** App icon'ları oluştur (192x192, 512x512, iOS icon'ları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.5** Splash screen yapılandırması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.6** Offline desteği (cache strategy) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.1.7** Install prompt (PWA yükleme butonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.1.1** next-pwa paketi kurulumu
+- [ ] **6.1.2** Manifest.json oluşturma (app name, icons, theme color)
+- [ ] **6.1.3** Service Worker yapılandırması
+- [ ] **6.1.4** App icon'ları oluştur (192x192, 512x512, iOS icon'ları)
+- [ ] **6.1.5** Splash screen yapılandırması
+- [ ] **6.1.6** Offline desteği (cache strategy)
+- [ ] **6.1.7** Install prompt (PWA yükleme butonu)
 
 ### 6.2 Mobil Optimizasyon
-- [ ] **6.2.1** Touch gesture desteği (swipe, pinch) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.2** Mobil navigasyon iyileştirmeleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.3** Fotoğraf yükleme optimizasyonu (mobil kamera entegrasyonu) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.4** Push notification desteği (opsiyonel) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.5** Share API entegrasyonu (kitap paylaşma) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.6** Responsive tasarım son kontrolleri | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.2.7** Çocuk Modu Telefon Kilidi Önleme (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.2.1** Touch gesture desteği (swipe, pinch)
+- [ ] **6.2.2** Mobil navigasyon iyileştirmeleri
+- [ ] **6.2.3** Fotoğraf yükleme optimizasyonu (mobil kamera entegrasyonu)
+- [ ] **6.2.4** Push notification desteği (opsiyonel)
+- [ ] **6.2.5** Share API entegrasyonu (kitap paylaşma)
+- [ ] **6.2.6** Responsive tasarım son kontrolleri
+- [ ] **6.2.7** Çocuk Modu Telefon Kilidi Önleme (23 Ocak 2026)
   - Çocuk modunda hikaye okunurken uygulama yaparken telefon tuş kilidine girmesin diye bir özellik eklenebilir
   - Bunu mobil app zamanı bakacağız, acil değil
   - Screen wake lock API
@@ -1520,38 +1520,38 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Battery optimization considerations
 
 ### 6.3 Android (Play Store) - TWA Build
-- [ ] **6.3.1** PWA Builder veya Bubblewrap ile TWA projesi oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.2** Android manifest yapılandırması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.3** APK/AAB build alma | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.4** Google Play Console hesabı oluştur ($25 tek seferlik) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.5** Store listing hazırlama (açıklama, ekran görüntüleri, icon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.6** Play Store'a yükleme ve yayınlama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.3.7** Test ve inceleme süreci | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.3.1** PWA Builder veya Bubblewrap ile TWA projesi oluştur
+- [ ] **6.3.2** Android manifest yapılandırması
+- [ ] **6.3.3** APK/AAB build alma
+- [ ] **6.3.4** Google Play Console hesabı oluştur ($25 tek seferlik)
+- [ ] **6.3.5** Store listing hazırlama (açıklama, ekran görüntüleri, icon)
+- [ ] **6.3.6** Play Store'a yükleme ve yayınlama
+- [ ] **6.3.7** Test ve inceleme süreci
 
 ### 6.4 iOS (App Store) - Capacitor Wrapper
-- [ ] **6.4.1** Capacitor kurulumu ve yapılandırması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.2** iOS platform ekleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.3** iOS native wrapper oluşturma | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.4** Xcode projesi yapılandırması | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.5** Apple Developer hesabı oluştur ($99/yıl) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.6** App Store Connect'te uygulama oluşturma | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.7** Store listing hazırlama (açıklama, ekran görüntüleri, icon) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.8** App Store'a yükleme ve yayınlama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.4.9** Test ve inceleme süreci | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.4.1** Capacitor kurulumu ve yapılandırması
+- [ ] **6.4.2** iOS platform ekleme
+- [ ] **6.4.3** iOS native wrapper oluşturma
+- [ ] **6.4.4** Xcode projesi yapılandırması
+- [ ] **6.4.5** Apple Developer hesabı oluştur ($99/yıl)
+- [ ] **6.4.6** App Store Connect'te uygulama oluşturma
+- [ ] **6.4.7** Store listing hazırlama (açıklama, ekran görüntüleri, icon)
+- [ ] **6.4.8** App Store'a yükleme ve yayınlama
+- [ ] **6.4.9** Test ve inceleme süreci
 
 ### 6.5 Test ve Optimizasyon
-- [ ] **6.5.1** PWA test (Lighthouse PWA audit) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.5.2** Android cihazlarda test (farklı ekran boyutları) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.5.3** iOS cihazlarda test (iPhone, iPad) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.5.4** Performance optimizasyonu (bundle size, loading time) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.5.5** Offline functionality test | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.5.6** Store'larda görünürlük ve kullanılabilirlik testi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.5.1** PWA test (Lighthouse PWA audit)
+- [ ] **6.5.2** Android cihazlarda test (farklı ekran boyutları)
+- [ ] **6.5.3** iOS cihazlarda test (iPhone, iPad)
+- [ ] **6.5.4** Performance optimizasyonu (bundle size, loading time)
+- [ ] **6.5.5** Offline functionality test
+- [ ] **6.5.6** Store'larda görünürlük ve kullanılabilirlik testi
 
 ### 6.6 Güncelleme ve Bakım
-- [ ] **6.6.1** OTA (Over-The-Air) güncelleme stratejisi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.6.2** Store güncelleme süreci dokümantasyonu | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.6.3** Kullanıcı geri bildirimi toplama sistemi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **6.6.4** Crash reporting (Sentry veya benzeri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **6.6.1** OTA (Over-The-Air) güncelleme stratejisi
+- [ ] **6.6.2** Store güncelleme süreci dokümantasyonu
+- [ ] **6.6.3** Kullanıcı geri bildirimi toplama sistemi
+- [ ] **6.6.4** Crash reporting (Sentry veya benzeri)
 
 **Not:** Bu faz web uygulaması tamamlandıktan ve production'da stabil çalıştıktan sonra başlatılacak. PWA yaklaşımı ile mevcut web kodunun %95'i kullanılabilir, sadece mobil optimizasyonlar ve store entegrasyonları eklenecek.
 
@@ -1714,48 +1714,48 @@ Mobile-first design with touch-friendly interactions.
 - **Açıklama:** Kitap oluşturma wizard'ındaki step'lerin mobil ve tablet görünümlerinde tek sayfaya sığacak şekilde optimize edilmesi gerekiyor.
 - **Maddeler:**
   1. **Step 1 - Mobil/Tablet Tek Sayfa Optimizasyonu:**
-     - [ ] Step 1 mobil ve tablet görünümde tek sayfaya sığacak şekilde düzenlenmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Name ve Age alanları yan yana olmalı (mobil/tablet) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Boy ve Girl seçenekleri yan yana olmalı (mobil/tablet) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Hair Color ve Eye Color alanları yan yana olmalı (mobil/tablet) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Special Features zaten 2'li grid'de, bu yeterli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Step 1 mobil ve tablet görünümde tek sayfaya sığacak şekilde düzenlenmeli
+     - [ ] Name ve Age alanları yan yana olmalı (mobil/tablet)
+     - [ ] Boy ve Girl seçenekleri yan yana olmalı (mobil/tablet)
+     - [ ] Hair Color ve Eye Color alanları yan yana olmalı (mobil/tablet)
+     - [ ] Special Features zaten 2'li grid'de, bu yeterli
      - **İlgili Dosya:** `app/create/step1/page.tsx`
      - **Durum:** ⏳ Bekliyor
   2. **Step 2 - Mobil/Tablet Tek Sayfa Optimizasyonu:**
-     - [ ] Step 2 mobil ve tablette tek sayfada görüntülenebilmeli (ilk hali - 1 karakter için) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Ek karakter eklenirse uzayabilir, ancak ilk hali tek sayfaya sığmalı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Step 2 mobil ve tablette tek sayfada görüntülenebilmeli (ilk hali - 1 karakter için)
+     - [ ] Ek karakter eklenirse uzayabilir, ancak ilk hali tek sayfaya sığmalı
      - **İlgili Dosya:** `app/create/step2/page.tsx`
      - **Durum:** ⏳ Bekliyor
   3. **Step 3 - Theme'ler 2'li Düzen:**
-     - [ ] Step 3 mobil görünümde aşağı doğru çok uzuyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Theme kartları 2'li olarak düzenlenmeli (mobil/tablet) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Step 3 mobil görünümde aşağı doğru çok uzuyor
+     - [ ] Theme kartları 2'li olarak düzenlenmeli (mobil/tablet)
      - **İlgili Dosya:** `app/create/step3/page.tsx`
      - **Durum:** ⏳ Bekliyor
   4. **Edit Alanları Veri Kaybı Kontrolü:**
-     - [ ] Tüm step'lerde (ara step'ler ve son step) edit alanları kontrol edilecek | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Edit diyince veri kaybı olup olmadığı test edilecek | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Hem Step 2'deki "Edit" butonu hem de Step 6'daki edit işlevleri test edilmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Tüm step'lerde (ara step'ler ve son step) edit alanları kontrol edilecek
+     - [ ] Edit diyince veri kaybı olup olmadığı test edilecek
+     - [ ] Hem Step 2'deki "Edit" butonu hem de Step 6'daki edit işlevleri test edilmeli
      - **İlgili Dosyalar:** `app/create/step2/page.tsx`, `app/create/step6/page.tsx`
      - **Durum:** ⏳ Bekliyor
   5. **Maliyet Takibi Sistemi:**
-     - [ ] 1 karakter için sayfa başı maliyet yaklaşık $0.12 (hikaye, karakter oluşturma ve görseller dahil) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Bu maliyeti takip edebileceğimiz bir yer oluşturulmalı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Dashboard'da veya admin panelinde maliyet takibi gösterilmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Her kitap oluşturma işleminde maliyet hesaplanmalı ve kaydedilmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] 1 karakter için sayfa başı maliyet yaklaşık $0.12 (hikaye, karakter oluşturma ve görseller dahil)
+     - [ ] Bu maliyeti takip edebileceğimiz bir yer oluşturulmalı
+     - [ ] Dashboard'da veya admin panelinde maliyet takibi gösterilmeli
+     - [ ] Her kitap oluşturma işleminde maliyet hesaplanmalı ve kaydedilmeli
      - **İlgili Dosyalar:** `app/api/books/route.ts`, `app/dashboard/page.tsx`
      - **Durum:** ⏳ Bekliyor
   6. **Custom Request Bilgilendirme Metni:**
-     - [ ] Step 5'te custom request alanına bilgilendirme metni eklenmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] "Tell us about any specific elements, characters, or scenarios you'd like to include in the story" yazısının devamına eklenecek | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Metin: "If left empty, AI will automatically create a story for you" gibi bir bilgi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Dikkat çekmesi için vurgulu gösterilmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Step 5'te custom request alanına bilgilendirme metni eklenmeli
+     - [ ] "Tell us about any specific elements, characters, or scenarios you'd like to include in the story" yazısının devamına eklenecek
+     - [ ] Metin: "If left empty, AI will automatically create a story for you" gibi bir bilgi
+     - [ ] Dikkat çekmesi için vurgulu gösterilmeli
      - **İlgili Dosya:** `app/create/step5/page.tsx`
      - **Durum:** ⏳ Bekliyor
   7. **Black Word Teması Karakter Formatı Sorunu:**
-     - [ ] Black word (block_world) temasında ortam doğru formatta ama karakter doğru formatta değil | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Karakter de block_world stiline uygun olmalı (Minecraft-like, pixelated, blocky) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Şu an ortam block_world ama karakter smooth/cartoon style görünüyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-     - [ ] Image generation prompt'larında karakter için block_world direktifleri güçlendirilmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+     - [ ] Black word (block_world) temasında ortam doğru formatta ama karakter doğru formatta değil
+     - [ ] Karakter de block_world stiline uygun olmalı (Minecraft-like, pixelated, blocky)
+     - [ ] Şu an ortam block_world ama karakter smooth/cartoon style görünüyor
+     - [ ] Image generation prompt'larında karakter için block_world direktifleri güçlendirilmeli
      - **İlgili Dosyalar:** `lib/prompts/image/v1.0.0/character.ts`, `lib/prompts/image/v1.0.0/style-descriptions.ts`
      - **Durum:** ⏳ Bekliyor
 - **Not:** Bu iyileştirmeler kullanıcı deneyimini önemli ölçüde artıracak, özellikle mobil kullanıcılar için wizard daha kullanışlı hale gelecek.
@@ -1848,11 +1848,11 @@ Mobile-first design with touch-friendly interactions.
     - Ellipsis gösterimi (çok sayfa varsa)
     - Test için 24 kitap mock data eklendi
 - **Gelecek İyileştirmeler:**
-  - [ ] **Before/After Toggle:** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek. Örnek kitaplar database'e eklendiğinde, her fotoğraf için originalPhoto ve transformedImage URL'leri kaydedilecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Swipe Navigation İyileştirmesi:** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir. Şu an arrow butonları var, touch gesture (sağa/sola kaydırma) geliştirilecek. `handleTouchStart` ve `handleTouchEnd` fonksiyonları mevcut ama daha smooth hale getirilebilir. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **"View Example" Route:** `/book/[id]` route'u oluşturulacak, örnek kitabı görüntüleme sayfası eklenecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **API Entegrasyonu:** Mock data yerine gerçek API çağrısı yapılacak, örnek kitaplar database'den çekilecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Gerçek Örnek Kitaplar:** Test için eklenen duplicate kitaplar yerine gerçek, farklı örnek kitaplar eklenecek. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+  - [ ] **Before/After Toggle:** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek. Örnek kitaplar database'e eklendiğinde, her fotoğraf için originalPhoto ve transformedImage URL'leri kaydedilecek.
+  - [ ] **Swipe Navigation İyileştirmesi:** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir. Şu an arrow butonları var, touch gesture (sağa/sola kaydırma) geliştirilecek. `handleTouchStart` ve `handleTouchEnd` fonksiyonları mevcut ama daha smooth hale getirilebilir.
+  - [ ] **"View Example" Route:** `/book/[id]` route'u oluşturulacak, örnek kitabı görüntüleme sayfası eklenecek.
+  - [ ] **API Entegrasyonu:** Mock data yerine gerçek API çağrısı yapılacak, örnek kitaplar database'den çekilecek.
+  - [ ] **Gerçek Örnek Kitaplar:** Test için eklenen duplicate kitaplar yerine gerçek, farklı örnek kitaplar eklenecek.
 - **İlgili Faz:** Faz 2.7.8
 - **Notlar:** 
   - Sayfa şu an mock data ile çalışıyor
@@ -1872,7 +1872,7 @@ Mobile-first design with touch-friendly interactions.
   - Görsel kalitesi optimize edilmeli
 
 ### Character Consistency (10 Ocak 2026)
-- [x] **GPT-image API Integration** - REST API ile `/v1/images/edits` endpoint ✅ (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **GPT-image API Integration** - REST API ile `/v1/images/edits` endpoint ✅ (15 Ocak 2026)
   - Kategori: MVP (Tamamlandı - Organization verification bekleniyor)
   - İlgili Faz: Faz 3 (AI Integration)
   - Notlar: 
@@ -1883,19 +1883,19 @@ Mobile-first design with touch-friendly interactions.
     - ⚠️ Organization verification gerekli (OpenAI organizasyon doğrulaması)
   - Dokümantasyon: `docs/strategies/CHARACTER_CONSISTENCY_IMPROVEMENT.md`
   - Status: API hazır, organization verification sonrası test edilecek
-- [ ] **Character Similarity Testing** - GPT-image API ile benzerlik değerlendirmesi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Character Similarity Testing** - GPT-image API ile benzerlik değerlendirmesi
   - Kategori: MVP
   - İlgili Faz: Faz 3
   - Notlar: Model karşılaştırması (1.5 vs 1 vs mini), benzerlik skorlaması
-- [ ] **Character Analysis İyileştirme** - OpenAI Vision API'den daha detaylı bilgi almak (opsiyonel) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Character Analysis İyileştirme** - OpenAI Vision API'den daha detaylı bilgi almak (opsiyonel)
   - Kategori: Post-MVP
   - İlgili Faz: Faz 3+
   - Notlar: GPT-image yeterli olmazsa uygulama, yüz hatları detayı artırma
-- [ ] **Multi-Attempt Generation** - 3x cover üret, en iyisini seç | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Multi-Attempt Generation** - 3x cover üret, en iyisini seç
   - Kategori: Post-MVP
   - İlgili Faz: Faz 4
   - Notlar: Trade-off: 3x maliyet vs daha iyi sonuç
-- [ ] **Custom Model Training** - LoRA/DreamBooth per character (uzak gelecek) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Custom Model Training** - LoRA/DreamBooth per character (uzak gelecek)
   - Kategori: Gelecek
   - İlgili Faz: Faz 6+
   - Notlar: Training time 5-15 dk, GPU cost, storage per user
@@ -1926,13 +1926,13 @@ Mobile-first design with touch-friendly interactions.
   - Print-on-Demand özelliği MVP'ye dahil değil, gelecek fazlarda eklenecek
 
 ### Bekleyen Kararlar
-- [ ] Domain adı belirlenmedi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Fiyatlar netleştirilmedi (TL/USD) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Basılı kitap (Print-on-Demand) MVP'ye dahil mi? | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **AI Tool Seçimi:** Hikaye üretimi için hangi AI? (GPT-4o, Gemini, Groq, Claude) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **AI Tool Seçimi:** GPT-image API (gpt-image-1.5, gpt-image-1, gpt-image-1-mini) ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **UI Builder:** v0.app seçildi ✅ | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [x] **OpenAI Organization Verification:** GPT-image API için organization verification ✅ (10 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] Domain adı belirlenmedi
+- [ ] Fiyatlar netleştirilmedi (TL/USD)
+- [ ] Basılı kitap (Print-on-Demand) MVP'ye dahil mi?
+- [ ] **AI Tool Seçimi:** Hikaye üretimi için hangi AI? (GPT-4o, Gemini, Groq, Claude)
+- [x] **AI Tool Seçimi:** GPT-image API (gpt-image-1.5, gpt-image-1, gpt-image-1-mini) ✅
+- [x] **UI Builder:** v0.app seçildi ✅
+- [x] **OpenAI Organization Verification:** GPT-image API için organization verification ✅ (10 Ocak 2026)
   - **Tarih:** 10 Ocak 2026
   - **Durum:** ✅ Onaylandı (Individual verification tamamlandı)
   - **Kategori:** Faz 3.5 - AI Entegrasyonu
@@ -1942,7 +1942,7 @@ Mobile-first design with touch-friendly interactions.
   - **Aksiyon:** Test edildi, çalışıyor
 
 ### Dil Seçimi Özelliği (24 Ocak 2026)
-- [x] **Dil Seçimi Özelliği** - Hikaye oluşturma akışına dil seçimi eklendi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **Dil Seçimi Özelliği** - Hikaye oluşturma akışına dil seçimi eklendi
   - **Tarih:** 24 Ocak 2026
   - **Kategori:** MVP
   - **Öncelik:** 🔴 Kritik
@@ -1976,7 +1976,7 @@ Mobile-first design with touch-friendly interactions.
   - **Status:** ✅ Tamamlandı
 
 ### Karakter Yönetimi Sistemi (Character Library) (15 Ocak 2026)
-- [ ] **Karakter Yönetimi Sistemi** - Kullanıcıların birden fazla çocuğu için karakter profilleri oluşturması ve yönetmesi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Karakter Yönetimi Sistemi** - Kullanıcıların birden fazla çocuğu için karakter profilleri oluşturması ve yönetmesi
   - **Tarih:** 15 Ocak 2026
   - **Kategori:** MVP
   - **Öncelik:** 🟡 Önemli
@@ -2042,12 +2042,12 @@ Mobile-first design with touch-friendly interactions.
   - **Detaylı Plan:** `docs/strategies/CHARACTER_LIBRARY_STRATEGY.md` (oluşturulacak)
 
 ### Gelecek Özellikler (Post-MVP)
-- [ ] **Hakkımızda (About) Sayfası** - Şirket hikayesi, ekip bilgileri, misyon/vizyon | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Hakkımızda (About) Sayfası** - Şirket hikayesi, ekip bilgileri, misyon/vizyon
   - **Tarih:** 25 Ocak 2026
   - **Kategori:** Post-MVP / Backlog
   - **Durum:** ⏸️ Ertelendi - MVP için gerekli değil
   - **Not:** Header ve Footer'dan About linki kaldırıldı. Gelecekte ihtiyaç duyulduğunda eklenebilir.
-- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)**
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** MVP / Faz 2.4.2
   - **Özellikler:**
@@ -2056,11 +2056,11 @@ Mobile-first design with touch-friendly interactions.
     - Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
     - Ücretsiz özellik (MVP'de dahil)
   - **Detaylar:** Faz 2.4.2'ye bakın
-- [ ] Multi-karakter desteği genişletme (5 karaktere kadar) - Post-MVP | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Pet ve oyuncak karakterleri (genişletilmiş liste) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Görsel yeniden oluşturma (revize) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Sesli kitap (text-to-speech) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Video hikayeler / Çizgi film (23 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] Multi-karakter desteği genişletme (5 karaktere kadar) - Post-MVP
+- [ ] Pet ve oyuncak karakterleri (genişletilmiş liste)
+- [ ] Görsel yeniden oluşturma (revize)
+- [ ] Sesli kitap (text-to-speech)
+- [ ] Video hikayeler / Çizgi film (23 Ocak 2026)
   - Video ile çizgi film yapmak satış ve ARGE açısından iyi bir yere gidebilir
   - Hemen değil ama roadmap'te kesinlikle olmalı
   - Kişiye özel çizgi film
@@ -2068,14 +2068,14 @@ Mobile-first design with touch-friendly interactions.
   - Araştırılması lazım
   - **Kategori:** Gelecek / ARGE
   - **Not:** Şu an için sadece fikir aşamasında, teknoloji ve maliyet analizi gerekli
-- [x] Mobil uygulama - ✅ **Faz 6'ya taşındı** (PWA yaklaşımı ile) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Abonelik modeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Referral programı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] Blog sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Kullanıcı review sayfası** – Kullanıcı yorumları ve puanları (10,000+ mutlu aile, 4.9/5 vb.) için ayrı sayfa. Anasayfadaki Trust Indicators bölümü kaldırıldı; review içeriği bu sayfada toplanacak. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] Mobil uygulama - ✅ **Faz 6'ya taşındı** (PWA yaklaşımı ile)
+- [ ] Abonelik modeli
+- [ ] Referral programı
+- [ ] Blog sayfası
+- [ ] **Kullanıcı review sayfası** – Kullanıcı yorumları ve puanları (10,000+ mutlu aile, 4.9/5 vb.) için ayrı sayfa. Anasayfadaki Trust Indicators bölümü kaldırıldı; review içeriği bu sayfada toplanacak.
   - **Kategori:** Post-MVP / Gelecek Özellikler
   - **Not:** Anasayfa UI iyileştirmeleri kapsamında Trust Indicators kaldırıldı (Şubat 2026).
-- [ ] **B2B (Business-to-Business) Özelliği** - Kreşler, özel okullar gibi şirketler için toplu kitap oluşturma sistemi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **B2B (Business-to-Business) Özelliği** - Kreşler, özel okullar gibi şirketler için toplu kitap oluşturma sistemi
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** Post-MVP / Gelecek Özellikler
   - **Detaylı Analiz:** `docs/strategies/B2B_FEATURE_ANALYSIS.md`
@@ -2088,7 +2088,7 @@ Mobile-first design with touch-friendly interactions.
     - Şirket dashboard'u (oluşturulan kitapları görüntüleme)
 
 ### Yasal ve Uyumluluk (Production Sonrası)
-- [ ] **ETBİS Kayıt İşlemi** - ETBİS sistemine kayıt olunması gerekiyor | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **ETBİS Kayıt İşlemi** - ETBİS sistemine kayıt olunması gerekiyor
   - **Tarih:** 24 Ocak 2026
   - **Kategori:** Post-MVP / Production Sonrası
   - **Öncelik:** 🔴 Kritik (Production sonrası)
@@ -2103,7 +2103,7 @@ Mobile-first design with touch-friendly interactions.
 ### Referans Siteden (magicalchildrensbook.com) Eksik Özellikler
 
 #### MVP'ye Eklenmeli (Önemli)
-- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye eklendi (4 Ocak 2026)** | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye eklendi (4 Ocak 2026)**
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** MVP / Faz 2.4.2
   - **Açıklama:** Hikaye oluştururken 3 karaktere kadar eklenebilmeli (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi)
@@ -2114,32 +2114,32 @@ Mobile-first design with touch-friendly interactions.
     - Ücretsiz özellik
   - **UI Yaklaşımı:** v0.app ile yeni component çizdirmek önerilir (daha temiz UX)
   - **Detaylar:** Faz 2.4.2'ye bakın
-- [ ] **Cookie Banner** - GDPR/KVKK uyumluluk için cookie onayı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Ülke/Para Birimi Seçici** - Header'da ülke ve para birimi değiştirme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Sepet İkonu** - Header'da sepet göstergesi (shopping bag) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **10+ Yaş Kategorisi** - Şu an sadece 0-2, 3-5, 6-9 var, 10+ eklenmeli | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Kampanya Banner'ları** - "Free shipping when you buy 2+ books", "50% off 3rd book" gibi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **"View Example" Butonları** - Örnek kitapları görüntüleme butonları | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **"Used Photos" Gösterimi** - Örneklerde hangi fotoğrafların kullanıldığını gösterme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Cookie Banner** - GDPR/KVKK uyumluluk için cookie onayı
+- [ ] **Ülke/Para Birimi Seçici** - Header'da ülke ve para birimi değiştirme
+- [ ] **Sepet İkonu** - Header'da sepet göstergesi (shopping bag)
+- [ ] **10+ Yaş Kategorisi** - Şu an sadece 0-2, 3-5, 6-9 var, 10+ eklenmeli
+- [ ] **Kampanya Banner'ları** - "Free shipping when you buy 2+ books", "50% off 3rd book" gibi
+- [ ] **"View Example" Butonları** - Örnek kitapları görüntüleme butonları
+- [ ] **"Used Photos" Gösterimi** - Örneklerde hangi fotoğrafların kullanıldığını gösterme
   - **Karar (4 Ocak 2026):** Örnek Kitaplar Carousel (2.2.3) içinde gösterilecek - Her kitap kartında kullanılan fotoğraf (solda) → Kitap kapağı (sağda) şeklinde before/after gösterimi
-- [ ] **Tema Kartları Görsel Gösterimi** - Her tema için görsel thumbnail | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **"View All Examples" Linki** - Tüm örnekleri görüntüleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **"View All Themes" Linki** - Tüm temaları görüntüleme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **"Show More Reviews" Butonu** - Reviews bölümünde daha fazla göster | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Tema Kartları Görsel Gösterimi** - Her tema için görsel thumbnail
+- [ ] **"View All Examples" Linki** - Tüm örnekleri görüntüleme
+- [ ] **"View All Themes" Linki** - Tüm temaları görüntüleme
+- [ ] **"Show More Reviews" Butonu** - Reviews bölümünde daha fazla göster
 
 #### Post-MVP (Gelecekte)
-- [ ] **Localization (i18n) Sistemi** - Çoklu dil desteği (TR, EN ve gelecekte 25+ dil) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Dil seçici component (header'da) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Tüm UI metinlerinin çevirisi | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Dinamik dil değiştirme | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] URL-based dil routing (/tr/, /en/, vb.) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] Cookie/localStorage ile dil tercihi saklama | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-  - [ ] **Localization Agent (23 Ocak 2026):** Bu işten sorumlu bir agent olmalı. Tüm düzeni bilir ve bu işleri hep onunla yaparız. Tüm localization işleri bu agent üzerinden yönetilmeli. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Localization (i18n) Sistemi** - Çoklu dil desteği (TR, EN ve gelecekte 25+ dil)
+  - [ ] Dil seçici component (header'da)
+  - [ ] Tüm UI metinlerinin çevirisi
+  - [ ] Dinamik dil değiştirme
+  - [ ] URL-based dil routing (/tr/, /en/, vb.)
+  - [ ] Cookie/localStorage ile dil tercihi saklama
+  - [ ] **Localization Agent (23 Ocak 2026):** Bu işten sorumlu bir agent olmalı. Tüm düzeni bilir ve bu işleri hep onunla yaparız. Tüm localization işleri bu agent üzerinden yönetilmeli.
   - **Not:** Şu an tüm UI EN olarak geliştiriliyor, localization Faz 5 veya Post-MVP'de eklenecek
-- [ ] **Çoklu Para Birimi** - USD, EUR, GBP, TRY, vb. otomatik dönüşüm | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb. | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-- [ ] **Reviews/Testimonials Sayfası** - Detaylı kullanıcı yorumları sayfası | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+- [ ] **Çoklu Para Birimi** - USD, EUR, GBP, TRY, vb. otomatik dönüşüm
+- [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı
+- [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb.
+- [ ] **Reviews/Testimonials Sayfası** - Detaylı kullanıcı yorumları sayfası
 
 ### Keyboard Shortcuts (E-book Viewer)
 
@@ -2302,12 +2302,12 @@ Mobile-first design with touch-friendly interactions.
   - **Typography (Faz 2.1.3):** Çocuk dostu fontlar (Fredoka, Quicksand) eklenmesi ertelendi. Şu an Inter kullanılıyor, yeterli. Faz 2.2 sonrası tekrar ele alınacak.
   - **Loading States ve Error Boundaries (Faz 2.1.4):** Global loading states ve error boundary component'leri ertelendi. Faz 2.2 (Ana Sayfa) tamamlandıktan sonra eklenmesi planlanıyor. Neden: Ana içerik geliştirmesi öncelikli, loading/error handling sonra optimize edilebilir.
   - **Geçiş Planı:**
-    - [ ] AWS S3 bucket oluştur | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] IAM policy ayarla | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Upload utility'leri S3'e migrate et | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Mevcut dosyaları S3'e taşı | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Supabase Storage kodlarını S3'e çevir | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] URL'ler Supabase DB'de kalır (S3 URL'leri) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [ ] AWS S3 bucket oluştur
+    - [ ] IAM policy ayarla
+    - [ ] Upload utility'leri S3'e migrate et
+    - [ ] Mevcut dosyaları S3'e taşı
+    - [ ] Supabase Storage kodlarını S3'e çevir
+    - [ ] URL'ler Supabase DB'de kalır (S3 URL'leri)
   - **Tahmini Süre:** 1-2 hafta (geçiş zamanı geldiğinde)
   - **Not:** Hibrit yaklaşım - Supabase (DB) + AWS S3 (Storage)
 - **Authentication Issues & Workarounds (10 Ocak 2026):**
@@ -2351,14 +2351,14 @@ Mobile-first design with touch-friendly interactions.
     - ✅ Her dil için özel prompt'lar (`lib/prompts/tts/v1.0.0/`)
     - ✅ Dil mapping sistemi (PRD kodu → Gemini TTS kodu)
   - **TTS Gelişmiş Özellikler (Gelecek):**
-    - [ ] **TTS Cache Temizleme (Hikaye Değişikliğinde):** Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur - ⏳ Planlanıyor (15 Ocak 2026) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [ ] **TTS Cache Temizleme (Hikaye Değişikliğinde):** Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur - ⏳ Planlanıyor (15 Ocak 2026)
       - **Sorun:** Hikaye metni düzenlendiğinde eski cache'den yanlış ses çalıyor
       - **Çözüm:** Hikaye güncellendiğinde ilgili sayfaların cache hash'lerini hesapla, eski dosyaları Supabase Storage'dan sil
       - **Implementasyon:** Book edit API'sinde veya sayfa metni değiştiğinde cache temizleme fonksiyonu çağır
-    - [ ] Otomatik Dil Algılama: Localization altyapısı ile birlikte (Faz 5) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Yaş Grubuna Göre Özelleştirme: 3-5 yaş (yavaş), 6-8 yaş (normal), 9-12 yaş (hızlı) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Modlar: Uyku modu (yavaş), Neşeli mod (enerjik), Samimi mod (sıcak) | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
-    - [ ] Alternatif Gemini Pro Sesler: 30 ses mevcut, eklenebilir | Priority: [ ] 🔴 DO [ ] 🟡 PLAN [ ] 🟠 DELEGATE [ ] ⚪ ELIMINATE
+    - [ ] Otomatik Dil Algılama: Localization altyapısı ile birlikte (Faz 5)
+    - [ ] Yaş Grubuna Göre Özelleştirme: 3-5 yaş (yavaş), 6-8 yaş (normal), 9-12 yaş (hızlı)
+    - [ ] Modlar: Uyku modu (yavaş), Neşeli mod (enerjik), Samimi mod (sıcak)
+    - [ ] Alternatif Gemini Pro Sesler: 30 ses mevcut, eklenebilir
     - **Strateji Dokümanı:** `docs/strategies/TTS_STRATEGY.md` (v2.0 - 15 Ocak 2026)
 
 ### v0.app vs bolt.new Karşılaştırması
