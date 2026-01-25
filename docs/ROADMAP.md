@@ -1325,6 +1325,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
   - Ebook alabilir ama baskı alamaz - satın alma sırasında bu bilgi verilmeli
   - Checkout sayfasında ülke kontrolü ve bilgilendirme mesajı
+  - **UI Bilgilendirmesi (26 Ocak 2026):**
+    - Pricing sayfasında hardcopy kartında "Currently available only in Turkey" bilgisi gösterilmeli
+    - Hardcopy butonları (My Library, Sepet, vb.) TR dışı kullanıcılar için disabled olmalı veya bilgilendirme mesajı gösterilmeli
+    - "Hardcopy is currently only available in Turkey. We're working on expanding to more countries soon!" gibi bir mesaj eklenmeli
+    - Diğer ülkelerde zamanla hardcopy desteği eklenecek, bu bilgi UI'da belirtilmeli
 
 ---
 
@@ -2096,6 +2101,52 @@ Mobile-first design with touch-friendly interactions.
   - Görsel referans: Ekte paylaşılan tasarım örneği
   - Print-on-Demand özelliği MVP'ye dahil değil, gelecek fazlarda eklenecek
 
+### Ülkeye Göre Pricing Sistemi (26 Ocak 2026)
+- **Kategori:** İş Mantığı / E-ticaret / Pricing
+- **Öncelik:** 🟡 Önemli
+- **Tarih:** 26 Ocak 2026
+- **Açıklama:** Her ülke için farklı fiyatlandırma stratejisi hazırlanmalı. Ülkeye göre fiyatlar, vergiler, kargo maliyetleri ve yerel ödeme yöntemleri dikkate alınmalı.
+- **Gereksinimler:**
+  - [ ] Ülkeye göre fiyat matrisi oluşturulmalı (USD, EUR, GBP, TRY, vb.)
+  - [ ] Her ülke için yerel para birimi desteği
+  - [ ] Ülkeye göre vergi hesaplama (VAT, KDV, Sales Tax, vb.)
+  - [ ] Kargo maliyetlerinin ülkeye göre hesaplanması (hardcopy için)
+  - [ ] Yerel ödeme yöntemleri entegrasyonu (Stripe, İyzico, vb.)
+  - [ ] Currency conversion API entegrasyonu (gerçek zamanlı döviz kurları)
+  - [ ] Pricing sayfasında ülkeye göre dinamik fiyat gösterimi
+  - [ ] Checkout sayfasında ülkeye göre vergi ve kargo hesaplama
+- **İlgili Fazlar:** Faz 4 (E-ticaret ve Ödeme), Faz 5 (Polish ve Lansman)
+- **İlgili Dosyalar:**
+  - `lib/currency.ts` - Currency detection sistemi (mevcut)
+  - `app/pricing/page.tsx` - Pricing sayfası (mevcut)
+  - `app/api/currency/route.ts` - Currency API (mevcut)
+  - Yeni: `lib/pricing/` - Ülkeye göre pricing hesaplama modülü (oluşturulacak)
+- **Not:** Currency detection sistemi zaten mevcut (IP-based geolocation). Bu sistem üzerine ülkeye göre fiyatlandırma mantığı eklenecek.
+
+### Hardcopy Ülke Kısıtlaması ve UI Bilgilendirmesi (26 Ocak 2026)
+- **Kategori:** UI/UX Fikirleri / Hardcopy / E-ticaret
+- **Öncelik:** 🟡 Önemli
+- **Tarih:** 26 Ocak 2026
+- **Açıklama:** Hardcopy şu an için sadece Türkiye'de mevcut. Diğer ülkelerde zamanla eklenecek. Bu bilgi kullanıcılara açıkça gösterilmeli.
+- **UI Gereksinimleri:**
+  - [ ] Pricing sayfasında hardcopy kartında "Currently available only in Turkey" bilgisi gösterilmeli
+  - [ ] Hardcopy butonları (My Library, Sepet, vb.) TR dışı kullanıcılar için disabled olmalı veya bilgilendirme mesajı gösterilmeli
+  - [ ] "Hardcopy is currently only available in Turkey. We're working on expanding to more countries soon!" gibi bir mesaj eklenmeli
+  - [ ] Checkout sayfasında ülke kontrolü: TR dışı ülkelerden hardcopy siparişi verilemez
+  - [ ] Sepet sayfasında hardcopy item'ları için ülke kontrolü ve bilgilendirme
+  - [ ] My Library'de hardcopy butonları için ülke kontrolü
+- **Gelecek Planlama:**
+  - Diğer ülkelerde zamanla hardcopy desteği eklenecek
+  - Her yeni ülke eklendiğinde UI'da bu bilgi güncellenecek
+  - Ülke bazlı hardcopy durumu database'de tutulabilir (availability table)
+- **İlgili Fazlar:** Faz 4.4.6 (Hardcopy sadece TR), Faz 5 (Polish)
+- **İlgili Dosyalar:**
+  - `app/pricing/page.tsx` - Pricing sayfası
+  - `app/dashboard/page.tsx` - My Library hardcopy butonları
+  - `app/cart/page.tsx` - Sepet sayfası
+  - `app/checkout/page.tsx` - Checkout sayfası
+- **Not:** Bu özellik kullanıcı deneyimini iyileştirecek ve yanlış sipariş vermeyi önleyecek.
+
 ### Bekleyen Kararlar
 - [ ] Domain adı belirlenmedi
 - [ ] Fiyatlar netleştirilmedi (TL/USD)
@@ -2307,6 +2358,21 @@ Mobile-first design with touch-friendly interactions.
   - [ ] Cookie/localStorage ile dil tercihi saklama
   - [ ] **Localization Agent (23 Ocak 2026):** Bu işten sorumlu bir agent olmalı. Tüm düzeni bilir ve bu işleri hep onunla yaparız. Tüm localization işleri bu agent üzerinden yönetilmeli.
   - **Not:** Şu an tüm UI EN olarak geliştiriliyor, localization Faz 5 veya Post-MVP'de eklenecek
+  - **Sektör Standartları ve URL Yapısı (26 Ocak 2026):**
+    - **Önerilen Yapı: Subdirectory (Alt Dizin)** - `kidstorybook.com/tr/`, `kidstorybook.com/en/`, `kidstorybook.com/de/`
+    - **Neden Subdirectory?**
+      - SEO equity tek domain'de toplanır (daha iyi SEO performansı)
+      - Daha düşük maliyet (tek SSL sertifikası, birleşik hosting)
+      - Daha basit analytics ve implementasyon
+      - Shopify, Stripe, Notion gibi büyük şirketler bu yöntemi kullanıyor
+    - **Alternatifler (Önerilmez):**
+      - Subdomain (`tr.kidstorybook.com`): SEO'yu böler, daha karmaşık analytics
+      - ccTLD (`kidstorybook.tr`, `kidstorybook.de`): En pahalı, ayrı hosting ve SSL gerektirir
+    - **Implementasyon:**
+      - Next.js 14 App Router ile `app/[locale]/` yapısı kullanılabilir
+      - `next-intl` veya `next-i18next` gibi kütüphaneler kullanılabilir
+      - Otomatik dil algılama: IP-based geolocation veya browser language
+      - Default dil: İngilizce (EN), fallback mekanizması
 - [ ] **Çoklu Para Birimi** - USD, EUR, GBP, TRY, vb. otomatik dönüşüm
 - [ ] **26 Ülkeye Kargo** - Basılı kitap için geniş kargo ağı
 - [ ] **Erişilebilirlik Özellikleri** - Screen reader, keyboard navigation, vb.
