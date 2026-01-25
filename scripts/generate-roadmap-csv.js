@@ -148,19 +148,18 @@ function parseRoadmap() {
       let cleanTitle = titleParts[0].trim();
       let notes = titleParts[1] ? titleParts[1].trim() : '';
       
-      // Priority bilgisini satırdan çıkar (eğer varsa)
-      // Priority: [x] 🔴 DO formatını ara
+      // Eisenhower kategorisini satırdan çıkar (format: | 🔴 DO, | 🟡 PLAN, | 🟠 DELEGATE, | ⚪ ELIMINATE)
       let priority = '';
-      const priorityMatch = line.match(/Priority:\s*\[x\]\s*(🔴\s*DO|🟡\s*PLAN|🟠\s*DELEGATE|⚪\s*ELIMINATE)/);
-      if (priorityMatch) {
-        if (priorityMatch[1].includes('DO')) priority = 'DO';
-        else if (priorityMatch[1].includes('PLAN')) priority = 'PLAN';
-        else if (priorityMatch[1].includes('DELEGATE')) priority = 'DELEGATE';
-        else if (priorityMatch[1].includes('ELIMINATE')) priority = 'ELIMINATE';
+      const eisenhowerMatch = line.match(/\|\s*(🔴\s*DO|🟡\s*PLAN|🟠\s*DELEGATE|⚪\s*ELIMINATE)/);
+      if (eisenhowerMatch) {
+        if (eisenhowerMatch[1].includes('DO')) priority = 'DO';
+        else if (eisenhowerMatch[1].includes('PLAN')) priority = 'PLAN';
+        else if (eisenhowerMatch[1].includes('DELEGATE')) priority = 'DELEGATE';
+        else if (eisenhowerMatch[1].includes('ELIMINATE')) priority = 'ELIMINATE';
       }
       
-      // Başlıktan Priority kısmını temizle (eğer varsa)
-      cleanTitle = cleanTitle.replace(/\s*\|\s*Priority:.*$/, '').trim();
+      // Başlıktan Eisenhower kısmını temizle (eğer varsa)
+      cleanTitle = cleanTitle.replace(/\s*\|\s*(🔴|🟡|🟠|⚪)\s*(DO|PLAN|DELEGATE|ELIMINATE).*$/, '').trim();
       
       // Mevcut task'ı bul ve güncelle
       const existingTask = tasks.find(t => t.id === id);

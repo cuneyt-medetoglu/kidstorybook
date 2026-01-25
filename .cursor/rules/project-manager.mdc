@@ -87,7 +87,45 @@ Kullanıcı prompt değişikliği yaptığında veya yeni version oluşturulduğ
 - Her changelog entry → dokümantasyon güncellemesi gerektirir
 - Kod ve dokümantasyon version'ları her zaman sync olmalı
 
-### 7. CSV Yönetimi ve Google Sheets Entegrasyonu
+### 7. Eisenhower Matrisi Yönetimi
+ROADMAP.md'deki görevleri aciliyet ve önemine göre kategorize etme:
+
+**Format:**
+- ROADMAP.md'de her görevin sonuna Eisenhower kategorisi eklenir
+- Format: `| 🔴 DO`, `| 🟡 PLAN`, `| 🟠 DELEGATE`, `| ⚪ ELIMINATE`
+- Örnek: `- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon) | 🔴 DO`
+
+**Kategoriler:**
+- **🔴 DO (Acil ve Önemli):** Hemen yapılmalı
+- **🟡 PLAN (Acil Değil ama Önemli):** Planlanmalı
+- **🟠 DELEGATE (Acil ama Önemli Değil):** Devredilmeli
+- **⚪ ELIMINATE (Acil Değil ve Önemli Değil):** Elimine edilmeli
+
+**Görevler:**
+1. **Eisenhower Kategorisi Ekleme:**
+   - Kullanıcı "X işi DO yap" dediğinde → ROADMAP.md'de ilgili satırı bul
+   - Satırın sonuna `| 🔴 DO` ekle (eğer zaten varsa değiştir)
+   - Diğer kategoriler için: `| 🟡 PLAN`, `| 🟠 DELEGATE`, `| ⚪ ELIMINATE`
+   - Format: `- [ ] [ID Başlık](#link) | 🔴 DO`
+
+2. **CSV Senkronizasyonu:**
+   - `npm run roadmap` çalıştırıldığında script otomatik olarak Eisenhower kategorilerini CSV'ye aktarır
+   - CSV'de `Priority` kolonunda: `DO`, `PLAN`, `DELEGATE`, `ELIMINATE` değerleri görünür
+   - HTML viewer'da Eisenhower kolonunda badge olarak gösterilir
+
+3. **Kullanım Senaryoları:**
+   - Kullanıcı "2.1.3 DO yap" dediğinde → ROADMAP.md'de `- [ ] [2.1.3 ...](#...) | 🔴 DO` formatına güncelle
+   - Kullanıcı "X işi PLAN yap" dediğinde → `| 🟡 PLAN` ekle
+   - Kullanıcı "Y işi DELEGATE yap" dediğinde → `| 🟠 DELEGATE` ekle
+   - Kullanıcı "Z işi ELIMINATE yap" dediğinde → `| ⚪ ELIMINATE` ekle
+
+**Önemli Kurallar:**
+- ROADMAP.md ana kaynaktır, CSV otomatik oluşturulur
+- Eisenhower kategorisi ROADMAP.md'de görünür olmalı
+- Script ROADMAP.md'den okuyup CSV'ye aktarır
+- HTML viewer CSV'den okuyup gösterir
+
+### 8. CSV Yönetimi ve Google Sheets Entegrasyonu
 ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:
 
 **Dosyalar:**
@@ -101,7 +139,7 @@ ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:
    - ROADMAP.md değiştiğinde CSV'yi güncelle
    - Script çalıştır: `npm run roadmap` (veya `node scripts/generate-roadmap-csv.js`)
    - CSV sadece `docs/` klasörüne yazılır (güvenlik için `public/` klasöründe değil)
-   - CSV'deki kolonlar: ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Notlar, Tarih, Link
+   - CSV'deki kolonlar: ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Priority (Eisenhower), Notlar, Tarih, Link
    - ID kolonunun başında tab karakteri var (Excel/Google Sheets'te tarih olarak algılanmaması için)
 
 2. **Draft Fikirler:**
@@ -181,6 +219,10 @@ Kullanıcı şunları diyebilir:
 - "Bugün ne yapmalıyım?" → Günlük plan öner
 - "CSV'yi güncelle" → CSV oluşturma script'ini çalıştır
 - "Google Sheets'te filtreleme nasıl?" → CSV README'den örnekler ver
+- "X işi DO yap" → ROADMAP.md'de ilgili satırın sonuna `| 🔴 DO` ekle
+- "Y işi PLAN yap" → ROADMAP.md'de ilgili satırın sonuna `| 🟡 PLAN` ekle
+- "Z işi DELEGATE yap" → ROADMAP.md'de ilgili satırın sonuna `| 🟠 DELEGATE` ekle
+- "W işi ELIMINATE yap" → ROADMAP.md'de ilgili satırın sonuna `| ⚪ ELIMINATE` ekle
 
 ---
 

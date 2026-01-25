@@ -44,7 +44,7 @@
 ### Faz 2: Frontend Geliştirme ✅
 - [x] [2.1.1 Ana layout component](#21-layout-ve-navigasyon)
 - [x] [2.1.2 Responsive tasarım](#21-layout-ve-navigasyon)
-- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon)
+- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon) | 🔴 DO
 - [ ] [2.1.4 Loading states](#21-layout-ve-navigasyon)
 - [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon)
 - [x] [2.1.6 Sepet ikonu](#21-layout-ve-navigasyon)
@@ -398,7 +398,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 2.1 Layout ve Navigasyon
 - [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
 - [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut)
-- [ ] **2.1.3** Tema sistemi (renk paleti, typography)
+- [ ] **2.1.3** Tema sistemi (renk paleti, typography) | 🔴 DO
   - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
   - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
   - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor)
@@ -408,7 +408,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
-- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)
+- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026) | 🔴 DO
   - Genel olarak sitenin renkler ve teması ile ilgili dark ve light için gözden geçirmeliyiz
   - Şu anki kullanılan renkler AI ile site yapanların hepsindeki gibi mor renk ağırlıklı
   - Daha çocuklara uyan bir şeye dönmeliyiz
