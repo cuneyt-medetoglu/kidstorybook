@@ -1707,6 +1707,59 @@ Mobile-first design with touch-friendly interactions.
 
 ## 📝 Notlar ve Fikirler
 
+### Mobil/Tablet Wizard Step İyileştirmeleri (25 Ocak 2026)
+- **Kategori:** UI/UX İyileştirmeleri / Responsive Design
+- **Öncelik:** 🟡 Önemli
+- **Tarih:** 25 Ocak 2026
+- **Açıklama:** Kitap oluşturma wizard'ındaki step'lerin mobil ve tablet görünümlerinde tek sayfaya sığacak şekilde optimize edilmesi gerekiyor.
+- **Maddeler:**
+  1. **Step 1 - Mobil/Tablet Tek Sayfa Optimizasyonu:**
+     - [ ] Step 1 mobil ve tablet görünümde tek sayfaya sığacak şekilde düzenlenmeli
+     - [ ] Name ve Age alanları yan yana olmalı (mobil/tablet)
+     - [ ] Boy ve Girl seçenekleri yan yana olmalı (mobil/tablet)
+     - [ ] Hair Color ve Eye Color alanları yan yana olmalı (mobil/tablet)
+     - [ ] Special Features zaten 2'li grid'de, bu yeterli
+     - **İlgili Dosya:** `app/create/step1/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  2. **Step 2 - Mobil/Tablet Tek Sayfa Optimizasyonu:**
+     - [ ] Step 2 mobil ve tablette tek sayfada görüntülenebilmeli (ilk hali - 1 karakter için)
+     - [ ] Ek karakter eklenirse uzayabilir, ancak ilk hali tek sayfaya sığmalı
+     - **İlgili Dosya:** `app/create/step2/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  3. **Step 3 - Theme'ler 2'li Düzen:**
+     - [ ] Step 3 mobil görünümde aşağı doğru çok uzuyor
+     - [ ] Theme kartları 2'li olarak düzenlenmeli (mobil/tablet)
+     - **İlgili Dosya:** `app/create/step3/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  4. **Edit Alanları Veri Kaybı Kontrolü:**
+     - [ ] Tüm step'lerde (ara step'ler ve son step) edit alanları kontrol edilecek
+     - [ ] Edit diyince veri kaybı olup olmadığı test edilecek
+     - [ ] Hem Step 2'deki "Edit" butonu hem de Step 6'daki edit işlevleri test edilmeli
+     - **İlgili Dosyalar:** `app/create/step2/page.tsx`, `app/create/step6/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  5. **Maliyet Takibi Sistemi:**
+     - [ ] 1 karakter için sayfa başı maliyet yaklaşık $0.12 (hikaye, karakter oluşturma ve görseller dahil)
+     - [ ] Bu maliyeti takip edebileceğimiz bir yer oluşturulmalı
+     - [ ] Dashboard'da veya admin panelinde maliyet takibi gösterilmeli
+     - [ ] Her kitap oluşturma işleminde maliyet hesaplanmalı ve kaydedilmeli
+     - **İlgili Dosyalar:** `app/api/books/route.ts`, `app/dashboard/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  6. **Custom Request Bilgilendirme Metni:**
+     - [ ] Step 5'te custom request alanına bilgilendirme metni eklenmeli
+     - [ ] "Tell us about any specific elements, characters, or scenarios you'd like to include in the story" yazısının devamına eklenecek
+     - [ ] Metin: "If left empty, AI will automatically create a story for you" gibi bir bilgi
+     - [ ] Dikkat çekmesi için vurgulu gösterilmeli
+     - **İlgili Dosya:** `app/create/step5/page.tsx`
+     - **Durum:** ⏳ Bekliyor
+  7. **Black Word Teması Karakter Formatı Sorunu:**
+     - [ ] Black word (block_world) temasında ortam doğru formatta ama karakter doğru formatta değil
+     - [ ] Karakter de block_world stiline uygun olmalı (Minecraft-like, pixelated, blocky)
+     - [ ] Şu an ortam block_world ama karakter smooth/cartoon style görünüyor
+     - [ ] Image generation prompt'larında karakter için block_world direktifleri güçlendirilmeli
+     - **İlgili Dosyalar:** `lib/prompts/image/v1.0.0/character.ts`, `lib/prompts/image/v1.0.0/style-descriptions.ts`
+     - **Durum:** ⏳ Bekliyor
+- **Not:** Bu iyileştirmeler kullanıcı deneyimini önemli ölçüde artıracak, özellikle mobil kullanıcılar için wizard daha kullanışlı hale gelecek.
+
 ### Pazarlama ve Satış Stratejisi (23 Ocak 2026)
 - **Kategori:** Pazarlama / Marketing
 - **Öncelik:** 🟡 Önemli
