@@ -44,7 +44,7 @@
 ### Faz 2: Frontend Geliştirme ✅
 - [x] [2.1.1 Ana layout component](#21-layout-ve-navigasyon)
 - [x] [2.1.2 Responsive tasarım](#21-layout-ve-navigasyon)
-- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon) | 🔴 DO
+- [ ] [2.1.3 Tema sistemi](#21-layout-ve-navigasyon)
 - [ ] [2.1.4 Loading states](#21-layout-ve-navigasyon)
 - [x] [2.1.5 Ülke/para birimi seçici](#21-layout-ve-navigasyon)
 - [x] [2.1.6 Sepet ikonu](#21-layout-ve-navigasyon)
@@ -89,8 +89,9 @@
 - [x] [2.6.5 Profil ayarları](#26-kullanıcı-dashboard)
 - [x] [2.6.6 Ücretsiz kapak hakkı göstergesi](#26-kullanıcı-dashboard)
 - [ ] [2.6.7 Characters tab](#26-kullanıcı-dashboard)
+- [ ] [2.6.8 Sipariş Yönetimi (Kullanıcı)](#26-kullanıcı-dashboard)
 - [ ] [2.7.1 Özellikler sayfası](#27-statik-sayfalar)
-- [ ] [2.7.2 Fiyatlandırma sayfası](#27-statik-sayfalar)
+- [ ] [2.7.2 Fiyatlandırma sayfası](#27-statik-sayfalar) | 🔴 DO
 - [ ] [2.7.4 İletişim sayfası](#27-statik-sayfalar)
 - [ ] [2.7.5 Gizlilik Politikası](#27-statik-sayfalar)
 - [ ] [2.7.6 Kullanım Şartları](#27-statik-sayfalar)
@@ -171,9 +172,12 @@
 - [ ] [4.2.7 Test modu](#42-iyzico-entegrasyonu-türkiye)
 - [ ] [4.3.1 Checkout sayfası](#43-sipariş-yönetimi)
 - [ ] [4.3.2 Sipariş özeti component](#43-sipariş-yönetimi)
-- [ ] [4.3.3 Ödeme başarılı sayfası](#43-sipariş-yönetimi)
-- [ ] [4.3.4 Sipariş durumu takibi](#43-sipariş-yönetimi)
-- [ ] [4.3.5 Email bildirimleri](#43-sipariş-yönetimi)
+- [ ] [4.3.3 Sepet Sistemi](#43-sipariş-yönetimi) | 🔴 DO
+- [ ] [4.3.4 Ödeme başarılı sayfası](#43-sipariş-yönetimi)
+- [ ] [4.3.5 Sipariş durumu takibi](#43-sipariş-yönetimi)
+- [ ] [4.3.6 Email bildirimleri](#43-sipariş-yönetimi)
+- [ ] [4.3.7 Sipariş API'leri (Backend)](#43-sipariş-yönetimi)
+- [ ] [4.3.8 Kullanıcı API'leri (Backend - Admin)](#43-sipariş-yönetimi)
 - [ ] [4.4.1 Sayfa sayısına göre fiyatlandırma](#44-fiyatlandırma-sistemi)
 - [ ] [4.4.2 E-book vs Basılı kitap fiyatları](#44-fiyatlandırma-sistemi)
 - [ ] [4.4.3 İndirim kodu sistemi](#44-fiyatlandırma-sistemi)
@@ -189,6 +193,14 @@
 - [ ] [5.2.2 Event tracking](#52-analytics)
 - [ ] [5.2.3 Conversion tracking](#52-analytics)
 - [ ] [5.2.4 Custom dashboard](#52-analytics)
+- [ ] [5.8.1 Admin panel oluşturma](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.2 UI Kit seçimi](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.3 Analytics entegrasyonu](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.4 Sipariş Yönetimi (Admin)](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.5 Kullanıcı Yönetimi (Admin)](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.6 Kitap Yönetimi (Admin)](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.7 Dashboard İstatistikleri](#58-admin-panel--dashboard-23-ocak-2026)
+- [ ] [5.8.8 Sistem Yönetimi](#58-admin-panel--dashboard-23-ocak-2026)
 - [ ] [5.3.1 HTTPS sertifikası](#53-güvenlik)
 - [ ] [5.3.2 Rate limiting](#53-güvenlik)
 - [ ] [5.3.3 Input validasyonu](#53-güvenlik)
@@ -398,7 +410,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 2.1 Layout ve Navigasyon
 - [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
 - [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut)
-- [ ] **2.1.3** Tema sistemi (renk paleti, typography) | 🔴 DO
+- [ ] **2.1.3** Tema sistemi (renk paleti, typography)
   - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
   - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
   - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor)
@@ -408,7 +420,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
-- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026) | 🔴 DO
+- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)
   - Genel olarak sitenin renkler ve teması ile ilgili dark ve light için gözden geçirmeliyiz
   - Şu anki kullanılan renkler AI ile site yapanların hepsindeki gibi mor renk ağırlıklı
   - Daha çocuklara uyan bir şeye dönmeliyiz
@@ -681,10 +693,23 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [ ] "Delete Character" (confirmation modal)
   - [ ] Empty state (karakter yoksa)
   - [ ] Loading states ve error handling
+- [ ] **2.6.8** Sipariş Yönetimi (Kullanıcı) - 🆕 **25 Ocak 2026**
+  - [ ] Sipariş detay sayfası (sipariş numarası, tarih, durum, ödeme bilgileri, kitap bilgileri)
+  - [ ] Sipariş durumu takibi (gerçek zamanlı durum güncellemeleri, timeline gösterimi)
+  - [ ] Sipariş filtreleme (tümü, bekleyen, tamamlanan, iptal edilen)
+  - [ ] Sipariş arama (sipariş numarası, kitap adı)
+  - [ ] Sipariş iptal talebi (iptal butonu, iptal nedeni formu)
+  - [ ] Sipariş indirme linkleri (PDF, e-book formatları)
+  - [ ] Sipariş faturası/ödeme makbuzu görüntüleme ve indirme
+  - [ ] Sipariş iletişim (destek ekibiyle iletişim butonu)
+  - [ ] Sipariş notları (kullanıcının kendi notları)
+  - [ ] Sipariş tekrar satın alma (aynı kitabı tekrar satın alma butonu)
+  - [ ] Sipariş paylaşma (sosyal medya, email ile paylaş)
+  - [ ] Sipariş değerlendirme (sipariş sonrası değerlendirme formu)
 
 ### 2.7 Statik Sayfalar
 - [ ] **2.7.1** Özellikler (Features) sayfası
-- [ ] **2.7.2** Fiyatlandırma sayfası
+- [ ] **2.7.2** Fiyatlandırma sayfası | 🔴 DO
 - [ ] **2.7.4** İletişim sayfası
 - [ ] **2.7.5** Gizlilik Politikası
 - [ ] **2.7.6** Kullanım Şartları
@@ -1171,7 +1196,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 4.3 Sipariş Yönetimi
 - [ ] **4.3.1** Checkout sayfası
 - [ ] **4.3.2** Sipariş özeti component
-- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ**
+- [ ] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ** | 🔴 DO
   - Sepet konusuna bakmamız lazım
   - Hem ebook olarak satın alma sepet atma hem de hardcopy olarak sepet durumunu yapmalıyız
   - Birden fazla ürün ekleme vs.
@@ -1179,9 +1204,35 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ebook ve hardcopy ayrımı
   - Multi-item cart support
   - Cart persistence (localStorage veya session)
-- [ ] **4.3.3** Ödeme başarılı sayfası
-- [ ] **4.3.4** Sipariş durumu takibi
-- [ ] **4.3.5** Email bildirimleri
+  - **Sepete Ürün Ekleme Mantığı:**
+    - Ebook: "Add to Cart" butonu → Sepete ebook ekle
+    - Hardcopy: "Add to Cart" butonu → Sepete hardcopy ekle (ebook kontrolü yapılacak)
+    - Sepet icon'unda item sayısı gösterimi
+    - Sepet dropdown/sidebar (ürün listesi, fiyat, remove butonu)
+- [ ] **4.3.4** Ödeme başarılı sayfası
+- [ ] **4.3.5** Sipariş durumu takibi (kullanıcı tarafı)
+- [ ] **4.3.6** Email bildirimleri
+- [ ] **4.3.7** Sipariş API'leri (Backend) - 🆕 **25 Ocak 2026**
+  - [ ] `GET /api/orders` - Kullanıcının siparişlerini listele (kullanıcı için)
+  - [ ] `GET /api/orders/:id` - Sipariş detayını getir (kullanıcı için)
+  - [ ] `POST /api/orders/:id/cancel` - Sipariş iptal talebi (kullanıcı için)
+  - [ ] `GET /api/orders/:id/download` - Sipariş indirme linki (kullanıcı için)
+  - [ ] `GET /api/admin/orders` - Tüm siparişleri listele (admin için, filtreleme, arama, sayfalama)
+  - [ ] `GET /api/admin/orders/:id` - Sipariş detayını getir (admin için, tam bilgiler)
+  - [ ] `PATCH /api/admin/orders/:id` - Sipariş durumu güncelle (admin için)
+  - [ ] `POST /api/admin/orders/:id/notes` - Sipariş notu ekle (admin için)
+  - [ ] `POST /api/admin/orders/:id/refund` - İade işlemi (admin için)
+  - [ ] `GET /api/admin/orders/stats` - Sipariş istatistikleri (admin için)
+  - [ ] `POST /api/admin/orders/export` - Sipariş export (CSV/Excel) (admin için)
+- [ ] **4.3.8** Kullanıcı API'leri (Backend - Admin) - 🆕 **25 Ocak 2026**
+  - [ ] `GET /api/admin/users` - Tüm kullanıcıları listele (admin için, filtreleme, arama, sayfalama)
+  - [ ] `GET /api/admin/users/:id` - Kullanıcı detayını getir (admin için, tam bilgiler)
+  - [ ] `GET /api/admin/users/:id/books` - Kullanıcının kitaplarını listele (admin için)
+  - [ ] `GET /api/admin/users/:id/orders` - Kullanıcının siparişlerini listele (admin için)
+  - [ ] `GET /api/admin/users/:id/activity` - Kullanıcı aktivite logları (admin için)
+  - [ ] `PATCH /api/admin/users/:id` - Kullanıcı durumu güncelle (aktif/pasif/ban) (admin için)
+  - [ ] `POST /api/admin/users/:id/notes` - Kullanıcı notu ekle (admin için)
+  - [ ] `GET /api/admin/users/stats` - Kullanıcı istatistikleri (admin için)
 
 ### 4.4 Fiyatlandırma Sistemi
 - [ ] **4.4.1** Sayfa sayısına göre fiyatlandırma (10/15/20 sayfa)
@@ -1206,7 +1257,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Fiyatlandırma stratejisi
   - Stripe Subscription entegrasyonu
   - Subscription management UI
-- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026)
+- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026) | 🔴 DO
   - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
   - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
   - Örneğin 10 sayfa lazımsa, zaten karakter ve kapak yaptıysak aslında 8 sayfa daha yapacağız gibi
@@ -1214,6 +1265,32 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Ne noktada para isteyeceğiz? (Düşünülecek)
   - Hem ebook satış hem de ebook almış kullanıcıya hardcopy satış
   - Sepet sistemi ve ödeme akışı tasarlanmalı
+- [ ] **4.4.9** Ürün Satın Alma Akışı (25 Ocak 2026) | 🔴 DO
+  - **Akış Adımları:**
+    1. **Free Cover Oluşturma:** Kullanıcı ücretsiz olarak sadece kapak oluşturur (draft status)
+    2. **Ebook Satın Alma:** Kullanıcı beğenirse "Add to Cart (Ebook)" butonuna tıklar
+       - Sepete ebook eklenir
+       - Checkout sayfasında ebook fiyatı gösterilir
+       - Ödeme tamamlandığında kalan sayfalar generate edilir (cover zaten var)
+       - Kitap status: `draft` → `generating` → `completed`
+    3. **Hardcopy Satın Alma:** Ebook satın aldıktan sonra "Add to Cart (Hardcopy)" butonu aktif olur
+       - Ebook satın alınmamışsa hardcopy butonu disabled veya görünmez
+       - Sepete hardcopy eklenir (ebook kontrolü yapılır)
+       - Checkout sayfasında hardcopy fiyatı gösterilir
+       - Ödeme tamamlandığında print-on-demand süreci başlar
+  - **Kurallar:**
+    - Ebook olmadan hardcopy satın alınamaz
+    - Hardcopy butonu sadece ebook satın alındıktan sonra aktif
+    - Sepet kontrolü: Hardcopy eklenirken ebook kontrolü yapılmalı
+    - Backend kontrolü: API'de hardcopy order oluşturulurken ebook order kontrolü
+  - **UI/UX:**
+    - Dashboard'da kitap kartında "Buy Ebook" ve "Buy Hardcopy" butonları
+    - Ebook satın alınmamışsa hardcopy butonu disabled + tooltip: "Önce ebook satın almalısınız"
+    - Sepet sayfasında hardcopy item'ı için ebook dependency gösterimi
+  - **Backend:**
+    - `POST /api/cart/add` - Sepete ürün ekleme (ebook/hardcopy)
+    - `POST /api/orders` - Sipariş oluşturma (ebook dependency kontrolü)
+    - `GET /api/books/:id/purchase-status` - Kitap satın alma durumu (ebook var mı?)
 - [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026)
   - Hardcopy şu an için sadece Türkiye'de var
   - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
@@ -1252,6 +1329,59 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Kitap oluşturma metrikleri
   - Satış analizi
   - Kullanıcı davranış analizi
+- [ ] **5.8.4** Sipariş Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Sipariş listesi sayfası (tüm siparişler)
+  - [ ] Sipariş filtreleme (durum, tarih, kullanıcı, tutar)
+  - [ ] Sipariş arama (sipariş numarası, kullanıcı email, kitap adı)
+  - [ ] Sipariş detay sayfası (tam bilgiler, ödeme detayları, kitap bilgileri)
+  - [ ] Sipariş durumu güncelleme (pending, processing, completed, cancelled, refunded)
+  - [ ] Toplu işlemler (çoklu sipariş seçimi, durum güncelleme)
+  - [ ] Sipariş notları/etiketleri ekleme
+  - [ ] Sipariş export (CSV, Excel)
+  - [ ] Sipariş istatistikleri (günlük/haftalık/aylık satış, gelir, sipariş sayısı)
+  - [ ] Ödeme durumu takibi (başarılı, başarısız, bekleyen)
+  - [ ] İade/iptal yönetimi
+  - [ ] Sipariş geçmişi ve log takibi
+- [ ] **5.8.5** Kullanıcı Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Kullanıcı listesi sayfası (tüm kullanıcılar)
+  - [ ] Kullanıcı filtreleme (kayıt tarihi, aktivite durumu, üyelik tipi)
+  - [ ] Kullanıcı arama (email, isim, ID)
+  - [ ] Kullanıcı detay sayfası
+    - [ ] Temel bilgiler (profil, email, kayıt tarihi)
+    - [ ] Oluşturduğu kitaplar listesi
+    - [ ] Sipariş geçmişi
+    - [ ] Karakterleri
+    - [ ] Aktivite logları (ne zaman giriş yaptı, ne yaptı)
+    - [ ] Ödeme geçmişi
+    - [ ] Ücretsiz kapak hakkı durumu
+  - [ ] Kullanıcı durumu yönetimi (aktif, pasif, ban)
+  - [ ] Kullanıcı notları/etiketleri ekleme
+  - [ ] Kullanıcı ile iletişim (email gönderme)
+  - [ ] Kullanıcı istatistikleri (toplam kitap sayısı, toplam harcama, son aktivite)
+- [ ] **5.8.6** Kitap Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Tüm kitaplar listesi
+  - [ ] Kitap filtreleme (durum, tema, yaş grubu, oluşturulma tarihi)
+  - [ ] Kitap arama (başlık, kullanıcı, ID)
+  - [ ] Kitap detay sayfası (tüm sayfalar, karakterler, sipariş bilgisi)
+  - [ ] Kitap durumu yönetimi (draft, processing, completed, published)
+  - [ ] Kitap silme/arşivleme
+  - [ ] Kitap istatistikleri (en çok oluşturulan temalar, yaş grupları)
+- [ ] **5.8.7** Dashboard İstatistikleri - 🆕 **25 Ocak 2026**
+  - [ ] Genel istatistikler kartları (toplam kullanıcı, toplam kitap, toplam sipariş, toplam gelir)
+  - [ ] Grafikler (günlük/haftalık/aylık trendler)
+  - [ ] En çok satan kitaplar/temalar
+  - [ ] Kullanıcı aktivite metrikleri
+  - [ ] Gelir analizi (günlük, haftalık, aylık, yıllık)
+  - [ ] Dönüşüm oranları (ziyaretçi → kayıt, kayıt → kitap oluşturma, kitap → satın alma)
+  - [ ] Coğrafi dağılım (ülkelere göre kullanıcı/sipariş)
+- [ ] **5.8.8** Sistem Yönetimi - 🆕 **25 Ocak 2026**
+  - [ ] Sistem ayarları (fiyatlandırma, özellik açma/kapama)
+  - [ ] Email şablonları yönetimi
+  - [ ] Bildirim ayarları
+  - [ ] Log görüntüleme (sistem logları, hata logları)
+  - [ ] Backup ve restore
+  - [ ] API kullanım istatistikleri (AI API çağrıları, maliyet takibi)
+  - [ ] Storage kullanım istatistikleri
 
 ### 5.3 Güvenlik
 - [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik)
@@ -1302,9 +1432,16 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 5.5 Deployment
 - [ ] **5.5.1** Vercel production deployment
 - [ ] **5.5.2** Domain bağlantısı
-- [ ] **5.5.3** SSL sertifikası
+- [ ] **5.5.3** SSL sertifikası (Vercel otomatik, kontrol edilmeli)
 - [ ] **5.5.4** Monitoring kurulumu
 - [ ] **5.5.5** Error tracking (Sentry)
+- [ ] **5.5.6** Production Environment Variables Kontrolü (25 Ocak 2026)
+  - Tüm environment variable'ların Vercel'de doğru ayarlandığından emin ol
+  - API key'lerin production'da çalıştığını test et
+  - Supabase production URL ve keys kontrolü
+  - OpenAI API key production kontrolü
+  - Google Cloud TTS key production kontrolü
+  - Tüm secret'ların güvenli şekilde saklandığından emin ol
 
 ### 5.7 PDF Tasarım İyileştirmesi
 - [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)
@@ -1371,6 +1508,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [ ] Kalite vs boyut dengesi testleri
   - **Not:** Şu an `pdfs` bucket (50 MB limit) kullanılıyor, optimizasyon opsiyonel
 - [x] **5.7.6** Cover Page İyileştirmeleri ✅ (25 Ocak 2026)
+- [ ] **5.7.8** PDF Layout Bug Düzeltmesi (25 Ocak 2026) - 🔴 **KRİTİK BUG**
+  - **Problem:** PDF generation'da eksik sayfalar ve son sayfa text problemi
+  - **Detaylar:** Faz 5.7 bölümünde "BİLİNEN SORUN" altında dokümante edildi
+  - **Çözüm:** `lib/pdf/generator.ts` → `prepareSpreads()` fonksiyonu yeniden yazılmalı
+  - **Öncelik:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
   - [x] **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026)
     - [x] Double-page spread layout (sol: görsel, sağ: başlık)
     - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
