@@ -161,7 +161,26 @@ ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:
 - Kullanıcı "Google Sheets'te filtreleme nasıl yapılır?" dediğinde → README'den örnekler ver
 - Kullanıcı "Draft fikir ekle" dediğinde → CSV'ye ekle, ROADMAP.md'ye de ekle
 
-### 8. Yeni Dokümantasyon Dosyası Oluşturma
+### 8. PRD Güncelleme Sorumluluğu
+Genel dokümantasyon güncellemesi yapıldığında veya önemli özellikler implement edildiğinde:
+1. **PRD.md'yi kontrol et:**
+   - Yeni implement edilen özellikler PRD'de var mı?
+   - PRD'deki özellikler kod tabanında implement edilmiş mi?
+   - Güncel olmayan bilgiler var mı?
+2. **PRD'yi güncelle:**
+   - Yeni özellikler ekle
+   - Tamamlanan özellikleri işaretle
+   - Güncel olmayan bilgileri düzelt
+   - Versiyon numarasını artır
+   - Son güncelleme tarihini ekle
+3. **Senkronizasyon:**
+   - PRD ↔ ROADMAP.md senkronizasyonu
+   - PRD ↔ FEATURES.md senkronizasyonu
+   - PRD ↔ Implementation dosyaları senkronizasyonu
+
+**Önemli:** Her dokümantasyon güncellemesinde PRD.md'yi de kontrol et ve gerekirse güncelle!
+
+### 9. Yeni Dokümantasyon Dosyası Oluşturma
 Yeni bir dokümantasyon dosyası oluştururken:
 1. **Dosya tipini belirle:**
    - Checklist → `docs/checklists/`
@@ -246,6 +265,7 @@ Kullanıcı şunları diyebilir:
 ### Sorumluluk Alanları
 - **@project-manager (sen):** 
   - `docs/ROADMAP.md` - Ana plan ve iş listesi
+  - `docs/PRD.md` - Ürün gereksinimleri dokümanı (güncel tutulmalı)
   - `docs/implementation/FAZ{X}_IMPLEMENTATION.md` - Faz bazlı implementasyon takibi
   - `docs/checklists/` - Kontrol listeleri
   - `docs/reports/` - Raporlar

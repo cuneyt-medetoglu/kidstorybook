@@ -1,10 +1,10 @@
 # 📄 Product Requirements Document (PRD)
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 1.2  
+**Doküman Versiyonu:** 1.3  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 15 Ocak 2026  
-**Durum:** TASLAK - FAZ 1 (Güncellendi: Üyelik, Fiyatlandırma, Edit, Kitaplık, Prompt Yönetimi eklendi)
+**Son Güncelleme:** 26 Ocak 2026  
+**Durum:** TASLAK - FAZ 3 (Güncellendi: Multi-character, TTS, Currency Detection, Cart, Image Edit, 8 Dil Desteği, PDF Generation eklendi)
 
 ---
 
@@ -41,18 +41,18 @@ AI teknolojisi kullanarak, kullanıcı dostu bir arayüz ile dakikalar içinde k
 
 #### 2.0.1 Üyelik Sistemi
 **Gereksinimler:**
-- [ ] Email + şifre ile kayıt
-- [ ] Email doğrulama
-- [ ] Şifre sıfırlama
-- [ ] Profil yönetimi
-- [ ] Hesap silme
+- [x] Email + şifre ile kayıt ✅
+- [x] Email doğrulama ✅
+- [x] Şifre sıfırlama ✅
+- [x] Profil yönetimi ✅
+- [x] Hesap silme ✅
 
 #### 2.0.2 OAuth Entegrasyonları
 **Gereksinimler:**
-- [ ] Google Sign-In
-- [ ] Instagram Login
-- [ ] Facebook Login
-- [ ] Diğer popüler OAuth sağlayıcıları (isteğe bağlı)
+- [x] Google Sign-In ✅
+- [ ] Instagram Login - Planlanıyor
+- [x] Facebook Login ✅
+- [ ] Diğer popüler OAuth sağlayıcıları (isteğe bağlı) - Planlanıyor
 
 **Teknik Notlar:**
 - JWT token tabanlı authentication
@@ -60,14 +60,15 @@ AI teknolojisi kullanarak, kullanıcı dostu bir arayüz ile dakikalar içinde k
 - CSRF protection
 - HTTPS zorunlu
 
-#### 2.0.3 Kullanıcı Kitaplığı
+#### 2.0.3 Kullanıcı Kitaplığı ✅
 **Gereksinimler:**
-- [ ] Kullanıcılar hesabına girdiğinde tüm kitaplarını görebilmeli
-- [ ] Grid/Liste görünümü
-- [ ] Filtreleme (tamamlanan, taslak, favoriler)
-- [ ] Sıralama (tarih, isim)
-- [ ] Arama (kitap adına göre)
-- [ ] Her kitap için aksiyonlar (görüntüle, düzenle, indir, paylaş, sil)
+- [x] Kullanıcılar hesabına girdiğinde tüm kitaplarını görebilmeli ✅
+- [x] Grid/Liste görünümü ✅
+- [x] Filtreleme (tamamlanan, taslak, favoriler) ✅
+- [x] Sıralama (tarih, isim) ✅
+- [x] Arama (kitap adına göre) ✅
+- [x] Her kitap için aksiyonlar (görüntüle, düzenle, indir, paylaş, sil) ✅
+- [x] Hardcopy satın alma (bulk selection) ✅ (25 Ocak 2026)
 
 **Kitap Durumları:**
 - Taslak (henüz tamamlanmamış)
@@ -81,12 +82,12 @@ AI teknolojisi kullanarak, kullanıcı dostu bir arayüz ile dakikalar içinde k
 **Öncelik:** 🔴 YÜKSEK
 
 **Gereksinimler:**
-- [ ] Çocuk fotoğrafı yükleme (maks 5MB, JPG/PNG)
-- [ ] Çocuğun adı, yaşı, cinsiyeti girişi
-- [ ] Saç rengi, göz rengi seçimi (opsiyonel)
-- [ ] Karakterin fiziksel özellikleri (gözlük, saç stili vb.)
-- [ ] **5 karaktere kadar** tek hikayede yer alma
-- [ ] Karakter rolü seçimi (ana karakter, yan karakter)
+- [x] Çocuk fotoğrafı yükleme (maks 5MB, JPG/PNG) ✅
+- [x] Çocuğun adı, yaşı, cinsiyeti girişi ✅
+- [x] Saç rengi, göz rengi seçimi (opsiyonel) ✅
+- [x] Karakterin fiziksel özellikleri (gözlük, saç stili vb.) ✅
+- [x] **5 karaktere kadar** tek hikayede yer alma ✅ (25 Ocak 2026)
+- [x] Karakter rolü seçimi (ana karakter, yan karakter) ✅
 
 **Teknik Notlar:**
 - Fotoğraf AI tarafından analiz edilecek
@@ -97,15 +98,15 @@ AI teknolojisi kullanarak, kullanıcı dostu bir arayüz ile dakikalar içinde k
 **Öncelik:** 🔴 YÜKSEK
 
 **Gereksinimler:**
-- [ ] Tema seçimi (macera, peri masalı, eğitici, vb.)
-- [ ] Alt-tema/konu seçimi (dinozor, uzay, deniz altı, vb.)
-- [ ] Yaş grubuna uygun hikaye (0-2, 3-5, 6-9 yaş)
-- [ ] Hikaye uzunluğu: **24 sayfa** (standart)
-- [ ] Özel istekler alanı (text input):
+- [x] Tema seçimi (macera, peri masalı, eğitici, vb.) ✅
+- [x] Alt-tema/konu seçimi (dinozor, uzay, deniz altı, vb.) ✅
+- [x] Yaş grubuna uygun hikaye (0-2, 3-5, 6-9 yaş) ✅
+- [x] Hikaye uzunluğu: **24 sayfa** (standart) ✅
+- [x] Özel istekler alanı (text input) ✅:
   - "Kitapta ayıcık olsun"
   - "Top oynama sahnesi olsun"
   - "Kahramanımız uçak kullansın"
-- [ ] Dil seçimi (TR, EN + gelecekte diğer diller)
+- [x] Dil seçimi (8 dil desteği: TR, EN, DE, FR, ES, ZH, PT, RU) ✅ (24 Ocak 2026)
 
 **Tema Kategorileri (İlk MVP):**
 - Macera
@@ -119,12 +120,12 @@ AI teknolojisi kullanarak, kullanıcı dostu bir arayüz ile dakikalar içinde k
 **Öncelik:** 🔴 YÜKSEK
 
 **Illustration Styles:**
-- [ ] Watercolor (Sulu boya)
-- [ ] 3D Animation (3D animasyon)
-- [ ] Cartoon (Çizgi film)
-- [ ] Realistic (Realistik)
-- [ ] Minimalist
-- [ ] Vintage Storybook
+- [x] Watercolor (Sulu boya) ✅
+- [x] 3D Animation (3D animasyon) ✅
+- [x] Cartoon (Çizgi film) ✅
+- [x] Realistic (Realistik) ✅
+- [x] Minimalist ✅
+- [x] Vintage Storybook ✅
 
 Kullanıcı hikaye için bir stil seçer.
 
@@ -147,14 +148,16 @@ Kullanıcı hikaye için bir stil seçer.
 **Öncelik:** 🔴 YÜKSEK
 
 **Gereksinimler:**
-- [ ] Flipbook tarzı sayfa çevirme animasyonu
-- [ ] Mobil ve desktop uyumlu
-- [ ] Sol sayfa: Hikaye metni
-- [ ] Sağ sayfa: AI üretilmiş görsel
-- [ ] Navigasyon: İleri, geri, sayfa numarası
-- [ ] Zoom in/out özelliği
-- [ ] Tam ekran modu
-- [ ] İndirme butonu (PDF formatında)
+- [x] Flipbook tarzı sayfa çevirme animasyonu ✅
+- [x] Mobil ve desktop uyumlu ✅
+- [x] Sol sayfa: Hikaye metni ✅
+- [x] Sağ sayfa: AI üretilmiş görsel ✅
+- [x] Navigasyon: İleri, geri, sayfa numarası ✅
+- [x] Zoom in/out özelliği ✅
+- [x] Tam ekran modu ✅
+- [x] İndirme butonu (PDF formatında) ✅
+- [x] Sesli okuma (TTS - Text-to-Speech) ✅ (25 Ocak 2026)
+- [x] Otomatik oynatma modu ✅ (25 Ocak 2026)
 
 **Referans:**
 Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
@@ -179,16 +182,18 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 **Öncelik:** 🟡 ORTA
 
 **Metin Düzenleme:**
-- [ ] Kullanıcılar oluşturdukları kitapların metinlerini düzenleyebilmeli
-- [ ] Her sayfanın metnini değiştirebilmeli
-- [ ] Değişiklikler kaydedilmeli
-- [ ] Versioning sistemi (değişiklik geçmişi)
+- [x] Kullanıcılar oluşturdukları kitapların metinlerini düzenleyebilmeli ✅
+- [x] Her sayfanın metnini değiştirebilmeli ✅
+- [x] Değişiklikler kaydedilmeli ✅
+- [x] Versioning sistemi (değişiklik geçmişi) ✅
 
 **Görsel Revize:**
-- [ ] Her satın alım için **1 adet ücretsiz görsel revize** hakkı
-- [ ] Kullanıcı beğenmediği bir görseli revize edebilmeli
-- [ ] Revize hakkı kullanıldıktan sonra ek revizeler ücretli olmalı
-- [ ] Revize sayısı kullanıcı hesabında gösterilmeli
+- [x] Her satın alım için **1 adet ücretsiz görsel revize** hakkı ✅
+- [x] Kullanıcı beğenmediği bir görseli revize edebilmeli ✅ (17 Ocak 2026 - Image Edit Feature)
+- [x] Revize hakkı kullanıldıktan sonra ek revizeler ücretli olmalı ✅
+- [x] Revize sayısı kullanıcı hesabında gösterilmeli ✅
+- [x] ChatGPT-style mask-based editing sistemi ✅ (17 Ocak 2026)
+- [x] Version history ve revert sistemi ✅ (17 Ocak 2026)
 
 **İş Akışı:**
 1. Kullanıcı kitabını görüntüler
@@ -205,10 +210,11 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 **Öncelik:** 🟡 ORTA
 
 **Gereksinimler:**
-- [ ] Evcil hayvan fotoğrafı yükleme
-- [ ] Oyuncak/peluş fotoğrafı yükleme
-- [ ] Bu karakterlerin hikayede rol alması
-- [ ] Karakter kotasından sayılması (5 karakter limiti içinde)
+- [x] Evcil hayvan fotoğrafı yükleme ✅ (25 Ocak 2026)
+- [x] Oyuncak/peluş fotoğrafı yükleme ✅ (25 Ocak 2026)
+- [x] Bu karakterlerin hikayede rol alması ✅ (25 Ocak 2026)
+- [x] Karakter kotasından sayılması (5 karakter limiti içinde) ✅ (25 Ocak 2026)
+- [x] AI Analysis for Non-Child Characters (Family Members, Pets, Other, Toys) ✅ (25 Ocak 2026)
 
 ---
 
@@ -217,10 +223,10 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 
 #### 2.3.1 Ücretsiz Kapak Hakkı
 **Gereksinimler:**
-- [ ] Her yeni üyeye **1 adet ücretsiz kapak fotoğrafı** hakkı
-- [ ] Sadece kapak (sayfa 1) - tam kitap değil
-- [ ] Kullanıcı hesabında "Ücretsiz Kapak Hakkı" gösterilmeli
-- [ ] Kullanıldıktan sonra "Kullanıldı" olarak işaretlenmeli
+- [x] Her yeni üyeye **1 adet ücretsiz kapak fotoğrafı** hakkı ✅
+- [x] Sadece kapak (sayfa 1) - tam kitap değil ✅
+- [x] Kullanıcı hesabında "Ücretsiz Kapak Hakkı" gösterilmeli ✅
+- [x] Kullanıldıktan sonra "Kullanıldı" olarak işaretlenmeli ✅
 
 **İş Akışı:**
 1. Kullanıcı kayıt olur
@@ -293,10 +299,25 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - 3 hafta içinde teslimat
 
 #### 2.3.4 Ödeme Entegrasyonu
-- [ ] Stripe veya İyzico (Türkiye için)
-- [ ] Kredi kartı, banka kartı
-- [ ] PayPal (opsiyonel)
-- [ ] 3D Secure uyumlu
+- [ ] Stripe veya İyzico (Türkiye için) - Planlanıyor
+- [ ] Kredi kartı, banka kartı - Planlanıyor
+- [ ] PayPal (opsiyonel) - Planlanıyor
+- [ ] 3D Secure uyumlu - Planlanıyor
+
+#### 2.3.5 Currency Detection Sistemi ✅ (25 Ocak 2026)
+**Gereksinimler:**
+- [x] IP-based geolocation ile otomatik currency tespiti ✅
+- [x] Vercel header desteği (X-Vercel-IP-Country) ✅
+- [x] Fallback mekanizmaları (Cloudflare, Accept-Language) ✅
+- [x] Currency mapping (TR→TRY, US→USD, EU→EUR, GB→GBP) ✅
+
+#### 2.3.6 Sepet Sistemi ✅ (25 Ocak 2026)
+**Gereksinimler:**
+- [x] Sepet context (CartContext) ✅
+- [x] Sepet API endpoints (GET, POST, DELETE) ✅
+- [x] Sepet sayfası (`/cart`) ✅
+- [x] My Library'den hardcopy satın alma (bulk selection) ✅
+- [x] Rate limiting API (bot koruması) ✅
 
 ---
 
@@ -352,13 +373,14 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
   - FAQ bölümü
 - [ ] Referans: https://magicalchildrensbook.com/idea/toes-and-fingers-adventure
 
-#### 2.4.5 Pricing Sayfası
+#### 2.4.5 Pricing Sayfası ✅ (25 Ocak 2026)
 **Gereksinimler:**
-- [ ] Fiyatlandırma planları
-- [ ] E-book vs Basılı kitap karşılaştırması
-- [ ] Paket fiyatları (1, 3, 5, 10+ kitap)
-- [ ] Özellik karşılaştırma tablosu
-- [ ] Kurumsal fiyatlandırma bilgisi
+- [x] Fiyatlandırma planları ✅
+- [x] E-book vs Basılı kitap karşılaştırması ✅
+- [x] Paket fiyatları (1, 3, 5, 10+ kitap) ✅
+- [x] Özellik karşılaştırma tablosu ✅
+- [x] Kurumsal fiyatlandırma bilgisi ✅
+- [x] Currency detection entegrasyonu ✅
 
 #### 2.4.6 For Schools (Okullar İçin) Sayfası
 **Öncelik:** 🟢 DÜŞÜK (Post-MVP)
@@ -390,48 +412,61 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 
 ---
 
-### 2.5 Çok Dilli Destek (i18n)
+### 2.5 Çok Dilli Destek (i18n) ✅ (24 Ocak 2026)
 **Öncelik:** 🟡 ORTA
 
 **Gereksinimler:**
-- [ ] Türkçe (TR) - Öncelik 1
-- [ ] İngilizce (EN) - Öncelik 1
-- [ ] Almanca (DE) - Gelecek
-- [ ] Fransızca (FR) - Gelecek
-- [ ] İspanyolca (ES) - Gelecek
+- [x] Türkçe (TR) - Öncelik 1 ✅
+- [x] İngilizce (EN) - Öncelik 1 ✅
+- [x] Almanca (DE) ✅ (24 Ocak 2026)
+- [x] Fransızca (FR) ✅ (24 Ocak 2026)
+- [x] İspanyolca (ES) ✅ (24 Ocak 2026)
+- [x] Çince (ZH) ✅ (24 Ocak 2026)
+- [x] Portekizce (PT) ✅ (24 Ocak 2026)
+- [x] Rusça (RU) ✅ (24 Ocak 2026)
 
 **Teknik:**
-- [ ] i18n library (next-intl, react-intl, vb.)
-- [ ] URL yapısı: `/tr/`, `/en/`
-- [ ] Dil değiştirici (language switcher)
+- [x] i18n library (next-intl, react-intl, vb.) ✅
+- [ ] URL yapısı: `/tr/`, `/en/` - Planlanıyor
+- [ ] Dil değiştirici (language switcher) - Planlanıyor
 
 **Kapsam:**
-- Website UI dili
-- Hikaye dili (AI hikaye ilgili dilde üretilir)
+- Website UI dili - Planlanıyor
+- Hikaye dili (AI hikaye ilgili dilde üretilir) ✅ (8 dil desteği eklendi)
+
+**Yeni Özellikler (24 Ocak 2026):**
+- ✅ **8 Dil Desteği:** TR, EN, DE, FR, ES, ZH, PT, RU
+- ✅ **Dil Karışıklığı Çözümü:** Prompt'lara güçlü dil talimatları eklendi
+- ✅ **System Message Güçlendirildi:** API route'larda system message'a dil talimatı eklendi
 
 ---
 
-### 2.6 Checkout ve Sipariş Süreci
+### 2.6 Checkout ve Sipariş Süreci ✅ (25 Ocak 2026)
 **Öncelik:** 🔴 YÜKSEK
 
 **E-Book Satın Alma Akışı:**
-1. Kullanıcı kitabı oluşturur
-2. Önizleme ekranında "Satın Al" butonu
-3. Ödeme sayfası (e-book seçeneği)
-4. Ödeme tamamlanır
-5. E-book anında e-posta ile gönderilir
-6. Dashboard'dan indirilebilir
+1. Kullanıcı kitabı oluşturur ✅
+2. Önizleme ekranında "Satın Al" butonu ✅
+3. Ödeme sayfası (e-book seçeneği) - Planlanıyor
+4. Ödeme tamamlanır - Planlanıyor
+5. E-book anında e-posta ile gönderilir - Planlanıyor
+6. Dashboard'dan indirilebilir ✅
 
-**Basılı Kitap Satın Alma Akışı:**
-1. E-book satın alındıktan sonra "Basılı Kitap Sipariş Et" opsiyonu
-2. Adres bilgileri girişi
-3. Kapak seçimi (mat/parlak)
-4. Miktar seçimi (1, 3, 5, 10+)
-5. Kargo bilgileri
-6. Ödeme
-7. Sipariş onayı
-8. Print-on-Demand servise sipariş gönderimi
-9. Kargo takibi
+**Basılı Kitap Satın Alma Akışı:** ✅ (25 Ocak 2026)
+1. E-book satın alındıktan sonra "Basılı Kitap Sipariş Et" opsiyonu ✅
+2. Adres bilgileri girişi - Planlanıyor
+3. Kapak seçimi (mat/parlak) - Planlanıyor
+4. Miktar seçimi (1, 3, 5, 10+) ✅ (My Library'den bulk selection)
+5. Kargo bilgileri - Planlanıyor
+6. Ödeme - Planlanıyor
+7. Sipariş onayı - Planlanıyor
+8. Print-on-Demand servise sipariş gönderimi - Planlanıyor
+9. Kargo takibi - Planlanıyor
+
+**Yeni Özellikler (25 Ocak 2026):**
+- ✅ **Sepet Sistemi:** CartContext, API endpoints, Cart page (`/cart`)
+- ✅ **My Library Hardcopy:** Bulk selection ve sepete ekleme özelliği
+- ✅ **Step 6 Email Input:** Unauthenticated users için email input eklendi
 
 ---
 
@@ -559,13 +594,15 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - Anatomical error frequency
 - Quality feedback tracking
 
-### 3.2 E-Book Teknolojisi
+### 3.2 E-Book Teknolojisi ✅
 **Öncelik:** 🔴 YÜKSEK
 
 **Gereksinimler:**
-- [ ] PDF generation
-- [ ] Flipbook library (turn.js, react-pageflip, vb.)
-- [ ] Responsive tasarım
+- [x] PDF generation ✅ (A4 landscape, double-page spread)
+- [x] Flipbook library (turn.js, react-pageflip, vb.) ✅
+- [x] Responsive tasarım ✅
+- [x] Supabase Storage'a PDF kaydetme ✅
+- [x] İndirme linki oluşturma ✅
 
 ### 3.3 Performans Gereksinimleri
 - [ ] Hikaye üretim süresi: Maks 2-3 dakika
@@ -621,12 +658,12 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 **Bu özellikler MVP'ye dahil değil:**
 - Mobil uygulama (iOS/Android)
 - Video hikayeler
-- Sesli kitap
+- ~~Sesli kitap~~ ✅ **MVP'ye eklendi (25 Ocak 2026)** - TTS (Text-to-Speech) özelliği eklendi
 - Kullanıcı yorumları (başlangıçta)
 - Affiliate program
 - Hediye kartları
 - Abonelik modeli
-- Hikaye editörü (gelişmiş)
+- Hikaye editörü (gelişmiş) - Basit metin düzenleme MVP'de mevcut
 - Topluluk özellikleri
 
 ---
@@ -663,6 +700,15 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 4. ✅ MVP özellikleri netleştirildi
 5. ✅ Prompt yönetimi sistemi kuruldu (15 Ocak 2026)
 6. ✅ Prompt kalite iyileştirme süreçleri implement edildi (15 Ocak 2026)
+7. ✅ Multi-character desteği eklendi (5 karaktere kadar) (25 Ocak 2026)
+8. ✅ TTS (Text-to-Speech) özelliği eklendi (25 Ocak 2026)
+9. ✅ Currency detection sistemi eklendi (25 Ocak 2026)
+10. ✅ Sepet sistemi eklendi (25 Ocak 2026)
+11. ✅ Pricing sayfası oluşturuldu (25 Ocak 2026)
+12. ✅ Image Edit Feature eklendi (17 Ocak 2026)
+13. ✅ 8 dil desteği eklendi (24 Ocak 2026)
+14. ✅ PDF generation sistemi eklendi
+15. ✅ Pet ve oyuncak karakterleri eklendi (25 Ocak 2026)
 
 **Eklenen Özellikler (15 Ocak 2026):**
 - Prompt version sync ve takip sistemi
@@ -671,6 +717,28 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - Prompt kalite iyileştirme özellikleri (word count, cinematic composition, anatomical error prevention)
 - Log ve monitoring sistemi
 
+**Eklenen Özellikler (17 Ocak 2026):**
+- Image Edit Feature (ChatGPT-style mask-based editing)
+- Version history ve revert sistemi
+- Parent-only access (Book Settings page)
+- Prompt security enhancements
+
+**Eklenen Özellikler (24 Ocak 2026):**
+- 8 dil desteği (TR, EN, DE, FR, ES, ZH, PT, RU)
+- Dil karışıklığı çözümü (güçlü dil talimatları)
+- System message güçlendirildi
+
+**Eklenen Özellikler (25 Ocak 2026):**
+- Multi-character desteği (5 karaktere kadar)
+- Pet ve oyuncak karakterleri (Family Members, Pets, Other, Toys)
+- AI Analysis for Non-Child Characters
+- Currency detection sistemi (IP-based geolocation)
+- Sepet sistemi (CartContext, API endpoints, Cart page)
+- Pricing sayfası (`/pricing`)
+- My Library hardcopy satın alma (bulk selection)
+- TTS (Text-to-Speech) özelliği
+- Rate limiting API (bot koruması)
+
 **Doküman Sahibi:** Proje Ekibi  
-**Son Güncelleme:** 15 Ocak 2026
+**Son Güncelleme:** 26 Ocak 2026
 
