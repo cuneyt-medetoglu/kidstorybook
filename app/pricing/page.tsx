@@ -155,8 +155,11 @@ export default function PricingPage() {
                   size="lg"
                   className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600 md:py-6 md:text-lg"
                 >
-                  Start Creating
+                  Start Creating Your Book
                 </Button>
+                <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-2">
+                  Create your personalized book step by step
+                </p>
               </Link>
             </div>
           </motion.div>

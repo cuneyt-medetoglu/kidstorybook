@@ -4,12 +4,15 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 
 export interface CartItem {
   id: string // Unique cart item ID
-  type: "hardcopy"
-  bookId: string
+  type: "hardcopy" | "ebook_plan"
+  bookId?: string // Optional for ebook_plan
   bookTitle: string
-  coverImage: string
-  price: number // $34.99
-  quantity: number // Always 1 for hardcopy
+  coverImage?: string // Optional for ebook_plan
+  price: number
+  quantity: number
+  planType?: string // For ebook_plan: "10", "12", etc.
+  draftId?: string // For ebook_plan: draft ID if available
+  characterData?: any // For ebook_plan: character data for book creation
 }
 
 interface CartContextType {
@@ -58,10 +61,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = useCallback((item: Omit<CartItem, "id">) => {
     setItems((prev) => {
-      // Check if item already exists (same bookId and type)
-      const existingIndex = prev.findIndex(
-        (i) => i.bookId === item.bookId && i.type === item.type
-      )
+      // Check if item already exists
+      // For hardcopy: same bookId and type
+      // For ebook_plan: same type (only one ebook plan allowed)
+      const existingIndex = prev.findIndex((i) => {
+        if (item.type === "hardcopy" && i.type === "hardcopy") {
+          return i.bookId === item.bookId
+        }
+        if (item.type === "ebook_plan" && i.type === "ebook_plan") {
+          return true // Only one ebook plan allowed
+        }
+        return false
+      })
 
       if (existingIndex >= 0) {
         // Item already exists, don't add duplicate
