@@ -76,6 +76,12 @@
 - [x] [2.4.4 Step 4: Illustration style](#24-kitap-oluşturma-wizard)
 - [x] [2.4.5 Step 5: Özel istekler](#24-kitap-oluşturma-wizard)
 - [x] [2.4.6 Step 6: Önizleme ve onay](#24-kitap-oluşturma-wizard)
+  - [x] Interactive Timeline/Flow design ✅
+  - [x] "Pay & Create My Book" butonu (ShoppingCart icon) ✅
+  - [x] "Create Free Cover" butonu (conditional) ✅
+  - [x] Email input (unauthenticated users) ✅
+  - [x] Currency detection entegrasyonu ✅
+  - [x] Modern animated timeline design ✅
 - [x] [2.4.7 Progress indicator](#24-kitap-oluşturma-wizard)
 - [x] [2.4.8 Form validasyonu](#24-kitap-oluşturma-wizard)
 - [x] [2.4.9 Ücretsiz kapak hakkı kontrolü](#24-kitap-oluşturma-wizard)

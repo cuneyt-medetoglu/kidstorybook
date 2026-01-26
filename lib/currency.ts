@@ -39,7 +39,7 @@ const COUNTRY_CURRENCY_MAP: Record<string, Currency> = {
 }
 
 // Currency configurations
-const CURRENCY_CONFIGS: Record<Currency, CurrencyConfig> = {
+export const CURRENCY_CONFIGS: Record<Currency, CurrencyConfig> = {
   USD: {
     currency: "USD",
     symbol: "$",
