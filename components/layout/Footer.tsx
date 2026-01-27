@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,8 +42,27 @@ const legalLinks = [
   { label: "Cookie Policy", href: "/cookies" },
 ]
 
+/** Buton sadece sayfa en alttan bu kadar px içerideyken gösterilir (en altlara gelince çıkar) */
+const SCROLL_TOP_SHOW_WHEN_PX_FROM_BOTTOM = 400
+
 export function Footer() {
   const [email, setEmail] = useState("")
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
+  useEffect(() => {
+    const update = () => {
+      if (typeof window === "undefined") return
+      const { scrollY, innerHeight } = window
+      const scrollHeight = document.documentElement.scrollHeight
+      const isScrollable = scrollHeight > innerHeight
+      const nearBottom =
+        scrollY + innerHeight >= scrollHeight - SCROLL_TOP_SHOW_WHEN_PX_FROM_BOTTOM
+      setShowScrollTop(Boolean(isScrollable && nearBottom))
+    }
+    update()
+    window.addEventListener("scroll", update, { passive: true })
+    return () => window.removeEventListener("scroll", update)
+  }, [])
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -248,16 +267,17 @@ export function Footer() {
         </motion.div>
       </div>
 
-      {/* Scroll to Top Button */}
+      {/* Scroll to Top Button - only visible when near bottom (≈400px from bottom); hides at top */}
       <motion.button
         onClick={scrollToTop}
-        initial={{ opacity: 0, scale: 0 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        className="fixed bottom-8 right-8 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400"
+        animate={{ opacity: showScrollTop ? 1 : 0 }}
+        transition={{ duration: 0.2 }}
+        whileHover={showScrollTop ? { scale: 1.1 } : undefined}
+        whileTap={showScrollTop ? { scale: 0.9 } : undefined}
+        className={`fixed bottom-8 right-8 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 ${!showScrollTop ? "pointer-events-none" : ""}`}
         aria-label="Scroll to top"
+        aria-hidden={!showScrollTop}
+        tabIndex={showScrollTop ? 0 : -1}
       >
         <ArrowUp className="h-6 w-6" />
       </motion.button>
