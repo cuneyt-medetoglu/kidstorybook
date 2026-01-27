@@ -3,7 +3,7 @@ import { HowItWorks } from '@/components/sections/HowItWorks'
 import { ExampleBooksCarousel } from '@/components/sections/ExampleBooksCarousel'
 import { FeaturesSection } from '@/components/sections/FeaturesSection'
 import { PricingSection } from '@/components/sections/PricingSection'
-import { CampaignBanners } from '@/components/sections/CampaignBanners'
+// import { CampaignBanners } from '@/components/sections/CampaignBanners' // Şimdilik kapalı, lazım olursa kullanılır
 import { FAQSection } from '@/components/sections/FAQSection'
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
       <ExampleBooksCarousel />
       <FeaturesSection />
       <PricingSection />
-      <CampaignBanners />
+      {/* <CampaignBanners /> */} {/* Şimdilik kapalı, lazım olursa kullanılır */}
       <FAQSection />
     </>
   )
