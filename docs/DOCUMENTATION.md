@@ -47,6 +47,7 @@ docs/
 │   ├── MY_LIBRARY_HARDCOPY_V0_PROMPT.md # My Library hardcopy özellikleri v0.app prompt rehberi
 │   ├── CART_PAGE_V0_PROMPT.md # Sepet sayfası v0.app prompt rehberi
 │   ├── CURRENCY_DETECTION.md # Currency detection sistemi dokümantasyonu
+│   ├── STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md # Step 6 Pay gizleme + Üyesiz ücretsiz kapak (email + IP) spec
 │   └── ...
 │
 ├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
@@ -195,6 +196,12 @@ docs/
 ## 🔄 Güncelleme
 
 Dokümantasyon sürekli güncellenir. Son güncellemeler:
+- **27 Ocak 2026:**
+  - Step 6 Pay gizleme: "Pay & Create My Book" sadece üyeli gösteriliyor; üye olmadan ödeme/satın alma yok
+  - Üyesiz 1 ücretsiz kapak: email zorunlu, `guest_free_cover_used` (1/email), create-free-cover içinde IP 5/24h, `drafts` (user_id=null)
+  - Migration 014: `guest_free_cover_used` tablosu, `drafts` için "Allow guest draft insert" RLS
+  - Spec: `docs/guides/STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md`
+
 - **4 Ocak 2026:** 
   - Faz 1.3: Environment ve yapılandırma tamamlandı
     - `lib/config.ts` oluşturuldu (environment-based configuration)
@@ -258,7 +265,7 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 25 Ocak 2026
+**Son Güncelleme:** 27 Ocak 2026
 
 - **23 Ocak 2026:**
   - **ROADMAP CSV Sistemi eklendi:**

@@ -2704,6 +2704,15 @@ Mobile-first design with touch-friendly interactions.
 6. Kapak oluşturulur → `free_cover_used = true` yapılır
 7. Sonraki kapaklar için ödeme gerekir
 
+#### Üyesiz (Guest) Kullanıcılar (27 Ocak 2026)
+- **1 ücretsiz kapak / e-posta:** `guest_free_cover_used` tablosu (email UNIQUE)
+- **Create Free Cover API guest dalı:** Body'de `email` zorunlu; `wizardData` → `characterData`, `theme`, `style` türetimi
+- **Sadece drafts (user_id=null):** Kitap oluşturulmaz; kapak `drafts` tablosuna kaydedilir
+- **IP rate limit:** 5 istek / IP / 24 saat (create-free-cover içinde); aşımda 429
+- **Step 6:** "Pay & Create My Book" sadece üyeli gösterilir (`!user` iken gizli); üyesizde "1 Free Cover" + email input + "Create Free Cover"
+- **Migration 014:** `guest_free_cover_used` tablosu, `drafts` için "Allow guest draft insert" RLS
+- **Spec:** `docs/guides/STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md`
+
 #### API Endpoint
 ```
 POST /api/ai/generate-cover
@@ -2771,9 +2780,9 @@ Response: {
 
 ---
 
-**Son Güncelleme:** 25 Ocak 2026  
+**Son Güncelleme:** 27 Ocak 2026  
 **Güncelleyen:** @project-manager agent  
-**Son Eklenen:** Pricing Sayfası, Sepet Sistemi ve My Library Hardcopy Özellikleri - 25 Ocak 2026
+**Son Eklenen:** Step 6 Pay Gizleme + Üyesiz Ücretsiz Kapak (Email + IP) - 27 Ocak 2026
 
 **Not:** 
 - Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)
@@ -2794,8 +2803,19 @@ Response: {
 - 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (Checkout sayfası, ödeme entegrasyonu)
 - ✅ **Faz 4 İlerleme:** Pricing sayfası, Sepet sistemi ve My Library hardcopy özellikleri tamamlandı (25 Ocak 2026)
 
+**Son Yapılanlar (27 Ocak 2026):**
+- ✅ **Step 6: Pay & Create My Book sadece üyeli:**
+  - "Pay & Create My Book" bloğu `user` varken gösteriliyor; `!user` iken gizli (ödeme için giriş/kayıt zorunlu) ✅
+- ✅ **Üyesiz 1 ücretsiz kapak (Email + IP):**
+  - Step 6: `hasFreeCover` üyesizde `true`; "1 Free Cover" badge + "Create Free Cover" + email input (geçerli email zorunlu) ✅
+  - `POST /api/books/create-free-cover` guest dalı: `email` zorunlu, `guest_free_cover_used` (1/email), IP 5 istek/24h (aşımda 429) ✅
+  - `wizardData` → `characterData`, `theme`, `style` türetimi; sadece `drafts` (user_id=null) + `guest_free_cover_used` INSERT ✅
+- ✅ **Veritabanı:**
+  - Migration 014: `guest_free_cover_used` tablosu (id, email UNIQUE, used_at); `drafts` için "Allow guest draft insert" RLS (user_id IS NULL, auth.uid() IS NULL) ✅
+- ✅ **Spec:** `docs/guides/STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md` ✅
+
 **Son Yapılanlar (25 Ocak 2026):**
-- ✅ **Pricing Sayfası Implementasyonu:** 
+- ✅ **Pricing Sayfası Implementasyonu:**
   - Pricing sayfası oluşturuldu (`/pricing`) ✅
   - Currency detection sistemi (IP-based geolocation) ✅
   - Pricing'e özel FAQ section ✅
@@ -2817,7 +2837,8 @@ Response: {
   - API'ye email gönderimi ✅
 - ✅ **Bot Koruması:**
   - Rate limiting API (`/api/rate-limit`) ✅
-  - IP-based rate limiting (1 free cover/IP/24h) ✅
+  - IP-based rate limiting ✅
+  - create-free-cover içinde guest için IP 5/24h + 1/email (`guest_free_cover_used`) ✅
   - Authenticated users için sınırsız ✅
 
 **Son Yapılanlar (24 Ocak 2026):**

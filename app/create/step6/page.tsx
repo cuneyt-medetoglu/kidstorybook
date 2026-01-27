@@ -118,7 +118,7 @@ export default function Step6Page() {
     fetchCurrency()
   }, [])
 
-  // Check free cover status
+  // Check free cover status: üyeli → API; üyesiz → 1 hak var varsayımı (API "zaten kullanıldı" dönebilir)
   useEffect(() => {
     const checkFreeCover = async () => {
       if (user) {
@@ -131,7 +131,7 @@ export default function Step6Page() {
           setHasFreeCover(false)
         }
       } else {
-        setHasFreeCover(false)
+        setHasFreeCover(true) // Üyesiz: 1 ücretsiz kapak hakkı var (email+IP ile sınır; API reddedebilir)
       }
       setIsCheckingFreeCover(false)
     }
@@ -940,7 +940,7 @@ export default function Step6Page() {
                   <Button
                     type="button"
                     onClick={handleCreateFreeCover}
-                    disabled={isCreating || (!user && !validateEmail(email))}
+                    disabled={isCreating || (!user && (!email || !validateEmail(email)))}
                     className="w-full bg-gradient-to-r from-green-500 to-emerald-500 px-8 py-6 text-base font-bold text-white shadow-lg transition-all hover:shadow-2xl dark:from-green-400 dark:to-emerald-400"
                   >
                     {isCreating ? (
@@ -961,64 +961,37 @@ export default function Step6Page() {
                 </motion.div>
               )}
 
-              {/* Pay & Create My Book Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.4, duration: 0.4 }}
-                className="w-full"
-              >
-                <Button
-                  type="button"
-                  disabled={
-                    isCreating ||
-                    isLoadingCurrency ||
-                    (!user && !validateEmail(email))
-                  }
-                  onClick={async () => {
-                    // Email validation for unauthenticated users
-                    if (!user) {
-                      if (!email) {
-                        setEmailError("Email address is required")
-                        toast({
-                          title: "Email Required",
-                          description: "Please enter your email address to continue.",
-                          variant: "destructive",
-                        })
-                        return
-                      }
-                      if (!validateEmail(email)) {
-                        setEmailError("Please enter a valid email address")
-                        toast({
-                          title: "Invalid Email",
-                          description: "Please enter a valid email address.",
-                          variant: "destructive",
-                        })
-                        return
-                      }
-                    }
-
-                    // Redirect to cart with email
-                    router.push(`/cart?plan=ebook&email=${encodeURIComponent(email)}`)
-                  }}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
+              {/* Pay & Create My Book Button - only for authenticated users */}
+              {user && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4, duration: 0.4 }}
+                  className="w-full"
                 >
-                  {isLoadingCurrency ? (
-                    <>
-                      <Loader2 className="mr-2 h-6 w-6 animate-spin" />
-                      <span>Loading...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="mr-2 h-6 w-6" />
-                      <span>Pay & Create My Book • {currencyConfig.price}</span>
-                    </>
-                  )}
-                </Button>
-                <p className="mt-2 text-center text-xs text-gray-600 dark:text-slate-400">
-                  {"You'll"} receive {currencyConfig.price} as a discount on the hardcover!
-                </p>
-              </motion.div>
+                  <Button
+                    type="button"
+                    disabled={isCreating || isLoadingCurrency}
+                    onClick={() => router.push(`/cart?plan=ebook`)}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
+                  >
+                    {isLoadingCurrency ? (
+                      <>
+                        <Loader2 className="mr-2 h-6 w-6 animate-spin" />
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="mr-2 h-6 w-6" />
+                        <span>Pay & Create My Book • {currencyConfig.price}</span>
+                      </>
+                    )}
+                  </Button>
+                  <p className="mt-2 text-center text-xs text-gray-600 dark:text-slate-400">
+                    {"You'll"} receive {currencyConfig.price} as a discount on the hardcover!
+                  </p>
+                </motion.div>
+              )}
 
               {/* Back Button */}
               <motion.div

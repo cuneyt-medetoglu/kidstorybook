@@ -1,7 +1,7 @@
 # Faz 4.4.5: Satış ve Sepet Kurgusu - İmplementasyon Takibi
 
 **Tarih:** 26 Ocak 2026  
-**Son Güncelleme:** 26 Ocak 2026  
+**Son Güncelleme:** 27 Ocak 2026  
 **Durum:** ✅ Tamamlandı (100%)  
 **Öncelik:** 🔴 Kritik
 
@@ -272,6 +272,26 @@ Faz 4.4.5, satış ve sepet kurgusu sisteminin implementasyonunu kapsar. 3 fazda
   - Butona tıklandığında free cover API'yi çağırma
   - Kapak oluşturulunca draft preview sayfasına yönlendirme
 
+### Faz 2.4: Guest (Üyesiz) Free Cover (27 Ocak 2026) ✅
+
+#### 2.4.1 - Step 6 Pay Gizleme ✅
+- **Dosya:** `app/create/step6/page.tsx`
+- **Değişiklik:** "Pay & Create My Book" bloğu sadece `user` varken gösteriliyor; `!user` iken gizli (ödeme için giriş/kayıt zorunlu)
+
+#### 2.4.2 - Create Free Cover API Guest Dalı ✅
+- **Dosya:** `app/api/books/create-free-cover/route.ts`
+- **Özellikler:** Body'de `email` zorunlu; `guest_free_cover_used` (1/email); IP 5/24h; `wizardData`→`characterData`/`theme`/`style` türetimi; sadece `drafts` (user_id=null) + `guest_free_cover_used` INSERT
+
+#### 2.4.3 - Migration 014 ✅
+- **Dosya:** `supabase/migrations/014_guest_free_cover_used.sql`
+- **İçerik:** `guest_free_cover_used` tablosu (email UNIQUE); `drafts` için "Allow guest draft insert" RLS (user_id IS NULL, auth.uid() IS NULL)
+
+#### 2.4.4 - Step 6 Üyesiz Free Cover UI ✅
+- **Dosya:** `app/create/step6/page.tsx`
+- **Özellikler:** `hasFreeCover` üyesizde `true`; "1 Free Cover" badge + "Create Free Cover" + email input (geçerli email zorunlu)
+
+- **Spec:** `docs/guides/STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md`
+
 ---
 
 ## 📊 İstatistikler
@@ -279,13 +299,13 @@ Faz 4.4.5, satış ve sepet kurgusu sisteminin implementasyonunu kapsar. 3 fazda
 ### Tamamlanan İşler
 - **Phase 1:** 8/8 görev (100%)
 - **Phase 3:** 8/8 görev (100%)
-- **Phase 2:** 6/6 görev (100%)
-- **Toplam:** 22/22 görev (100%)
+- **Phase 2:** 10/10 görev (100%) — Faz 2.4 Guest Free Cover dahil (27 Ocak 2026)
+- **Toplam:** 26/26 görev (100%)
 
 ### Dosya İstatistikleri
 - **Yeni Dosyalar:** 15
-- **Güncellenen Dosyalar:** 8
-- **Migration Dosyaları:** 2
+- **Güncellenen Dosyalar:** 10 (step6, create-free-cover route dahil)
+- **Migration Dosyaları:** 3 (012, 013, 014)
 
 ---
 
@@ -315,4 +335,4 @@ Faz 4.4.5, satış ve sepet kurgusu sisteminin implementasyonunu kapsar. 3 fazda
 
 ---
 
-**Son Güncelleme:** 26 Ocak 2026
+**Son Güncelleme:** 27 Ocak 2026
