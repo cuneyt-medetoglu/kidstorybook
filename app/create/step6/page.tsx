@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import {
   User,
@@ -176,8 +176,6 @@ export default function Step6Page() {
     if (saved) {
       try {
         const data = JSON.parse(saved)
-        console.log("[Step 6] Loaded wizard data:", data)
-        console.log("[Step 6] Character photo:", data?.step2?.characterPhoto)
         setWizardData(data)
       } catch (error) {
         console.error("Error parsing wizard data:", error)
@@ -203,20 +201,15 @@ export default function Step6Page() {
   // Get actual data from wizardData (localStorage)
   // NEW: Support both old characterPhoto and new characters array
   const getCharactersData = () => {
-    console.log("[Step 6] getCharactersData - wizardData.step2:", wizardData?.step2)
-    console.log("[Step 6] getCharactersData - characters array:", wizardData?.step2?.characters)
-    
     if (wizardData?.step2?.characters && Array.isArray(wizardData.step2.characters)) {
       // New format: characters array
       // Filter out characters that don't have at least an id or characterType
-      const validCharacters = wizardData.step2.characters.filter((char: any) => 
+      return wizardData.step2.characters.filter((char: any) => 
         char && (char.id || char.characterType || char.photo)
       )
-      console.log("[Step 6] Using new format - valid characters count:", validCharacters.length)
-      return validCharacters
-    } else if (wizardData?.step2?.characterPhoto) {
+    }
+    if (wizardData?.step2?.characterPhoto) {
       // Old format: single characterPhoto (backward compatibility)
-      console.log("[Step 6] Using old format - single characterPhoto")
       return [
         {
           id: "1",
@@ -226,13 +219,10 @@ export default function Step6Page() {
         },
       ]
     }
-    console.log("[Step 6] No characters found - returning empty array")
     return []
   }
 
   const charactersData = getCharactersData()
-  console.log("[Step 6] Final charactersData:", charactersData)
-  console.log("[Step 6] Characters count:", charactersData.length)
 
   const formData = {
       character: {
@@ -850,16 +840,16 @@ export default function Step6Page() {
                   style={{ transformOrigin: "left center" }}
                 />
 
-                {/* Mobile vertical line */}
+                {/* Mobile vertical line - sol sütun merkezinden geçer; 3. node’ın altında bitiyor (bottom-24), 3. adımdan sonra devam etmiyor */}
                 <motion.div
                   initial={{ scaleY: 0 }}
                   animate={{ scaleY: 1 }}
                   transition={{ duration: 1, delay: 0.9, ease: "easeInOut" }}
-                  className="absolute left-8 top-10 h-[calc(100%-2.5rem)] w-1 origin-top bg-gradient-to-b from-purple-500 via-pink-500 to-purple-600 md:hidden"
+                  className="absolute left-[2.375rem] top-8 bottom-[5.5rem] w-1 origin-top bg-gradient-to-b from-purple-500 via-pink-500 to-purple-600 md:hidden"
                 />
 
-                {/* Timeline Steps */}
-                <div className="relative flex flex-col gap-8 md:flex-row md:justify-between md:gap-12">
+                {/* Timeline Steps - Mobil: CSS Grid 3 eşit satır (metin uzunluğundan bağımsız); md: flex yatay */}
+                <div className="relative grid min-h-[420px] grid-cols-1 grid-rows-3 gap-8 md:min-h-0 md:flex md:flex-row md:justify-between md:gap-12">
                   {timelineSteps.map((step, index) => {
                     const Icon = step.icon
                     const isHovered = hoveredStep === step.id
@@ -874,54 +864,45 @@ export default function Step6Page() {
                           delay: 0.2 * index + 1,
                           ease: "easeOut",
                         }}
-                        className="relative flex flex-1 flex-col items-center"
+                        className="relative flex min-h-0 flex-1 flex-row items-start gap-4 md:flex-col md:items-center md:gap-0"
                         onMouseEnter={() => setHoveredStep(step.id)}
                         onMouseLeave={() => setHoveredStep(null)}
                       >
-                        {/* Node Circle */}
-                        <motion.div
-                          whileHover={{ scale: 1.1 }}
-                          className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${step.gradient} shadow-lg transition-all duration-300 md:h-20 md:w-20 ${
-                            isHovered ? `${step.shadowColor} shadow-xl` : ""
-                          }`}
-                        >
-                          {/* Step Number Badge */}
-                          <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-purple-600 shadow-md dark:bg-slate-800 dark:text-purple-400">
-                            {step.id}
-                          </div>
-
-                          {/* Icon */}
+                        {/* Sol sütun (mobil): node; desktop: md:contents ile sadece node */}
+                        <div className="w-20 flex-shrink-0 flex justify-center md:contents">
+                          {/* Node Circle - hover: büyüme+gölge korunuyor */}
                           <motion.div
-                            initial={{ rotate: -180 }}
-                            animate={{ rotate: 0 }}
-                            transition={{
-                              duration: 0.5,
-                              delay: 0.2 * index + 1.1,
-                            }}
+                            whileHover={{ scale: 1.1 }}
+                            className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br ${step.gradient} shadow-lg transition-all duration-300 md:h-20 md:w-20 ${
+                              isHovered ? `shadow-xl ${step.shadowColor}` : ""
+                            }`}
                           >
-                            <Icon className="h-8 w-8 text-white md:h-10 md:w-10" />
-                          </motion.div>
-                        </motion.div>
-
-                        {/* Step Title */}
-                        <h3 className="mt-4 text-center text-sm font-semibold text-gray-900 dark:text-white md:text-base">
-                          {step.title}
-                        </h3>
-
-                        {/* Step Description - Always visible on mobile, hover on desktop */}
-                        <AnimatePresence>
-                          {(isHovered || isMobile) && (
+                            <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-purple-600 shadow-md dark:bg-slate-800 dark:text-purple-400">
+                              {step.id}
+                            </div>
                             <motion.div
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              transition={{ duration: 0.2 }}
-                              className="mt-3 max-w-xs text-center text-xs text-gray-600 dark:text-slate-400 md:text-sm"
+                              initial={{ rotate: -180 }}
+                              animate={{ rotate: 0 }}
+                              transition={{
+                                duration: 0.5,
+                                delay: 0.2 * index + 1.1,
+                              }}
                             >
-                              {step.description}
+                              <Icon className="h-8 w-8 text-white md:h-10 md:w-10" />
                             </motion.div>
-                          )}
-                        </AnimatePresence>
+                          </motion.div>
+                        </div>
+
+                        {/* Sağ sütun (mobil) / alt (desktop): başlık + açıklama; metinde arka plan/gölge yok */}
+                        <div className="flex flex-1 min-w-0 flex-col md:flex-initial">
+                          <h3 className="mt-0 text-left text-sm font-semibold text-gray-900 dark:text-white md:mt-4 md:text-center md:text-base">
+                            {step.title}
+                          </h3>
+                          {/* Açıklama her zaman görünür; AnimatePresence kaldırıldı */}
+                          <p className="mt-3 max-w-none text-left text-xs text-gray-600 dark:text-slate-400 md:max-w-xs md:text-center md:text-sm">
+                            {step.description}
+                          </p>
+                        </div>
                       </motion.div>
                     )
                   })}
