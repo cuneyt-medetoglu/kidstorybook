@@ -47,7 +47,7 @@ Create a magical and engaging 10-page children's story.
 
 ADDITIONAL CHARACTERS:
 [IF MULTIPLE CHARACTERS EXIST]
-2. [CHARACTER_2_NAME] ([CHARACTER_NAME]'s [CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - A warm and caring family member
+2. [CHARACTER_2_NAME] ([CHARACTER_NAME]'s [CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes - A warm and caring family member
 3. [CHARACTER_3_NAME] ([CHARACTER_NAME]'s [CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] hair, [EYE_COLOR] eyes - A warm and caring family member
 [END IF]
 
@@ -275,9 +275,9 @@ The story should focus on nature, animals, and the environment. Include educatio
 ### v1.0.1 (16 Ocak 2026 - Multiple Characters Support)
 - ✅ **Enhanced Additional Characters Section** - Detailed appearance descriptions (age, hair color, eye color, features)
 - ✅ **Character Name Usage Directive** - Explicit instruction to use character names (Zeynep, Cüneyt) instead of generic terms like "friends" or "companions"
-- ✅ **Pets Support** - Fur color, eye color, special features for pets
-- ✅ **Family Members Support** - Age, hair color, eye color, special features for family members
-- ✅ **Other Characters Support** - Hair color, eye color, special features for other character types
+- ✅ **Pets Support** - Fur color, eye color, unique features (from AI image analysis) for pets
+- ✅ **Family Members Support** - Age, hair color, eye color, unique features (from AI image analysis) for family members
+- ✅ **Other Characters Support** - Hair color, eye color, unique features (from AI image analysis) for other character types
 - 🎯 **Goal:** Story uses specific character names and detailed descriptions, not generic terms
 
 ---

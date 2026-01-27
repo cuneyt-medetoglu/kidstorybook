@@ -76,7 +76,7 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 - **Yeni Özellikler (25 Ocak 2026):**
   - ✅ **AI Analysis for Non-Child Characters:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
     - Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
-    - User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+    - User-provided data (hairColor, eyeColor) ile AI analizi merge
     - Master karakter oluşturma için detaylı description kullanımı
   - ✅ **Gender Validation Improvements:** Character type'a göre otomatik gender düzeltme
     - Family Members için otomatik gender (Dad → boy, Mom → girl, Uncle → boy, Aunt → girl, etc.)

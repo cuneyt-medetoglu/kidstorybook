@@ -8,6 +8,13 @@
 
 ## Versiyon Geçmişi
 
+### Removed: Special Features Form (27 Ocak 2026)
+- **Kaldırılan:** Step 1 ve Step 2'deki Special Features (Glasses, Freckles, Dimples, Braces, Curly Hair, Long Hair) form alanı.
+- **Gerekçe:** Karakterler yüklenen görselden oluşturuluyor; unique features artık sadece AI görsel analizinden geliyor.
+- **Etki:** `characterSchema`, `Character` tipi, API body, prompt `step1Data` ve dokümanlar güncellendi.
+
+---
+
 ### Config (24 Ocak 2026) - Story model default
 - Create Book ve generate-story API varsayılan story modeli **gpt-4o-mini** olarak güncellendi.
 - `app/api/books/route.ts`, `app/api/ai/generate-story/route.ts`, `app/create/step6/page.tsx`. Prompt değişikliği yok.
@@ -712,7 +719,7 @@ Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal
 #### 3. Image Prompt İyileştirmeleri (`lib/prompts/image/v1.0.0/character.ts`)
 - ✅ Family Members için detaylı açıklamalar:
   - Character name vurgusu: `Zeynep (mom)` formatı
-  - Age, hair color, eye color, special features eklendi
+  - Age, hair color, eye color, unique features (AI image analysis) eklendi
   - Critical emphasis: `(IMPORTANT: This character has X eyes, NOT the same eye color as Character 1)`
   - Individual character vurgusu: `(IMPORTANT: This is Zeynep, a specific person with unique appearance)`
 - ✅ Fallback descriptions güçlendirildi (description null olduğunda)
@@ -738,9 +745,9 @@ Cover (Page 1) oluşturulduktan sonra, tüm sayfalarda (Pages 2-10) hem orijinal
 
 #### Story Prompt İyileştirmeleri (`lib/prompts/story/v1.0.0/base.ts`)
 - ✅ Additional Characters bölümü genişletildi:
-  - **Pets:** Fur color, eye color, special features eklendi
-  - **Family Members:** Age, hair color, eye color, special features eklendi
-  - **Other:** Hair color, eye color, special features eklendi
+  - **Pets:** Fur color, eye color, unique features (AI image analysis) eklendi
+  - **Family Members:** Age, hair color, eye color, unique features (AI image analysis) eklendi
+  - **Other:** Hair color, eye color, unique features (AI image analysis) eklendi
 - ✅ Character name kullanımı vurgulandı:
   - `**IMPORTANT:** Use the character names (Zeynep, Cüneyt) throughout the story, not generic terms like "friends" or "companions"`
 - ✅ Detaylı format örneği:

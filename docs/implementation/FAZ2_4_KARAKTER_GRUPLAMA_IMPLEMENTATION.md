@@ -345,7 +345,6 @@ const handleFileUpload = async (characterId: string, file: File) => {
             gender: step1Data.gender?.toLowerCase() || "girl",
             hairColor: step1Data.hairColor || "brown",
             eyeColor: step1Data.eyeColor || "brown",
-            specialFeatures: step1Data.specialFeatures || [],
             photoBase64: photoBase64,
             characterType: character.characterType, // Yeni: Karakter tipi bilgisi
           }),
@@ -1151,8 +1150,7 @@ const CHARACTER_OPTIONS = {
     "age": 5,
     "gender": "girl",
     "hairColor": "brown",
-    "eyeColor": "brown",
-    "specialFeatures": []
+    "eyeColor": "brown"
   },
   "step2": {
     "characters": [
@@ -1645,7 +1643,7 @@ if (referenceImageUrls.length > 0) {
 **Etki:** Kritik - Sayfalarda tüm karakterler artık reference image'larına benziyor ✅
 
 ### 2. localStorage Kaydetme Düzeltmesi ✅
-**Sorun:** Step 2'de localStorage'a kaydederken Non-Child karakterler için görsel özellikler (hairColor, eyeColor, specialFeatures) kaydedilmiyordu.
+**Sorun:** Step 2'de localStorage'a kaydederken Non-Child karakterler için görsel özellikler (hairColor, eyeColor) kaydedilmiyordu.
 
 **Çözüm:**
 - ✅ Tüm karakter tipleri için görsel özellikler kaydediliyor
@@ -1658,8 +1656,8 @@ if (referenceImageUrls.length > 0) {
 
 **Çözüm:**
 - ✅ Tüm karakterler için görsel özellikler gösteriliyor
-- ✅ Main character: Age, Gender, Hair Color, Eye Color, Special Features
-- ✅ Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa), Special Features (varsa)
+- ✅ Main character: Age, Gender, Hair Color, Eye Color
+- ✅ Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa)
 
 **Dosya:** `app/create/step6/page.tsx` (16 Ocak 2026)
 
@@ -1685,7 +1683,7 @@ if (referenceImageUrls.length > 0) {
 ### 5. AI Analysis for Non-Child Characters ✅
 **Özellik:** Family Members, Pets, Other, Toys karakterleri için fotoğraf analizi eklendi
 - ✅ Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
-- ✅ User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+- ✅ User-provided data (hairColor, eyeColor) ile AI analizi merge
 - ✅ Master karakter oluşturma için detaylı description kullanımı
 - ✅ Fallback mekanizması (AI analizi başarısız olursa basic description kullanılıyor)
 

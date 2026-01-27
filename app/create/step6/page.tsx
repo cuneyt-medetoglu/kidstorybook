@@ -235,13 +235,12 @@ export default function Step6Page() {
   console.log("[Step 6] Characters count:", charactersData.length)
 
   const formData = {
-    character: {
+      character: {
       name: wizardData?.step1?.name || "Child",
       age: wizardData?.step1?.age || 3,
       gender: wizardData?.step1?.gender || "Girl",
       hairColor: wizardData?.step1?.hairColor || "Brown",
       eyeColor: wizardData?.step1?.eyeColor || "Brown",
-      specialFeatures: wizardData?.step1?.specialFeatures || [],
     },
     // NEW: Multiple characters support
     characters: charactersData,
@@ -558,15 +557,6 @@ export default function Step6Page() {
                                     <span className="font-semibold">Eye Color:</span>{" "}
                                     {char.eyeColor || formData.character.eyeColor}
                                   </p>
-                                  {(() => {
-                                    const features = char.specialFeatures || formData.character.specialFeatures || []
-                                    return features.length > 0 ? (
-                                      <p>
-                                        <span className="font-semibold">Special Features:</span>{" "}
-                                        {features.join(", ")}
-                                      </p>
-                                    ) : null
-                                  })()}
                                 </div>
                               ) : (
                                 // Additional characters - Show type and appearance details
@@ -604,12 +594,6 @@ export default function Step6Page() {
                                     <p>
                                       <span className="font-semibold">Gender:</span>{" "}
                                       {char.gender}
-                                    </p>
-                                  )}
-                                  {char.specialFeatures && char.specialFeatures.length > 0 && (
-                                    <p>
-                                      <span className="font-semibold">Special Features:</span>{" "}
-                                      {char.specialFeatures.join(", ")}
                                     </p>
                                   )}
                                 </div>
@@ -1224,7 +1208,6 @@ export default function Step6Page() {
                                 additionalDetails: {
                                   hairColor: step1Data.hairColor || "brown",
                                   eyeColor: step1Data.eyeColor || "brown",
-                                  specialFeatures: step1Data.specialFeatures || [],
                                 },
                                 skipOpenAI: true, // Skip OpenAI API call
                                 mockAnalysis: wizardData?.step2?.characterAnalysis || {
@@ -1361,7 +1344,7 @@ export default function Step6Page() {
                             build: "normal",
                             clothingStyle: "casual",
                             clothingColors: ["blue", "red"],
-                            uniqueFeatures: step1.specialFeatures || formData.character.specialFeatures || [],
+                            uniqueFeatures: [],
                             typicalExpression: "happy",
                             personalityTraits: ["curious", "friendly"],
                           }
@@ -1423,7 +1406,7 @@ export default function Step6Page() {
                             build: "normal",
                             clothingStyle: "casual",
                             clothingColors: ["blue", "red"],
-                            uniqueFeatures: step1.specialFeatures || formData.character.specialFeatures || [],
+                            uniqueFeatures: [],
                             typicalExpression: "happy",
                             personalityTraits: ["curious", "friendly"],
                           }

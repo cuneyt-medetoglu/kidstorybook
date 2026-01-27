@@ -161,7 +161,7 @@
 - ✅ Text-based character detection replaced with structured characterIds
 - ✅ Multiple characters support with detailed appearance descriptions
 - ✅ Character name usage emphasized (not generic terms)
-- ✅ Age, hair color, eye color, special features for all character types
+- ✅ Age, hair color, eye color, unique features (from AI image analysis) for all character types
 
 **Kod:** `lib/prompts/story/v1.0.0/base.ts`  
 **Dokümantasyon:** `STORY_PROMPT_TEMPLATE_v1.0.0.md`  

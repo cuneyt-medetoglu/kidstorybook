@@ -35,7 +35,6 @@
    - **Gender:** Girl (veya Boy)
    - **Hair Color:** Dark Blonde (veya istediğin)
    - **Eye Color:** Hazel (veya istediğin)
-   - **Special Features:** Dimples (opsiyonel, istediğin kadar seç)
 
 2. **"Next" butonuna tıkla**
 

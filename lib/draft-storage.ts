@@ -10,7 +10,6 @@ export interface CharacterFormData {
   gender: "boy" | "girl"
   hairColor: string
   eyeColor: string
-  specialFeatures?: string[]
 }
 
 // Draft data structure

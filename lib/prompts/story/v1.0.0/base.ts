@@ -57,7 +57,6 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     // New: Direct character features from Step 1 (optional)
     hairColor,
     eyeColor,
-    specialFeatures,
     // NEW: Multiple characters support
     characters,
   } = input
@@ -76,7 +75,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterAge,
     characterGender,
     referencePhotoAnalysis, // Optional: for backward compatibility
-    { hairColor, eyeColor, specialFeatures } // Step 1 data
+    { hairColor, eyeColor } // Step 1 data
   )
 
   // Add additional characters if present
@@ -701,12 +700,12 @@ function buildCharacterDescription(
   age: number,
   gender: string,
   analysis?: any, // Optional: kept for backward compatibility
-  step1Data?: { hairColor?: string; eyeColor?: string; specialFeatures?: string[] } // Step 1 data (preferred)
+  step1Data?: { hairColor?: string; eyeColor?: string } // Step 1 data (preferred)
 ): string {
   let desc = `Name: ${name}\nAge: ${age} years old\nGender: ${gender}`
   
   // Prefer Step 1 data if available (simpler, no AI Analysis needed)
-  if (step1Data && (step1Data.hairColor || step1Data.eyeColor || step1Data.specialFeatures?.length)) {
+  if (step1Data && (step1Data.hairColor || step1Data.eyeColor)) {
     desc += `\n\nPHYSICAL APPEARANCE (use in every image):`
     
     // Default reasonable values for missing data
@@ -733,10 +732,6 @@ function buildCharacterDescription(
     desc += `\n- Face: ${faceShape} face shape`
     desc += `\n- Build: average height, normal build for age`
     desc += `\n- Clothing style: casual in various colors`
-    
-    if (step1Data.specialFeatures && step1Data.specialFeatures.length > 0) {
-      desc += `\n- Unique features: ${step1Data.specialFeatures.join(', ')}`
-    }
     
     desc += `\n\nPERSONALITY:`
     desc += `\n- Expression: happy, cheerful`

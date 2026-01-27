@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           eyeColor: additionalDetails?.eyeColor || 'brown',
           skinTone: mockAnalysis.skinTone || 'fair',
         },
-        uniqueFeatures: additionalDetails?.specialFeatures || [],
+        uniqueFeatures: [],
         typicalExpression: 'happy',
         personalityTraits: ['curious', 'friendly'],
         clothingStyle: 'casual',
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           build: 'normal',
           clothingStyle: 'casual',
           clothingColors: ['blue', 'red'],
-          uniqueFeatures: additionalDetails?.specialFeatures || [],
+          uniqueFeatures: [],
           typicalExpression: 'happy',
           personalityTraits: ['curious', 'friendly'],
         },
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     // Extract specific fields from OpenAI analysis (or mock) for database columns
     const hairColor = characterData.hair?.color || characterData.finalDescription?.hairColor || additionalDetails?.hairColor || 'brown'
     const eyeColor = characterData.physicalFeatures?.eyeColor || characterData.finalDescription?.eyeColor || additionalDetails?.eyeColor || 'brown'
-    const features = characterData.uniqueFeatures || characterData.finalDescription?.uniqueFeatures || additionalDetails?.specialFeatures || []
+    const features = characterData.uniqueFeatures || characterData.finalDescription?.uniqueFeatures || []
     
     // Use finalDescription if available (for mock), otherwise construct from OpenAI response
     const characterDescription = characterData.finalDescription || {

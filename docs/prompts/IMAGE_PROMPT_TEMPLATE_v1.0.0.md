@@ -157,7 +157,7 @@ Please carefully analyze the uploaded child's photo with EXTREME ATTENTION TO DE
 - **Eye color** (exact shade)
 - **Skin tone** (exact shade)
 - **Facial features** (face shape, nose, mouth, cheeks)
-- **Special features** (glasses, freckles, dimples, etc.)
+- **Unique features from image analysis** (e.g. glasses, freckles, dimples — AI extracts from reference photo)
 - **Clothing** (if visible, exact colors and style)
 - **Body proportions** (head size relative to body, etc.)
 - **General appearance and characteristic features**
@@ -213,7 +213,7 @@ Create an illustration for each page:
      * Same eye color (exact shade)
      * Same skin tone (exact shade)
      * Same facial features (face shape, nose, mouth, cheeks)
-     * Same special features (glasses, freckles, dimples, etc.)
+     * Same unique features from reference (e.g. glasses, freckles, dimples — from image analysis)
      * Same body proportions
    - Only clothing and position can change
    - **Pay special attention to hair length - this is a common mistake. If the photo shows short hair, the illustration must show short hair. If long, show long.**
@@ -227,9 +227,9 @@ Create an illustration for each page:
      * Do NOT mix features between characters - each character must maintain their individual characteristics.
    
    - **Additional Characters:** Each additional character must maintain their unique appearance:
-     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_2_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_2_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
-     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_3_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_3_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
-     * **For Pets:** [PET_NAME] (a [PET_TYPE]) - [FUR_COLOR] fur, [EYE_COLOR] eyes, [SPECIAL_FEATURES] - friendly and playful expression
+     * **CHARACTER 2 (Reference Image 2):** [CHARACTER_2_NAME] ([CHARACTER_2_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_2_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_2_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
+     * **CHARACTER 3 (Reference Image 3):** [CHARACTER_3_NAME] ([CHARACTER_3_TYPE]) - [AGE] years old, [HAIR_COLOR] [HAIR_LENGTH] [HAIR_STYLE] [HAIR_TEXTURE] hair, [EYE_COLOR] eyes - (IMPORTANT: This character has [EYE_COLOR] eyes, NOT the same eye color as Character 1) - (IMPORTANT: This is [CHARACTER_3_NAME], a specific person with unique appearance, NOT a generic [CHARACTER_3_TYPE]) - (CRITICAL: Hair style and length must match reference photo EXACTLY - [HAIR_LENGTH] [HAIR_STYLE]) - (CRITICAL: If [AGE] >= 18, this is an ADULT, NOT a child - must have adult body proportions, adult facial features, adult height) - (CRITICAL: If [AGE] >= 18, adult facial features (mature face, NOT childlike), adult body proportions (NOT child proportions))
+     * **For Pets:** [PET_NAME] (a [PET_TYPE]) - [FUR_COLOR] fur, [EYE_COLOR] eyes - friendly and playful expression
      * **CRITICAL:** Each character must maintain their individual characteristics. Do NOT mix features between characters.
      * **CRITICAL:** Match each character's text description with its corresponding reference image (image 1 → character 1, image 2 → character 2, etc.)
      * **CRITICAL (NEW: v1.0.7):** Hair style, length, and texture details are now included for better consistency
@@ -449,7 +449,7 @@ Comic Book - Bold outlines, relatively flat colors, strong dramatic shadows, com
 ### v1.0.5 (16 Ocak 2026 - Multiple Reference Images & Enhanced Character Descriptions)
 - ✅ **Multiple Reference Images Support** - All characters' reference images sent to API (image[] format)
 - ✅ **CRITICAL INSTRUCTION for Multiple Characters** - Reference image matching directives
-- ✅ **Enhanced Family Member Descriptions** - Age, hair color, eye color, special features included
+- ✅ **Enhanced Family Member Descriptions** - Age, hair color, eye color, unique features (from AI image analysis)
 - ✅ **Individual Character Emphasis** - Eye color preservation, specific person not generic
 - ✅ **Character Name Usage** - Explicit character names (Zeynep, Cüneyt) instead of generic terms
 - ✅ **Enhanced Fallback Descriptions** - Better descriptions when character.description is null

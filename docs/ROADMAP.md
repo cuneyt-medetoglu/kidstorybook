@@ -858,7 +858,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 - [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
 - [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi
   - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
-  - [x] User-provided data (hairColor, eyeColor, specialFeatures) ile AI analizi merge
+  - [x] User-provided data (hairColor, eyeColor) ile AI analizi merge
   - [x] Toys için gender-neutral validation
 - [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
 - [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
@@ -1806,7 +1806,7 @@ Requirements:
 Create an animated multi-step wizard form for creating a personalized children's book with smooth transitions and playful animations.
 
 Steps:
-1. Character Info (name, age, gender, hair color, eye color, special features)
+1. Character Info (name, age, gender, hair color, eye color)
 2. Photo Upload (drag & drop with preview, AI analysis button)
 3. Theme Selection (adventure, fairy tale, etc. with icons and previews)
 4. Illustration Style (grid of style options with images)
@@ -1934,7 +1934,6 @@ Mobile-first design with touch-friendly interactions.
      - [ ] Name ve Age alanları yan yana olmalı (mobil/tablet)
      - [ ] Boy ve Girl seçenekleri yan yana olmalı (mobil/tablet)
      - [ ] Hair Color ve Eye Color alanları yan yana olmalı (mobil/tablet)
-     - [ ] Special Features zaten 2'li grid'de, bu yeterli
      - **İlgili Dosya:** `app/create/step1/page.tsx`
      - **Durum:** ⏳ Bekliyor
   2. **Step 2 - Mobil/Tablet Tek Sayfa Optimizasyonu:**

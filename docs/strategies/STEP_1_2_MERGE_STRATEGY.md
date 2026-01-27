@@ -231,8 +231,7 @@ Step 6: Review & Create (tüm karakterleri göster)
     "age": 5,
     "gender": "girl",
     "hairColor": "brown",
-    "eyeColor": "brown",
-    "specialFeatures": ["dimples"]
+    "eyeColor": "brown"
   },
   "step2": {
     "characters": [
@@ -512,7 +511,6 @@ Character Photos
 │  │ Gender: girl                       │   │
 │  │ Hair Color: brown                  │   │
 │  │ Eye Color: brown                   │   │
-│  │ Special Features: dimples          │   │
 │  │                                     │   │
 │  │ [Photo Preview]                    │   │
 │  └─────────────────────────────────────┘   │

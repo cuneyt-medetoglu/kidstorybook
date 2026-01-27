@@ -950,7 +950,7 @@
   - Gender radio buttons (Boy/Erkek, Girl/Kız, custom styling)
   - Hair color dropdown (6 options, TR/EN labels)
   - Eye color dropdown (5 options, TR/EN labels)
-  - Special features checkboxes (6 options, optional, grid layout)
+  - ~~Special features checkboxes~~ Kaldırıldı (27 Ocak 2026 — unique features artık AI görsel analizinden)
 - ✅ "Next" button (gradient, disabled when invalid, ArrowRight icon)
 - ✅ Form validation (React Hook Form + Zod)
 - ✅ Real-time validation (onChange mode)
@@ -1000,7 +1000,7 @@
 - ✅ Component: `app/create/step6/page.tsx`
 - ✅ Özellikler:
   - Progress indicator: "Step 6 of 6" (100% progress bar)
-  - Character Information Summary: Step 1'den tüm karakter bilgileri (name, age, gender, hair color, eye color, special features)
+  - Character Information Summary: Step 1'den tüm karakter bilgileri (name, age, gender, hair color, eye color)
   - Reference Photo Preview: Step 2'den fotoğraf önizleme + AI analiz sonuçları (badges formatında)
   - Theme & Age Group Summary: Step 3'ten seçilen tema ve yaş grubu
   - Illustration Style Summary: Step 4'ten seçilen illustration style
@@ -1052,7 +1052,7 @@
 
 **2.4.8 - Form Validasyonu (Zod + React Hook Form):**
 - ✅ Step 1: Zod schema + React Hook Form + zodResolver
-  - Schema: `characterSchema` (name, age, gender, hairColor, eyeColor, specialFeatures)
+  - Schema: `characterSchema` (name, age, gender, hairColor, eyeColor)
   - Validation: min/max length, enum, array validation
 - ✅ Step 2: Custom file validation (`validateFile` function)
   - File type validation: JPG, PNG only

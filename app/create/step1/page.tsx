@@ -4,7 +4,6 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { User, Heart, Eye, Scissors, ArrowRight, Sparkles, Star, BookOpen } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -22,7 +21,6 @@ const characterSchema = z.object({
   }),
   hairColor: z.string().min(1, "Please select a hair color"),
   eyeColor: z.string().min(1, "Please select an eye color"),
-  specialFeatures: z.array(z.string()).optional(),
 })
 
 type CharacterFormData = z.infer<typeof characterSchema>
@@ -44,32 +42,18 @@ const eyeColorOptions = [
   { value: "hazel", label: "Hazel" },
 ]
 
-const specialFeaturesOptions = [
-  { value: "glasses", label: "Glasses" },
-  { value: "freckles", label: "Freckles" },
-  { value: "dimples", label: "Dimples" },
-  { value: "braces", label: "Braces" },
-  { value: "curly-hair", label: "Curly Hair" },
-  { value: "long-hair", label: "Long Hair" },
-]
-
 export default function Step1Page() {
   const router = useRouter()
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isValid },
   } = useForm<CharacterFormData>({
     resolver: zodResolver(characterSchema),
     mode: "onChange",
-    defaultValues: {
-      specialFeatures: [],
-    },
   })
 
   const selectedGender = watch("gender")
@@ -89,7 +73,6 @@ export default function Step1Page() {
           gender: data.gender,
           hairColor: data.hairColor,
           eyeColor: data.eyeColor,
-          specialFeatures: data.specialFeatures || [],
         },
       }
       localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
@@ -100,14 +83,6 @@ export default function Step1Page() {
       console.error("Error saving step 1 data:", error)
       setIsSubmitting(false)
     }
-  }
-
-  const toggleFeature = (feature: string) => {
-    const newFeatures = selectedFeatures.includes(feature)
-      ? selectedFeatures.filter((f) => f !== feature)
-      : [...selectedFeatures, feature]
-    setSelectedFeatures(newFeatures)
-    setValue("specialFeatures", newFeatures)
   }
 
   // Floating animations for decorative elements
@@ -412,42 +387,6 @@ export default function Step1Page() {
                     {errors.eyeColor.message}
                   </motion.p>
                 )}
-              </motion.div>
-
-              {/* Special Features Checkboxes */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.9, duration: 0.4 }}
-                className="space-y-3"
-              >
-                <Label className="text-sm font-semibold text-gray-700 dark:text-slate-300">
-                  Special Features <span className="text-gray-500">(Optional)</span>
-                </Label>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {specialFeaturesOptions.map((option, index) => (
-                    <motion.label
-                      key={option.value}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.9 + index * 0.05, duration: 0.3 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 p-3 transition-all ${
-                        selectedFeatures.includes(option.value)
-                          ? "border-purple-500 bg-purple-50 dark:border-purple-400 dark:bg-purple-900/20"
-                          : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800"
-                      }`}
-                    >
-                      <Checkbox
-                        checked={selectedFeatures.includes(option.value)}
-                        onCheckedChange={() => toggleFeature(option.value)}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-pink-500"
-                      />
-                      <span className="text-sm font-medium text-gray-900 dark:text-slate-50">{option.label}</span>
-                    </motion.label>
-                  ))}
-                </div>
               </motion.div>
 
               {/* Navigation Buttons */}

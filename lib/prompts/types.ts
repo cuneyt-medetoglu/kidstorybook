@@ -32,7 +32,6 @@ export interface StoryGenerationInput {
   // Step 1 data (preferred, no AI Analysis needed)
   hairColor?: string
   eyeColor?: string
-  specialFeatures?: string[]
   // NEW: Multiple characters support
   characters?: Array<{
     id: string

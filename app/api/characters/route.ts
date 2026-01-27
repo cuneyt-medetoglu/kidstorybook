@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
       gender,
       hairColor,
       eyeColor,
-      specialFeatures = [],
       photoBase64, // Base64 encoded photo (data URL without prefix)
       characterType, // NEW: Character type info {group, value, displayName}
     } = body
@@ -103,17 +102,14 @@ export async function POST(request: NextRequest) {
       console.log(`[Character Creation] 🤖 Performing AI analysis for ${characterType.group} character`)
       
       try {
+        const additionalStr = [hairColor && `Hair: ${hairColor}`, eyeColor && `Eyes: ${eyeColor}`].filter(Boolean).join(', ') || undefined
         const analysisPrompt = generateCharacterAnalysisPrompt(
           'Analyze this photo and extract detailed character features',
           {
             name,
             age: parseInt(age) || 5,
             gender: validatedGender || 'other',
-            additionalDetails: {
-              hairColor,
-              eyeColor,
-              specialFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
-            },
+            additionalDetails: additionalStr,
           }
         )
 
@@ -149,10 +145,6 @@ export async function POST(request: NextRequest) {
         const analyzedHairColor = aiAnalysisData.hair?.color || aiAnalysisData.finalDescription?.hairColor || hairColor || 'brown'
         const analyzedEyeColor = aiAnalysisData.physicalFeatures?.eyeColor || aiAnalysisData.finalDescription?.eyeColor || eyeColor || 'brown'
         const analyzedFeatures = aiAnalysisData.uniqueFeatures || aiAnalysisData.finalDescription?.uniqueFeatures || []
-        // Merge with user-provided specialFeatures
-        const mergedFeatures = Array.isArray(specialFeatures) && specialFeatures.length > 0
-          ? [...new Set([...analyzedFeatures, ...specialFeatures])]
-          : analyzedFeatures
 
         // Build character description from AI analysis
         characterDescription = aiAnalysisData.finalDescription || {
@@ -169,7 +161,7 @@ export async function POST(request: NextRequest) {
           build: aiAnalysisData.body?.build || 'normal',
           clothingStyle: aiAnalysisData.clothingStyle?.style || 'casual',
           clothingColors: aiAnalysisData.clothingStyle?.colors || ['blue', 'red'],
-          uniqueFeatures: mergedFeatures,
+          uniqueFeatures: analyzedFeatures,
           typicalExpression: aiAnalysisData.expression?.typical || 'happy',
           personalityTraits: aiAnalysisData.personalityTraits || ['curious', 'friendly'],
         }
@@ -192,7 +184,7 @@ export async function POST(request: NextRequest) {
           build: 'normal',
           clothingStyle: 'casual',
           clothingColors: ['blue', 'red'],
-          uniqueFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+          uniqueFeatures: [],
           typicalExpression: 'happy',
           personalityTraits: ['curious', 'friendly'],
         }
@@ -213,7 +205,7 @@ export async function POST(request: NextRequest) {
         build: 'normal',
         clothingStyle: 'casual',
         clothingColors: ['blue', 'red'], // Default
-        uniqueFeatures: Array.isArray(specialFeatures) ? specialFeatures : [],
+        uniqueFeatures: [],
         typicalExpression: 'happy',
         personalityTraits: ['curious', 'friendly'], // Default
       }
@@ -294,7 +286,7 @@ export async function POST(request: NextRequest) {
         character_type: characterType || { group: 'Child', value: 'Child', displayName: name }, // NEW: Character type info
         hair_color: hairColor || 'brown',
         eye_color: eyeColor || 'brown',
-        features: Array.isArray(specialFeatures) ? specialFeatures : [],
+        features: [],
         reference_photo_url: referencePhotoUrl,
         reference_photo_path: referencePhotoPath,
         description: characterDescription,

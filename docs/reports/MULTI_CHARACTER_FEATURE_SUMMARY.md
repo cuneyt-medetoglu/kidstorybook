@@ -182,7 +182,7 @@ ACCOMPANYING CHARACTERS:
 **Dosya:** `app/create/step2/page.tsx`
 
 **Değişiklikler (16 Ocak 2026):**
-- ✅ Non-Child karakterler için görsel özellikler (hairColor, eyeColor, specialFeatures) localStorage'a kaydediliyor
+- ✅ Non-Child karakterler için görsel özellikler (hairColor, eyeColor) localStorage'a kaydediliyor
 - ✅ Mevcut karakter bilgileri korunuyor (photo güncellenirken diğer bilgiler silinmiyor)
 - ✅ Tüm karakter tipleri için appearance details kaydediliyor
 
@@ -194,8 +194,8 @@ ACCOMPANYING CHARACTERS:
 - `characterIds` array'ini book creation request'ine ekliyor
 - Backward compatibility: Eski tek `characterId` hala çalışıyor
 - ✅ **Tüm karakterler için görsel özellikler gösteriliyor** (16 Ocak 2026)
-  - Main character: Age, Gender, Hair Color, Eye Color, Special Features
-  - Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa), Special Features (varsa)
+  - Main character: Age, Gender, Hair Color, Eye Color
+  - Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa)
 
 ---
 
@@ -426,7 +426,7 @@ if (referenceImageUrls.length > 0) {
 **Etki:** Kritik - Sayfalarda tüm karakterler artık reference image'larına benziyor ✅
 
 ### 5. localStorage Kaydetme Düzeltmesi ✅
-**Sorun:** Step 2'de localStorage'a kaydederken Non-Child karakterler için görsel özellikler (hairColor, eyeColor, specialFeatures) kaydedilmiyordu.
+**Sorun:** Step 2'de localStorage'a kaydederken Non-Child karakterler için görsel özellikler (hairColor, eyeColor) kaydedilmiyordu.
 
 **Çözüm:**
 - ✅ Tüm karakter tipleri için görsel özellikler kaydediliyor
@@ -450,19 +450,18 @@ if (currentCharacter.characterType.group === "Child") {
   // Non-Child characters - appearance details
   characterData.hairColor = currentCharacter.hairColor
   characterData.eyeColor = currentCharacter.eyeColor
-  characterData.specialFeatures = currentCharacter.specialFeatures || []
 }
 ```
 
 **Etki:** Orta - Step 6'da karakter bilgileri doğru görünüyor ✅
 
 ### 6. Step 6 Karakter Bilgileri Gösterimi Düzeltmesi ✅
-**Sorun:** Step 6'da additional characters için sadece "Type" gösteriliyordu, görsel özellikler (hairColor, eyeColor, specialFeatures) gösterilmiyordu.
+**Sorun:** Step 6'da additional characters için sadece "Type" gösteriliyordu, görsel özellikler (hairColor, eyeColor) gösterilmiyordu.
 
 **Çözüm:**
 - ✅ Tüm karakterler için görsel özellikler gösteriliyor
-- ✅ Main character: Age, Gender, Hair Color, Eye Color, Special Features
-- ✅ Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa), Special Features (varsa)
+- ✅ Main character: Age, Gender, Hair Color, Eye Color
+- ✅ Additional characters: Type, Hair/Fur Color, Eye Color, Age (varsa), Gender (varsa)
 
 **Dosya:** `app/create/step6/page.tsx` (16 Ocak 2026)
 

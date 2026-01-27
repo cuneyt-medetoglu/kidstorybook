@@ -291,7 +291,7 @@ CRITICAL: Analyze and extract:
 6. Skin tone (exact shade)
 7. Body proportions
 8. Clothing (if visible)
-9. Any special features
+9. Unique features from image (e.g. glasses, freckles, dimples)
 
 Verify user inputs and add missing details.
 Return as JSON with all details.
