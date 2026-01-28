@@ -443,6 +443,11 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
 ### 2.2 Ana Sayfa (Homepage)
 - [x] **2.2.1** Hero section (başlık, CTA, görsel) - ✅ v0.app'den alındı ve entegre edildi
   - ✅ **Hero Transformation Component Güncellendi (25 Ocak 2026):** Yeni side-by-side layout ile fotoğraftan karaktere dönüşüm gösterimi eklendi. Magic arrow, theme selector, auto-cycle özellikleri eklendi. Responsive tasarım (mobil: dikey, desktop: yatay layout). `HeroBookTransformation.tsx` component'i entegre edildi.
+  - [ ] **2.2.1.1** "Your Child, The Hero" – Real Photo & Story Character Görselleri (27 Ocak 2026)
+    - Dummy görselleri kaldır; gerçek real photo + story character görselleri kullan
+    - Konfigüratif yapı: 1 real photo → X adet story character (örn. 1. foto → 3 story, 2. foto → 3 story)
+    - Görsel format rehberi ve kolay güncelleme dokümantasyonu
+    - **Analiz:** `docs/guides/HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md`
 - [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi

@@ -48,6 +48,7 @@ docs/
 │   ├── CART_PAGE_V0_PROMPT.md # Sepet sayfası v0.app prompt rehberi
 │   ├── CURRENCY_DETECTION.md # Currency detection sistemi dokümantasyonu
 │   ├── STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md # Step 6 Pay gizleme + Üyesiz ücretsiz kapak (email + IP) spec
+│   ├── HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md # "Your Child, The Hero" real photo + story character görselleri (config, format, rehber)
 │   └── ...
 │
 ├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
