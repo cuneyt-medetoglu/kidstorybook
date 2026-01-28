@@ -1,8 +1,15 @@
 # 🎨 Faz 2: Frontend Geliştirme - İmplementasyon Takibi
 
 **Başlangıç Tarihi:** 4 Ocak 2026  
-**Son Güncelleme:** 25 Ocak 2026  
+**Son Güncelleme:** 27 Ocak 2026  
 **Durum:** 🟡 Devam Ediyor
+
+**27 Ocak 2026 - HeroBookTransformation köşe izi (corner artifacts):**
+- ✅ Köşe beyazlığı/iz analiz dokümanı: `docs/guides/HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md`
+- ✅ 5.1 denemesi uygulandı: Footer görsel container dışına alındı (görsele `rounded-t-xl`, footer `rounded-b-xl`); Real Photo ve Story Character kartlarında – geri bildirim bekleniyor.
+
+**27 Ocak 2026 - HeroBookTransformation tema göstergesi + navigation dots:**
+- ✅ Gradient kaldırıldı; tema göstergesi ve aktif navigation dot her hikaye için solid renk (`sparkleColors[0]`). Görünürlük iyileşti.
 
 **25 Ocak 2026 - Hero Transformation Component Güncellendi:**
 - ✅ Yeni side-by-side layout ile fotoğraftan karaktere dönüşüm gösterimi eklendi

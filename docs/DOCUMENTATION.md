@@ -49,6 +49,7 @@ docs/
 │   ├── CURRENCY_DETECTION.md # Currency detection sistemi dokümantasyonu
 │   ├── STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md # Step 6 Pay gizleme + Üyesiz ücretsiz kapak (email + IP) spec
 │   ├── HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md # "Your Child, The Hero" real photo + story character görselleri (config, format, rehber)
+│   ├── HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md # HeroBookTransformation kartlarında köşe beyazlığı/iz analizi ve denenen çözümler
 │   └── ...
 │
 ├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
@@ -202,6 +203,8 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
   - Üyesiz 1 ücretsiz kapak: email zorunlu, `guest_free_cover_used` (1/email), create-free-cover içinde IP 5/24h, `drafts` (user_id=null)
   - Migration 014: `guest_free_cover_used` tablosu, `drafts` için "Allow guest draft insert" RLS
   - Spec: `docs/guides/STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md`
+  - HeroBookTransformation köşe izi: Analiz `docs/guides/HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md`; 5.1 (footer dışarı alındı) denendi – geri bildirim bekleniyor.
+  - HeroBookTransformation tema göstergesi + navigation dots: Gradient kaldırıldı, solid tema rengi (`sparkleColors[0]`). Görünürlük iyileşti. ✅
 
 - **4 Ocak 2026:** 
   - Faz 1.3: Environment ve yapılandırma tamamlandı

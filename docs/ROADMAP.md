@@ -448,6 +448,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - Konfigüratif yapı: 1 real photo → X adet story character (örn. 1. foto → 3 story, 2. foto → 3 story)
     - Görsel format rehberi ve kolay güncelleme dokümantasyonu
     - **Analiz:** `docs/guides/HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md`
+    - **Köşe beyazlığı/iz:** `docs/guides/HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md`; 5.1 (footer dışarı) denendi – geri bildirim bekleniyor.
+    - ✅ **Tema göstergesi + navigation dots:** Gradient kaldırıldı; her hikaye kendi rengi (solid `sparkleColors[0]`). Görünürlük iyileşti.
 - [x] **2.2.2** "Nasıl Çalışır?" bölümü (3 adım) - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.3** Örnek kitaplar carousel - ✅ v0.app'den alındı ve entegre edildi
 - [x] **2.2.4** Özellikler özeti - ✅ v0.app'den alındı ve entegre edildi

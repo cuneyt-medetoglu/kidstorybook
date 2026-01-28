@@ -2,48 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import { useState, useEffect } from "react"
-import { Sparkles, Star, BookOpen, Wand2, ArrowRight, Rocket, Fish, TreePine, Castle } from "lucide-react"
+import { Sparkles, Star, Wand2, ArrowRight } from "lucide-react"
 import Image from "next/image"
-
-// Theme configurations
-const themes = [
-  {
-    id: "space",
-    name: "Space Adventure",
-    icon: Rocket,
-    gradient: "from-indigo-600 via-purple-600 to-blue-600",
-    childPhoto: "/placeholder-child.jpg",
-    characterArt: "/example-book-space.jpg",
-    sparkleColors: ["#818cf8", "#c084fc", "#60a5fa"],
-  },
-  {
-    id: "ocean",
-    name: "Ocean Explorer",
-    icon: Fish,
-    gradient: "from-cyan-500 via-blue-500 to-teal-500",
-    childPhoto: "/placeholder-child.jpg",
-    characterArt: "/example-book-ocean.jpg",
-    sparkleColors: ["#06b6d4", "#3b82f6", "#14b8a6"],
-  },
-  {
-    id: "forest",
-    name: "Forest Journey",
-    icon: TreePine,
-    gradient: "from-emerald-500 via-green-500 to-lime-500",
-    childPhoto: "/placeholder-child.jpg",
-    characterArt: "/example-book-forest.jpg",
-    sparkleColors: ["#10b981", "#22c55e", "#84cc16"],
-  },
-  {
-    id: "castle",
-    name: "Magical Castle",
-    icon: Castle,
-    gradient: "from-pink-500 via-purple-500 to-rose-500",
-    childPhoto: "/placeholder-child.jpg",
-    characterArt: "/example-book-castle.jpg",
-    sparkleColors: ["#ec4899", "#a855f7", "#f43f5e"],
-  },
-]
+import { heroTransformationConfig } from "@/lib/config/hero-transformation"
 
 // Floating magical particles
 function MagicalParticles({ colors }: { colors: string[] }) {
@@ -141,31 +102,25 @@ function MagicArrow() {
 }
 
 export function HeroBookTransformation() {
-  const [currentThemeIndex, setCurrentThemeIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
   const [showTransformation, setShowTransformation] = useState(false)
 
-  const currentTheme = themes[currentThemeIndex]
-  const Icon = currentTheme.icon
+  const currentItem = heroTransformationConfig[currentIndex]
+  const Icon = currentItem.icon
 
-  // Auto-advance themes and trigger transformation
+  // Auto-advance and trigger transformation
   useEffect(() => {
-    // Start transformation after initial load
-    const transformTimer = setTimeout(() => {
-      setShowTransformation(true)
-    }, 500)
-
-    // Auto-cycle through themes
-    const themeInterval = setInterval(() => {
+    const transformTimer = setTimeout(() => setShowTransformation(true), 500)
+    const interval = setInterval(() => {
       setShowTransformation(false)
       setTimeout(() => {
-        setCurrentThemeIndex((prev) => (prev + 1) % themes.length)
+        setCurrentIndex((prev) => (prev + 1) % heroTransformationConfig.length)
         setShowTransformation(true)
       }, 800)
     }, 6000)
-
     return () => {
       clearTimeout(transformTimer)
-      clearInterval(themeInterval)
+      clearInterval(interval)
     }
   }, [])
 
@@ -208,22 +163,25 @@ export function HeroBookTransformation() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className={`absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r ${currentTheme.gradient} blur-3xl`}
+          className={`absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r ${currentItem.gradient} blur-3xl`}
         />
 
-        {/* Theme indicator - tablet smaller */}
+        {/* Theme indicator - theme color, solid (no gradient) */}
         <motion.div
-          key={currentTheme.id}
+          key={currentItem.id}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           className="mb-2 flex items-center justify-center gap-2 sm:mb-3 md:mb-2 md:gap-1.5 lg:mb-3"
         >
-          <div className={`rounded-full bg-gradient-to-r ${currentTheme.gradient} p-1.5 shadow-lg md:p-1 lg:p-1.5`}>
+          <div
+            className="rounded-full p-1.5 shadow-lg md:p-1 lg:p-1.5"
+            style={{ backgroundColor: currentItem.sparkleColors[0] }}
+          >
             <Icon className="h-3 w-3 text-white md:h-3 md:w-3 lg:h-4 lg:w-4" />
           </div>
           <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 md:text-xs lg:text-sm">
-            {currentTheme.name}
+            {currentItem.name}
           </span>
         </motion.div>
 
@@ -248,20 +206,19 @@ export function HeroBookTransformation() {
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Real Photo</span>
               </motion.div>
 
-              {/* Photo frame */}
-              <div className="relative aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
+              {/* Photo frame - image only (5.1: footer outside to avoid corner artifacts) */}
+              <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
                 <Image
-                  src={currentTheme.childPhoto || "/placeholder.svg"}
+                  src={currentItem.realPhoto.src}
                   alt="Child photo"
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, 40vw"
                 />
-
-                {/* Polaroid-style bottom */}
-                <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
-                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300">Emma, Age 7</p>
-                </div>
+              </div>
+              {/* Footer outside image container */}
+              <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
+                <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{currentItem.realPhoto.name}, {currentItem.realPhoto.age}</p>
               </div>
 
               {/* Corner decoration */}
@@ -297,7 +254,7 @@ export function HeroBookTransformation() {
           {/* Right: Character Illustration */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentTheme.id}
+              key={currentItem.id}
               initial={{ opacity: 0, x: 50, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -319,35 +276,34 @@ export function HeroBookTransformation() {
                   <Sparkles className="h-3 w-3 text-pink-500" />
                 </motion.div>
 
-                {/* Character frame */}
+                {/* Character frame - image only (5.1: footer outside to avoid corner artifacts) */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: showTransformation ? 1 : 0 }}
                   transition={{ duration: 0.8 }}
-                  className="relative aspect-square overflow-hidden rounded-xl"
+                  className="relative aspect-square overflow-hidden rounded-t-xl"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${currentTheme.gradient}`} />
+                  <div className={`absolute inset-0 bg-gradient-to-br ${currentItem.gradient}`} />
                   <Image
-                    src={currentTheme.characterArt || "/placeholder.svg"}
-                    alt={`${currentTheme.name} character`}
+                    src={currentItem.storyCharacter.src}
+                    alt={`${currentItem.name} character`}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                     sizes="(max-width: 768px) 100vw, 40vw"
                   />
 
-                  {/* Theme badge at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
-                    <div className="flex items-center justify-center gap-1.5">
-                      <Icon className="h-3 w-3 text-purple-600" />
-                      <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                        {currentTheme.name}
-                      </p>
-                    </div>
-                  </div>
-
                   {/* Magical particles overlay */}
-                  <MagicalParticles colors={currentTheme.sparkleColors} />
+                  <MagicalParticles colors={currentItem.sparkleColors} />
                 </motion.div>
+                {/* Footer outside image container */}
+                <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <Icon className="h-3 w-3 text-purple-600" />
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                      {currentItem.name}
+                    </p>
+                  </div>
+                </div>
 
                 {/* Corner decoration */}
                 <div className="absolute left-3 top-3 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
@@ -365,38 +321,39 @@ export function HeroBookTransformation() {
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
-                  className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentTheme.gradient} blur-xl`}
+                  className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentItem.gradient} blur-xl`}
                 />
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Theme selector dots - tablet smaller margin */}
+        {/* Theme selector dots - theme color when active, solid (no gradient) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1, duration: 0.6 }}
-          className="mt-4 flex justify-center gap-2 md:mt-3 lg:mt-6"
+          className="mt-4 flex justify-center gap-2.5 md:mt-3 lg:mt-6"
         >
-          {themes.map((theme, index) => (
+          {heroTransformationConfig.map((item, index) => (
             <motion.button
-              key={theme.id}
+              key={item.id}
               onClick={() => {
                 setShowTransformation(false)
                 setTimeout(() => {
-                  setCurrentThemeIndex(index)
+                  setCurrentIndex(index)
                   setShowTransformation(true)
                 }, 300)
               }}
               whileHover={{ scale: 1.2 }}
               whileTap={{ scale: 0.9 }}
-              className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
-                index === currentThemeIndex
-                  ? `bg-gradient-to-r ${theme.gradient} shadow-lg ring-2 ring-white dark:ring-slate-800`
-                  : "bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500"
+              style={index === currentIndex ? { backgroundColor: item.sparkleColors[0] } : undefined}
+              className={`h-3 w-3 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "shadow-md ring-2 ring-slate-800/40 dark:ring-white/50"
+                  : "bg-slate-300 hover:bg-slate-400 dark:bg-slate-400 dark:hover:bg-slate-300"
               }`}
-              aria-label={`Switch to ${theme.name}`}
+              aria-label={`Switch to ${item.name}`}
             />
           ))}
         </motion.div>
