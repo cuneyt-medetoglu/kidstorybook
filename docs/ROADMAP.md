@@ -1930,6 +1930,44 @@ Mobile-first design with touch-friendly interactions.
 
 ## 📝 Notlar ve Fikirler
 
+### 🚨 API Hata Yönetimi Sistemi (28 Ocak 2026)
+- **Kategori:** Teknik / Error Handling
+- **Öncelik:** 🔴 Yüksek (MVP)
+- **Tarih:** 28 Ocak 2026
+- **Durum:** ⏳ Planlandı
+- **Açıklama:** Story oluşturma veya görsel generate ederken API'den hata alındığında kullanıcıya gösterilecek ortak bir hata yönetimi sistemi. İlk fazda temel hata mesajları, sonraki fazlarda detaylı hata yönetimi eklenecek.
+- **Faz 1 - Temel Hata Yönetimi:**
+  - [ ] Ortak hata component'i (`components/ui/error-message.tsx`)
+  - [ ] API error response standardizasyonu
+  - [ ] Story generation hatası için kullanıcı dostu mesaj
+  - [ ] Image generation hatası için kullanıcı dostu mesaj
+  - [ ] Cover generation hatası için kullanıcı dostu mesaj
+  - [ ] Loading state sırasında hata yakalama
+  - [ ] Toast notification entegrasyonu
+- **Faz 2 - Detaylı Hata Yönetimi (Sonra):**
+  - [ ] Retry butonu ve otomatik retry mekanizması
+  - [ ] Hata türüne göre farklı mesajlar (network, timeout, API limit, vb.)
+  - [ ] Hata loglama ve tracking (Sentry entegrasyonu)
+  - [ ] Kullanıcıya alternatif öneriler (farklı tema, farklı stil dene)
+  - [ ] Admin dashboard'da hata istatistikleri
+- **Etkilenen Alanlar:**
+  - `app/api/books/route.ts` - Kitap oluşturma API
+  - `app/api/generate-story/route.ts` - Story generation
+  - `app/api/generate-cover/route.ts` - Cover generation
+  - `app/api/generate-images/route.ts` - Image generation
+  - `app/create/step6/page.tsx` - Wizard son adım (generation başlıyor)
+  - `components/book-viewer/` - Kitap görüntüleme
+- **Örnek Hata Mesajları:**
+  - Story: "Hikaye oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin."
+  - Image: "Görsel oluşturulurken bir sorun oluştu. Farklı bir tema deneyebilirsiniz."
+  - Network: "Bağlantı hatası. İnternet bağlantınızı kontrol edin."
+  - Timeout: "İşlem çok uzun sürdü. Lütfen tekrar deneyin."
+- **İlgili İşler:**
+  - `3.5.13 Retry ve hata yönetimi` (ertelendi, bu işle birleştirilebilir)
+  - `5.5.5 Error tracking (Sentry)`
+  - `2.1.4 Loading states ve error boundaries`
+- **Not:** Bu sistem MVP için kritik. Kullanıcıların hata durumunda ne yapacaklarını bilmeleri önemli.
+
 ### Mobil/Tablet Wizard Step İyileştirmeleri (25 Ocak 2026)
 - **Kategori:** UI/UX İyileştirmeleri / Responsive Design
 - **Öncelik:** 🟡 Önemli
