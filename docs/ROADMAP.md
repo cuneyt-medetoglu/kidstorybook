@@ -1309,7 +1309,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - Fiyatlandırma stratejisi
   - Stripe Subscription entegrasyonu
   - Subscription management UI
-- [ ] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026) | 🔴 DO
+- [x] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026) | ✅ Tamamlandı (FAZ4_4_5_IMPLEMENTATION.md)
   - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
   - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
   - Örneğin 10 sayfa lazımsa, zaten karakter ve kapak yaptıysak aslında 8 sayfa daha yapacağız gibi
