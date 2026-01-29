@@ -1968,6 +1968,23 @@ Mobile-first design with touch-friendly interactions.
   - `2.1.4 Loading states ve error boundaries`
 - **Not:** Bu sistem MVP için kritik. Kullanıcıların hata durumunda ne yapacaklarını bilmeleri önemli.
 
+### Debug / Feature Flags Sistemi (29 Ocak 2026)
+- **Kategori:** Teknik / Config
+- **Öncelik:** 🟡 Önemli (test ve admin için)
+- **Tarih:** 29 Ocak 2026
+- **Durum:** ✅ Tamamlandı (29 Ocak 2026)
+- **Sorun:** Create book ödemeye bağlı olduğu için admin olarak ödeme yapmadan test yapılamıyor. İleride admin dashboard gibi özellikler de sadece yetkili kullanıcıda görünmeli.
+- **Önerilen çözüm:** Config tabanlı DEBUG/feature flags + kullanıcı rolü (admin). DEBUG açıkken veya admin kullanıcı + ilgili flag açıkken: ödemesiz kitap oluşturma, debug UI, ileride admin dashboard görünsün.
+- **Analiz dokümanı:** `docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md`
+- **İmplementasyon takibi:** `docs/implementation/DEBUG_FEATURE_FLAGS_IMPLEMENTATION.md`
+- **Yapılanlar:**
+  - [x] `lib/config.ts` içinde feature flags (skipPaymentForCreateBook, showAdminDashboard)
+  - [x] Env: `DEBUG_SKIP_PAYMENT` (sadece server, opsiyonel). Görünürlük DB admin rolü ile.
+  - [x] users tablosunda role (migration 015 + ilk admin manuel atanır)
+  - [x] Create book API: skipPayment yetkisi (DEBUG veya admin+flag)
+  - [x] Step 6: "Create without payment (Debug)" butonu; sadece API canSkipPayment (admin veya DEBUG_SKIP_PAYMENT)
+  - [ ] Admin dashboard yapıldığında aynı config/role ile görünürlük (ileride)
+
 ### Mobil/Tablet Wizard Step İyileştirmeleri (25 Ocak 2026)
 - **Kategori:** UI/UX İyileştirmeleri / Responsive Design
 - **Öncelik:** 🟡 Önemli

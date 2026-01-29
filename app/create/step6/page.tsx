@@ -77,6 +77,9 @@ export default function Step6Page() {
   const [hasFreeCover, setHasFreeCover] = useState(false)
   const [isCheckingFreeCover, setIsCheckingFreeCover] = useState(true)
 
+  // Debug / skip payment: only from API (admin role in DB or DEBUG_SKIP_PAYMENT server env)
+  const [canSkipPayment, setCanSkipPayment] = useState(false)
+
   // Currency state
   const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>(
     getCurrencyConfig("USD")
@@ -140,6 +143,24 @@ export default function Step6Page() {
       checkFreeCover()
     }
   }, [user, isLoadingAuth])
+
+  // Can skip payment (debug or admin) – for "Create without payment" button
+  useEffect(() => {
+    if (!user) {
+      setCanSkipPayment(false)
+      return
+    }
+    const check = async () => {
+      try {
+        const res = await fetch("/api/debug/can-skip-payment")
+        const data = await res.json()
+        setCanSkipPayment(!!data.canSkipPayment)
+      } catch {
+        setCanSkipPayment(false)
+      }
+    }
+    check()
+  }, [user])
 
   // Detect mobile
   useEffect(() => {
@@ -336,6 +357,72 @@ export default function Step6Page() {
           error instanceof Error
             ? error.message
             : "Failed to create free cover",
+        variant: "destructive",
+      })
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  // Create book without payment: only when API says canSkipPayment (DB role=admin or server DEBUG_SKIP_PAYMENT).
+  const showSkipPaymentButton = user && canSkipPayment
+
+  const handleCreateWithoutPayment = async () => {
+    if (!wizardData || !user) return
+    const chars = getCharactersData()
+    const characterIds = chars
+      .map((c: any) => c.id)
+      .filter(Boolean) as string[]
+    const singleId = characterIds.length === 1 ? characterIds[0] : null
+    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("kidstorybook_character_id") : null
+    const themeKey =
+      wizardData?.step3?.theme?.id ||
+      (typeof wizardData?.step3?.theme === "string" ? wizardData.step3.theme : "") ||
+      "adventure"
+    const styleKey =
+      wizardData?.step4?.illustrationStyle?.id ||
+      (typeof wizardData?.step4?.illustrationStyle === "string" ? wizardData.step4.illustrationStyle : "") ||
+      "watercolor"
+    const language = (wizardData?.step3?.language?.id || formData.language?.id || "en") as "en" | "tr" | "de" | "fr" | "es" | "zh" | "pt" | "ru"
+    const payload = {
+      ...(characterIds.length > 0 ? { characterIds } : singleId || fallbackId ? { characterId: singleId || fallbackId } : {}),
+      theme: themeKey,
+      illustrationStyle: styleKey,
+      customRequests: formData.customRequests || "",
+      pageCount: formData.pageCount,
+      language,
+      skipPayment: true,
+    }
+    if (!payload.characterIds && !(payload as any).characterId) {
+      toast({
+        title: "Characters required",
+        description: "Save character(s) in previous steps first.",
+        variant: "destructive",
+      })
+      return
+    }
+    setIsCreating(true)
+    try {
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || result.message || "Create book failed")
+      }
+      const bookId = result.data?.id ?? result.id
+      toast({
+        title: "Book creation started",
+        description: "Your book is being generated.",
+      })
+      router.push(bookId ? `/library?book=${bookId}` : "/library")
+    } catch (error) {
+      console.error("Create without payment error:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create book",
         variant: "destructive",
       })
     } finally {
@@ -989,6 +1076,36 @@ export default function Step6Page() {
                   </Button>
                   <p className="mt-2 text-center text-xs text-gray-600 dark:text-slate-400">
                     {"You'll"} receive {currencyConfig.price} as a discount on the hardcover!
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Create without payment (Debug / Admin only) */}
+              {showSkipPaymentButton && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.35, duration: 0.4 }}
+                  className="w-full"
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isCreating || !wizardData}
+                    onClick={handleCreateWithoutPayment}
+                    className="w-full border-amber-500/50 text-amber-700 dark:text-amber-400 dark:border-amber-400/50"
+                  >
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <span>Create without payment (Debug)</span>
+                    )}
+                  </Button>
+                  <p className="mt-1 text-center text-xs text-amber-600/80 dark:text-amber-400/80">
+                    Admin / debug only – no payment
                   </p>
                 </motion.div>
               )}

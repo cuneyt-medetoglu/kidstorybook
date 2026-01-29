@@ -1,6 +1,6 @@
 # 📊 KidStoryBook Database Schema
 
-**Last Updated:** 10 Ocak 2026  
+**Last Updated:** 29 Ocak 2026  
 **Database:** PostgreSQL (Supabase)  
 **Version:** 1.0.0
 
@@ -9,6 +9,7 @@
 - ✅ Migration 002: Books table trigger - **Uygulandı (10 Ocak 2026)**
 - ✅ Migration 003: Books table enhance - **Uygulandı (10 Ocak 2026)**
 - ⏳ Migration 004: Storage buckets policies - **Sırada**
+- ✅ Migration 015: public.users role column (admin/user) - **Debug/Feature Flags (29 Ocak 2026)**
 
 ---
 
@@ -19,12 +20,9 @@
 │   users     │         │ characters  │         │   books     │
 │  (Supabase) │◄───────│             │◄────────│             │
 └─────────────┘         └─────────────┘         └─────────────┘
-                                │
-                                │
-                        ┌───────▼──────┐
-                        │  book_pages  │
-                        └──────────────┘
 ```
+
+**public.users (metadata):** id (PK, FK auth.users), email, name, avatar_url, free_cover_used, **role** ('user' | 'admin'), created_at, updated_at. Sync via trigger on auth.users insert. See Migration 005, 013, 015.
 
 ---
 

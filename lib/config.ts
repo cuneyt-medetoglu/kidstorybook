@@ -63,11 +63,15 @@ export const appConfig = {
 
   // Feature Flags
   features: {
-    // Development-only features
+    // Development-only / debug features (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
     dev: {
       testSupabasePage: isDevelopment,
       debugMode: isDevelopment,
       verboseLogging: isDevelopment,
+      /** Server: allow skipping payment for create book (DEBUG_SKIP_PAYMENT or admin+flag in API). Do not set in production. */
+      skipPaymentForCreateBook: isDevelopment || process.env.DEBUG_SKIP_PAYMENT === 'true',
+      /** Server: allow showing admin dashboard. Do not set in production except for admins. */
+      showAdminDashboard: isDevelopment || process.env.SHOW_ADMIN_DASHBOARD === 'true',
     },
     // Production features
     production: {

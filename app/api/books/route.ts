@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { appConfig } from '@/lib/config'
 // Note: createClient now supports Bearer token from Authorization header
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
@@ -299,6 +300,8 @@ export interface CreateBookRequest {
   pageCount?: number // Debug: Optional page count override (3-20)
   language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
   storyModel?: string // Story generation model (default: 'gpt-4o-mini')
+  /** When true, create book without payment. Only allowed when DEBUG_SKIP_PAYMENT or user is admin + skipPaymentForCreateBook. */
+  skipPayment?: boolean
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
@@ -347,7 +350,20 @@ export async function POST(request: NextRequest) {
       pageCount, // Debug: Optional page count override (0 or undefined = cover only)
       language = 'en',
       storyModel = 'gpt-4o-mini', // Default: GPT-4o Mini (Önerilen)
+      skipPayment,
     } = body
+
+    // Skip-payment: only when DEBUG or admin + flag (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
+    if (skipPayment === true) {
+      const debugSkip = process.env.DEBUG_SKIP_PAYMENT === 'true'
+      const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
+      const isAdmin = profile?.role === 'admin'
+      const flagOn = appConfig.features.dev.skipPaymentForCreateBook
+      const canSkip = debugSkip || (isAdmin && flagOn)
+      if (!canSkip) {
+        return CommonErrors.forbidden('Skip payment is not allowed for this user')
+      }
+    }
 
     // Image generation defaults (hardcoded - no override)
     const imageModel = 'gpt-image-1.5'

@@ -1,10 +1,10 @@
 # 📄 Product Requirements Document (PRD)
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 1.3  
+**Doküman Versiyonu:** 1.4  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 26 Ocak 2026  
-**Durum:** TASLAK - FAZ 3 (Güncellendi: Multi-character, TTS, Currency Detection, Cart, Image Edit, 8 Dil Desteği, PDF Generation eklendi)
+**Son Güncelleme:** 29 Ocak 2026  
+**Durum:** TASLAK - FAZ 3 (Güncellendi: Multi-character, TTS, Currency Detection, Cart, Image Edit, 8 Dil Desteği, PDF Generation, Debug/Feature Flags eklendi)
 
 ---
 
@@ -618,6 +618,19 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - [ ] SSL sertifikası
 - [ ] Secure payment gateway
 
+### 3.5 Operasyonel Yapılandırma (Debug / Feature Flags) (29 Ocak 2026)
+**Amaç:** Admin/test ortamında ödeme yapmadan kitap oluşturma; ileride admin dashboard gibi özelliklerin sadece yetkili kullanıcıda açılması.
+
+**Config:**
+- `lib/config.ts` içinde feature flags: `skipPaymentForCreateBook`, `showAdminDashboard`.
+- Env: `DEBUG_SKIP_PAYMENT` (sadece server, opsiyonel test için). Görünürlük sadece DB'deki admin rolü ile.
+
+**Yetkilendirme:**
+- Kullanıcı rolü: `role` veya `is_admin` (veritabanı / profiles).
+- Production’da DEBUG env’leri kapalı tutulmalı; yetki kontrolü her zaman server-side yapılır.
+
+**Referans:** `docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md`
+
 ---
 
 ## 4. Kullanıcı Deneyimi (UX) Gereksinimleri
@@ -709,6 +722,12 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 13. ✅ 8 dil desteği eklendi (24 Ocak 2026)
 14. ✅ PDF generation sistemi eklendi
 15. ✅ Pet ve oyuncak karakterleri eklendi (25 Ocak 2026)
+16. Debug / Feature Flags sistemi (planlandı – 29 Ocak 2026)
+
+**Eklenen Özellikler (29 Ocak 2026):**
+- Debug ve Feature Flags sistemi (operasyonel yapılandırma)
+- PRD 3.5: Operasyonel Yapılandırma (Debug/Feature Flags) bölümü eklendi
+- Referans: `docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md`
 
 **Eklenen Özellikler (15 Ocak 2026):**
 - Prompt version sync ve takip sistemi
@@ -740,5 +759,5 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - Rate limiting API (bot koruması)
 
 **Doküman Sahibi:** Proje Ekibi  
-**Son Güncelleme:** 26 Ocak 2026
+**Son Güncelleme:** 29 Ocak 2026
 

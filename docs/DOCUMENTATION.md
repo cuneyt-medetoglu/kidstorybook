@@ -17,6 +17,7 @@ docs/
 ├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
 │   ├── FAZ1_IMPLEMENTATION.md  # Faz 1 implementasyon takibi
 │   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi (gelecek)
+│   ├── DEBUG_FEATURE_FLAGS_IMPLEMENTATION.md  # Debug / Feature Flags implementasyon takibi
 │   └── ...
 │
 ├── checklists/                 # Kontrol listeleri (aktif)
@@ -163,6 +164,10 @@ docs/
    - Çoklu kitap stratejisi
    - Database schema
    - Kullanıcı akışları
+3. **strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md** - Debug ve feature flags sistemi analizi
+   - Ödemesiz create book testi (admin/DEBUG)
+   - Config + kullanıcı rolü (admin) önerisi
+   - İleride admin dashboard görünürlüğü
 
 ### Database
 1. **database/SCHEMA.md** - Database schema dokümantasyonu
