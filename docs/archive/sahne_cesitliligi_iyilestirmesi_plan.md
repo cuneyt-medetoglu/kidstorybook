@@ -350,7 +350,7 @@ if (!isCover && previousScenes && previousScenes.length > 0) {
 
 **Dosyalar:**
 - `lib/prompts/story/v1.0.0/base.ts`
-- `docs/prompts/STORY_PROMPT_TEMPLATE_v1.0.0.md`
+- `docs/prompts/STORY_PROMPT_TEMPLATE.md`
 
 ### Faz 2: Image Generation Scene Diversity Logic (Orta Öncelik)
 1. ✅ Scene diversity analysis fonksiyonu ekle
@@ -431,9 +431,8 @@ if (!isCover && previousScenes && previousScenes.length > 0) {
 ## 📝 Dokümantasyon Güncellemeleri
 
 ### Güncellenecek Dosyalar
-1. ✅ `docs/prompts/STORY_PROMPT_TEMPLATE_v1.0.0.md` - Visual diversity bölümü eklenecek
-2. ✅ `docs/prompts/CHANGELOG.md` - v1.0.2 versiyonu eklenecek
-3. ✅ `docs/prompts/IMAGE_PROMPT_TEMPLATE_v1.0.0.md` - Scene diversity bölümü eklenecek
+1. ✅ `docs/prompts/STORY_PROMPT_TEMPLATE.md` - Visual diversity bölümü eklenecek
+2. ✅ `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` - Scene diversity bölümü eklenecek
 4. ✅ `docs/ROADMAP.md` - Yeni task eklenecek
 
 ---

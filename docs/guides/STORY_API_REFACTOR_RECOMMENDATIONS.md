@@ -1,7 +1,7 @@
 # Story API Refactor Önerileri
 
 **Tarih:** 24 Ocak 2026  
-**Dosya:** `lib/prompts/story/v1.0.0/base.ts` (959 satır)  
+**Dosya:** `lib/prompts/story/base.ts`  
 **Durum:** ✅ Uygulandı (v1.4.0 - 24 Ocak 2026)
 
 ---
@@ -12,7 +12,7 @@
 - ✅ Yardımcı fonksiyonlar iyi organize edilmiş (`getAgeGroup`, `getThemeConfig`, `getSafetyRules`, vb.)
 - ✅ Type safety mevcut (`StoryGenerationInput`, `StoryGenerationOutput`)
 - ✅ Versioning sistemi var
-- ✅ Dokümantasyon (CHANGELOG, VERSION_STATUS)
+- ✅ Dokümantasyon (STORY_PROMPT_TEMPLATE.md)
 
 ### İyileştirme Gereken Alanlar
 

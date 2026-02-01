@@ -1,7 +1,7 @@
 # Image Generation API Refactor Analizi
 
 **Tarih:** 24 Ocak 2026  
-**Dosya:** `lib/prompts/image/v1.0.0/scene.ts` (1125 satır)  
+**Dosya:** `lib/prompts/image/scene.ts`  
 **Durum:** ✅ Uygulandı (v1.7.0 - 24 Ocak 2026)
 
 ---
@@ -335,8 +335,7 @@ if (useCoverReference) {
 - ✅ `VERSION.changelog`: 4 yeni entry eklendi (v1.7.0 genel, Faz 1, Faz 2, Faz 3)
 
 ### Dokümantasyon Güncellemeleri ✅
-- ✅ `docs/prompts/CHANGELOG.md`: Image v1.7.0 entry eklendi
-- ✅ `docs/prompts/VERSION_STATUS.md`: Image module version güncellendi (v1.6.0 → v1.7.0)
+- ✅ `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`: Image refactor dokümante edildi
 - ✅ `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`: Durum "Uygulandı" olarak güncellendi, uygulama detayları eklendi
 
 ### Sonuç

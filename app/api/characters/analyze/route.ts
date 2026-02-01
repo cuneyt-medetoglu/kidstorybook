@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import { createCharacter } from '@/lib/db/characters'
 import OpenAI from 'openai'
 
@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
           build: 'normal',
           clothingStyle: 'casual',
           clothingColors: ['blue', 'red'],
+          defaultClothing: mockAnalysis.defaultClothing || 'casual blue and red outfit',
           uniqueFeatures: [],
           typicalExpression: 'happy',
           personalityTraits: ['curious', 'friendly'],
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest) {
     const features = characterData.uniqueFeatures || characterData.finalDescription?.uniqueFeatures || []
     
     // Use finalDescription if available (for mock), otherwise construct from OpenAI response
-    const characterDescription = characterData.finalDescription || {
+    const rawDesc = characterData.finalDescription || {
       age: characterData.age || parseInt(age),
       gender: characterData.gender || gender,
       skinTone: characterData.physicalFeatures?.skinTone || 'fair',
@@ -168,12 +169,19 @@ export async function POST(request: NextRequest) {
       faceShape: characterData.physicalFeatures?.faceShape || 'round',
       height: 'average',
       build: 'normal',
-      clothingStyle: characterData.clothingStyle || 'casual',
-      clothingColors: characterData.clothingColors || ['blue', 'red'],
+      clothingStyle: characterData.clothingStyle?.style ?? characterData.clothingStyle ?? 'casual',
+      clothingColors: characterData.clothingStyle?.colors ?? characterData.clothingColors ?? ['blue', 'red'],
       uniqueFeatures: features,
       typicalExpression: characterData.typicalExpression || 'happy',
       personalityTraits: characterData.personalityTraits || ['curious', 'friendly'],
     }
+    // Faz 1: defaultClothing from analysis (exact outfit from photo for story/image consistency)
+    const defaultClothing =
+      characterData.defaultClothing ||
+      (rawDesc.clothingStyle && Array.isArray(rawDesc.clothingColors)
+        ? `${rawDesc.clothingStyle} in ${rawDesc.clothingColors.join(' and ')}`
+        : undefined)
+    const characterDescription = { ...rawDesc, ...(defaultClothing && { defaultClothing }) }
 
     // Create character in database
     const { data: character, error: dbError } = await createCharacter(

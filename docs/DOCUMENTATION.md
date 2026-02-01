@@ -16,19 +16,27 @@ docs/
 │
 ├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
 │   ├── FAZ1_IMPLEMENTATION.md  # Faz 1 implementasyon takibi
-│   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi (gelecek)
-│   ├── DEBUG_FEATURE_FLAGS_IMPLEMENTATION.md  # Debug / Feature Flags implementasyon takibi
+│   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi
+│   ├── FAZ3_IMPLEMENTATION.md  # Faz 3 implementasyon takibi
+│   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
+│   ├── IMAGE_QUALITY_IMPROVEMENT_PLAN.md # Görsel + sahne kalitesi tek plan (3.5.19, 3.5.20; nasıl ilerleyeceğiz burada)
 │   └── ...
 │
 ├── checklists/                 # Kontrol listeleri (aktif)
 │   └── ...
 │
-├── archive/                    # Arşivlenmiş dosyalar
+├── archive/                    # Arşivlenmiş dosyalar (sahne/kompozisyon/analiz → IMAGE_QUALITY_IMPROVEMENT_PLAN)
 │   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi (arşiv)
 │   ├── FAZ1_TEST_CHECKLIST.md  # Faz 1 test checklist (arşiv)
 │   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu (arşiv)
 │   ├── FAZ1_3_FINAL_REPORT.md  # Faz 1.3 final raporu (arşiv)
-│   └── FAZ1_TEST_REPORT.md     # Faz 1 test raporu (arşiv)
+│   ├── FAZ1_TEST_REPORT.md     # Faz 1 test raporu (arşiv)
+│   ├── sahne_cesitliligi_iyilestirmesi_plan.md
+│   ├── SCENE_AND_COVER_IMPROVEMENT_README.md
+│   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md
+│   ├── SCENE_REPETITION_AND_CLOTHING_CONSISTENCY_ANALYSIS.md
+│   ├── VISUAL_CONSISTENCY_AND_STORY_QUALITY_DEEP_DIVE.md
+│   └── UNIFIED_ANALYSIS_FOUR_MODELS.md  # (analysis/ boşaltıldı, içerik arşive taşındı)
 │
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
@@ -41,8 +49,6 @@ docs/
 │   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
 │   ├── IMAGE_EDIT_FEATURE_GUIDE.md # Image edit feature rehberi (ChatGPT-style mask-based editing)
-│   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md # Görsel kompozisyon ve derinlik analizi
-│   ├── SCENE_AND_COVER_IMPROVEMENT_README.md   # Sahne kalitesi, kapak–ilk sayfa benzerliği (3.5.19, 3.5.20) analiz ve ilerleme
 │   ├── EXAMPLES_PAGE_V0_PROMPT.md # Examples sayfası v0.app prompt rehberi (mobil-first tasarım)
 │   ├── PRICING_PAGE_V0_PROMPT.md # Pricing sayfası v0.app prompt rehberi
 │   ├── MY_LIBRARY_HARDCOPY_V0_PROMPT.md # My Library hardcopy özellikleri v0.app prompt rehberi
@@ -62,6 +68,7 @@ docs/
 │   ├── CURRENT_STATUS_ANALYSIS.md # Mevcut durum analizi ve eksikler listesi
 │   ├── MISSING_IMPLEMENTATIONS_ANALYSIS.md # Eksik implementasyonlar analizi (MVP için kritik)
 │   ├── IMAGE_QUALITY_ANALYSIS.md # Görsel kalite analizi
+   ├── QUALITY_AND_CONSISTENCY_ANALYSIS.md # Görsel ve hikaye kalite analizi (Kıyafet & Kurgu)
 │   └── ...
 │
 ├── strategies/                 # Strateji dokümanları
@@ -70,6 +77,8 @@ docs/
 │   ├── TTS_STRATEGY.md         # Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
 │   ├── CHARACTER_CONSISTENCY_STRATEGY.md # Master character multi-book tutarlılığı
 │   ├── B2B_FEATURE_ANALYSIS.md # B2B (Business-to-Business) özellik analizi
+│   ├── EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md # Examples: gerçek kitaplar + Create your own stratejisi
+│   ├── EXAMPLE_BOOKS_CUSTOM_REQUESTS.md # Example Books görsel kalite sorunları (5 problem analizi + çözümler)
 │   └── ...
 │
 ├── database/                   # Database schemas ve migration'lar
@@ -85,11 +94,8 @@ docs/
 │   └── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı
 │
 ├── prompts/                     # AI prompt template'leri
-│   ├── IMAGE_PROMPT_TEMPLATE_v1.0.0.md # Görsel üretimi prompt template (v1.0.0)
-│   ├── STORY_PROMPT_TEMPLATE_v1.0.0.md  # Hikaye üretimi prompt template (v1.0.0)
-│   ├── CHANGELOG.md             # Prompt versiyon geçmişi ve değişiklikler
-│   ├── VERSION_SYNC_GUIDE.md    # Version sync ve takip sistemi rehberi
-│   ├── VERSION_STATUS.md        # Mevcut prompt versiyon durumu
+│   ├── IMAGE_PROMPT_TEMPLATE.md # Görsel üretimi prompt template
+│   ├── STORY_PROMPT_TEMPLATE.md # Hikaye üretimi prompt template
 │   └── ...
 │
 └── technical/                   # Teknik dokümanlar
@@ -152,6 +158,8 @@ docs/
 2. **ai/AI_TOOLS_COMPARISON.md** - AI tool karşılaştırması ve test planı
 3. **ai/CHARACTER_CREATION_FLOW.md** - Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
 4. **prompts/** - Tüm prompt template'leri
+5. **analysis/STORY_AND_IMAGE_AI_FLOW.md** - Story ve Image için AI’a ne gönderildiği / ne döndüğü (request-response akışı, inceleme için)
+6. **analysis/SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md** - Kıyafet tutarlılığı sistem tasarımı (v1.6.0 single source of truth)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
@@ -235,8 +243,8 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
   - Faz 3: Backend ve AI Integration başladı
   - Prompt Management System kuruldu
     - Prompt versiyonlama sistemi (`lib/prompts/`)
-    - Story generation prompts v1.0.0
-    - Image generation prompts v1.0.0 (character, scene, negative)
+    - Story generation prompts (`lib/prompts/story/base.ts`)
+    - Image generation prompts (`lib/prompts/image/`: character, scene, negative, style-descriptions)
     - Prompt Manager Agent oluşturuldu (`.cursor/rules/prompt-manager.mdc`)
   - Character Consistency System
     - Master Character konsepti tasarlandı

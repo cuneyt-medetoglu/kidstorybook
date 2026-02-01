@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createCharacter } from '@/lib/db/characters'
-import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import type { CharacterDescription } from '@/lib/prompts/types'
 import OpenAI from 'openai'
 
@@ -146,15 +146,15 @@ export async function POST(request: NextRequest) {
         const analyzedEyeColor = aiAnalysisData.physicalFeatures?.eyeColor || aiAnalysisData.finalDescription?.eyeColor || eyeColor || 'brown'
         const analyzedFeatures = aiAnalysisData.uniqueFeatures || aiAnalysisData.finalDescription?.uniqueFeatures || []
 
-        // Build character description from AI analysis
-        characterDescription = aiAnalysisData.finalDescription || {
+        // Build character description from AI analysis (Faz 1: defaultClothing for consistency)
+        const rawDesc = aiAnalysisData.finalDescription || {
           age: aiAnalysisData.age || parseInt(age) || 5,
           gender: validatedGender || aiAnalysisData.gender || 'other',
           skinTone: aiAnalysisData.physicalFeatures?.skinTone || 'fair',
-          hairColor: hairColor || analyzedHairColor, // User input takes priority
+          hairColor: hairColor || analyzedHairColor,
           hairStyle: aiAnalysisData.hair?.style || 'natural',
           hairLength: aiAnalysisData.hair?.length || (parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long'),
-          eyeColor: eyeColor || analyzedEyeColor, // User input takes priority
+          eyeColor: eyeColor || analyzedEyeColor,
           eyeShape: aiAnalysisData.physicalFeatures?.eyeShape || 'round',
           faceShape: aiAnalysisData.physicalFeatures?.faceShape || 'round',
           height: aiAnalysisData.body?.heightForAge || 'average',
@@ -165,6 +165,12 @@ export async function POST(request: NextRequest) {
           typicalExpression: aiAnalysisData.expression?.typical || 'happy',
           personalityTraits: aiAnalysisData.personalityTraits || ['curious', 'friendly'],
         }
+        const defaultCloth =
+          aiAnalysisData.defaultClothing ||
+          (rawDesc.clothingStyle && Array.isArray(rawDesc.clothingColors)
+            ? `${rawDesc.clothingStyle} in ${rawDesc.clothingColors.join(' and ')}`
+            : undefined)
+        characterDescription = { ...rawDesc, ...(defaultCloth && { defaultClothing: defaultCloth }) }
 
         console.log(`[Character Creation] ✅ AI analysis completed (confidence: ${analysisConfidence})`)
       } catch (analysisError) {

@@ -1,4 +1,4 @@
-import type { PromptVersion } from '../../types'
+import type { PromptVersion } from '../types'
 
 /**
  * Negative Prompts - Version 1.0.0

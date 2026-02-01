@@ -7,7 +7,7 @@
 **Last Update:** 16 Ocak 2026 (Hand-Holding Ban)  
 **Status:** 🔴 Active Issue  
 **Author:** @prompt-manager  
-**Related:** `IMAGE_PROMPT_TEMPLATE_v1.0.0.md`, `lib/prompts/image/v1.0.0/negative.ts`
+**Related:** `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`, `lib/prompts/image/negative.ts`
 
 ---
 
@@ -387,8 +387,7 @@ Bu bölüm GPT'den alınan öneriler ile doldurulacak:
 
 ## 🔗 İlgili Dokümanlar
 
-- `docs/prompts/IMAGE_PROMPT_TEMPLATE_v1.0.0.md` - Ana görüntü prompt template
-- `docs/prompts/CHANGELOG.md` - Prompt değişiklik geçmişi
+- `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` - Ana görüntü prompt template
 - `lib/prompts/image/v1.0.0/negative.ts` - Negative prompts implementasyonu
 - `lib/prompts/image/v1.0.0/scene.ts` - Scene prompt generation
 

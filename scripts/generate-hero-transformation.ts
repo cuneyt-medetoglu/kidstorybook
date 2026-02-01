@@ -29,8 +29,8 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { config } from 'dotenv'
-import { getStyleDescription } from '../lib/prompts/image/v1.0.0/style-descriptions'
-import { getStyleSpecificDirectives } from '../lib/prompts/image/v1.0.0/scene'
+import { getStyleDescription } from '../lib/prompts/image/style-descriptions'
+import { getStyleSpecificDirectives } from '../lib/prompts/image/scene'
 
 config()
 

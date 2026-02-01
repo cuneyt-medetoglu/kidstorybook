@@ -32,6 +32,8 @@ export interface StoryGenerationInput {
   // Step 1 data (preferred, no AI Analysis needed)
   hairColor?: string
   eyeColor?: string
+  /** Faz 1: Master karakterin kilitli kıyafeti; story tüm sayfalarda bunu kullanır. */
+  defaultClothing?: string
   // NEW: Multiple characters support
   characters?: Array<{
     id: string
@@ -49,12 +51,26 @@ export interface StoryGenerationOutput {
   title: string
   pages: StoryPage[]
   totalPages: number
+  /** NEW: Supporting entities (animals, objects) in the story - for master generation */
+  supportingEntities?: SupportingEntity[]
   metadata: {
     ageGroup: string
     readingTime: number
     educationalThemes: string[]
     safetyChecked: boolean
   }
+}
+
+/**
+ * Supporting entity in the story (animals, objects, etc.)
+ * Used to generate master illustrations for consistency
+ */
+export interface SupportingEntity {
+  id: string // Unique ID (e.g., "rabbit-001", "ball-001")
+  type: 'animal' | 'object' // Entity type
+  name: string // Entity name (e.g., "Fluffy the Rabbit", "Magic Ball")
+  description: string // Brief description for master generation (e.g., "white rabbit with long ears")
+  appearsOnPages: number[] // Which pages this entity appears on
 }
 
 export interface StoryPage {

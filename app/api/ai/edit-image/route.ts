@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
-import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/v1.0.0/negative'
+import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/negative'
 
 export interface ImageEditRequest {
   bookId: string

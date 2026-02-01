@@ -225,7 +225,7 @@
 - [ ] [5.5.3 SSL sertifikası](#55-deployment)
 - [ ] [5.5.4 Monitoring kurulumu](#55-deployment)
 - [ ] [5.5.5 Error tracking](#55-deployment)
-- [ ] [5.6.1 Örnek kitaplar oluştur](#56-lansman-hazırlıkları)
+- [ ] [5.6.1 Örnek kitaplar oluştur](#56-lansman-hazırlıkları) | 🔴 DO
 - [ ] [5.6.2 Sosyal medya hesapları](#56-lansman-hazırlıkları)
 - [ ] [5.6.3 Landing page son kontrolü](#56-lansman-hazırlıkları)
 - [ ] [5.6.4 Beta kullanıcılar ile test](#56-lansman-hazırlıkları)
@@ -781,7 +781,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [x] Test için 24 kitap mock data eklendi
   - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek.
   - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek).
-  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli.
+  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli. | 🔴 DO
   - **Detaylı Plan:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
@@ -895,8 +895,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] /api/books route'unda cover image'ı page generation'da referans olarak kullan
   - [x] Log iyileştirmeleri: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri
   - **Detaylar:**
-    - `lib/prompts/image/v1.0.0/character.ts`: Hazel göz rengi için açıklama eklendi
-    - `lib/prompts/image/v1.0.0/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
+    - `lib/prompts/image/character.ts`: Hazel göz rengi için açıklama eklendi
+    - `lib/prompts/image/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
     - `app/api/books/route.ts`: Cover image page generation'da referans olarak kullanılıyor (pages 2+)
     - Log'lar: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri eklendi
 - [x] **3.5.11** Karakter Tutarlılığı İyileştirmeleri - Part 2 (16 Ocak 2026) - ✅ **TAMAMLANDI**
@@ -933,9 +933,9 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
   - [x] Geometric stil açıklaması güçlendirildi: "flat design", "minimalist", "angular", "vector art", "geometric abstraction", "low-poly" terimleri eklendi
   - **Detaylar:**
     - `app/api/books/route.ts`: Page 1'de de cover reference kullanılıyor (isCoverPage mantığı düzeltildi)
-    - `lib/prompts/image/v1.0.0/character.ts`: Blue göz rengi için özel vurgu eklendi (main character + family members)
-    - `lib/prompts/image/v1.0.0/style-descriptions.ts`: Geometric stil açıklaması güçlendirildi
-    - `lib/prompts/image/v1.0.0/scene.ts`: Geometric stil direktifleri güçlendirildi
+    - `lib/prompts/image/character.ts`: Blue göz rengi için özel vurgu eklendi (main character + family members)
+    - `lib/prompts/image/style-descriptions.ts`: Geometric stil açıklaması güçlendirildi
+    - `lib/prompts/image/scene.ts`: Geometric stil direktifleri güçlendirildi
 - [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
 - [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
   - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça
@@ -1034,8 +1034,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - [x] Anatomical error prevention (100+ negative prompts for hands, fingers, limbs)
     - [x] Anatomical correctness directives (5 fingers, 2 hands, proper proportions)
   - **Documentation:**
-    - [x] `STORY_PROMPT_TEMPLATE_v1.0.0.md` güncellendi
-    - [x] `IMAGE_PROMPT_TEMPLATE_v1.0.0.md` güncellendi (v1.0.1 features)
+    - [x] `STORY_PROMPT_TEMPLATE.md` güncellendi
+    - [x] `IMAGE_PROMPT_TEMPLATE.md` güncellendi (v1.0.1 features)
 - [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
   - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
   - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
@@ -1119,8 +1119,8 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - `generateFullPagePrompt()` refactor edildi - builder fonksiyonlarıyla yeniden yapılandırıldı
     - Prompt sırası korundu (mevcut prompt çıktısı aynı kaldı)
   - **Versiyon:** v1.6.0 → v1.7.0
-  - **Kod:** `lib/prompts/image/v1.0.0/scene.ts`
-  - **Dokümantasyon:** `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`, `docs/prompts/CHANGELOG.md`
+  - **Kod:** `lib/prompts/image/scene.ts`
+  - **Dokümantasyon:** `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
 
 - [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
   - **Özet:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
@@ -1137,7 +1137,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - `getClothingFewShotExamples()` fonksiyonu güncellendi - artık `themeConfig.clothingExamples` kullanıyor
   - **Sonuç:** Kod daha modüler ve bakımı kolay, her bölüm bağımsız test edilebilir, clothing direktifleri tek yerden yönetiliyor
   - **Version:** Story prompt v1.3.2 → v1.4.0
-  - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/CHANGELOG.md`, `docs/prompts/VERSION_STATUS.md`
+  - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/STORY_PROMPT_TEMPLATE.md`
   - **Test:** ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
 - [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
   - [x] Database migration (`011_add_image_edit_feature.sql`)
@@ -1645,7 +1645,7 @@ MVP lansmanı: Çalışan bir ürün ✅ **MVP HAZIR!** (11 Ocak 2026)
     - **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
 
 ### 5.6 Lansman Hazırlıkları
-- [ ] **5.6.1** Örnek kitaplar oluştur (demo)
+- [ ] **5.6.1** Örnek kitaplar oluştur (demo) | 🔴 DO
 - [ ] **5.6.2** Sosyal medya hesapları
 - [ ] **5.6.3** Landing page son kontrolü
 - [ ] **5.6.4** Beta kullanıcılar ile test
@@ -2033,7 +2033,7 @@ Mobile-first design with touch-friendly interactions.
      - [ ] Karakter de block_world stiline uygun olmalı (Minecraft-like, pixelated, blocky)
      - [ ] Şu an ortam block_world ama karakter smooth/cartoon style görünüyor
      - [ ] Image generation prompt'larında karakter için block_world direktifleri güçlendirilmeli
-     - **İlgili Dosyalar:** `lib/prompts/image/v1.0.0/character.ts`, `lib/prompts/image/v1.0.0/style-descriptions.ts`
+     - **İlgili Dosyalar:** `lib/prompts/image/character.ts`, `lib/prompts/image/style-descriptions.ts`
      - **Durum:** ⏳ Bekliyor
 - **Not:** Bu iyileştirmeler kullanıcı deneyimini önemli ölçüde artıracak, özellikle mobil kullanıcılar için wizard daha kullanışlı hale gelecek.
 
@@ -2295,7 +2295,7 @@ Mobile-first design with touch-friendly interactions.
   - **Implementasyon:**
     - `app/create/step3/page.tsx` - Dil seçimi UI eklendi
     - `app/create/step6/page.tsx` - Dil bilgisi review'da gösteriliyor
-    - `lib/prompts/story/v1.0.0/base.ts` - Dil desteği genişletildi, güçlü dil talimatları eklendi
+    - `lib/prompts/story/base.ts` - Dil desteği genişletildi, güçlü dil talimatları eklendi
     - `app/api/books/route.ts` - System message güçlendirildi
     - `app/api/ai/generate-story/route.ts` - System message güçlendirildi
     - `lib/prompts/types.ts` - Type definitions güncellendi (8 dil)

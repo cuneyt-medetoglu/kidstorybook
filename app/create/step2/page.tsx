@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Plus,
   Sparkles,
+  Info,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -826,6 +827,23 @@ export default function Step2Page() {
                 Upload photos for up to 3 characters (minimum 1)
               </p>
             </motion.div>
+
+            {/* Master photo best practices (better character consistency in book) */}
+            <div className="mx-auto mb-6 max-w-2xl rounded-lg border border-blue-200 bg-blue-50/80 p-4 dark:border-blue-800 dark:bg-blue-950/30">
+              <div className="flex gap-3">
+                <Info className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
+                <div className="text-sm text-gray-700 dark:text-slate-300">
+                  <p className="font-medium text-blue-900 dark:text-blue-100">En iyi sonuç için</p>
+                  <ul className="mt-2 list-inside space-y-1 text-xs">
+                    <li>Tam karşıdan fotoğraf (yüz kameraya baksın)</li>
+                    <li>Doğal ışık (güneş ışığı, yumuşak gölge)</li>
+                    <li>Sade arka plan (dikkat dağıtmayan)</li>
+                    <li>Doğal, rahat duruş</li>
+                    <li>Yan veya profil açı tüm sayfalarda aynı açıya yol açar</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
 
             <div className="space-y-6">
               <AnimatePresence mode="popLayout">

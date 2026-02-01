@@ -24,7 +24,13 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - `docs/ARCHITECTURE.md` - Mimari kararlar ve yapı
 
 ### İmplementasyon Takibi (docs/implementation/)
-- `docs/implementation/FAZ{X}_IMPLEMENTATION.md` - Faz bazlı implementasyon takibi
+- `docs/implementation/FAZ{X}_IMPLEMENTATION.md` - Faz bazlı implementasyon takibi (sadece bunlar + IMAGE_QUALITY_IMPROVEMENT_PLAN.md gibi gerekli planlar kalır)
+- Test amaçlı veya geçici analiz/plan dokümanları silinir; birleştirilebilir olanlar FAZ implementasyonuna özet olarak eklenir
+
+### Commit Öncesi Temizlik
+- **Doküman:** Test amaçlı dokümantasyonları sil. Gerekli olanlar: ROADMAP, PRD, FEATURES, ARCHITECTURE, DOCUMENTATION, FAZ{X}_IMPLEMENTATION, guides/reports/strategies (aktif). Gereksiz analiz/plan (tek seferlik, tamamlanmış konular) silinir veya archive'e taşınır.
+- **Kod:** Gereksiz log (console.log/warn) varsa kaldır.
+- **Kalan faz tespiti:** ROADMAP'ta tamamlanmamış ilk işe bak; özellikle Faz 3.5.19 (Görsel Kompozisyon), 3.5.20 (Kapak–İlk Sayfa benzerliği) ve sahne kalitesi (çocuk ön planda yapışık görünme, yüz açıları) odak alanı olabilir.
 
 ### Diğer Önemli Dosyalar
 - `docs/ai/` - AI stratejisi ve dokümanları
@@ -124,6 +130,13 @@ ROADMAP.md'deki görevleri aciliyet ve önemine göre kategorize etme:
 - Eisenhower kategorisi ROADMAP.md'de görünür olmalı
 - Script ROADMAP.md'den okuyup CSV'ye aktarır
 - HTML viewer CSV'den okuyup gösterir
+
+### 7.1. Commit Öncesi Temizlik (Toparlanma)
+Kullanıcı commit öncesi toparlanma istediğinde:
+1. **Doküman:** Test amaçlı ve tamamlanmış konuların geçici dokümanlarını sil (implementation/ içinde test guide, root cause, action phases, analiz dokümanları). Gerekli olanlar: FAZ{X}_IMPLEMENTATION.md, IMAGE_QUALITY_IMPROVEMENT_PLAN.md, docs/plans/ (sahne çeşitliliği vb.).
+2. **Birleştirme:** Birbirine benzeyen dokümanları tek özet halinde ilgili FAZ implementasyonuna ekle; gereksiz kopyaları sil.
+3. **Kod:** Gereksiz console.log/warn/error varsa kaldır.
+4. **Kalan faz:** ROADMAP.md'de sıradaki tamamlanmamış işi tespit et (örn. 3.5.19 Görsel Kompozisyon, 3.5.20 Kapak–İlk Sayfa benzerliği, sahne kalitesi / çocuk ön planda yapışık görünme, yüz açıları).
 
 ### 8. CSV Yönetimi ve Google Sheets Entegrasyonu
 ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:

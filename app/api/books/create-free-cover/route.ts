@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createBook } from "@/lib/db/books"
-import { buildDetailedCharacterPrompt } from "@/lib/prompts/image/v1.0.0/character"
+import { buildDetailedCharacterPrompt } from "@/lib/prompts/image/character"
 import type { CharacterDescription } from "@/lib/prompts/types"
 import type { CharacterFormData } from "@/lib/draft-storage"
 import OpenAI from "openai"

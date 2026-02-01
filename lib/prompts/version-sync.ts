@@ -58,24 +58,24 @@ function extractVersionFromFile(filePath: string): PromptModuleVersion | null {
       changelog.push(...items.map(item => item.replace(/['"]/g, '')))
     }
     
-    // Determine module type from path
-    let module: 'story' | 'image' | 'cover' = 'image'
+    // Determine module type from path (değişken adı 'module' olamaz; Next/Node global ile çakışır)
+    let moduleType: 'story' | 'image' | 'cover' = 'image'
     let submodule: string | undefined
-    
+
     if (filePath.includes('/story/')) {
-      module = 'story'
+      moduleType = 'story'
     } else if (filePath.includes('/cover/')) {
-      module = 'cover'
+      moduleType = 'cover'
     }
-    
+
     // Extract submodule name from filename
     const filename = filePath.split('/').pop()?.replace('.ts', '') || ''
     if (filename !== 'base' && filename !== 'index') {
       submodule = filename
     }
-    
+
     return {
-      module,
+      module: moduleType,
       submodule,
       version: versionMatch2[1],
       releaseDate: releaseDateMatch ? new Date(releaseDateMatch[1]) : new Date(),
@@ -96,25 +96,25 @@ function extractVersionFromFile(filePath: string): PromptModuleVersion | null {
 export function scanPromptVersions(rootPath: string = join(process.cwd(), 'lib/prompts')): PromptModuleVersion[] {
   const versions: PromptModuleVersion[] = []
   
-  // Scan story modules
+  // Scan story modules (sürüm bilgisi dosya içinde; klasör yapısı sürümsüz)
   const storyPath = join(rootPath, 'story')
   if (existsSync(storyPath)) {
     const storyFiles = ['base.ts']
     storyFiles.forEach(file => {
-      const filePath = join(storyPath, 'v1.0.0', file)
+      const filePath = join(storyPath, file)
       if (existsSync(filePath)) {
         const version = extractVersionFromFile(filePath)
         if (version) versions.push(version)
       }
     })
   }
-  
-  // Scan image modules
+
+  // Scan image modules (sürüm bilgisi dosya içinde; klasör yapısı sürümsüz)
   const imagePath = join(rootPath, 'image')
   if (existsSync(imagePath)) {
     const imageFiles = ['negative.ts', 'scene.ts', 'character.ts']
     imageFiles.forEach(file => {
-      const filePath = join(imagePath, 'v1.0.0', file)
+      const filePath = join(imagePath, file)
       if (existsSync(filePath)) {
         const version = extractVersionFromFile(filePath)
         if (version) versions.push(version)
@@ -154,7 +154,7 @@ export function checkSyncStatus(): SyncStatus[] {
   // Check story sync
   if (storyVersions.length > 0) {
     const storyVersion = storyVersions[0] // Assume base.ts is main
-    const docPath = join(process.cwd(), 'docs/prompts/STORY_PROMPT_TEMPLATE_v1.0.0.md')
+    const docPath = join(process.cwd(), 'docs/prompts/STORY_PROMPT_TEMPLATE.md')
     const docExists = existsSync(docPath)
     
     let docVersion: string | null = null
@@ -194,7 +194,7 @@ export function checkSyncStatus(): SyncStatus[] {
   if (imageVersions.length > 0) {
     // Use scene.ts as main image version (or combine all)
     const imageVersion = imageVersions.find(v => v.submodule === 'scene') || imageVersions[0]
-    const docPath = join(process.cwd(), 'docs/prompts/IMAGE_PROMPT_TEMPLATE_v1.0.0.md')
+    const docPath = join(process.cwd(), 'docs/prompts/IMAGE_PROMPT_TEMPLATE.md')
     const docExists = existsSync(docPath)
     
     let docVersion: string | null = null

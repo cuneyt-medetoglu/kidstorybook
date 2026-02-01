@@ -200,7 +200,7 @@
 
 ## Uygulama Planı (Faz 1–2–3)
 
-**lib/prompts ve docs/prompts:** Tüm iyileştirmelerde bu klasörler güncellenecek. Her kod değişikliği → version bump, CHANGELOG entry, template dokümantasyon sync ([VERSION_SYNC_GUIDE](docs/prompts/VERSION_SYNC_GUIDE.md)).
+**lib/prompts ve docs/prompts:** Tüm iyileştirmelerde bu klasörler güncellenecek. Template dokümantasyon: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`.
 
 | Faz | Özet |
 |-----|------|

@@ -1,0 +1,779 @@
+import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from '../types'
+
+/**
+ * Story Generation Prompt - Version 1.0.0
+ * 
+ * Initial version focused on:
+ * - Age-appropriate content
+ * - Safety (no scary/inappropriate content)
+ * - Educational value
+ * - Clear structure for AI
+ * - Detailed image prompts
+ */
+
+export const VERSION: PromptVersion = {
+  version: '1.7.0',
+  releaseDate: new Date('2026-01-30'),
+  status: 'active',
+  changelog: [
+    'Initial release',
+    'Age-appropriate content rules',
+    'Safety filters implemented',
+    'Educational themes integrated',
+    'Image prompt generation included',
+    '8 language support added (tr, en, de, fr, es, zh, pt, ru) - 24 Ocak 2026',
+    'Strong language enforcement directives added - 24 Ocak 2026',
+    'Language mixing prevention (no English words in non-English stories) - 24 Ocak 2026',
+    'Final language check mechanism added - 24 Ocak 2026',
+    'v1.0.1: Enhanced additional characters section with detailed appearance descriptions (age, hair color, eye color, features) and explicit character name usage directive (16 Ocak 2026)',
+    'v1.0.2: Visual safety guidelines added - avoid risky hand interactions for better anatomical accuracy (GPT research-backed) (18 Ocak 2026)',
+    'v1.0.3: Character mapping per page - Story generation now returns characterIds array for each page, replacing unreliable text-based character detection (18 Ocak 2026)',
+    'v1.1.0: Enhanced writing quality improvements (25 Ocak 2026)',
+    'v1.1.0: Added getExampleText() - age-group specific example texts with dialogue and sensory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced "show, don\'t tell" examples - detailed BAD and GOOD examples with full sensory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced sensory details emphasis - visual, auditory, tactile, olfactory, gustatory details (25 Ocak 2026)',
+    'v1.1.0: Enhanced pacing control - strong hook early, shorter scenes, predictable patterns, scene-by-scene breakdown (25 Ocak 2026)',
+    'v1.1.0: Enhanced illustration guidelines - sensory details visualization (25 Ocak 2026)',
+    'v1.2.0: Page 1 vs Cover rule - first interior page must differ from cover (scene, composition, camera) (3.5.20) (24 Ocak 2026)',
+    'v1.3.0: Story-driven clothing – "clothing" per page in JSON; CRITICAL CHARACTER CLOTHING updated; imagePrompt/sceneDescription include SPECIFIC clothing; plan: Kapak/Close-up/Kıyafet (24 Ocak 2026)',
+    'v1.3.1: characterIds and clothing REQUIRED enforcement – JSON schema "DO NOT OMIT", CRITICAL reminders strengthened, validation added in books route (24 Ocak 2026)',
+    'v1.3.2: Theme-specific clothing güçlendirme – getThemeConfig space → "astronaut suit", few-shot examples eklendi (space/underwater/forest), "mavi ve kırmızı rahat giysiler" yasaklandı, JSON şemasında tema bazlı örnekler (24 Ocak 2026)',
+    'v1.4.0: Story API Refactor – Faz 1: Clothing direktiflerini modülerleştir (getClothingDirectives, getClothingFewShotExamples), Faz 2: Prompt\'u 11 bölüme ayır (builder fonksiyonları), Faz 3: Theme-specific logic\'i merkezileştir (getThemeConfig.clothingExamples) (24 Ocak 2026)',
+    'v1.4.1: defaultClothing (Faz 1) – Master kıyafet story prompt\'a enjekte; tüm sayfalarda aynı kıyafet zorunluluğu (CONSISTENCY_AND_QUALITY_ACTION_PHASES) (31 Ocak 2026)',
+    'v1.5.0: Master-For-All-Entities – supportingEntities (hayvan/obje) eklendi; entity detection direktifleri; tüm varlıklar için master üretme (31 Ocak 2026)',
+    'v1.6.0: SYSTEM REDESIGN (CLOTHING CONSISTENCY) – Story no longer generates clothing; master system = single source of truth for visual details. REMOVED: getClothingDirectives, ClothingDirectives interface, stripClothingFromSceneText. ADDED: "DO NOT DESCRIBE" directive (no clothing/appearance in story text), "sceneContext" field (replaces "clothing"), supportingEntities already present. IMPACT: Story focuses on narrative (actions, emotions, plot); all visual details from master illustrations. (30 Ocak 2026)',
+    'v1.7.0: PROMPT SLIM – Request length reduced. System: one-line language rule. User: removed duplicate opening line; removed PERSONALITY block; removed Theme-Specific Examples; LANGUAGE section one line + verification; STORY STRUCTURE = short cover/interior/different-scenes; THEME + DO NOT DESCRIBE shortened; VISUAL DIVERSITY, WRITING STYLE, ILLUSTRATION, CRITICAL REMINDERS, OUTPUT FORMAT, SUPPORTING ENTITIES shortened. (30 Ocak 2026)',
+  ],
+  author: '@prompt-manager',
+}
+
+export function generateStoryPrompt(input: StoryGenerationInput): string {
+  const {
+    characterName,
+    characterAge,
+    characterGender,
+    theme,
+    illustrationStyle,
+    customRequests,
+    pageCount, // Debug: Optional page count override
+    referencePhotoAnalysis, // Optional: kept for backward compatibility, but not required
+    language = 'en',
+    // New: Direct character features from Step 1 (optional)
+    hairColor,
+    eyeColor,
+    /** Faz 1: Master karakterin kilitli kıyafeti; tüm sayfalarda aynı kıyafet. */
+    defaultClothing,
+    // NEW: Multiple characters support
+    characters,
+  } = input
+
+  // Get age-appropriate rules
+  const ageGroup = getAgeGroup(characterAge)
+  const safetyRules = getSafetyRules(ageGroup)
+  const themeConfig = getThemeConfig(theme)
+  
+  // REMOVED: clothing directives (v1.6.0) – kıyafet story'nin sorumluluğu değil; sadece master'da
+
+  // Build character description (use Step 1 data if available, otherwise use analysis)
+  let characterDesc = buildCharacterDescription(
+    characterName,
+    characterAge,
+    characterGender,
+    referencePhotoAnalysis, // Optional: for backward compatibility
+    { hairColor, eyeColor } // Step 1 data
+  )
+
+  // Add additional characters if present
+  if (characters && characters.length > 1) {
+    characterDesc += `\n\nADDITIONAL CHARACTERS:\n`
+    
+    characters.slice(1).forEach((char, index) => {
+      const charName = char.name || char.type.displayName
+      const charNumber = index + 2
+      
+      if (char.type.group === "Pets") {
+        characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} fur`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
+        characterDesc += ` - A friendly and playful companion`
+      } else if (char.type.group === "Toys") {
+        characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} color`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} details`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
+        characterDesc += ` - A beloved and special toy`
+      } else if (char.type.group === "Family Members") {
+        // NEW: Detailed family member description
+        characterDesc += `\n${charNumber}. ${charName} (${characterName}'s ${char.type.value.toLowerCase()})`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.age) characterDesc += `, ${char.description.age} years old`
+          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} hair`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
+        characterDesc += ` - A warm and caring family member`
+      } else {
+        // Other
+        characterDesc += `\n${charNumber}. ${charName}`
+        // Add appearance details if available
+        if (char.description) {
+          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} hair`
+          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
+          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
+            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+          }
+        }
+      }
+    })
+    
+    characterDesc += `\n\n**CRITICAL - CHARACTER USAGE REQUIREMENTS (MANDATORY - NO EXCEPTIONS):**`
+    characterDesc += `\n- ALL ${characters.length} characters MUST appear in the story`
+    characterDesc += `- The main character is ${characterName}`
+    characterDesc += `- Use ALL character names (${characters.map(c => c.name || c.type.displayName).join(', ')}) throughout the story, not generic terms like "friends" or "companions"`
+    
+    // Character distribution requirements (NEW: 25 Ocak 2026)
+    const familyMembers = characters.filter(c => c.type?.group === "Family Members")
+    if (familyMembers.length > 0) {
+      characterDesc += `\n\n**FAMILY MEMBERS USAGE (MANDATORY):**`
+      characterDesc += `\n- Family Members (${familyMembers.map(c => c.name || c.type.displayName).join(', ')}) MUST appear in multiple pages`
+      characterDesc += `\n- Each Family Member should appear in at least ${Math.max(3, Math.floor(getPageCount(ageGroup, pageCount) * 0.4))} pages`
+      characterDesc += `\n- DO NOT exclude any Family Member from the story - ALL must be included`
+    }
+    
+    characterDesc += `\n\n**CHARACTER DISTRIBUTION REQUIREMENTS:**`
+    characterDesc += `\n- ALL ${characters.length} characters should appear throughout the story`
+    characterDesc += `\n- Each character should appear in at least ${Math.max(2, Math.floor(getPageCount(ageGroup, pageCount) * 0.3))} pages`
+    characterDesc += `\n- Main character (${characterName}) will appear in most/all pages`
+    if (characters.length > 2) {
+      characterDesc += `\n- Pages 2-${Math.floor(getPageCount(ageGroup, pageCount) * 0.6)} should feature at least 2 characters`
+      characterDesc += `\n- Pages ${Math.floor(getPageCount(ageGroup, pageCount) * 0.6) + 1}-${getPageCount(ageGroup, pageCount)} should feature all ${characters.length} characters when possible`
+    }
+    characterDesc += `\n- Distribute characters evenly - do not favor some characters over others`
+    
+    // CHARACTER MAPPING for JSON response
+    characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
+    characters.forEach((char, index) => {
+      characterDesc += `- Character ${index + 1}: ID="${char.id}", Name="${char.name || char.type.displayName}"\n`
+    })
+    
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include a "characterIds" array indicating which characters appear on that page using their IDs from the mapping above.`
+    characterDesc += `\n- "characterIds" is a REQUIRED field - do NOT omit it`
+    characterDesc += `\n- Use the exact character IDs from the mapping above`
+    characterDesc += `\n- Example: If page 2 features both ${characterName} and ${characters[1].name || characters[1].type.displayName}, set "characterIds": ["${characters[0].id}", "${characters[1].id}"]`
+    characterDesc += `\n- **CRITICAL:** ALL ${characters.length} characters must appear in the story - check each page's characterIds to ensure ALL characters are included across all pages`
+    characterDesc += `\n- **VERIFICATION:** Before returning JSON, verify that ALL character IDs (${characters.map(c => c.id).join(', ')}) appear in at least one page's characterIds array`
+    characterDesc += `\n- **DO NOT** exclude any character - ALL ${characters.length} characters must be used in the story`
+  } else if (characters && characters.length === 1) {
+    // Single character - still include characterIds for consistency
+    characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
+    characterDesc += `- Character 1: ID="${characters[0].id}", Name="${characters[0].name || characters[0].type.displayName}"\n`
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${characters[0].id}"]`
+  }
+
+  // Faz 2: Prompt bölümlerini oluştur (açılış system'de; tekrar yok)
+  const sections = [
+    buildCharacterSection(characterDesc, characters),
+    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount, language, illustrationStyle, customRequests),
+    buildSupportingEntitiesSection(theme), // NEW: Supporting entities for master generation
+    buildLanguageSection(language),
+    buildAgeAppropriateSection(ageGroup),
+    buildStoryStructureSection(characterName, ageGroup, pageCount, characters),
+    buildThemeSpecificSection(themeConfig, ageGroup, theme),
+    buildVisualDiversitySection(),
+    buildWritingStyleSection(ageGroup, language, characterName, characters),
+    buildSafetySection(ageGroup),
+    buildIllustrationSection(illustrationStyle, characterName, characters),
+    buildOutputFormatSection(ageGroup, pageCount, illustrationStyle, theme, themeConfig, characters || [], characterName),
+    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount, language),
+    `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
+  ]
+  
+  return sections.join('\n\n').trim()
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+function getAgeGroup(age: number): string {
+  if (age <= 3) return 'toddler'
+  if (age <= 5) return 'preschool'
+  if (age <= 7) return 'early-elementary'
+  if (age <= 9) return 'elementary'
+  return 'pre-teen'
+}
+
+function getPageCount(ageGroup: string, override?: number): number {
+  // Debug: Allow page count override (2-20)
+  if (override !== undefined && override >= 2 && override <= 20) {
+    return override
+  }
+  
+  // Fixed to 10 pages for all age groups (user request: 10 Ocak 2026)
+  return 10
+  
+  // Previous logic (commented out for reference):
+  // const counts: Record<string, number> = {
+  //   toddler: 6,
+  //   preschool: 8,
+  //   'early-elementary': 10,
+  //   elementary: 12,
+  //   'pre-teen': 14,
+  // }
+  // return counts[ageGroup] || 10
+}
+
+function getVocabularyLevel(ageGroup: string): string {
+  const levels: Record<string, string> = {
+    toddler: 'very simple, common words only',
+    preschool: 'simple words, basic concepts',
+    'early-elementary': 'simple to moderate words, some new vocabulary',
+    elementary: 'moderate vocabulary, age-appropriate challenges',
+    'pre-teen': 'rich vocabulary, complex concepts',
+  }
+  return levels[ageGroup] || 'age-appropriate'
+}
+
+function getSentenceLength(ageGroup: string): string {
+  const lengths: Record<string, string> = {
+    toddler: 'very short (3-5 words)',
+    preschool: 'short (5-8 words)',
+    'early-elementary': 'short to medium (8-12 words)',
+    elementary: 'medium (10-15 words)',
+    'pre-teen': 'medium to long (12-20 words)',
+  }
+  return lengths[ageGroup] || 'age-appropriate'
+}
+
+function getComplexityLevel(ageGroup: string): string {
+  const levels: Record<string, string> = {
+    toddler: 'very simple, repetitive, predictable',
+    preschool: 'simple with gentle surprises',
+    'early-elementary': 'moderate with clear cause-effect',
+    elementary: 'moderate complexity with problem-solving',
+    'pre-teen': 'more complex with deeper themes',
+  }
+  return levels[ageGroup] || 'age-appropriate'
+}
+
+function getWordCount(ageGroup: string): string {
+  // Updated word counts (25 Ocak 2026): All values are AVERAGES, doubled from previous version
+  // User request: Increase word counts by 2x for richer story content
+  const counts: Record<string, string> = {
+    toddler: '70-90',           // avg 80 words (doubled from 35-45)
+    preschool: '100-140',        // avg 120 words (doubled from 50-70)
+    'early-elementary': '160-200', // avg 180 words (doubled from 80-100)
+    elementary: '220-260',       // avg 240 words (doubled from 110-130)
+    'pre-teen': '220-260',       // avg 240 words (doubled from 110-130)
+  }
+  return counts[ageGroup] || '160-200'
+}
+
+function getReadingTime(ageGroup: string): number {
+  const times: Record<string, number> = {
+    toddler: 1,
+    preschool: 2,
+    'early-elementary': 3,
+    elementary: 4,
+    'pre-teen': 5,
+  }
+  return times[ageGroup] || 3
+}
+
+/**
+ * Get example text for age group (NEW: 25 Ocak 2026)
+ * Provides concrete examples with dialogue, sensory details, and atmosphere
+ */
+function getExampleText(
+  ageGroup: string,
+  characterName: string,
+  language: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  // Note: Examples are in English for instruction, but the actual story should be in the specified language
+  // The function returns English examples as templates - the model should write in the target language
+  
+  const companionName = characters && characters.length > 1 
+    ? (characters[1].name || characters[1].type.displayName)
+    : 'companion'
+  
+  const examples: Record<string, string> = {
+    toddler: `"Look!" ${characterName} said, pointing at the colorful flowers. The sun felt warm on ${characterName}'s face. ${characterName} smiled and touched the soft petals. "Pretty!" ${characterName} giggled. The flowers smelled sweet like honey.`,
+    
+    preschool: `"Wow!" ${characterName} said, looking at the big tree. The leaves rustled in the gentle breeze. ${characterName} could hear birds singing high above. "I want to climb it!" ${characterName} said excitedly. The bark felt rough under ${characterName}'s small hands.`,
+    
+    'early-elementary': `As ${characterName} walked through the forest, the morning sun filtered through the tall trees. "This is amazing!" ${characterName} whispered to ${companionName}. The air smelled fresh and earthy, like rain and pine needles. ${characterName} could hear the crunch of leaves underfoot and the distant call of a bird. "I feel so happy here," ${characterName} said, feeling the warm sunlight on ${characterName}'s face.`,
+    
+    elementary: `The golden afternoon light painted everything in warm colors as ${characterName} and ${companionName} explored the meadow. "Do you hear that?" ${characterName} asked, stopping to listen. The gentle hum of bees mixed with the rustle of tall grass in the breeze. ${characterName} took a deep breath, smelling wildflowers and fresh earth. "This is the best day ever!" ${characterName} said, feeling the soft grass tickle ${characterName}'s bare feet. The sky above was a brilliant blue with fluffy white clouds.`,
+    
+    'pre-teen': `As the sun began to set, casting long shadows across the path, ${characterName} felt a sense of wonder. "Look at those colors," ${characterName} said to ${companionName}, pointing at the sky painted in orange, pink, and purple. The evening air was cool against ${characterName}'s skin, and ${characterName} could hear the distant sound of crickets beginning their nightly song. "I'll never forget this moment," ${characterName} thought, feeling grateful and peaceful. The world seemed to slow down, and everything felt perfect.`,
+  }
+  
+  return examples[ageGroup] || examples['early-elementary']
+}
+
+function getSafetyRules(ageGroup: string) {
+  return {
+    mustInclude: [
+      'Positive, uplifting message',
+      'Age-appropriate problem-solving',
+      'Kindness, friendship, or courage themes',
+      'Safe, supportive environment',
+      'Happy or hopeful ending',
+    ],
+    mustAvoid: [
+      'Violence, fighting, weapons',
+      'Scary monsters, ghosts, or nightmares',
+      'Death, injury, or harm to characters',
+      'Abandonment or separation anxiety',
+      'Adult themes or situations',
+      'Negative stereotypes',
+      'Commercialism or brand names',
+      'Dark, frightening imagery',
+      'Hopeless or sad endings',
+    ],
+  }
+}
+
+function getThemeConfig(theme: string) {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
+  const configs: Record<string, any> = {
+    adventure: {
+      name: 'Adventure',
+      mood: 'exciting',
+      setting: 'outdoor exploration (forest, mountain, beach)',
+      commonElements: ['discovery', 'nature', 'exploration', 'teamwork'],
+      clothingStyle: 'comfortable outdoor clothing appropriate for adventure (casual pants/shorts, t-shirts, sneakers, outdoor gear)',
+      clothingExamples: {
+        correct: [
+          'outdoor gear',
+          'hiking clothes',
+          'adventure outfit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
+    },
+    sports: {
+      name: 'Sports & Activities',
+      mood: 'exciting',
+      setting: 'playground, sports field, or indoor activity space',
+      commonElements: ['movement', 'teamwork', 'practice', 'friendly competition', 'having fun'],
+      clothingStyle: 'sportswear (athletic clothes, sports shoes, comfortable activewear)',
+      clothingExamples: {
+        correct: [
+          'sportswear',
+          'athletic clothes',
+          'sports outfit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
+    },
+    fantasy: {
+      name: 'Fantasy',
+      mood: 'magical',
+      setting: 'magical world or enchanted place',
+      commonElements: ['magic', 'wonder', 'imagination', 'friendly creatures'],
+      clothingStyle: 'fantasy-appropriate clothing (adventure-style casual, magical themes, not formal)',
+      clothingExamples: {
+        correct: [
+          'fantasy adventure outfit',
+          'magical adventure clothes',
+          'enchanted explorer clothing'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler',
+          'formal wear'
+        ]
+      }
+    },
+    animals: {
+      name: 'Animals',
+      mood: 'fun',
+      setting: 'farm, zoo, or natural habitat',
+      commonElements: ['animal friends', 'nature', 'care', 'learning'],
+      clothingStyle: 'casual comfortable clothing appropriate for nature/outdoors (jeans, t-shirts, casual shoes)',
+      clothingExamples: {
+        correct: [
+          'casual comfortable clothing',
+          'outdoor casual clothes',
+          'nature-appropriate outfit'
+        ],
+        wrong: [
+          'formal wear',
+          'dress clothes'
+        ]
+      }
+    },
+    'daily-life': {
+      name: 'Daily Life',
+      mood: 'relatable',
+      setting: 'home, school, or neighborhood',
+      commonElements: ['family', 'friends', 'everyday activities', 'growth'],
+      clothingStyle: 'everyday casual clothing (normal kids clothes, casual outfits)',
+      clothingExamples: {
+        correct: [
+          'everyday casual clothing',
+          'normal kids clothes'
+        ],
+        wrong: [] // Bu tema için kabul edilebilir
+      }
+    },
+    space: {
+      name: 'Space',
+      mood: 'inspiring',
+      setting: 'space, planets, or stars',
+      commonElements: ['exploration', 'discovery', 'wonder', 'science'],
+      clothingStyle: 'astronaut suit / space suit (child-sized space outfit with helmet, space exploration gear)',
+      clothingExamples: {
+        correct: [
+          'child-sized astronaut suit with helmet',
+          'space exploration outfit',
+          'astronaut gear'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler',
+          'everyday casual clothing'
+        ]
+      }
+    },
+    underwater: {
+      name: 'Underwater',
+      mood: 'mysterious',
+      setting: 'ocean, sea, or underwater world',
+      commonElements: ['sea creatures', 'exploration', 'discovery', 'beauty'],
+      clothingStyle: 'swimwear or beach-appropriate clothing (swimsuit, beach clothes, casual summer wear)',
+      clothingExamples: {
+        correct: [
+          'swimwear',
+          'beach clothes',
+          'swimsuit'
+        ],
+        wrong: [
+          'casual clothes',
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
+    },
+  }
+  
+  return configs[normalizedTheme] || configs['adventure']
+}
+
+// ============================================================================
+// Educational Focus Helper
+// ============================================================================
+
+function getEducationalFocus(ageGroup: string, theme: string): string {
+  const t = (theme || '').toString().trim().toLowerCase()
+  const normalizedTheme =
+    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
+      ? 'sports'
+      : t
+
+  const focuses: Record<string, string[]> = {
+    toddler: ['colors', 'shapes', 'counting', 'emotions'],
+    preschool: ['sharing', 'kindness', 'curiosity', 'basic concepts'],
+    'early-elementary': ['problem-solving', 'creativity', 'friendship', 'courage'],
+    elementary: ['perseverance', 'teamwork', 'responsibility', 'empathy'],
+    'pre-teen': ['self-confidence', 'resilience', 'critical thinking', 'ethics'],
+  }
+  
+  const themeFocuses: Record<string, string> = {
+    adventure: 'courage and exploration',
+    sports: 'movement, teamwork, and healthy habits',
+    fantasy: 'imagination and creativity',
+    animals: 'empathy and care for animals',
+    'daily-life': 'social-emotional skills',
+    space: 'curiosity and science',
+    underwater: 'environmental awareness',
+  }
+  
+  const ageFocus = focuses[ageGroup] || focuses['elementary']
+  const themeFocus = themeFocuses[normalizedTheme] || 'general growth'
+  
+  return `${themeFocus}, ${ageFocus.join(', ')}`
+}
+
+function buildCharacterDescription(
+  name: string,
+  age: number,
+  gender: string,
+  analysis?: any, // Optional: kept for backward compatibility
+  step1Data?: { hairColor?: string; eyeColor?: string } // Step 1 data (preferred)
+): string {
+  let desc = `Name: ${name}\nAge: ${age} years old\nGender: ${gender}`
+  
+  // Prefer Step 1 data if available (simpler, no AI Analysis needed). Skin/face/build = reference image; only hair/eyes in prompt.
+  if (step1Data && (step1Data.hairColor || step1Data.eyeColor)) {
+    desc += `\n\nPHYSICAL APPEARANCE (use in every image – only what we have; rest from reference):`
+    const hairStyle = 'natural'
+    const hairLength = age <= 3 ? 'short' : age <= 7 ? 'medium' : 'long'
+    const eyeShape = 'round'
+    if (step1Data.hairColor) {
+      desc += `\n- Hair: ${step1Data.hairColor} ${hairStyle} ${hairLength} hair`
+    } else {
+      desc += `\n- Hair: natural ${hairStyle} ${hairLength} hair`
+    }
+    if (step1Data.eyeColor) {
+      desc += `\n- Eyes: ${step1Data.eyeColor} ${eyeShape} eyes`
+    } else {
+      desc += `\n- Eyes: brown ${eyeShape} eyes`
+    }
+    return desc
+  }
+  
+  // Fallback: Use analysis data if available (backward compatibility)
+  if (analysis?.finalDescription) {
+    const char = analysis.finalDescription
+    desc += `\n\nPHYSICAL APPEARANCE (use in every image):`
+    
+    if (char.skinTone) desc += `\n- Skin tone: ${char.skinTone}`
+    if (char.hairColor && char.hairStyle && char.hairLength) {
+      desc += `\n- Hair: ${char.hairColor} ${char.hairStyle} ${char.hairLength} hair`
+    } else if (char.hairColor) {
+      desc += `\n- Hair: ${char.hairColor}`
+    }
+    if (char.eyeColor && char.eyeShape) {
+      desc += `\n- Eyes: ${char.eyeColor} ${char.eyeShape} eyes`
+    } else if (char.eyeColor) {
+      desc += `\n- Eyes: ${char.eyeColor}`
+    }
+    if (char.faceShape) desc += `\n- Face: ${char.faceShape} face shape`
+    if (char.height && char.build) {
+      desc += `\n- Build: ${char.height}, ${char.build}`
+    }
+    // v1.6.0: Do not add clothingStyle/clothingColors to story prompt; clothing comes from master only.
+    
+    if (char.uniqueFeatures && Array.isArray(char.uniqueFeatures) && char.uniqueFeatures.length > 0) {
+      desc += `\n- Unique features: ${char.uniqueFeatures.join(', ')}`
+    }
+  } else if (analysis?.detectedFeatures) {
+    // Fallback: Use detectedFeatures if finalDescription is not available
+    const features = analysis.detectedFeatures
+    desc += `\n\nPHYSICAL APPEARANCE (from photo analysis):`
+    if (features.hairColor) desc += `\n- Hair: ${features.hairColor}`
+    if (features.eyeColor) desc += `\n- Eyes: ${features.eyeColor}`
+    if (features.faceShape) desc += `\n- Face: ${features.faceShape}`
+    if (features.skinTone) desc += `\n- Skin tone: ${features.skinTone}`
+  } else {
+    // Minimal fallback: only hair/eyes; skin/face/build from reference image at image-generation time
+    desc += `\n\nPHYSICAL APPEARANCE (use in every image – only what we have; rest from reference):`
+    desc += `\n- Hair: natural hair`
+    desc += `\n- Eyes: brown round eyes`
+  }
+  return desc
+}
+
+// ============================================================================
+// Prompt Section Builder Functions (Faz 2: Bölümlere Ayırma)
+// ============================================================================
+
+function buildCharacterSection(
+  characterDesc: string,
+  characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
+): string {
+  return `# CHARACTER${characters && characters.length > 1 ? 'S' : ''}
+${characterDesc}`
+}
+
+function buildStoryRequirementsSection(
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  characterAge: number,
+  ageGroup: string,
+  pageCount: number,
+  language: string,
+  illustrationStyle: string,
+  customRequests?: string
+): string {
+  return `# STORY REQUIREMENTS
+- Theme: ${themeConfig.name} (${themeConfig.mood} mood)
+- Target Age: ${characterAge} years old (${ageGroup} age group)
+- Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
+- Language: ${getLanguageName(language)}
+- Illustration Style: ${illustrationStyle}
+- Special Requests: ${customRequests || 'None'}`
+}
+
+function buildSupportingEntitiesSection(theme: string): string {
+  return `# SUPPORTING ENTITIES (Master-For-All-Entities)
+Identify ALL animals and important objects that appear in the story; each gets a master illustration.
+- Include: any animals and key objects that the story needs. Exclude: background-only elements (e.g. trees, rocks), character clothing.
+- Rules: unique name+id per entity; visual description for master; same name throughout; list appearsOnPages.
+- JSON: include "supportingEntities" array with id, type (animal|object), name, description, appearsOnPages. Verify all story entities are listed.
+
+# SUGGESTED OUTFITS (for master illustrations)
+Output "suggestedOutfits": an object with one entry per character. Keys = character IDs from CHARACTER MAPPING (exact UUIDs). Value for each key = one line in English describing that character's outfit for this story (e.g. "comfortable outdoor clothing, sneakers"; "casual dress, sandals"). Used for master character illustrations so each character's clothing fits the story. Match story setting and theme. If only one character, the object has one key.`
+}
+
+function buildLanguageSection(language: string): string {
+  const langName = getLanguageName(language)
+  return `# LANGUAGE
+- **Page "text" only:** Write the story narrative (the "text" field for each page) in ${langName} only. This is what appears in the book. Do not use words from other languages in "text".
+- **imagePrompt, sceneDescription, sceneContext:** Always in English only. These fields are used for image generation APIs and must be in English.
+Before returning JSON: verify every word in every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.`
+}
+
+function buildAgeAppropriateSection(ageGroup: string): string {
+  return `# AGE-APPROPRIATE GUIDELINES
+- Vocabulary: ${getVocabularyLevel(ageGroup)}
+- Sentence Length: ${getSentenceLength(ageGroup)}
+- Complexity: ${getComplexityLevel(ageGroup)}
+- Reading Time: ${getReadingTime(ageGroup)} minutes per page`
+}
+
+function buildStoryStructureSection(
+  characterName: string,
+  ageGroup: string,
+  pageCount: number,
+  characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
+): string {
+  return `# STORY STRUCTURE
+- **Cover:** One page for the book cover (main character + theme). Professional, striking.
+- **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
+- **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
+- Vary locations and time of day across pages so the story feels like a progression.`
+}
+
+function buildThemeSpecificSection(
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  ageGroup: string,
+  theme: string
+): string {
+  return `# THEME
+Use a setting, mood, and educational focus that fit the theme "${themeConfig.name}" and target age. Do not list fixed examples; derive them from the story you create.
+
+# DO NOT DESCRIBE VISUAL DETAILS
+Story = narrative only. Visual details (appearance, clothing, object colors) = master illustration system. Do not describe character looks or clothing in text/imagePrompt/sceneContext. Focus on actions, emotions, location, time of day, plot. sceneContext = short location/time/action only, in English (e.g. "forest clearing, morning, character approaching").`
+}
+
+function buildVisualDiversitySection(): string {
+  return `# VISUAL DIVERSITY
+Each page = different scene. Vary location, time of day, perspective, composition, action. Scene description and imagePrompt: detailed (150+ and 200+ chars).`
+}
+
+function buildWritingStyleSection(
+  ageGroup: string,
+  language: string,
+  characterName: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  return `# WRITING STYLE
+Each page: ~${getWordCount(ageGroup)} words. Include dialogue, sensory details (see, hear, feel), atmosphere. Show, don't just tell. Structure: opening + action/dialogue + emotion + transition. Example (${getLanguageName(language)}): ${getExampleText(ageGroup, characterName, language, characters)}`
+}
+
+function buildSafetySection(ageGroup: string): string {
+  const safetyRules = getSafetyRules(ageGroup)
+  return `# SAFETY RULES (CRITICAL - MUST FOLLOW)
+## MUST INCLUDE:
+${safetyRules.mustInclude.map(rule => `- ${rule}`).join('\n')}
+
+## ABSOLUTELY AVOID:
+${safetyRules.mustAvoid.map(rule => `- ${rule}`).join('\n')}`
+}
+
+function buildIllustrationSection(
+  illustrationStyle: string,
+  characterName: string,
+  characters?: Array<{ name?: string; type: { displayName: string } }>
+): string {
+  return `# ILLUSTRATION
+Per page: scene description + detailed image prompt (${illustrationStyle}). Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.`
+}
+
+function buildOutputFormatSection(
+  ageGroup: string,
+  pageCount: number,
+  illustrationStyle: string,
+  theme: string,
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  characters: Array<{ id: string; name?: string; type: { displayName: string; group?: string } }>,
+  characterName: string
+): string {
+  const characterIdsList = characters.map(c => c.id).join(', ')
+  const familyMembers = characters.filter(c => c.type?.group === "Family Members")
+  const familyMembersList = familyMembers.map(c => c.name || c.type.displayName).join(', ')
+  
+  return `# OUTPUT FORMAT (JSON)
+Return a valid JSON object:
+{
+  "title": "Story title",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "Page text (~${getWordCount(ageGroup)} words, dialogue + descriptions)",
+      "imagePrompt": "English only. Detailed ${illustrationStyle} prompt (200+ chars): location, time of day, composition, character action. No appearance/clothing (master). Each page = distinct scene.",
+      "sceneDescription": "English only. Detailed scene (150+ chars): location, time, action, mood. No appearance/clothing.",
+      "characterIds": ["id-from-CHARACTER-MAPPING"],
+      "sceneContext": "English only. Short location/time/action only, e.g. 'forest clearing, morning, character approaching'"
+    }
+  ],
+  "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
+  "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"character-id-from-MAPPING": "one line English outfit"'},
+  "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
+}
+Pages array: EXACTLY ${getPageCount(ageGroup, pageCount)} items. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING). suggestedOutfits REQUIRED: object with one key per character ID from CHARACTER MAPPING, value = one line English outfit for that character (used for master illustration).`
+}
+
+function buildCriticalRemindersSection(
+  ageGroup: string,
+  characterName: string,
+  themeConfig: ReturnType<typeof getThemeConfig>,
+  pageCount: number,
+  language: string
+): string {
+  return `# CRITICAL REMINDERS
+- Return EXACTLY ${getPageCount(ageGroup, pageCount)} pages. characterIds REQUIRED per page.
+- ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.
+- Before returning: verify page "text" is in ${getLanguageName(language)}; verify imagePrompt, sceneDescription, sceneContext are in English; verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING (each value = one line English outfit, used for master).`
+}
+
+// ============================================================================
+// Language Helper Functions
+// ============================================================================
+
+function getLanguageName(language: string = 'en'): string {
+  const languageMap: Record<string, string> = {
+    'en': 'English',
+    'tr': 'Turkish',
+    'de': 'German',
+    'fr': 'French',
+    'es': 'Spanish',
+    'zh': 'Chinese (Mandarin)',
+    'pt': 'Portuguese',
+    'ru': 'Russian',
+  }
+  return languageMap[language] || 'English'
+}
+
+export default {
+  VERSION,
+  generateStoryPrompt,
+}
+

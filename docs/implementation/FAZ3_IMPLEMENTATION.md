@@ -107,7 +107,7 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 #### 3.5.2 - Story Generation Prompts v1.0.0 ✅
 - **Tarih:** 10 Ocak 2026
 - **Son Güncelleme:** 24 Ocak 2026
-- **Dosyalar:** `lib/prompts/story/v1.0.0/`
+- **Dosyalar:** `lib/prompts/story/`
 - **Durum:** Yaş gruplarına özel, safety rules, educational content
 - **Yeni Özellikler (16 Ocak 2026):**
   - ✅ Theme "sports" desteği eklendi: `getThemeConfig()` fonksiyonuna "sports" tema konfigürasyonu eklendi
@@ -126,14 +126,22 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 #### 3.5.3 - Image Generation Prompts v1.0.0 ✅
 - **Tarih:** 10 Ocak 2026
 - **Son Güncelleme:** 16 Ocak 2026
-- **Dosyalar:** `lib/prompts/image/v1.0.0/`
+- **Dosyalar:** `lib/prompts/image/`
 - **Durum:** Character consistency, scene generation, negative prompts
 - **Yeni Özellikler (16 Ocak 2026):**
   - ✅ Theme "sports" environment mapping eklendi: `getThemeEnvironment()` fonksiyonuna sports sahne çevreleri eklendi (stadium, field, court vb.)
 
 #### 3.5.4 - Character Consistency System ✅
 - **Tarih:** 10 Ocak 2026
+- **Son Güncelleme:** 1 Şubat 2026
 - **Durum:** Master Character concept, multi-book tutarlılığı
+- **Tamamlanan (Ocak–Şubat 2026):**
+  - ✅ Master tam boy (full body, ayaklar görünür); referans foto + hikaye kıyafeti ile üretim
+  - ✅ Master kıyafeti hikayeden (ilk sayfa clothing); kapak/sayfalar `match_reference` ile master'a bakıyor
+  - ✅ Sayfa prompt'undan kıyafet cümlesi strip (`stripClothingFromSceneText`); model sadece referansı takip ediyor
+  - ✅ Entity master (hayvan/obje) için generations API; `response_format` kaldırıldı (gpt-image-1.5 uyumu)
+  - ✅ Log: sadece gerekli console.log (story request/response özeti)
+  - **Sonuç:** master = kapak = sayfalar (görsel ve kıyafet tutarlılığı)
 
 #### 3.5.5 - Story Generation API ✅
 - **Tarih:** 10 Ocak 2026

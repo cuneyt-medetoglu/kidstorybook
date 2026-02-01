@@ -1,4 +1,4 @@
-import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../../types'
+import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../types'
 
 /**
  * Character Analysis and Consistency System - Version 1.0.0
@@ -34,6 +34,7 @@ export const VERSION: PromptVersion = {
     'v1.0.6: Hands descriptor simplified - research-backed simple directives (18 Ocak 2026)',
     'v1.1.0: Major optimization - buildCharacterPrompt simplified (800→300 chars), buildMultipleCharactersPrompt reduced (1500→500 chars), removed verbose descriptions, minimized CRITICAL/IMPORTANT emphasis, streamlined adult/child distinction (18 Ocak 2026)',
     'v1.2.0: Clothing excluded from master character and page character prompts - clothing comes from story per page (Plan: Kapak/Close-up/Kıyafet) (24 Ocak 2026)',
+    'v1.3.0: Character analysis output adds defaultClothing - exact outfit from photo for story/image consistency (Faz 1 - CONSISTENCY_AND_QUALITY_ACTION_PHASES) (31 Ocak 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -114,6 +115,12 @@ Based on age and photo:
 - Preferred colors
 - Common clothing items
 
+## DEFAULT OUTFIT (CRITICAL for consistency)
+Describe the EXACT outfit visible in the photo in ONE detailed sentence. This will be used as the character's locked outfit across all story pages unless the story explicitly requires a change (e.g. pajama party, swimwear, astronaut suit).
+- Example: "Purple knitted sweater with small flower patterns, dark blue pants"
+- Example: "Light blue t-shirt with a star print, beige shorts"
+- Be specific: colors, pattern, garment types. This is the defaultClothing field.
+
 # OUTPUT FORMAT (JSON)
 Return a valid JSON object:
 {
@@ -157,6 +164,7 @@ Return a valid JSON object:
     "colors": ["color1", "color2"],
     "commonItems": ["item1", "item2"]
   },
+  "defaultClothing": "One detailed sentence describing the exact outfit visible in the photo (e.g. purple knitted sweater with small flower patterns, dark blue pants). REQUIRED.",
   "illustrationNotes": "Additional notes for illustrators to maintain consistency",
   "confidence": 0.95
 }

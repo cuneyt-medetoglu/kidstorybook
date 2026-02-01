@@ -11,15 +11,23 @@ import { appConfig } from '@/lib/config'
 // Note: createClient now supports Bearer token from Authorization header
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
+import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
-import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/v1.0.0/scene'
+import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
+import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
+
+/** STOP_AFTER: .env'de STOP_AFTER=story_request | story_response | master_request | master_response yaz. O adım loglandıktan sonra istek durur. */
+function stopAfter(step: string) {
+  if (process.env.STOP_AFTER === step) {
+    console.log(`[Create Book] ⏸️ STOP_AFTER=${step}`)
+    throw new Error(`STOP_AFTER ${step}`)
+  }
+}
 
 function normalizeThemeKey(theme: string): string {
   const t = (theme || '').toString().trim().toLowerCase()
@@ -125,49 +133,44 @@ async function retryWithBackoff<T>(
  * UPDATED: 18 Ocak 2026 - Each character gets its own master illustration
  */
 async function generateMasterCharacterIllustration(
-  characterPhoto: string, // Single character photo (changed from array)
-  characterDescription: any, // Single character description (changed from array)
-  characterId: string, // Character ID for filename
+  characterPhoto: string,
+  characterDescription: any,
+  characterId: string,
   illustrationStyle: string,
   userId: string,
   supabase: any,
-  includeAge: boolean = true, // Whether to include age in prompt
-  characterGender?: 'boy' | 'girl' | 'other' // NEW: Character gender from database (25 Ocak 2026)
+  includeAge: boolean = true,
+  characterGender?: 'boy' | 'girl' | 'other',
+  storyClothing?: string // Hikayeden gelen kıyafet – master bu kıyafetle çizilir (referans sadece yüz/vücut)
 ): Promise<string> {
-  console.log('[Master Illustration] 🎨 Generating master character illustration for character:', characterId)
-  console.log('[Master Illustration] 👤 Character gender from DB:', characterGender || 'not provided')
-  console.log('[Master Illustration] 👤 Character description gender:', characterDescription?.gender || 'not in description')
-  
-  // FIX: Use characterGender from database if available, fallback to description.gender (25 Ocak 2026)
-  // This ensures correct gender is used even if description.gender is missing or incorrect
   const fixedDescription = {
     ...characterDescription,
-    gender: characterGender || characterDescription?.gender || 'boy', // Fallback to 'boy' if both missing
+    gender: characterGender || characterDescription?.gender || 'boy',
   }
-  
-  console.log('[Master Illustration] ✅ Fixed gender for prompt:', fixedDescription.gender)
-  
-  // Build optimized prompt for master illustration (single character)
-  // Plan: Kapak/Close-up/Kıyafet - exclude clothing from master (clothing comes from story per page)
-  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge, true) // excludeClothing: true
-  
-  // Style directive (optimized)
-  const styleDirective = illustrationStyle === '3d_animation' 
-    ? 'Pixar-style 3D' 
-    : illustrationStyle === 'watercolor' 
-    ? 'Watercolor' 
-    : illustrationStyle
-  
-  // Master illustration prompt (optimized, minimal)
+  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge, true)
+  const styleDirective = illustrationStyle === '3d_animation' ? 'Pixar-style 3D' : illustrationStyle === 'watercolor' ? 'Watercolor' : illustrationStyle
+
+  // Master kıyafeti: hikayeden geliyorsa onu kullan, yoksa referans fotoğraftan
+  const outfitPart = storyClothing?.trim()
+    ? `Character wearing exactly: ${storyClothing}. `
+    : ''
   const masterPrompt = [
     '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]',
     `[STYLE] ${styleDirective} [/STYLE]`,
-    `Neutral front-facing portrait. ${characterPrompt}. Plain neutral background. Illustration style (NOT photorealistic). Match reference photos.`,
+    `Full body, standing, feet visible, neutral pose. Child from head to toe. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style (NOT photorealistic). Match reference photos for face and body.`,
   ].join(' ')
-  
-  console.log('[Master Illustration] 📏 Prompt length:', masterPrompt.length, 'characters')
-  console.log('[Master Illustration] 🧾 Master prompt:', masterPrompt)
-  
+
+  const masterRequestRaw = {
+    model: 'gpt-image-1.5',
+    prompt: masterPrompt,
+    size: '1024x1536',
+    quality: 'low',
+    input_fidelity: 'high',
+    image: '(FormData Blob)',
+  }
+  console.log('[Create Book] 📤 MASTER REQUEST sent (model, prompt length:', masterPrompt.length, ')')
+  stopAfter('master_request')
+
   // Download character photo as blob
   const imageResponse = await fetch(characterPhoto)
   const imageBlob = await imageResponse.blob()
@@ -195,10 +198,13 @@ async function generateMasterCharacterIllustration(
   
   const result = await response.json()
   const b64Image = result.data?.[0]?.b64_json
-  
+
   if (!b64Image) {
     throw new Error('No image data in master illustration response')
   }
+
+  console.log('[Create Book] 📥 MASTER RESPONSE received (image data present)')
+  stopAfter('master_response')
   
   // Upload to Supabase with character ID in filename
   const imageBuffer = Buffer.from(b64Image, 'base64')
@@ -219,8 +225,83 @@ async function generateMasterCharacterIllustration(
     .getPublicUrl(filePath)
   
   const masterUrl = urlData.publicUrl
-  console.log('[Master Illustration] ✅ Master illustration created:', masterUrl)
+  return masterUrl
+}
+
+/**
+ * Generate Master Illustration for Supporting Entity (Animal/Object)
+ * NEW: 31 Ocak 2026 - Master-For-All-Entities
+ * Creates master illustration for animals and objects WITHOUT reference photo
+ * Uses text-only prompt generation
+ */
+async function generateSupportingEntityMaster(
+  entityId: string,
+  entityType: 'animal' | 'object',
+  entityName: string,
+  entityDescription: string,
+  illustrationStyle: string,
+  userId: string,
+  supabase: any
+): Promise<string> {
+  // Build prompt for entity master (text-only, no reference photo)
+  const styleDirective = illustrationStyle === '3d_animation' 
+    ? 'Pixar-style 3D animation' 
+    : illustrationStyle === 'watercolor' 
+    ? 'Watercolor illustration' 
+    : illustrationStyle
   
+  const entityPrompt = [
+    `[STYLE] ${styleDirective} [/STYLE]`,
+    `Neutral front-facing view. ${entityDescription}.`,
+    `Plain neutral background. Illustration style (NOT photorealistic).`,
+    entityType === 'animal' ? 'Friendly and appealing animal character.' : 'Clear and recognizable object.',
+    'Centered in frame. Simple, clean, professional children\'s book illustration.',
+  ].join(' ')
+  
+  // Call /v1/images/generations API (text-only; no reference image)
+  const apiKey = process.env.OPENAI_API_KEY
+  // gpt-image-1.5 generations API does not accept response_format; returns b64 by default
+  const body = {
+    model: 'gpt-image-1.5',
+    prompt: entityPrompt,
+    size: '1024x1536' as const,
+    quality: 'low' as const,
+  }
+  const response = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const errText = await response.text()
+    throw new Error(`Entity master generation failed: ${response.status}${errText ? ` - ${errText.slice(0, 150)}` : ''}`)
+  }
+
+  const result = await response.json()
+  const b64Image = result.data?.[0]?.b64_json
+  if (!b64Image || typeof b64Image !== 'string') {
+    throw new Error('No b64_json in entity master response. API may require response_format.')
+  }
+
+  const imageBuffer = Buffer.from(b64Image, 'base64')
+  const timestamp = Date.now()
+  const filename = `entity_master_${entityId}_${timestamp}.png`
+  const filePath = `${userId}/entity-masters/${filename}`
+  
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('book-images')
+    .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: false })
+  
+  if (uploadError) {
+    throw new Error(`Failed to upload entity master: ${uploadError.message}`)
+  }
+  
+  const { data: urlData } = supabase.storage
+    .from('book-images')
+    .getPublicUrl(filePath)
+  
+  const masterUrl = urlData.publicUrl
   return masterUrl
 }
 
@@ -228,6 +309,10 @@ async function generateMasterCharacterIllustration(
  * Detect which characters appear in page text
  * UPDATED: 18 Ocak 2026 - Used to select only relevant character masters for each page
  */
+// ============================================================================
+// Character Detection Helper (for page-level character tracking)
+// ============================================================================
+
 function detectCharactersInPageText(
   pageText: string,
   characters: Array<{ id: string; name: string }>
@@ -516,6 +601,34 @@ export async function POST(request: NextRequest) {
         })),
       })
 
+      const languageNames: Record<string, string> = {
+        en: 'English',
+        tr: 'Turkish',
+        de: 'German',
+        fr: 'French',
+        es: 'Spanish',
+        zh: 'Chinese (Mandarin)',
+        pt: 'Portuguese',
+        ru: 'Russian',
+      }
+      const languageName = languageNames[language] || 'English'
+      const storyRequestBody = {
+        model: storyModel,
+        messages: [
+          {
+            role: 'system' as const,
+            content:
+              `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. Return exactly the requested number of pages. Write the entire story in ${languageName} only; do not use words from other languages.`,
+          },
+          { role: 'user' as const, content: storyPrompt },
+        ],
+        response_format: { type: 'json_object' as const },
+        temperature: 0.8,
+        max_tokens: 8000, // 12+ sayfa için güvenli; limitin üzerinde kalması sorun değil
+      }
+      console.log('[Create Book] 📤 STORY REQUEST sent (model:', storyModel, ', prompt length:', storyPrompt.length, ')')
+      stopAfter('story_request')
+
       console.log(`[Create Book] 🤖 Calling OpenAI for story generation (model: ${storyModel})`)
       console.log('[Create Book] ⏱️  Story request started at:', new Date().toISOString())
       
@@ -528,40 +641,8 @@ export async function POST(request: NextRequest) {
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
           const storyReqStart = Date.now()
-          
-          // Get language name for system message
-          const languageNames: Record<string, string> = {
-            'en': 'English',
-            'tr': 'Turkish',
-            'de': 'German',
-            'fr': 'French',
-            'es': 'Spanish',
-            'zh': 'Chinese (Mandarin)',
-            'pt': 'Portuguese',
-            'ru': 'Russian',
-          }
-          const languageName = languageNames[language] || 'English'
 
-          // Call OpenAI with selected model
-          completion = await openai.chat.completions.create({
-            model: storyModel,
-            messages: [
-              {
-                role: 'system',
-                content:
-                  `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. You MUST return the exact number of pages requested.
-
-CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageName} ONLY. DO NOT use any English words, phrases, or sentences. Every single word in the story text must be in ${languageName}. If you use any English words, the story will be rejected.`,
-              },
-              {
-                role: 'user',
-                content: storyPrompt,
-              },
-            ],
-            response_format: { type: 'json_object' },
-            temperature: 0.8,
-            max_tokens: 4000,
-          })
+          completion = await openai.chat.completions.create(storyRequestBody)
           const storyReqMs = Date.now() - storyReqStart
           console.log(`[Create Book] ⏱️  Story response time (attempt ${attempt}/${MAX_RETRIES}):`, storyReqMs, 'ms')
 
@@ -570,8 +651,9 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             throw new Error('No story content generated')
           }
 
-          // Parse JSON response
           generatedStoryData = JSON.parse(storyContent)
+          console.log('[Create Book] 📥 STORY RESPONSE received (title:', generatedStoryData?.title, ', pages:', generatedStoryData?.pages?.length, ')')
+          stopAfter('story_response')
 
           // Validate Story Structure
           if (!generatedStoryData.title || !generatedStoryData.pages || !Array.isArray(generatedStoryData.pages)) {
@@ -585,12 +667,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             }
           }
 
-          // Validate clothing field in each page (REQUIRED - Plan: Kapak/Close-up/Kıyafet)
-          for (const page of generatedStoryData.pages) {
-            if (!page.clothing || typeof page.clothing !== 'string' || page.clothing.trim().length === 0) {
-              throw new Error(`Page ${page.pageNumber} is missing required "clothing" field - clothing must match story setting (e.g. space → astronaut suit)`)
-            }
-          }
+          // v1.6.0: "clothing" field REMOVED from story schema – visual details from master system only; no validation for clothing
 
           // Enforce requested pageCount strictly
           if (pageCount !== undefined && pageCount !== null) {
@@ -625,14 +702,18 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           }
         } catch (error: any) {
           lastError = error
+          // STOP_AFTER is intentional – do not retry, just rethrow
+          if (error?.message?.startsWith?.('STOP_AFTER')) {
+            throw error
+          }
+          console.log(`[Create Book] 📥 STORY RESPONSE: err, message=${(error?.message || '').slice(0, 120)}`)
           console.error(`[Create Book] ❌ Story generation attempt ${attempt}/${MAX_RETRIES} failed:`, error.message)
           
           if (attempt < MAX_RETRIES) {
             console.log(`[Create Book] 🔄 Retrying story generation...`)
-            // Wait a bit before retry (exponential backoff)
             await new Promise(resolve => setTimeout(resolve, 1000 * attempt))
           } else {
-            throw error // Last attempt failed, throw error
+            throw error
           }
         }
       }
@@ -651,15 +732,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       storyData = generatedStoryData
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
-      
-      // Log clothing from story (Plan: Kapak/Close-up/Kıyafet)
-      for (const page of storyData.pages) {
-        if (page.clothing) {
-          console.log(`[Create Book] 👔 Page ${page.pageNumber} clothing: "${page.clothing}"`)
-        } else {
-          console.log(`[Create Book] ⚠️  Page ${page.pageNumber} clothing MISSING - validation should have caught this`)
-        }
-      }
 
       // Create Book in Database
       const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
@@ -704,9 +776,21 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
     // ====================================================================
     // STEP 2: GENERATE MASTER CHARACTER ILLUSTRATION (UPDATED: 18 Ocak 2026)
     // UPDATED: Each character gets its own master illustration
+    // Master kıyafeti: tema ile uyumlu (adventure → outdoor gear; story clothing yok artık)
     // ====================================================================
     console.log(`[Create Book] 🎨 Starting master character illustration generation...`)
     
+    const themeClothingForMaster: Record<string, string> = {
+      adventure: 'comfortable outdoor clothing, hiking clothes, sneakers (adventure outfit)',
+      space: 'child-sized astronaut suit or space exploration outfit',
+      underwater: 'swimwear, beach clothes',
+      sports: 'sportswear, athletic clothes',
+      fantasy: 'fantasy-appropriate casual clothing, adventure-style',
+      'daily-life': 'everyday casual clothing',
+    }
+    const themeClothing = themeClothingForMaster[themeKey] || 'age-appropriate casual clothing'
+    const suggestedOutfits = storyData?.suggestedOutfits && typeof storyData.suggestedOutfits === 'object' ? storyData.suggestedOutfits as Record<string, string> : null
+
     const masterIllustrations: Record<string, string> = {}
     
     // Generate master illustration for each character separately
@@ -731,10 +815,14 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         includeAge = isChildType && hasAge
       }
       
+      // Her karakter için kıyafet: sadece suggestedOutfits[char.id]; yoksa tema (tek outfit tüm karakterlere uygulanmaz)
+      const charOutfit = (suggestedOutfits?.[char.id]?.trim()) || themeClothing
+      if (suggestedOutfits?.[char.id]) {
+        console.log(`[Create Book] 👕 Master clothing for ${char.name} from story (suggestedOutfits):`, charOutfit.slice(0, 60) + (charOutfit.length > 60 ? '...' : ''))
+      }
+
       try {
         // FIX: Pass char.gender to ensure correct gender is used (25 Ocak 2026)
-        // char.gender comes from database and is always correct
-        // char.description.gender might be missing or incorrect
         const masterUrl = await generateMasterCharacterIllustration(
           char.reference_photo_url,
           char.description,
@@ -743,11 +831,16 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           user.id,
           supabase,
           includeAge,
-          char.gender // NEW: Pass character gender from database
+          char.gender,
+          charOutfit
         )
         masterIllustrations[char.id] = masterUrl
         console.log(`[Create Book] ✅ Master illustration created for character ${char.id} (${char.name}): ${masterUrl}`)
-      } catch (error) {
+      } catch (error: any) {
+        // STOP_AFTER is intentional – do not continue, rethrow so request stops
+        if (error?.message?.startsWith?.('STOP_AFTER')) {
+          throw error
+        }
         console.error(`[Create Book] ❌ Master illustration generation failed for character ${char.id} (${char.name}):`, error)
         // Continue with other characters - this character will use original photo as fallback
       }
@@ -774,6 +867,50 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           masterIllustrationError: 'No master illustrations generated for any character',
         },
       })
+    }
+
+    // ====================================================================
+    // STEP 2.5: GENERATE SUPPORTING ENTITY MASTERS (NEW: 31 Ocak 2026)
+    // ====================================================================
+    // Generate master illustrations for animals and objects from story
+    const entityMasterIllustrations: Record<string, string> = {}
+    
+    if (storyData?.supportingEntities && storyData.supportingEntities.length > 0) {
+      console.log(`[Create Book] 🐾 Generating ${storyData.supportingEntities.length} supporting entity masters...`)
+      
+      for (const entity of storyData.supportingEntities) {
+        try {
+          const entityMasterUrl = await generateSupportingEntityMaster(
+            entity.id,
+            entity.type,
+            entity.name,
+            entity.description,
+            illustrationStyle,
+            user.id,
+            supabase
+          )
+          entityMasterIllustrations[entity.id] = entityMasterUrl
+          console.log(`[Create Book] ✅ Entity master created for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
+        } catch (error) {
+          console.error(`[Create Book] ❌ Entity master generation failed for ${entity.name}:`, error)
+          // Continue with other entities
+        }
+      }
+      
+      // Update generation_metadata with entity master illustrations
+      if (Object.keys(entityMasterIllustrations).length > 0) {
+        const currentMetadata = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMetadata,
+            entityMasterIllustrations: entityMasterIllustrations,
+            entityMasterCreated: true,
+          },
+        })
+        console.log(`[Create Book] 💾 Entity masters saved to generation_metadata (${Object.keys(entityMasterIllustrations).length} entities)`)
+      }
+    } else {
+      console.log('[Create Book] ℹ️  No supporting entities in story - skipping entity master generation')
     }
 
     console.log(`[Create Book] 🎨 Starting cover generation...`)
@@ -846,21 +983,17 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       // Determine age group (default for cover only mode)
       const ageGroup = isCoverOnlyMode ? 'preschool' : (storyData?.metadata?.ageGroup || 'preschool')
       
-      // Create SceneInput for cover (Page 1); plan: Kapak/Close-up/Kıyafet – story-driven clothing
+      // Kapak/sayfa: Master referans varsa kıyafeti referanstan al (mavi/kırmızı zorlaması yok)
+      const useMasterForClothing = Object.keys(masterIllustrations).length > 0
+      const coverClothing = useMasterForClothing ? 'match_reference' : undefined // v1.6.0: no clothing from story
       const coverSceneInput = {
-        pageNumber: 1, // Cover is always page 1
+        pageNumber: 1,
         sceneDescription: coverSceneDescription,
         theme: themeKey,
-        mood: themeKey === 'adventure' ? 'exciting' : 
-              themeKey === 'fantasy' ? 'mysterious' :
-              themeKey === 'space' ? 'inspiring' :
-              themeKey === 'sports' ? 'exciting' :
-              'happy',
-        characterAction: characters.length > 1
-          ? `characters integrated into environment as guides into the world; sense of wonder and adventure`
-          : `character integrated into environment as guide into the world; sense of wonder and adventure`,
-        focusPoint: 'balanced' as const, // Cover: poster feel, no "character centered" (plan: Kapak/Close-up/Kıyafet)
-        ...(storyData?.pages?.[0]?.clothing && { clothing: storyData.pages[0].clothing }),
+        mood: themeKey === 'adventure' ? 'exciting' : themeKey === 'fantasy' ? 'mysterious' : themeKey === 'space' ? 'inspiring' : themeKey === 'sports' ? 'exciting' : 'happy',
+        characterAction: characters.length > 1 ? `characters integrated into environment as guides into the world; sense of wonder and adventure` : `character integrated into environment as guide into the world; sense of wonder and adventure`,
+        focusPoint: 'balanced' as const,
+        ...(coverClothing && { clothing: coverClothing }),
       }
       
       // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
@@ -876,28 +1009,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         false // useCoverReference: false (no cover yet - this IS the cover)
       )
 
-      console.log('[Create Book] 🖼️  Calling GPT-image API for cover generation...')
-      console.log('[Create Book] ✅ Using generateFullPagePrompt for cover generation (POC style)')
-      console.log('[Create Book] 🎨 Illustration style:', illustrationStyle)
-      console.log('[Create Book] 📏 Final prompt length:', textPrompt.length, 'characters')
-      console.log('[Create Book] 📄 Prompt preview (first 200 chars):', textPrompt.substring(0, 200) + '...')
-      console.log('[Create Book] 🧾 Cover FULL PROMPT START')
-      console.log(textPrompt)
-      console.log('[Create Book] 🧾 Cover FULL PROMPT END')
-      
-      // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
-      const hasClothingDirective = textPrompt.toLowerCase().includes('clothing') || 
-                                   textPrompt.toLowerCase().includes('wear') ||
-                                   textPrompt.toLowerCase().includes('outdoor') ||
-                                   textPrompt.toLowerCase().includes('casual')
-      const hasFormalWearWarning = textPrompt.toLowerCase().includes('formal') ||
-                                   textPrompt.toLowerCase().includes('suits') ||
-                                   textPrompt.toLowerCase().includes('dress shoes')
-      console.log('[Create Book] 👔 Cover clothing directive:', hasClothingDirective ? '✅ Found' : '⚠️ Missing')
-      if (hasFormalWearWarning) {
-        console.log('[Create Book] 👔 Cover formal wear warning: ✅ Found (good - prevents formal wear)')
-      }
-
+      console.log('[Create Book] 📤 COVER IMAGE REQUEST: prompt length=', textPrompt.length)
       // Call GPT-image API (text-to-image via /v1/images/generations)
       const apiKey = process.env.OPENAI_API_KEY
       if (!apiKey) {
@@ -907,8 +1019,13 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       // NEW: Use all character master illustrations as reference (if available)
       // Fallback to character photos if master generation failed
       const coverMasterUrls = Object.values(masterIllustrations).filter((url): url is string => Boolean(url))
-      const referenceImageUrls = coverMasterUrls.length > 0
-        ? coverMasterUrls  // TÜM karakterlerin master'larını kullan (cover'da tüm karakterler olmalı)
+      
+      // NEW: Add entity masters to cover references (31 Ocak 2026)
+      const entityMasterUrls = Object.values(entityMasterIllustrations).filter((url): url is string => Boolean(url))
+      const allCoverMasters = [...coverMasterUrls, ...entityMasterUrls] // Character masters + entity masters
+      
+      const referenceImageUrls = allCoverMasters.length > 0
+        ? allCoverMasters  // TÜM karakterlerin + entity'lerin master'larını kullan (cover'da hepsi olmalı)
         : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
       
       let coverImageUrl: string | null = null
@@ -918,25 +1035,8 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       let referenceImageBlobTotalBytes = 0
       let editsApiSuccess = false // Track if edits API was successful
 
-      console.log('[Create Book] 📸 Reference type:', coverMasterUrls.length > 0 ? 'Master Illustrations ✅' : 'Character Photos ⚠️')
-      console.log('[Create Book] 📸 Reference images:', referenceImageUrls.length, coverMasterUrls.length > 0 ? `(${coverMasterUrls.length} master illustrations for all characters)` : '')
-      if (referenceImageUrls.length > 0) {
-        referenceImageUrls.forEach((url, index) => {
-          console.log(`[Create Book] 📸 Reference image ${index + 1} URL:`, url)
-        })
-        console.log('[Create Book] 🔍 Reference will be used for /v1/images/edits API')
-      } else {
-        console.log('[Create Book] ⚠️  No reference - will use /v1/images/generations')
-      }
-
       // Use /v1/images/edits if reference image available, otherwise /v1/images/generations
       if (referenceImageUrls.length > 0) {
-        console.log('[Create Book] 🔧 Attempting to use /v1/images/edits (with reference image)')
-        console.log('[Create Book] 📋 Model:', imageModel)
-        console.log('[Create Book] 📏 Size:', imageSize)
-        console.log('[Create Book] 📝 Prompt will be included: Yes ✅')
-        console.log('[Create Book] 📏 Prompt length:', textPrompt.length, 'characters')
-        
         // Convert reference image URLs to Blobs (support both data URL and HTTP URL)
         // Reference images format: Blob (binary data) sent as multipart/form-data
         const imageBlobs: Array<{ blob: Blob; filename: string }> = []
@@ -1114,7 +1214,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
                   console.log('[Create Book] ✅✅✅ /v1/images/edits API SUCCESSFUL - Reference image was used! ✅✅✅')
                 }
                 if (coverImageB64) {
-                  console.log('[Create Book] 🧩 Cover image b64 received (length:', coverImageB64.length, 'chars)')
                   editsApiSuccess = true
                   console.log('[Create Book] ✅✅✅ /v1/images/edits API SUCCESSFUL - Reference image was used! ✅✅✅')
                   console.log('[Create Book] 🔍 CRITICAL: Edits API returned b64_json (not URL) - this is NORMAL and SUCCESSFUL')
@@ -1200,7 +1299,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               // Try to parse error JSON for better logging
               try {
                 const errorJson = JSON.parse(errorText)
-                console.error('[Create Book]   Parsed Error:', JSON.stringify(errorJson, null, 2))
+                console.error('[Create Book]   Parsed Error:', (errorJson?.error?.message || errorText?.slice(0, 300)))
               } catch {
                 console.error('[Create Book]   Raw Error Text:', errorText)
               }
@@ -1286,7 +1385,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               console.log('[Create Book] 🖼️  Cover image URL received (length:', coverImageUrl.length, 'chars)')
             }
             if (coverImageB64) {
-              console.log('[Create Book] 🧩 Cover image b64 received (length:', coverImageB64.length, 'chars)')
             }
         } catch (genError) {
           const generationsApiTime = Date.now() - generationsApiStartTime
@@ -1455,27 +1553,18 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             console.log(`[Create Book] 🖼️  [BATCH] Generating image for page ${pageNumber}/${totalPages}...`)
 
         // Build prompt for this page
-        const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
+        let sceneDescription = page.imagePrompt || page.sceneDescription || page.text
         const ageGroup = storyData.metadata?.ageGroup || 'preschool'
+        // NEW (v1.6.0): Story no longer generates clothing; master system handles it
+        const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
+        // Note: stripClothingFromSceneText REMOVED (v1.6.0) - story doesn't produce clothing text anymore
         
-        // Extract character action from page text (what character is doing)
         const characterActionRaw = page.text || sceneDescription
         const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
-        const characterAction = riskAnalysis.hasRisk
-          ? getSafeSceneAlternative(characterActionRaw)
-          : characterActionRaw
-        
-        // Determine focus point (all pages balanced; cover uses character separately)
+        let characterAction = riskAnalysis.hasRisk ? getSafeSceneAlternative(characterActionRaw) : characterActionRaw
         const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'
-        
-        // Determine mood from theme or use default
-        const mood = themeKey === 'adventure' ? 'exciting' :
-                     themeKey === 'fantasy' ? 'mysterious' :
-                     themeKey === 'space' ? 'inspiring' :
-                     themeKey === 'sports' ? 'exciting' :
-                     'happy'
-        
-        // Create SceneInput object for generateFullPagePrompt (plan: Kapak/Close-up/Kıyafet – story-driven clothing)
+        const mood = themeKey === 'adventure' ? 'exciting' : themeKey === 'fantasy' ? 'mysterious' : themeKey === 'space' ? 'inspiring' : themeKey === 'sports' ? 'exciting' : 'happy'
+        const pageClothing = pageUseMasterClothing ? 'match_reference' : undefined // v1.6.0: no clothing from story
         const sceneInput = {
           pageNumber,
           sceneDescription,
@@ -1483,30 +1572,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           mood,
           characterAction,
           focusPoint,
-          ...(page.clothing && { clothing: page.clothing }),
-        }
-        
-        // Log clothing from story (Plan: Kapak/Close-up/Kıyafet)
-        if (page.clothing) {
-          console.log(`[Create Book] 👔 Page ${pageNumber} clothing from story: "${page.clothing}"`)
-        } else {
-          console.log(`[Create Book] ⚠️  Page ${pageNumber} clothing MISSING from story - will use theme fallback`)
-        }
-
-        console.log(`[Create Book] 📋 Page ${pageNumber} scene input:`, {
-          pageNumber,
-          theme,
-          mood,
-          illustrationStyle,
-          ageGroup,
-          focusPoint,
-          sceneDescriptionLength: sceneDescription.length,
-          hasClothing: !!sceneInput.clothing,
-          clothing: sceneInput.clothing || '(theme fallback)',
-        })
-        if (riskAnalysis.hasRisk) {
-          console.log(`[Create Book] ⚠️  Page ${pageNumber} risky scene detected:`, riskAnalysis.riskyElements)
-          console.log(`[Create Book] ✅ Page ${pageNumber} safe action applied:`, characterAction)
+          ...(pageClothing && { clothing: pageClothing }),
         }
 
         // Generate full page prompt (NEW: Master illustration only, no cover reference)
@@ -1547,15 +1613,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         // additionalCharactersCount güncelle (sadece bu page için)
         const additionalCharactersCount = pageAdditionalCharacters.length
         
-        // Logging: Page-specific character info
-        console.log(`[Create Book] 📝 Page ${pageNumber} - Character IDs from story:`, pageCharacters)
-        console.log(`[Create Book] 👥 Page ${pageNumber} - Characters in prompt:`, [
-          mainCharacter.name || 'Main Character',
-          ...pageAdditionalCharacters.map(c => c.type.displayName)
-        ].join(', '))
-        if (pageAdditionalCharacters.length > 0) {
-          console.log(`[Create Book] 📝 Page ${pageNumber} - Additional characters:`, pageAdditionalCharacters.map(c => c.type.displayName).join(', '))
-        }
         
         // NEW: Analyze scene diversity (16 Ocak 2026)
         const currentSceneAnalysis = analyzeSceneDiversity(
@@ -1565,15 +1622,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           sceneDiversityAnalysis
         )
         sceneDiversityAnalysis.push(currentSceneAnalysis)
-        
-        console.log(`[Create Book] 🎬 Page ${pageNumber} scene analysis:`, {
-          location: currentSceneAnalysis.location,
-          timeOfDay: currentSceneAnalysis.timeOfDay,
-          weather: currentSceneAnalysis.weather,
-          perspective: currentSceneAnalysis.perspective,
-          composition: currentSceneAnalysis.composition
-        })
-        
         const fullPrompt = generateFullPagePrompt(
           characterPrompt,
           sceneInput,
@@ -1584,29 +1632,6 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           false, // useCoverReference: false - master illustration is used instead
           sceneDiversityAnalysis.slice(0, -1) // Pass previous scenes (exclude current)
         )
-
-        console.log(`[Create Book] 📝 Page ${pageNumber} prompt (first 200 chars):`, fullPrompt.substring(0, 200) + '...')
-        console.log(`[Create Book] 📏 Page ${pageNumber} prompt length:`, fullPrompt.length, 'characters')
-        console.log(`[Create Book] 🎨 Page ${pageNumber} illustration style in prompt:`, illustrationStyle)
-        if (additionalCharactersCount > 0) {
-          console.log(`[Create Book] 👥 Page ${pageNumber} includes ${additionalCharactersCount + 1} characters`)
-        }
-        console.log(`[Create Book] 🧾 Page ${pageNumber} FULL PROMPT START`)
-        console.log(fullPrompt)
-        console.log(`[Create Book] 🧾 Page ${pageNumber} FULL PROMPT END`)
-        
-        // LOG: Clothing prompt check (NEW: 15 Ocak 2026 - Quality Check)
-        const hasClothingDirective = fullPrompt.toLowerCase().includes('clothing') || 
-                                     fullPrompt.toLowerCase().includes('wear') ||
-                                     fullPrompt.toLowerCase().includes('outdoor') ||
-                                     fullPrompt.toLowerCase().includes('casual')
-        const hasFormalWearWarning = fullPrompt.toLowerCase().includes('formal') ||
-                                     fullPrompt.toLowerCase().includes('suits') ||
-                                     fullPrompt.toLowerCase().includes('dress shoes')
-        console.log(`[Create Book] 👔 Page ${pageNumber} clothing directive: ${hasClothingDirective ? '✅ Found' : '⚠️ Missing'}`)
-        if (hasFormalWearWarning) {
-          console.log(`[Create Book] 👔 Page ${pageNumber} formal wear warning: ✅ Found (good - prevents formal wear)`)
-        }
 
         // Call GPT-image API
         const apiKey = process.env.OPENAI_API_KEY
@@ -1619,35 +1644,35 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         let pageImageOutputFormat: string | null = null
 
         const pageImageStartTime = Date.now()
-        console.log(`[Create Book] ⏱️  Page ${pageNumber} image generation started at:`, new Date().toISOString())    
-        
         // FIX: pageCharacters already defined above (line 1411) - use existing variable (25 Ocak 2026)
         // Use characterIds directly from story generation (required field) - pageCharacters already defined
         const pageMasterUrls = pageCharacters
           .map(charId => masterIllustrations[charId])
           .filter((url): url is string => Boolean(url))
         
+        // NEW: Add entity masters for this page (31 Ocak 2026)
+        const pageEntityIds: string[] = []
+        if (storyData?.supportingEntities) {
+          for (const entity of storyData.supportingEntities) {
+            if (entity.appearsOnPages && entity.appearsOnPages.includes(pageNumber)) {
+              pageEntityIds.push(entity.id)
+            }
+          }
+        }
+        const pageEntityMasterUrls = pageEntityIds
+          .map(entityId => entityMasterIllustrations[entityId])
+          .filter((url): url is string => Boolean(url))
+        
+        // Combine character + entity masters
+        const allPageMasters = [...pageMasterUrls, ...pageEntityMasterUrls]
+        
         // Fallback to character photos if no master illustrations available for detected characters
-        const referenceImageUrls = pageMasterUrls.length > 0
-          ? pageMasterUrls  // Sadece o sayfada geçen karakter(ler)in master'ları
+        const referenceImageUrls = allPageMasters.length > 0
+          ? allPageMasters  // Character master'ları + Entity master'ları
           : characters
               .filter(c => pageCharacters.includes(c.id))
               .map(c => c.reference_photo_url)
               .filter((url): url is string => Boolean(url))
-        
-        // Page characters already logged above (duplicate removal)
-        // console.log(`[Create Book] Page ${pageNumber} - Character IDs from story:`, pageCharacters)
-        console.log(`[Create Book] Page ${pageNumber} - Reference type:`, pageMasterUrls.length > 0 ? 'Master Illustrations ✅' : 'Character Photos ⚠️')
-        console.log(`[Create Book] Page ${pageNumber} - Reference count:`, referenceImageUrls.length)
-        if (referenceImageUrls.length > 0) {
-          console.log(`[Create Book] Page ${pageNumber} - Reference URLs:`)
-          referenceImageUrls.forEach((url, index) => {
-            const charId = pageCharacters[index] || `unknown_${index}`
-            const charName = characters.find(c => c.id === charId)?.name || `character_${index + 1}`
-            const label = pageMasterUrls.length > 0 ? `master_${charName}` : `photo_${charName}`
-            console.log(`[Create Book]   - ${label}: ${url}`)
-          })
-        }
         
         if (referenceImageUrls.length > 0) {
           // Convert reference image URLs to Blobs (support both data URL and HTTP URL)
@@ -1787,13 +1812,11 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             pageImageUrl = editsResult.data[0]?.url || null
             pageImageB64 = editsResult.data[0]?.b64_json || null
             pageImageOutputFormat = editsResult.output_format || null
-            
             console.log(`[Create Book] ✅ Page ${pageNumber} edits response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
             if (pageImageUrl) {
               console.log(`[Create Book] 🖼️  Page ${pageNumber} image URL received (length:`, pageImageUrl.length, 'chars)')
             }
             if (pageImageB64) {
-              console.log(`[Create Book] 🧩 Page ${pageNumber} image b64 received (length:`, pageImageB64.length, 'chars)')
             }
           }
 
@@ -1844,7 +1867,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
               // Try to parse error JSON
               try {
                 const errorJson = JSON.parse(errorText)
-                console.error(`[Create Book]   Parsed Error:`, JSON.stringify(errorJson, null, 2))
+                console.error(`[Create Book]   Parsed Error:`, (errorJson?.error?.message || errorText?.slice(0, 300)))
               } catch {
                 console.error(`[Create Book]   Raw Error Text:`, errorText)
               }
@@ -1863,13 +1886,11 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
             pageImageUrl = genResult.data?.[0]?.url || null
             pageImageB64 = genResult.data?.[0]?.b64_json || null
             pageImageOutputFormat = genResult.output_format || null
-            
             console.log(`[Create Book] ✅ Page ${pageNumber} - Generations response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
             if (pageImageUrl) {
               console.log(`[Create Book] 🖼️  Page ${pageNumber} - Image URL received (length:`, pageImageUrl.length, 'chars)')
             }
             if (pageImageB64) {
-              console.log(`[Create Book] 🧩 Page ${pageNumber} - Image b64 received (length:`, pageImageB64.length, 'chars)')
             }
           }
         } else {
@@ -1923,13 +1944,11 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
           pageImageUrl = genResult.data?.[0]?.url || null
           pageImageB64 = genResult.data?.[0]?.b64_json || null
           pageImageOutputFormat = genResult.output_format || null
-
           console.log(`[Create Book] ✅ Page ${pageNumber} - Generations response image field:`, pageImageUrl ? 'url ✅' : (pageImageB64 ? 'b64_json ✅' : 'missing ❌'))
           if (pageImageUrl) {
             console.log(`[Create Book] 🖼️  Page ${pageNumber} - Image URL received (length:`, pageImageUrl.length, 'chars)')
           }
           if (pageImageB64) {
-            console.log(`[Create Book] 🧩 Page ${pageNumber} - Image b64 received (length:`, pageImageB64.length, 'chars)')
           }
         }
 
@@ -1984,8 +2003,7 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
         console.log(`[Create Book] ⏱️  Page ${pageNumber} - Upload time:`, uploadMs, 'ms')
 
         if (uploadError) {
-          console.error(`[Create Book] ❌ Page ${pageNumber} - Error uploading image:`, uploadError)
-          console.error(`[Create Book]   Upload error details:`, JSON.stringify(uploadError, null, 2))
+          console.error(`[Create Book] ❌ Page ${pageNumber} - Error uploading image:`, uploadError?.message ?? uploadError)
           return null
         }
 

@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getCharacterById } from '@/lib/db/characters'
-import { generateStoryPrompt } from '@/lib/prompts/story/v1.0.0/base'
+import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import OpenAI from 'openai'
 
@@ -102,6 +102,13 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 4. Generate Story Prompt
     // ====================================================================
+    // Faz 1: defaultClothing from master character (exact outfit for story consistency)
+    const defaultClothing =
+      (character.description as Record<string, unknown>)?.defaultClothing as string | undefined ||
+      (character.description?.clothingStyle && Array.isArray(character.description?.clothingColors)
+        ? `${character.description.clothingStyle} in ${character.description.clothingColors.join(' and ')}`
+        : undefined)
+
     const storyPrompt = generateStoryPrompt({
       characterName: character.name,
       characterAge: character.age,
@@ -115,6 +122,7 @@ export async function POST(request: NextRequest) {
         confidence: character.analysis_confidence || 0.8,
       },
       language,
+      defaultClothing,
     })
 
     console.log('Story generation started for character:', character.name)

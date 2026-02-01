@@ -539,9 +539,8 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - Kod ve dokümantasyon version'ları sync olmalı
 
 **Dokümantasyon:**
-- `docs/prompts/VERSION_SYNC_GUIDE.md` - Sync sistemi rehberi
-- `docs/prompts/VERSION_STATUS.md` - Mevcut sync durumu
-- `docs/prompts/CHANGELOG.md` - Version geçmişi
+- `docs/prompts/STORY_PROMPT_TEMPLATE.md` - Hikaye prompt şablonu
+- `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` - Görsel prompt şablonu
 
 #### 3.1.5 Prompt Kalite İyileştirme Süreçleri ✅ (15 Ocak 2026)
 **Öncelik:** 🔴 YÜKSEK
@@ -575,9 +574,8 @@ Ekte paylaşılan ekran görüntüsüne göre tasarım yapılacak.
 - ✅ Log sistemi (word count analizi, clothing directive kontrolü)
 
 **Dokümantasyon:**
-- `docs/prompts/STORY_PROMPT_TEMPLATE_v1.0.0.md`
-- `docs/prompts/IMAGE_PROMPT_TEMPLATE_v1.0.0.md`
-- `docs/prompts/CHANGELOG.md`
+- `docs/prompts/STORY_PROMPT_TEMPLATE.md`
+- `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
 
 #### 3.1.6 Prompt Monitoring ve Logging ✅ (15 Ocak 2026)
 **Öncelik:** 🟡 ORTA

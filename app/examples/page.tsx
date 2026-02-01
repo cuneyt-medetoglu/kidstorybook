@@ -395,7 +395,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
 
       {/* Action buttons */}
       <div className="flex flex-col gap-2">
-        <Link href={`/book/${book.id}`} className="w-full">
+        <Link href={`/examples/${book.id}`} className="w-full">
           <Button className="w-full h-11 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white">
             <Eye className="w-4 h-4 mr-2" />
             View Example
@@ -415,15 +415,35 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
 function ExamplesPageContent() {
   const [selectedAge, setSelectedAge] = useState<AgeGroup | "all">("all")
   const [isLoading, setIsLoading] = useState(true)
+  const [books, setBooks] = useState<ExampleBook[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [modalPhotos, setModalPhotos] = useState<UsedPhoto[]>([])
   const [modalInitialIndex, setModalInitialIndex] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
 
-  // Simulate loading
+  // Fetch example books from API
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
+    const fetchExampleBooks = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/examples')
+        const result = await response.json()
+
+        if (result.success && result.data) {
+          setBooks(result.data)
+        } else {
+          console.error('[Examples] Failed to fetch:', result.error)
+          setBooks([]) // Fallback to empty array
+        }
+      } catch (error) {
+        console.error('[Examples] Error fetching example books:', error)
+        setBooks([]) // Fallback to empty array
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchExampleBooks()
   }, [])
 
   // Reset to page 1 when age filter changes
@@ -432,8 +452,8 @@ function ExamplesPageContent() {
   }, [selectedAge])
 
   const filteredBooks = selectedAge === "all" 
-    ? mockExampleBooks 
-    : mockExampleBooks.filter(book => book.ageGroup === selectedAge)
+    ? books 
+    : books.filter(book => book.ageGroup === selectedAge)
 
   // Pagination logic - responsive items per page
   const getItemsPerPage = () => {

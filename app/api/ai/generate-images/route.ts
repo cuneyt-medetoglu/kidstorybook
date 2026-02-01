@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { getCharacterById } from '@/lib/db/characters'
-import { buildCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
-import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternative } from '@/lib/prompts/image/v1.0.0/scene'
+import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
+import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternative } from '@/lib/prompts/image/scene'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 
 export interface ImageGenerationRequest {
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
     }))
     
     const characterPrompt = additionalCharacters.length > 0
-      ? require('@/lib/prompts/image/v1.0.0/character').buildMultipleCharactersPrompt(character.description, additionalCharacters)
+      ? buildMultipleCharactersPrompt(character.description, additionalCharacters)
       : buildCharacterPrompt(character.description)
     
     // Get age group from book metadata or default
@@ -237,9 +237,10 @@ export async function POST(request: NextRequest) {
       // Add ALL character reference images to cover
       console.log(`[Image Generation] Adding ${allCharacterReferences.length} reference images to cover`)
       if (allCharacterReferences.length > 0) {
-        console.log('[Image Generation] Cover reference image URLs (full):')
+        console.log('[Image Generation] Cover reference images:', allCharacterReferences.length)
         allCharacterReferences.forEach((url, index) => {
-          console.log(`[Image Generation]   - character_${index + 1}: ${url}`)
+          const preview = url.startsWith('data:') ? `[data URL, ${url.length} chars]` : url.slice(0, 80) + (url.length > 80 ? '...' : '')
+          console.log(`[Image Generation]   - character_${index + 1}: ${preview}`)
         })
       }
       for (let idx = 0; idx < allCharacterReferences.length; idx++) {
@@ -422,12 +423,13 @@ export async function POST(request: NextRequest) {
         totalReferences: referenceImages.length
       })
       if (referenceImages.length > 0) {
-        console.log(`[Image Generation] Page ${pageNumber} reference image URLs (full):`)
+        console.log(`[Image Generation] Page ${pageNumber} reference images:`, referenceImages.length)
         referenceImages.forEach((url, index) => {
           const label = coverImageUrl && index === referenceImages.length - 1
             ? 'cover'
             : `character_${index + 1}`
-          console.log(`[Image Generation]   - ${label}: ${url}`)
+          const preview = url.startsWith('data:') ? `[data URL, ${url.length} chars]` : url.slice(0, 80) + (url.length > 80 ? '...' : '')
+          console.log(`[Image Generation]   - ${label}: ${preview}`)
         })
       }
       
@@ -476,7 +478,7 @@ export async function POST(request: NextRequest) {
       const imageUrl = apiResult.data?.[0]?.url
 
       if (!imageUrl) {
-        console.error(`[Image Generation] Could not extract image URL for page ${pageNumber}:`, JSON.stringify(apiResult, null, 2))
+        console.error(`[Image Generation] Could not extract image URL for page ${pageNumber}. hasData:`, !!apiResult?.data, ', dataLength:', apiResult?.data?.length)
         throw new Error(`No image URL found in GPT-image API response for page ${pageNumber}`)
       }
 

@@ -224,6 +224,14 @@ export default function Step6Page() {
     return []
   }
 
+  // Get character UUIDs for API: Step 2 stores real UUID in characterId, id can be local "1"
+  const getCharacterIdsForApi = (chars: any[]): string[] => {
+    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    return chars
+      .map((c: any) => c.characterId || c.id)
+      .filter((id: unknown): id is string => typeof id === "string" && uuidRe.test(id))
+  }
+
   const charactersData = getCharactersData()
 
   const formData = {
@@ -367,12 +375,13 @@ export default function Step6Page() {
   // Create book without payment: only when API says canSkipPayment (DB role=admin or server DEBUG_SKIP_PAYMENT).
   const showSkipPaymentButton = user && canSkipPayment
 
+  // Create example book: only for admin (visible when canSkipPayment is true, i.e., admin or DEBUG)
+  const showCreateExampleButton = user && canSkipPayment
+
   const handleCreateWithoutPayment = async () => {
     if (!wizardData || !user) return
     const chars = getCharactersData()
-    const characterIds = chars
-      .map((c: any) => c.id)
-      .filter(Boolean) as string[]
+    const characterIds = getCharacterIdsForApi(chars)
     const singleId = characterIds.length === 1 ? characterIds[0] : null
     const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("kidstorybook_character_id") : null
     const themeKey =
@@ -417,12 +426,88 @@ export default function Step6Page() {
         title: "Book creation started",
         description: "Your book is being generated.",
       })
-      router.push(bookId ? `/library?book=${bookId}` : "/library")
+      router.push("/dashboard")
     } catch (error) {
       console.error("Create without payment error:", error)
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to create book",
+        variant: "destructive",
+      })
+    } finally {
+      setIsCreating(false)
+    }
+  }
+
+  // Create example book: admin creates a book and marks it as is_example = true (public, viewable by everyone)
+  const handleCreateExampleBook = async () => {
+    if (!wizardData || !user) return
+
+    const chars = getCharactersData()
+    const characterIds = getCharacterIdsForApi(chars)
+    const singleId = characterIds.length === 1 ? characterIds[0] : null
+    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("kidstorybook_character_id") : null
+
+    const themeKey =
+      wizardData?.step3?.theme?.id ||
+      (typeof wizardData?.step3?.theme === "string" ? wizardData.step3.theme : "") ||
+      "adventure"
+    const styleKey =
+      wizardData?.step4?.illustrationStyle?.id ||
+      (typeof wizardData?.step4?.illustrationStyle === "string" ? wizardData.step4.illustrationStyle : "") ||
+      "watercolor"
+    const language = (wizardData?.step3?.language?.id || formData.language?.id || "en") as "en" | "tr" | "de" | "fr" | "es" | "zh" | "pt" | "ru"
+
+    const payload = {
+      ...(characterIds.length > 0 ? { characterIds } : singleId || fallbackId ? { characterId: singleId || fallbackId } : {}),
+      theme: themeKey,
+      illustrationStyle: styleKey,
+      customRequests: formData.customRequests || "",
+      pageCount: formData.pageCount,
+      language,
+      isExample: true, // Mark as example book (admin only)
+      skipPayment: true, // Also skip payment for example book creation
+    }
+
+    if (!payload.characterIds && !(payload as any).characterId) {
+      toast({
+        title: "Characters required",
+        description: "Save character(s) in previous steps first.",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsCreating(true)
+    try {
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to create example book")
+      }
+
+      toast({
+        title: "Example Book Created!",
+        description: "Your example book is being generated. It will appear on the Examples page when ready.",
+      })
+
+      router.push(`/dashboard`)
+    } catch (error) {
+      console.error("Error creating example book:", error)
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to create example book",
         variant: "destructive",
       })
     } finally {
@@ -1106,6 +1191,39 @@ export default function Step6Page() {
                   </Button>
                   <p className="mt-1 text-center text-xs text-amber-600/80 dark:text-amber-400/80">
                     Admin / debug only – no payment
+                  </p>
+                </motion.div>
+              )}
+
+              {/* Create example book (Admin only) */}
+              {showCreateExampleButton && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4, duration: 0.4 }}
+                  className="w-full"
+                >
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={isCreating || !wizardData}
+                    onClick={handleCreateExampleBook}
+                    className="w-full border-green-500/50 text-green-700 dark:text-green-400 dark:border-green-400/50"
+                  >
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        <span>Create example book</span>
+                      </>
+                    )}
+                  </Button>
+                  <p className="mt-1 text-center text-xs text-green-600/80 dark:text-green-400/80">
+                    Admin only – create public example for Examples page
                   </p>
                 </motion.div>
               )}

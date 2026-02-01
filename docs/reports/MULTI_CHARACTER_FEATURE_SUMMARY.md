@@ -117,7 +117,7 @@ type Character = {
 ```
 
 #### 2. Prompts - Story Generation
-**Dosya:** `lib/prompts/types.ts`, `lib/prompts/story/v1.0.0/base.ts`
+**Dosya:** `lib/prompts/types.ts`, `lib/prompts/story/base.ts`
 
 **Değişiklikler:**
 - `StoryGenerationInput`: `characters` array'i eklendi
@@ -140,7 +140,7 @@ IMPORTANT: All 3 characters should appear in the story. The main character is Ar
 ```
 
 #### 3. Prompts - Image Generation
-**Dosyalar:** `lib/prompts/image/v1.0.0/character.ts`, `lib/prompts/image/v1.0.0/scene.ts`
+**Dosyalar:** `lib/prompts/image/v1.0.0/character.ts`, `lib/prompts/image/scene.ts`
 
 **Değişiklikler:**
 - `buildMultipleCharactersPrompt`: Yeni fonksiyon (ana + ek karakterler)
@@ -339,7 +339,7 @@ ACCOMPANYING CHARACTERS:
   - mutant/malformed/twisted fingers, missing/extra knuckles
   - thumb variations, webbed fingers, impossible angles
 
-**Dosya:** `lib/prompts/image/v1.0.0/negative.ts` (v1.0.1)
+**Dosya:** `lib/prompts/image/negative.ts` (v1.0.1)
 
 ### 2. Çoklu Karakter Referans Eşleştirme İyileştirmeleri ✅
 **Sorun:** 2. karakter eklenince göz rengi seçilenden farklı çıkıyordu (karakter özellikleri karışıyordu)
@@ -385,9 +385,9 @@ imageBlobs.forEach(({ blob, filename }) => {
 ```
 
 **Versiyonlar:**
-- `lib/prompts/image/v1.0.0/negative.ts`: v1.0.0 → v1.0.1
+- `lib/prompts/image/negative.ts`: v1.0.0 → v1.0.1
 - `lib/prompts/image/v1.0.0/character.ts`: v1.0.2 → v1.0.3
-- `docs/prompts/CHANGELOG.md`: v2.2 (16 Ocak 2026 güncellemeleri)
+- `docs/prompts/`: prompt template'leri (16 Ocak 2026 güncellemeleri)
 
 **Kaynak:** AI image generation hands/anatomy best practices 2026 (web research)
 
@@ -512,9 +512,9 @@ if (currentCharacter.characterType.group === "Child") {
 - `app/create/step2/page.tsx` - Frontend UI ✅
 - `app/create/step6/page.tsx` - Submission ✅
 - `lib/prompts/types.ts` - Type definitions ✅
-- `lib/prompts/story/v1.0.0/base.ts` - Story prompts ✅
+- `lib/prompts/story/base.ts` - Story prompts ✅
 - `lib/prompts/image/v1.0.0/character.ts` - Character prompts ✅
-- `lib/prompts/image/v1.0.0/scene.ts` - Scene prompts ✅
+- `lib/prompts/image/scene.ts` - Scene prompts ✅
 - `app/api/books/route.ts` - Books API ✅
 
 ---

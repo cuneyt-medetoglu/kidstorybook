@@ -755,7 +755,6 @@ Bu analize dayanarak detaylı bir iyileştirme planı oluşturuldu ve uygulandı
 - ✅ Versiyon: v1.0.3 → v1.1.0
 
 **Dokümantasyon:**
-- ✅ CHANGELOG.md güncellendi
-- ✅ VERSION_STATUS.md güncellendi
+- ✅ docs/prompts template dokümanları güncellendi
 
 **Detaylı plan:** `docs/guides/IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md` analizine dayanarak oluşturuldu ve uygulandı.

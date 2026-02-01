@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/v1.0.0/character'
+import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/character'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest) {
       // Try to parse error JSON for better error handling
       try {
         const errorJson = JSON.parse(errorText)
-        console.error('[Cover Generation] Parsed Error:', JSON.stringify(errorJson, null, 2))
+        console.error('[Cover Generation] Parsed Error:', errorJson?.error?.message ?? errorText?.slice(0, 300))
         
         // Check if it's a verification error
         if (errorJson.error?.message?.includes('organization must be verified')) {
@@ -278,7 +278,7 @@ export async function POST(request: NextRequest) {
     }
 
     const apiResult = await apiResponse.json()
-    console.log('[Cover Generation] API Response (full):', JSON.stringify(apiResult, null, 2))
+    console.log('[Cover Generation] API Response received (hasData:', !!apiResult?.data, ', dataLength:', apiResult?.data?.length ?? 0, ')')
 
     // Extract image URL from response
     // GPT-image API /v1/images/edits endpoint returns: { data: [{ url: "...", ... }] }
@@ -307,13 +307,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (!coverUrl) {
-      console.error('[Cover Generation] Could not extract image URL from response:', JSON.stringify(apiResult, null, 2))
-      console.error('[Cover Generation] Response structure:', {
+      console.error('[Cover Generation] Could not extract image URL from response. Response structure:', {
         hasData: !!apiResult.data,
         dataType: typeof apiResult.data,
         isArray: Array.isArray(apiResult.data),
         dataLength: apiResult.data?.length,
-        firstItem: apiResult.data?.[0],
+        firstItemKeys: apiResult.data?.[0] ? Object.keys(apiResult.data[0]) : [],
         hasUrl: !!apiResult.url,
       })
       throw new Error('No image URL found in GPT-image API response')

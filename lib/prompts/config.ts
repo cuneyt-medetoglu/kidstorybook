@@ -8,9 +8,9 @@
 export const PROMPT_CONFIG = {
   // Active versions in production
   activeVersions: {
-    story: 'v1.0.0',
-    image: 'v1.0.0',
-    cover: 'v1.0.0',
+    story: 'v1.4.0',
+    image: 'v1.8.0',
+    cover: 'v1.8.0',
   },
 
   // A/B Testing (if enabled, will split traffic)
@@ -19,7 +19,7 @@ export const PROMPT_CONFIG = {
       enabled: false,
       testId: 'story-length-test-001',
       variants: [
-        { name: 'control', version: 'v1.0.0', traffic: 50 },
+        { name: 'control', version: 'v1.4.0', traffic: 50 },
         { name: 'treatment', version: 'v1.1.0', traffic: 50 },
       ],
     },
