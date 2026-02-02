@@ -166,7 +166,7 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   }
 
   const handleShareBook = () => {
-    // TODO: Implement share functionality
+    // ROADMAP: Share functionality (kitap paylaşımı)
     toast({
       title: "Coming Soon",
       description: "Share functionality will be available soon",

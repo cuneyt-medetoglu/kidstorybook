@@ -62,10 +62,10 @@ export async function GET(request: NextRequest) {
       coverImage: book.cover_image_url || '',
       ageGroup: book.age_group || '',
       theme: book.theme || '',
-      usedPhotos: [], // TODO: Extract from story_data or images_data when available
+      usedPhotos: [], // ROADMAP: Examples metadata - extract from story_data/images_data when available
       storyDetails: {
         style: book.illustration_style || '',
-        font: 'Playful', // TODO: Get from metadata
+        font: 'Playful', // ROADMAP: Get from book/metadata when available
         characterCount: book.generation_metadata?.characterIds?.length || 1,
       },
     }))

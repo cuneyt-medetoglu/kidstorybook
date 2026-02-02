@@ -12,6 +12,7 @@ import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { createClient } from "@/lib/supabase/client"
 
 // Form validation schema
 const registerSchema = z
@@ -129,35 +130,31 @@ export default function RegisterPage() {
     } catch (err) {
       console.error("Register error:", err)
       const errorMessage = err instanceof Error ? err.message : "Registration failed. Please try again."
-      alert(errorMessage) // TODO: Replace with toast notification
+      alert(errorMessage) // ROADMAP: Replace with toast notification (ToastProvider)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // OAuth handlers (placeholder - Faz 3'te Supabase Auth entegrasyonu yapılacak)
+  // OAuth: Supabase signInWithOAuth - same as login (auth/callback handles token)
   const handleGoogleOAuth = async () => {
-    console.log("[OAuth] Google OAuth clicked - Faz 3'te entegrasyon yapılacak")
-    // TODO: Faz 3'te Supabase Auth signInWithOAuth('google') entegrasyonu
-    // const supabase = createClient()
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'google',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // })
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
   }
 
   const handleFacebookOAuth = async () => {
-    console.log("[OAuth] Facebook OAuth clicked - Faz 3'te entegrasyon yapılacak")
-    // TODO: Faz 3'te Supabase Auth signInWithOAuth('facebook') entegrasyonu
-    // const supabase = createClient()
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'facebook',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // })
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
   }
 
   // Floating animations for decorative elements

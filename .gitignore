@@ -10,6 +10,9 @@
 # testing
 /coverage
 
+# Script outputs (generated images, exports)
+scripts/output/
+
 # next.js
 /.next/
 /out/

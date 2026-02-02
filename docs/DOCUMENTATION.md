@@ -2,6 +2,8 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
+**Son güncelleme:** 2 Şubat 2026 (FAZ 10 – README ve dokümantasyon güncellemesi)
+
 ---
 
 ## 📁 Klasör Yapısı
@@ -9,23 +11,40 @@ Bu klasör projenin tüm dokümantasyonunu içerir.
 ```
 docs/
 ├── DOCUMENTATION.md             # Bu dosya - Dokümantasyon indeksi
-├── ROADMAP.md                   # Ana proje planı ve iş listesi
-├── PRD.md                       # Ürün gereksinimleri
+├── DOCUMENTATION_MAP.md         # Tüm dokümanların kategorisi ve özeti (FAZ 1 çıktısı)
+├── ARCHIVE_LIST.md              # Archive'a taşınacak dosyalar listesi (FAZ 1 çıktısı)
+├── ROADMAP.md                   # Ana proje planı (özet + faz dosyalarına linkler)
+├── roadmap/                     # Faz bazlı iş listesi ve CSV/viewer
+│   ├── PHASE_1_FOUNDATION.md    # Faz 1: Temel altyapı
+│   ├── PHASE_2_FRONTEND.md      # Faz 2: Frontend
+│   ├── PHASE_3_BACKEND_AI.md    # Faz 3: Backend ve AI
+│   ├── PHASE_4_ECOMMERCE.md     # Faz 4: E-ticaret
+│   ├── PHASE_5_LAUNCH.md        # Faz 5: Polish ve lansman
+│   ├── PHASE_6_PWA.md           # Faz 6: PWA
+│   ├── roadmap.csv              # CSV (faz dosyalarından otomatik; npm run roadmap)
+│   ├── roadmap-viewer.html      # HTML görüntüleyici - Gizli
+│   ├── V0_APP_PROMPT_GUIDE.md   # v0.app prompt rehberi
+│   ├── NOTLAR_VE_FIKIRLER.md    # Notlar ve fikirler
+│   └── ILERLEME_TAKIBI.md       # İlerleme takibi
+├── PRD.md                       # Ürün gereksinimleri (kısa; teknik detay → technical/PRD_TECHNICAL_DETAILS.md)
+├── COMPLETED_FEATURES.md        # Tamamlanan özellikler changelog (PRD'den taşındı)
 ├── FEATURES.md                  # Özellik listesi ve önceliklendirme
 ├── ARCHITECTURE.md              # Mimari kararlar ve yapı
 │
 ├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
-│   ├── FAZ1_IMPLEMENTATION.md  # Faz 1 implementasyon takibi
-│   ├── FAZ2_IMPLEMENTATION.md  # Faz 2 implementasyon takibi
-│   ├── FAZ3_IMPLEMENTATION.md  # Faz 3 implementasyon takibi
+│   ├── README.md               # Klasör açıklaması (FAZ 6)
+│   ├── FAZ3_IMPLEMENTATION.md   # Faz 3 implementasyon takibi
 │   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
-│   ├── IMAGE_QUALITY_IMPROVEMENT_PLAN.md # Görsel + sahne kalitesi tek plan (3.5.19, 3.5.20; nasıl ilerleyeceğiz burada)
-│   └── ...
+│   ├── IMAGE_QUALITY_IMPROVEMENT_PLAN.md # Görsel + sahne kalitesi tek plan
+│   └── (FAZ1, FAZ2, FAZ2.4, FAZ3 PDF plan → archive/2026-q1/implementation/)
 │
 ├── checklists/                 # Kontrol listeleri (aktif)
 │   └── ...
 │
-├── archive/                    # Arşivlenmiş dosyalar (sahne/kompozisyon/analiz → IMAGE_QUALITY_IMPROVEMENT_PLAN)
+├── archive/                    # Arşivlenmiş dosyalar (referans için)
+│   ├── README.md               # Arşiv yapısı (FAZ 6)
+│   ├── 2026-q1/                # FAZ 6 ile taşınan 17 dosya (implementation, guides, reports, strategies, ai)
+│   │   └── README.md           # 2026-q1 özeti
 │   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi (arşiv)
 │   ├── FAZ1_TEST_CHECKLIST.md  # Faz 1 test checklist (arşiv)
 │   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu (arşiv)
@@ -36,9 +55,10 @@ docs/
 │   ├── IMAGE_COMPOSITION_AND_DEPTH_ANALYSIS.md
 │   ├── SCENE_REPETITION_AND_CLOTHING_CONSISTENCY_ANALYSIS.md
 │   ├── VISUAL_CONSISTENCY_AND_STORY_QUALITY_DEEP_DIVE.md
-│   └── UNIFIED_ANALYSIS_FOUR_MODELS.md  # (analysis/ boşaltıldı, içerik arşive taşındı)
+│   └── UNIFIED_ANALYSIS_FOUR_MODELS.md
 │
 ├── guides/                     # Rehberler ve talimatlar
+│   ├── README.md               # Klasör açıklaması (FAZ 6)
 │   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
 │   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
 │   ├── SUPABASE_MIGRATION_GUIDE.md # Supabase migration uygulama rehberi
@@ -46,7 +66,6 @@ docs/
 │   ├── COLOR_PALETTE.md        # Renk paleti rehberi
 │   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
 │   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
-│   ├── BOOK_VIEWER_IMPROVEMENTS_GUIDE.md # Kitap görüntüleme iyileştirmeleri (desktop görsel + mobil flip)
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)
 │   ├── IMAGE_EDIT_FEATURE_GUIDE.md # Image edit feature rehberi (ChatGPT-style mask-based editing)
 │   ├── EXAMPLES_PAGE_V0_PROMPT.md # Examples sayfası v0.app prompt rehberi (mobil-first tasarım)
@@ -59,27 +78,27 @@ docs/
 │   ├── HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md # HeroBookTransformation kartlarında köşe beyazlığı/iz analizi ve denenen çözümler
 │   └── ...
 │
-├── roadmap.csv                 # Google Sheets'e import edilebilir CSV dosyası (ROADMAP.md'den otomatik oluşturulur) - Gizli
-├── roadmap-viewer.html        # HTML tablo görüntüleyici (filtreleme, sıralama, arama) - Gizli
-├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (Google Sheets filtreleme, draft fikirler, HTML Viewer, vb.)
+├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (roadmap.csv ve viewer docs/roadmap/ içinde)
 │
 ├── reports/                    # Raporlar (aktif)
-│   ├── GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md # GPT-image API hata analizi
-│   ├── CURRENT_STATUS_ANALYSIS.md # Mevcut durum analizi ve eksikler listesi
-│   ├── MISSING_IMPLEMENTATIONS_ANALYSIS.md # Eksik implementasyonlar analizi (MVP için kritik)
+│   ├── README.md               # Klasör açıklaması (FAZ 6)
 │   ├── IMAGE_QUALITY_ANALYSIS.md # Görsel kalite analizi
-   ├── QUALITY_AND_CONSISTENCY_ANALYSIS.md # Görsel ve hikaye kalite analizi (Kıyafet & Kurgu)
-│   └── ...
+│   ├── QUALITY_AND_CONSISTENCY_ANALYSIS.md # Görsel ve hikaye kalite analizi (Kıyafet & Kurgu)
+│   ├── MULTI_CHARACTER_FEATURE_SUMMARY.md
+│   ├── PAYMENT_FLOW_UX_ANALYSIS.md
+│   ├── SALES_AND_CART_STRATEGY_ANALYSIS.md
+│   └── (CURRENT_STATUS, MISSING_IMPLEMENTATIONS, GPT_IMAGE_COVER → archive/2026-q1/reports/)
 │
 ├── strategies/                 # Strateji dokümanları
+│   ├── README.md               # Klasör açıklaması (FAZ 6)
 │   ├── GIT_STRATEGY.md         # Git branching stratejisi
 │   ├── EBOOK_VIEWER_STRATEGY.md # E-book Viewer stratejisi
 │   ├── TTS_STRATEGY.md         # Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
 │   ├── CHARACTER_CONSISTENCY_STRATEGY.md # Master character multi-book tutarlılığı
 │   ├── B2B_FEATURE_ANALYSIS.md # B2B (Business-to-Business) özellik analizi
 │   ├── EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md # Examples: gerçek kitaplar + Create your own stratejisi
-│   ├── EXAMPLE_BOOKS_CUSTOM_REQUESTS.md # Example Books görsel kalite sorunları (5 problem analizi + çözümler)
-│   └── ...
+│   ├── EXAMPLE_BOOKS_CUSTOM_REQUESTS.md # Example Books görsel kalite sorunları
+│   └── (STEP_1_2_MERGE, CHARACTER_CONSISTENCY_IMPROVEMENT → archive/2026-q1/strategies/)
 │
 ├── database/                   # Database schemas ve migration'lar
 │   └── SCHEMA.md               # Database schema dokümantasyonu
@@ -89,14 +108,20 @@ docs/
 │   └── POSTMAN_COLLECTION.md   # Postman collection kullanım rehberi
 │
 ├── ai/                          # AI ile ilgili dokümanlar
+│   ├── README.md                # Klasör açıklaması (FAZ 6)
 │   ├── AI_STRATEGY.md           # AI prompt stratejisi
-│   ├── AI_TOOLS_COMPARISON.md   # AI tool karşılaştırması (test sonuçları)
-│   └── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı
+│   ├── CHARACTER_CREATION_FLOW.md # Karakter oluşturma akışı
+│   └── (AI_TOOLS_COMPARISON → archive/2026-q1/ai/)
 │
-├── prompts/                     # AI prompt template'leri
+├── prompts/                     # AI prompt template'leri ve listeleri
 │   ├── IMAGE_PROMPT_TEMPLATE.md # Görsel üretimi prompt template
 │   ├── STORY_PROMPT_TEMPLATE.md # Hikaye üretimi prompt template
+│   ├── HERO_TRANSFORMATION_PROMPTS.md # Hero sahne prompt örnekleri (FAZ 9)
 │   └── ...
+│
+├── research/                    # Araştırma notları (referans; FAZ 9)
+│   ├── README.md
+│   └── GPT_ANATOMICAL_RESEARCH.md # GPT-4 Vision / DALL·E parmak-anatomi araştırması
 │
 └── technical/                   # Teknik dokümanlar
     ├── TECHNICAL_DECISIONS.md   # Teknik kararlar (Next.js, Supabase, vb.)
@@ -107,12 +132,13 @@ docs/
 
 ### 📋 Ana Dosyalar (docs/ root)
 
-**Sadece şu 5 dosya docs/ root'unda olmalı:**
+**Ana dosyalar (docs/ root):**
 1. **DOCUMENTATION.md** - Bu dosya (dokümantasyon indeksi)
 2. **ROADMAP.md** - Ana proje planı ve iş listesi
-3. **PRD.md** - Ürün gereksinimleri
-4. **FEATURES.md** - Özellik listesi ve önceliklendirme
-5. **ARCHITECTURE.md** - Mimari kararlar ve yapı
+3. **PRD.md** - Ürün gereksinimleri (kısa; teknik detay: technical/PRD_TECHNICAL_DETAILS.md)
+4. **COMPLETED_FEATURES.md** - Tamamlanan özellikler changelog
+5. **FEATURES.md** - Özellik listesi ve önceliklendirme
+6. **ARCHITECTURE.md** - Mimari kararlar ve yapı
 
 **Diğer tüm dosyalar alt klasörlerde:**
 - `implementation/` - Faz bazlı implementasyon takibi
@@ -129,13 +155,15 @@ docs/
 1. **ROADMAP.md** - Tüm işlerin listesi, buradan takip et
 2. **PRD.md** - Ürün gereksinimleri
 3. **FEATURES.md** - Özellik listesi ve önceliklendirme
+4. **DOCUMENTATION_MAP.md** - Tüm dokümanların kategorisi (AKTİF / GÜNCELLENECEK / ESKİ); hangi dosya nerede, güncel mi?
+5. **ARCHIVE_LIST.md** - Archive'a taşınacak dosyalar (FAZ 6'da kullanılacak)
 
 ### İş Takibi ve CSV Yönetimi
-1. **roadmap.csv** - Google Sheets'e import edilebilir CSV dosyası (Gizli - `docs/` klasöründe)
-   - ROADMAP.md'den otomatik oluşturulur (`npm run roadmap`)
+1. **roadmap.csv** - Google Sheets'e import edilebilir CSV dosyası (Gizli - `docs/roadmap/` klasöründe)
+   - Faz dosyalarından (docs/roadmap/PHASE_*.md) otomatik oluşturulur (`npm run roadmap`)
    - Google Sheets'te filtreleme, sıralama, grafik oluşturma
    - Draft fikirler ekleme
-2. **roadmap-viewer.html** - HTML tablo görüntüleyici ⭐ (Gizli - `docs/` klasöründe)
+2. **roadmap-viewer.html** - HTML tablo görüntüleyici ⭐ (Gizli - `docs/roadmap/` klasöründe)
    - Tarayıcıda çalışan interaktif tablo
    - CSV otomatik yükleme (aynı klasörde `roadmap.csv`)
    - Filtreleme, sıralama, arama özellikleri
@@ -155,8 +183,8 @@ docs/
 
 ### AI ve Prompt'lar
 1. **ai/AI_STRATEGY.md** - AI stratejisi ve prompt engineering
-2. **ai/AI_TOOLS_COMPARISON.md** - AI tool karşılaştırması ve test planı
-3. **ai/CHARACTER_CREATION_FLOW.md** - Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
+2. **ai/CHARACTER_CREATION_FLOW.md** - Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
+3. (AI_TOOLS_COMPARISON → archive/2026-q1/ai/)
 4. **prompts/** - Tüm prompt template'leri
 5. **analysis/STORY_AND_IMAGE_AI_FLOW.md** - Story ve Image için AI’a ne gönderildiği / ne döndüğü (request-response akışı, inceleme için)
 6. **analysis/SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md** - Kıyafet tutarlılığı sistem tasarımı (v1.6.0 single source of truth)
@@ -205,6 +233,8 @@ docs/
 - Süre/tahmin belirtilmemeli
 - Sürekli güncellenmeli
 - Türkçe yazılmalı (kod yorumları İngilizce olabilir)
+
+**Archive stratejisi:** Tamamlanmış veya tek seferlik analiz dokümanları `docs/archive/` altına taşınır. Tarih bazlı alt klasör kullanılır (örn. `archive/2026-q1/`). Hangi dosyanın nerede olduğu için [DOCUMENTATION_MAP.md](DOCUMENTATION_MAP.md) ve [ARCHIVE_LIST.md](ARCHIVE_LIST.md) kullanılır.
 
 ---
 
@@ -282,12 +312,17 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 27 Ocak 2026
+**Son Güncelleme:** 2 Şubat 2026
+
+- **2 Şubat 2026 (FAZ 10 – README ve dokümantasyon):**
+  - README.md güncellendi: proje yapısı (app/, components/, lib/), özellikler (TTS, Multi-character, Currency Detection), hızlı başlangıç (port 3001), dokümantasyon tablosu, teknoloji stack
+  - DOCUMENTATION.md: son güncelleme tarihi ve archive stratejisi notu eklendi
+  - .cursorrules güncellendi: güncel proje yapısı, önemli dosyalar, logger kullanımı
 
 - **23 Ocak 2026:**
   - **ROADMAP CSV Sistemi eklendi:**
-    - `docs/roadmap.csv` - Google Sheets'e import edilebilir CSV dosyası
-    - `scripts/generate-roadmap-csv.js` - CSV oluşturma script'i
+    - `docs/roadmap/roadmap.csv` - Google Sheets'e import edilebilir CSV dosyası
+    - `scripts/generate-roadmap-csv.js` - Faz dosyalarından CSV oluşturma script'i
     - `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
     - ROADMAP.md'den otomatik CSV oluşturma
     - Google Sheets'te filtreleme, sıralama, grafik oluşturma

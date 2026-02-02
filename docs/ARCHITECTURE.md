@@ -1,7 +1,10 @@
 # 🏗️ KidStoryBook - Mimari Kararlar ve Yapı
 
-**Tarih:** 4 Ocak 2026  
-**Durum:** Aktif Geliştirme
+**Tarih:** 2 Şubat 2026  
+**Durum:** AKTİF – Güncel (FAZ 5 çıktısı)
+
+**Detaylı şema:** [docs/database/SCHEMA.md](database/SCHEMA.md)  
+**API dokümantasyonu:** [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md)
 
 ---
 
@@ -141,56 +144,77 @@ NODE_ENV=development
 
 ## 📁 Proje Yapısı
 
-### Mevcut Yapı (Faz 1.2 Sonrası)
+### Mevcut Yapı (Güncel – 2 Şubat 2026)
 
 ```
 kidstorybook/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx          # Root layout
-│   ├── page.tsx            # Homepage
-│   ├── globals.css         # Global styles
-│   ├── test-supabase/     # Supabase test sayfası
-│   └── api/                # API Routes (Backend)
-│       └── test/           # Test endpoints
-│           └── storage/     # Storage test endpoint
-├── components/             # React Components
-│   └── ui/                 # shadcn/ui components
-│       └── button.tsx      # Button component
-├── lib/                    # Utility functions
-│   ├── utils.ts            # Helper functions (cn)
-│   └── supabase/           # Supabase clients
-│       ├── client.ts       # Browser client
-│       ├── server.ts       # Server client
-│       └── middleware.ts   # Middleware client (auth refresh)
-├── supabase/               # Supabase configuration
-│   ├── migrations/         # Database migrations
-│   │   └── 00001_initial_schema.sql
-│   └── README.md           # Supabase setup guide
-├── middleware.ts           # Next.js middleware (Supabase auth)
-├── docs/                   # Dokümantasyon
-│   ├── implementation/     # Faz bazlı implementasyon takibi
-│   ├── checklists/         # Kontrol listeleri
-│   ├── guides/             # Rehberler
-│   ├── reports/            # Raporlar
-│   └── strategies/         # Strateji dokümanları
-├── poc/                    # Proof of Concept
-└── public/                 # Static files
+├── app/                        # Next.js App Router
+│   ├── layout.tsx, page.tsx    # Root, Homepage
+│   ├── globals.css             # Global styles
+│   ├── api/                    # API Routes (29 endpoint – aşağıda özet)
+│   │   ├── ai/                 # generate-story, generate-images, generate-cover, edit-image
+│   │   ├── auth/               # test-login
+│   │   ├── books/              # CRUD, [id], generate-pdf, edit-history, revert-image, create-free-cover, purchase-from-draft
+│   │   ├── cart/               # Sepet CRUD
+│   │   ├── characters/         # CRUD, analyze, [id], set-default
+│   │   ├── currency/           # Para birimi tespiti
+│   │   ├── debug/              # can-skip-payment
+│   │   ├── draft(s)/           # share, transfer, [draftId]
+│   │   ├── email/              # send-ebook
+│   │   ├── examples/           # Örnek kitaplar
+│   │   ├── rate-limit/         # Rate limiting
+│   │   ├── tts/                # generate (Text-to-Speech)
+│   │   ├── users/              # free-cover-status
+│   │   └── test/               # storage
+│   ├── auth/                   # login, register, callback, forgot-password, verify-email
+│   ├── books/[id]/             # view, settings
+│   ├── cart/                   # Sepet sayfası
+│   ├── checkout/               # Checkout, success
+│   ├── create/step1..6/        # Kitap oluşturma wizard
+│   ├── dashboard/              # Kitaplık, settings
+│   ├── examples/               # Örnek kitaplar sayfası
+│   ├── pricing/                # Fiyatlandırma
+│   └── draft-preview/          # Taslak önizleme
+├── components/                 # React Components
+│   ├── book-viewer/            # book-viewer, book-page, ImageEditModal, EditHistoryPanel, page-thumbnails
+│   ├── checkout/               # CartSummary, CheckoutForm, PlanSelectionModal
+│   ├── layout/                 # Header, Footer, CookieConsentBanner
+│   ├── providers/               # ThemeProvider, ToastProvider
+│   ├── sections/               # Hero, HowItWorks, FAQ, Pricing, CampaignBanners, HeroBookTransformation, vb.
+│   └── ui/                     # shadcn/ui (button, card, dialog, input, select, tabs, vb.)
+├── lib/                        # Utility ve business logic
+│   ├── api/response.ts         # API response formatı
+│   ├── config.ts               # Environment, app config
+│   ├── currency.ts             # Currency detection (IP → TRY/USD/EUR/GBP)
+│   ├── db/                     # books.ts, characters.ts (Supabase helpers)
+│   ├── draft-storage.ts        # Taslak depolama
+│   ├── pdf/                    # generator, templates (PDF üretimi)
+│   ├── prompts/                # Prompt Management (config, story, image, tts v1.0.0 dil dosyaları)
+│   ├── queue/                  # image-generation-queue
+│   ├── supabase/               # client, server, server-auth, middleware
+│   ├── utils.ts                # cn, helpers
+│   └── wizard-state.ts         # Wizard state
+├── supabase/migrations/        # Database migrations
+├── middleware.ts                # Next.js middleware (Supabase auth)
+├── docs/                       # Dokümantasyon (roadmap, PRD, guides, database, api, vb.)
+└── public/                     # Static files
 ```
 
-### Gelecekteki Yapı (Büyüdükçe)
+### API Routes Özeti (29 endpoint)
 
-```
-kidstorybook/
-├── app/                    # Frontend
-├── components/            # UI Components
-├── lib/                    # Shared utilities
-├── api/                    # API Routes (Backend)
-├── types/                  # TypeScript types
-├── hooks/                  # React hooks
-├── stores/                 # State management (Zustand/Redux)
-├── tests/                  # Test files
-└── ...
-```
+| Grup | Endpoint'ler |
+|------|--------------|
+| **AI** | POST generate-story, generate-images, generate-cover, edit-image |
+| **Books** | GET/POST books, GET/PATCH/DELETE books/[id], POST generate-pdf, edit-history, revert-image, create-free-cover, purchase-from-draft |
+| **Characters** | GET/POST characters, GET/PATCH/DELETE characters/[id], POST analyze, set-default |
+| **Cart** | GET/POST/PATCH/DELETE cart |
+| **Currency** | GET currency |
+| **Drafts** | GET/POST drafts, GET/PATCH/DELETE drafts/[draftId], POST share, transfer |
+| **TTS** | POST tts/generate |
+| **Users** | GET free-cover-status |
+| **Diğer** | email/send-ebook, examples, rate-limit, debug/can-skip-payment, auth/test-login, test/storage |
+
+Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 
 ---
 
@@ -214,20 +238,23 @@ kidstorybook/
 
 | Katman | Teknoloji | Versiyon | Not |
 |--------|-----------|----------|-----|
-| **Frontend** | Next.js 14 (App Router) | 14.2.35 | SSR, SEO, Performance |
+| **Frontend** | Next.js (App Router) | 14.2.35 | SSR, SEO, Performance |
 | **UI Framework** | Tailwind CSS | 3.4.19 | Utility-first CSS |
-| **UI Components** | shadcn/ui | Latest | Radix UI + Tailwind |
-| **Backend** | Next.js API Routes | Built-in | Serverless functions |
-| **Database** | Supabase (PostgreSQL) | Latest | Auth, DB, Storage |
+| **UI Components** | shadcn/ui (Radix) | - | button, card, dialog, select, tabs, vb. |
+| **Backend** | Next.js API Routes | Built-in | 29 endpoint, serverless |
+| **Database** | Supabase (PostgreSQL) | - | Auth, DB, Storage |
 | **Supabase Client** | @supabase/ssr | 0.8.0 | SSR support |
 | **Supabase JS** | @supabase/supabase-js | 2.89.0 | Core client |
 | **TypeScript** | TypeScript | 5.9.3 | Type safety |
 | **React** | React | 18.3.1 | UI library |
-| **AI** | OpenAI, Groq, Gemini | TBD | Multiple providers |
-| **Ödeme** | Stripe + İyzico | TBD | Global + Türkiye |
-| **Hosting** | Vercel | TBD | Next.js için optimize |
-| **Container** | Docker | Gelecek | Local dev, CI/CD |
-| **Theme** | next-themes | Faz 2.1.3 | Dark/Light mode support |
+| **AI** | OpenAI (GPT-4o, GPT-image) | openai ^6.16.0 | Hikaye, görsel, kapak, edit |
+| **TTS** | Google Cloud Text-to-Speech | @google-cloud/text-to-speech ^6.4.0 | 8 dil |
+| **PDF** | jsPDF, Puppeteer | jspdf ^4.0.0, puppeteer ^24.35.0 | PDF üretimi |
+| **Ödeme** | Stripe + İyzico | TBD | Planlanıyor |
+| **Hosting** | Vercel | - | Next.js için optimize |
+| **Theme** | next-themes | 0.4.6 | Dark/Light mode |
+| **Form** | react-hook-form, zod | ^7.70.0, ^4.3.5 | Validasyon |
+| **Animasyon** | framer-motion | ^12.23.26 | UI animasyonları |
 
 ---
 
@@ -267,11 +294,23 @@ kidstorybook/
    - Image domains eklendi ve optimize edildi
    - Environment setup rehberi oluşturuldu
 
+### Tamamlananlar (Faz 2–4 – Mimari Bileşenler)
+
+1. ✅ **Prompt Management System** – `lib/prompts/` (config, story, image, tts dil dosyaları, version-sync)
+2. ✅ **TTS Architecture** – `/api/tts/generate`, 8 dil, Google Cloud TTS
+3. ✅ **Currency Detection** – `lib/currency.ts`, `/api/currency`, IP → TRY/USD/EUR/GBP
+4. ✅ **Cart System** – `/api/cart`, `/cart`, checkout components, My Library bulk selection
+5. ✅ **Image Edit Feature** – `/api/ai/edit-image`, revert-image, edit-history, ImageEditModal
+6. ✅ **Multi-character Support** – characters tablosu (description JSONB), CRUD + analyze + set-default, 5 karakter kotası
+7. ✅ **API Routes** – 29 endpoint (AI, books, characters, cart, currency, drafts, tts, users, vb.)
+8. ✅ **Database** – public.users (role), characters, books; migrations 001–003, 015 uygulandı (bkz. docs/database/SCHEMA.md)
+
 ### Sıradakiler
 
-1. ⏳ Faz 2: Frontend geliştirme
-2. ⏳ Gelecekte: Docker desteği
-3. ⏳ Gelecekte: AWS S3 storage geçişi (Supabase limitine yaklaşıldığında)
+1. ⏳ Ödeme: Stripe/İyzico entegrasyonu, checkout akışı
+2. ⏳ Admin panel: sipariş/kullanıcı/kitap yönetimi
+3. ⏳ Gelecekte: Docker desteği (opsiyonel)
+4. ⏳ Gelecekte: AWS S3 storage geçişi (Supabase limitine yaklaşıldığında)
 
 ---
 
@@ -310,6 +349,112 @@ kidstorybook/
 4. Mevcut kodları migrate et
 5. Mevcut dosyaları S3'e taşı
 6. Test et ve production'a al
+
+---
+
+## 📝 Prompt Management System
+
+**Konum:** `lib/prompts/`  
+**Amaç:** Hikaye ve görsel üretimi için prompt versiyonları, dil dosyaları ve konfigürasyon.
+
+### Yapı
+- **config.ts** – Aktif versiyonlar (story v1.4.0, image v1.8.0, cover v1.8.0), A/B test ve feature flag’ler.
+- **story/** – Hikaye prompt base.
+- **image/** – Görsel prompt’ları (character, scene, style-descriptions, negative).
+- **tts/v1.0.0/** – TTS için 8 dil (tr, en, de, fr, es, zh, pt, ru).
+- **version-sync.ts** – Kod–dokümantasyon senkronizasyonu.
+
+### Gerekçe
+- Tek yerden prompt yönetimi; versiyon değişikliği tek dosyadan.
+- A/B test ve feature flag ile deney yapılabilir.
+
+---
+
+## 🔊 TTS (Text-to-Speech) Mimarisi
+
+**Konum:** `app/api/tts/generate`, `lib/prompts/tts/`  
+**Amaç:** E-book görüntüleyicide sesli okuma (8 dil).
+
+### Akış
+1. Frontend: metin + dil kodu → POST `/api/tts/generate`.
+2. Backend: Google Cloud Text-to-Speech API (veya yapılandırılmış provider).
+3. Dil dosyaları: `lib/prompts/tts/v1.0.0/{tr,en,de,...}.ts` – dil bazlı ayarlar.
+
+### Gerekçe
+- Erişilebilirlik ve çocuk kullanıcı deneyimi.
+- Dil bazlı prompt/ayar dosyaları ile tutarlı ses çıktısı.
+
+---
+
+## 💱 Currency Detection
+
+**Konum:** `lib/currency.ts`, `app/api/currency/route.ts`  
+**Amaç:** Kullanıcı bölgesine göre para birimi (TRY, USD, EUR, GBP) tespiti.
+
+### Akış
+1. Frontend veya middleware: GET `/api/currency` veya `getCurrencyFromRequest()`.
+2. IP tabanlı ülke: Vercel header (`X-Vercel-IP-Country`), fallback (Cloudflare, Accept-Language).
+3. `COUNTRY_CURRENCY_MAP`: TR→TRY, US→USD, EU ülkeleri→EUR, GB→GBP.
+4. Fiyat gösterimi: `lib/currency.ts` içindeki `CurrencyConfig` (symbol, price string).
+
+### Gerekçe
+- Tek fiyat alanı; gösterim bölgeye göre otomatik.
+- Stripe/İyzico entegrasyonu öncesi doğru para birimi seçimi.
+
+---
+
+## 🛒 Cart System
+
+**Konum:** `app/api/cart/route.ts`, `app/cart/`, `components/checkout/`  
+**Amaç:** Sepet CRUD, checkout öncesi ürün toplama.
+
+### Bileşenler
+- **API:** GET/POST/PATCH/DELETE `/api/cart` – sepetteki öğeler (kitap/draft, plan, miktar).
+- **Sayfa:** `app/cart/page.tsx` – sepet görüntüleme ve düzenleme.
+- **Checkout:** `CartSummary`, `CheckoutForm`, `PlanSelectionModal` – ödeme akışına hazırlık.
+- **My Library:** Basılı kitap toplu seçim → sepete ekleme.
+
+### Gerekçe
+- Tek sepet; e-book ve basılı kitap aynı akışta.
+- Rate limiting (`api/rate-limit`) ile API koruması.
+
+---
+
+## 🖼️ Image Edit Feature
+
+**Konum:** `app/api/ai/edit-image/route.ts`, `app/api/books/[id]/revert-image/route.ts`, `components/book-viewer/ImageEditModal.tsx`  
+**Amaç:** ChatGPT tarzı mask-based görsel düzenleme; version history ve revert.
+
+### Akış
+1. Book viewer’da “Edit image” → mask çizimi (react-sketch-canvas).
+2. POST `/api/ai/edit-image`: orijinal görsel + mask + talimat → yeni görsel (OpenAI edits API).
+3. Edit history: `api/books/[id]/edit-history`, `revert-image` – önceki sürüme dönme.
+4. Parent-only: Book Settings sayfası yetki kontrolü.
+
+### Gerekçe
+- Kullanıcı tek sayfayı revize edebilir; tüm kitabı yeniden üretmeye gerek yok.
+- Version history ile geri alım ve deney takibi.
+
+---
+
+## 👥 Multi-character Support
+
+**Konum:** `lib/db/characters.ts`, `app/api/characters/`, `docs/database/SCHEMA.md` (characters tablosu)  
+**Amaç:** Kullanıcı başına 5 karaktere kadar (çocuk + pet/oyuncak); ana/yan karakter; hikayede tutarlı kullanım.
+
+### Veri modeli
+- **characters:** user_id, name, age, gender, reference_photo_url, description (JSONB), analysis_raw, is_default, used_in_books, total_books, version, previous_versions.
+- **description JSONB:** physicalFeatures, hair, body, clothing; AI analiz çıktısı ve master description.
+- Karakter türü: Child / Family / Pet / Other / Toy (AI analyze ile sınıflandırma).
+
+### API
+- POST `/api/characters/analyze` – referans fotoğraf + bilgiler → AI analiz → description.
+- CRUD `/api/characters`, `/api/characters/[id]`, POST `set-default`.
+- Kitaplar: karakter ID’leri ile ilişki; wizard’da seçilen karakterler hikaye/görsel prompt’larına enjekte edilir.
+
+### Gerekçe
+- Aynı çocuk birden fazla kitapta tutarlı görünsün (master description).
+- Pet/oyuncak hikayeye dahil edilebilsin; 5 karakter kotası ile sınır.
 
 ---
 
@@ -397,7 +542,23 @@ kidstorybook/
 - Type-safe configuration
 - Otomatik validation (production'da hata verir)
 
+### 2 Şubat 2026 - FAZ 5: ARCHITECTURE Güncelleme ✅
+**Ne değişti:**
+- Proje yapısı güncellendi (app/, components/, lib/ – güncel klasör ve dosya listesi)
+- API Routes özeti eklendi (29 endpoint, gruplu tablo)
+- Yeni bölümler: Prompt Management System, TTS Architecture, Currency Detection, Cart System, Image Edit Feature, Multi-character Support
+- Teknoloji stack güncellendi (Next.js 14.2.35, React 18.3.1, OpenAI, TTS, PDF, form/animasyon kütüphaneleri)
+- Tamamlananlar (Faz 2–4) listesi eklendi; Sıradakiler güncellendi
+- docs/database/SCHEMA.md ve docs/api/API_DOCUMENTATION.md referansları eklendi
+
+**Neden:**
+- Mimari dokümanın mevcut koda ve özelliklere uyumlu olması gerekiyordu
+- Yeni eklenen sistemlerin (TTS, Currency, Cart, Image Edit, Multi-character) tek yerde özetlenmesi
+
+**Çıktı:**
+- ARCHITECTURE.md güncel; FAZ 5 tamamlandı
+
 ---
 
-**Son Güncelleme:** 4 Ocak 2026
+**Son Güncelleme:** 2 Şubat 2026
 

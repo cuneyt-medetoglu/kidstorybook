@@ -4,93 +4,93 @@ AI destekli kişiselleştirilmiş çocuk hikaye kitapları oluşturma platformu.
 
 ## 📖 Proje Hakkında
 
-KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir web platformudur. Ebeveynler çocuklarının özel hikayelerini yaratabilir, önce dijital olarak inceleyebilir, sonra basılı kitap olarak sipariş verebilir.
+KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir web platformudur. Ebeveynler çocuklarının özel hikayelerini yaratabilir, dijital olarak inceleyebilir, PDF indirebilir ve basılı kitap siparişi verebilir.
 
 ## ✨ Özellikler
 
-- 🎨 **AI Destekli Hikaye Oluşturma** - GPT-4o ile özgün hikayeler
-- 🖼️ **Kişiselleştirilmiş Görseller** - DALL-E 3 ile çocuğun fotoğrafından karakter oluşturma
-- 📖 **Dijital Kitap Görüntüleme** - Flipbook tarzı interaktif kitap deneyimi
-- 📦 **Basılı Kitap Siparişi** - Fiziksel kitap siparişi ve teslimat
-- 🌍 **Çok Dilli Destek** - Türkçe ve İngilizce (daha fazla dil eklenecek)
-- 💳 **Güvenli Ödeme** - Stripe ve İyzico entegrasyonu
+- 🎨 **AI Destekli Hikaye** – GPT-4o ile özgün hikayeler
+- 🖼️ **Kişiselleştirilmiş Görseller** – GPT-image / DALL-E ile çocuk fotoğrafından karakter oluşturma
+- 👧👦 **Çoklu Karakter** – Birden fazla çocuk karakteri tek kitapta
+- 🔊 **TTS (Seslendirme)** – Google Cloud TTS ile hikaye seslendirme
+- 💱 **Para Birimi Tespiti** – Bölgeye göre fiyat ve ödeme (TRY, USD, EUR)
+- 🛒 **Sepet ve Ödeme** – Stripe / İyzico entegrasyonu
+- 📖 **Dijital Kitap** – Flipbook tarzı görüntüleme, PDF indirme
+- 🌍 **Çok Dilli** – Türkçe, İngilizce ve diğer diller (8 dil desteği)
 
 ## 🚀 Hızlı Başlangıç
 
 ### Gereksinimler
 
-- Node.js 18+ 
+- Node.js 18+
 - npm veya yarn
-- API Keys (OpenAI, Groq, vb.)
+- API anahtarları: OpenAI, Supabase, (opsiyonel) Groq, Google Cloud TTS, Stripe/İyzico
 
 ### Kurulum
 
 ```bash
-# Repository'yi klonla
-git clone https://github.com/yourusername/kidstorybook.git
+git clone https://github.com/cuneyt-medetoglu/kidstorybook.git
 cd kidstorybook
 
-# Bağımlılıkları yükle
 npm install
-
-# Environment variables oluştur
 cp .env.example .env
-# .env dosyasını düzenle ve API key'lerini ekle
+# .env dosyasını düzenleyin; gerekli API key'leri ekleyin (bkz. docs/guides/ENVIRONMENT_SETUP.md)
 
-# Development server'ı başlat
 npm run dev
 ```
 
-Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini açın.
+Tarayıcıda **http://localhost:3001** adresini açın.
+
+### Dokümantasyon Yapısı
+
+| Ne arıyorsunuz? | Dosya |
+|-----------------|--------|
+| Tüm dokümanların listesi | [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) |
+| Hangi doküman nerede, güncel mi? | [docs/DOCUMENTATION_MAP.md](docs/DOCUMENTATION_MAP.md) |
+| Proje planı ve iş listesi | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| Ürün gereksinimleri | [docs/PRD.md](docs/PRD.md) |
+| Özellik listesi ve öncelikler | [docs/FEATURES.md](docs/FEATURES.md) |
+| Mimari ve teknik yapı | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Ortam değişkenleri kurulumu | [docs/guides/ENVIRONMENT_SETUP.md](docs/guides/ENVIRONMENT_SETUP.md) |
 
 ## 🛠️ Teknoloji Stack
 
 | Katman | Teknoloji |
 |--------|-----------|
 | **Frontend** | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
-| **Backend** | Next.js API Routes, Supabase |
-| **Database** | PostgreSQL (Supabase) |
-| **AI - Metin** | OpenAI GPT-4o, Gemini Pro, Groq, Claude |
-| **AI - Görsel** | DALL-E 3, Gemini Imagen 3, Stable Diffusion, Grok |
+| **Backend** | Next.js API Routes, Supabase (Auth, DB, Storage) |
+| **Veritabanı** | PostgreSQL (Supabase) |
+| **AI – Metin** | OpenAI GPT-4o, (opsiyonel) Groq, Claude, Gemini |
+| **AI – Görsel** | OpenAI GPT-image / DALL-E, (opsiyonel) Imagen, Stable Diffusion |
+| **TTS** | Google Cloud Text-to-Speech |
 | **Ödeme** | Stripe, İyzico |
 | **Hosting** | Vercel |
-| **Storage** | Supabase Storage |
 
 ## 📁 Proje Yapısı
 
 ```
 kidstorybook/
-├── docs/              # Dokümantasyon
-│   ├── DOCUMENTATION.md  # Dokümantasyon indeksi
-│   ├── ROADMAP.md       # Proje yol haritası
-│   ├── PRD.md          # Ürün gereksinimleri
-│   └── ...
-├── poc/               # Proof of Concept (çalışan demo)
-├── src/               # Kaynak kod (oluşturulacak)
-└── .cursor/           # Cursor AI kuralları
+├── app/                 # Next.js App Router (sayfalar, API routes)
+├── components/          # React bileşenleri (ui, layout, sections)
+├── lib/                 # Yardımcılar, Supabase, DB, prompt’lar, PDF, TTS
+├── hooks/               # React hooks
+├── contexts/            # React context (örn. Cart)
+├── public/              # Statik dosyalar (görseller, test-images)
+├── scripts/             # Yardımcı script’ler (roadmap CSV, hero transformation)
+├── docs/                # Dokümantasyon (ROADMAP, PRD, guides, roadmap/, technical/)
+├── supabase/            # Migration’lar ve schema
+└── .cursor/             # Cursor AI kuralları
 ```
 
 ## 📚 Dokümantasyon
 
-Detaylı dokümantasyon için [`docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md) dosyasına bakın.
+Detaylı dokümantasyon için [docs/DOCUMENTATION.md](docs/DOCUMENTATION.md) kullanın. Özet linkler:
 
-- [Proje Yol Haritası](docs/ROADMAP.md)
-- [Ürün Gereksinimleri](docs/PRD.md)
-- [Özellik Listesi](docs/FEATURES.md)
-- [AI Stratejisi](docs/ai/AI_STRATEGY.md)
-- [Teknik Dokümantasyon](docs/technical/)
-
-## 🧪 POC (Proof of Concept)
-
-Proje şu anda POC aşamasında. Çalışan demo için:
-
-```bash
-cd poc
-npm install
-npm start
-```
-
-POC hakkında daha fazla bilgi için [`poc/README.md`](poc/README.md) dosyasına bakın.
+- [Doküman haritası](docs/DOCUMENTATION_MAP.md) – Hangi dosya nerede, güncel mi?
+- [Yol haritası](docs/ROADMAP.md) – Fazlar ve iş listesi
+- [PRD](docs/PRD.md) – Ürün gereksinimleri
+- [Özellikler](docs/FEATURES.md) – Özellik listesi ve önceliklendirme
+- [Mimari](docs/ARCHITECTURE.md) – Proje yapısı ve API özeti
+- [Rehberler](docs/guides/) – Kurulum, API test, PDF, TTS, vb.
 
 ## 🤝 Katkıda Bulunma
 
@@ -104,11 +104,6 @@ POC hakkında daha fazla bilgi için [`poc/README.md`](poc/README.md) dosyasına
 
 Bu proje özel bir projedir. Tüm hakları saklıdır.
 
-## 📞 İletişim
-
-- **Hedef Kitle:** Ebeveynler, anaokulları, kreşler
-- **Diller:** Türkçe, İngilizce (daha fazla dil eklenecek)
-
 ---
 
-**Not:** Bu proje aktif geliştirme aşamasındadır. MVP lansmanı için çalışmalar devam etmektedir.
+**Not:** Proje aktif geliştirme aşamasındadır. MVP lansmanı için çalışmalar devam etmektedir. Son tamamlanan özellikler için [docs/COMPLETED_FEATURES.md](docs/COMPLETED_FEATURES.md) dosyasına bakın.

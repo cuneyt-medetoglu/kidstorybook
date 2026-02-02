@@ -29,21 +29,21 @@ const mockBooks: Book[] = [
   {
     id: "book-123",
     title: "Arya's Adventure",
-    coverImage: "/children-s-book-cover-with-magical-adventure-theme.jpg",
+    coverImage: "/test-images/books/children-s-book-cover-with-magical-adventure-theme.jpg",
     status: "completed",
     createdDate: "Jan 5, 2026",
   },
   {
     id: "book-456",
     title: "Emma's Space Journey",
-    coverImage: "/children-s-book-cover-with-space-theme.jpg",
+    coverImage: "/test-images/books/children-s-book-cover-with-space-theme.jpg",
     status: "in-progress",
     createdDate: "Jan 8, 2026",
   },
   {
     id: "book-789",
     title: "Oliver's Magic Forest",
-    coverImage: "/children-s-book-cover-with-enchanted-forest-theme.jpg",
+    coverImage: "/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg",
     status: "draft",
     createdDate: "Jan 10, 2026",
   },
@@ -252,13 +252,13 @@ export default function LibraryPage() {
   }
 
   const handleShareBook = (bookId: string) => {
-    // TODO: Share functionality (Faz 3'te implement edilecek)
+    // ROADMAP: Share functionality (dashboard kitap paylaşımı)
     console.log("Share book:", bookId)
   }
 
   const handleDeleteBook = async (bookId: string) => {
     try {
-      // TODO: Add confirmation modal later
+      // ROADMAP: Confirmation modal before delete
       if (!confirm('Are you sure you want to delete this book? This action cannot be undone.')) {
         return
       }

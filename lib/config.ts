@@ -3,6 +3,8 @@
  * Environment-based configuration for development and production
  */
 
+import logger from "./logger"
+
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -105,8 +107,8 @@ export function validateConfig() {
   }
 
   if (errors.length > 0) {
-    console.error('❌ Configuration errors:')
-    errors.forEach((error) => console.error(`  - ${error}`))
+    logger.error('❌ Configuration errors:')
+    errors.forEach((error) => logger.error(`  - ${error}`))
     if (isProduction) {
       throw new Error('Invalid configuration')
     }

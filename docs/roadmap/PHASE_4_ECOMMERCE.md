@@ -1,0 +1,154 @@
+## 💳 FAZ 4: E-ticaret ve Ödeme
+**Öncelik:** 🔴 Kritik
+
+### 4.1 Stripe Entegrasyonu
+- [ ] **4.1.1** Stripe hesabı oluştur ve yapılandır
+- [ ] **4.1.2** Stripe SDK kurulumu
+- [ ] **4.1.3** Ürünler ve fiyatlar oluştur
+- [ ] **4.1.4** Checkout session oluşturma
+- [ ] **4.1.5** Payment intent flow
+- [ ] **4.1.6** Stripe webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026)
+  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/stripe`)
+  - [ ] Webhook signature doğrulama
+  - [ ] Payment success/failure event handling
+  - [ ] Order status güncelleme
+- [ ] **4.1.7** Test modu ile test et
+
+### 4.2 İyzico Entegrasyonu (Türkiye)
+- [ ] **4.2.1** İyzico hesabı oluştur
+- [ ] **4.2.2** İyzico SDK kurulumu
+- [ ] **4.2.3** Ödeme formu entegrasyonu
+- [ ] **4.2.4** 3D Secure desteği
+- [ ] **4.2.5** İyzico webhook handler - ✅ Faz 3.7'den taşındı (15 Ocak 2026)
+  - [ ] Webhook endpoint oluştur (`POST /api/webhooks/iyzico`)
+  - [ ] Webhook signature doğrulama
+  - [ ] Payment success/failure event handling
+  - [ ] Order status güncelleme
+- [ ] **4.2.6** Callback handler (3D Secure sonrası)
+- [ ] **4.2.7** Test modu ile test et
+
+### 4.3 Sipariş Yönetimi
+- [ ] **4.3.1** Checkout sayfası
+- [ ] **4.3.2** Sipariş özeti component
+- [x] **4.3.3** Sepet Sistemi (23 Ocak 2026) - 🔴 **ÖNEMLİ** | 🔴 DO - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] Sepet state management (Context API) ✅ (`contexts/CartContext.tsx`)
+  - [x] Sepet sayfası (`/cart`) ✅ (`app/cart/page.tsx`)
+  - [x] Sepet API endpoints ✅ (`app/api/cart/route.ts`)
+    - [x] GET /api/cart - Sepeti getir
+    - [x] POST /api/cart - Sepete ekle (validation, ebook dependency kontrolü)
+    - [x] DELETE /api/cart - Sepetten çıkar
+  - [x] Cart persistence (localStorage) ✅
+  - [x] Multi-item cart support ✅
+  - [x] **Sepete Ürün Ekleme Mantığı:**
+    - [x] Hardcopy: "Add to Cart" butonu → Sepete hardcopy ekle (ebook kontrolü yapılıyor) ✅
+    - [x] Sepet icon'unda item sayısı gösterimi ✅ (Header'da gerçek state)
+    - [x] Sepet sayfası (ürün listesi, fiyat, remove butonu) ✅
+    - [x] Cart summary (subtotal, shipping, total) ✅
+    - [x] Empty state ✅
+  - [ ] Ebook sepete ekleme (sonraki faz - pricing sayfasından)
+- [ ] **4.3.4** Ödeme başarılı sayfası
+- [ ] **4.3.5** Sipariş durumu takibi (kullanıcı tarafı)
+- [ ] **4.3.6** Email bildirimleri
+- [ ] **4.3.7** Sipariş API'leri (Backend) - 🆕 **25 Ocak 2026**
+  - [ ] `GET /api/orders` - Kullanıcının siparişlerini listele (kullanıcı için)
+  - [ ] `GET /api/orders/:id` - Sipariş detayını getir (kullanıcı için)
+  - [ ] `POST /api/orders/:id/cancel` - Sipariş iptal talebi (kullanıcı için)
+  - [ ] `GET /api/orders/:id/download` - Sipariş indirme linki (kullanıcı için)
+  - [ ] `GET /api/admin/orders` - Tüm siparişleri listele (admin için, filtreleme, arama, sayfalama)
+  - [ ] `GET /api/admin/orders/:id` - Sipariş detayını getir (admin için, tam bilgiler)
+  - [ ] `PATCH /api/admin/orders/:id` - Sipariş durumu güncelle (admin için)
+  - [ ] `POST /api/admin/orders/:id/notes` - Sipariş notu ekle (admin için)
+  - [ ] `POST /api/admin/orders/:id/refund` - İade işlemi (admin için)
+  - [ ] `GET /api/admin/orders/stats` - Sipariş istatistikleri (admin için)
+  - [ ] `POST /api/admin/orders/export` - Sipariş export (CSV/Excel) (admin için)
+- [ ] **4.3.8** Kullanıcı API'leri (Backend - Admin) - 🆕 **25 Ocak 2026**
+  - [ ] `GET /api/admin/users` - Tüm kullanıcıları listele (admin için, filtreleme, arama, sayfalama)
+  - [ ] `GET /api/admin/users/:id` - Kullanıcı detayını getir (admin için, tam bilgiler)
+  - [ ] `GET /api/admin/users/:id/books` - Kullanıcının kitaplarını listele (admin için)
+  - [ ] `GET /api/admin/users/:id/orders` - Kullanıcının siparişlerini listele (admin için)
+  - [ ] `GET /api/admin/users/:id/activity` - Kullanıcı aktivite logları (admin için)
+  - [ ] `PATCH /api/admin/users/:id` - Kullanıcı durumu güncelle (aktif/pasif/ban) (admin için)
+  - [ ] `POST /api/admin/users/:id/notes` - Kullanıcı notu ekle (admin için)
+  - [ ] `GET /api/admin/users/stats` - Kullanıcı istatistikleri (admin için)
+
+### 4.4 Fiyatlandırma Sistemi
+- [ ] **4.4.1** Sayfa sayısına göre fiyatlandırma (10/15/20 sayfa)
+- [ ] **4.4.2** E-book vs Basılı kitap fiyatları
+- [ ] **4.4.3** İndirim kodu sistemi (gelecekte)
+- [ ] **4.4.4** Ücretsiz kapak hakkı takibi
+- [ ] **4.4.10** Bot Koruması - CAPTCHA Entegrasyonu (25 Ocak 2026)
+  - [ ] hCaptcha veya reCAPTCHA entegrasyonu
+  - [ ] Cover generation öncesi CAPTCHA kontrolü
+  - [ ] Rate limiting ile birlikte çalışacak şekilde yapılandırma
+  - [ ] Unauthenticated users için zorunlu, authenticated users için opsiyonel
+- [ ] **4.4.7** Yurtdışı Şirket Kurulumu (23 Ocak 2026)
+  - Ürünü yurtdışında satabilmek için TR dışında bir yerde şirket olmalı
+  - Stripe Atlas diye bizim için şirket açan yapısı var
+  - Başvuru hazırlanacak ve bakılacak
+  - Aynı zamanda Firstbase diye bir yerde var, onlara da bakmak lazım
+  - Hangisi olursa olsun, yurtdışı şirket kurulumu gerekli
+  - **Kategori:** Yasal / İş Geliştirme
+  - **Öncelik:** 🟡 Önemli
+- [ ] **4.4.8** Abonelik Modeli Araştırması (23 Ocak 2026)
+  - Abonelik modeli ile satış düşünülecek
+  - Nasıl bir şekilde entegre edilebilir
+  - Abone olanlara aylık x adet kitap gibi mi yada daha farklı bir şey gibi düşünülecek
+  - Araştırılması gereken konu
+  - Subscription model tasarımı (monthly, yearly)
+  - Kitap limitleri (aylık x adet)
+  - Fiyatlandırma stratejisi
+  - Stripe Subscription entegrasyonu
+  - Subscription management UI
+- [x] **4.4.5** Satış ve sepet kurgusu (23 Ocak 2026) | ✅ Tamamlandı (FAZ4_4_5_IMPLEMENTATION.md)
+  - **Güncelleme (23 Ocak 2026):** Sadece kitap kapağı ücretsiz olacak (2 sayfa değil)
+  - Ücretsiz kapak (draft) üzerinden eğer satın alım yaparsa kalan sayfalara generate yaptırabilmeliyiz
+  - Örneğin 10 sayfa lazımsa, zaten karakter ve kapak yaptıysak aslında 8 sayfa daha yapacağız gibi
+  - Draft kitap (sadece kapak) → Satın alma → Kalan sayfalar generate
+  - Ne noktada para isteyeceğiz? (Düşünülecek)
+  - Hem ebook satış hem de ebook almış kullanıcıya hardcopy satış
+  - Sepet sistemi ve ödeme akışı tasarlanmalı
+- [x] **4.4.9** Ürün Satın Alma Akışı (25 Ocak 2026) | 🔴 DO - ✅ **KISMEN TAMAMLANDI (25 Ocak 2026)**
+  - [x] **Hardcopy Satın Alma Akışı:** ✅
+    - [x] My Library'de hardcopy butonu (sadece completed ebook'lar için) ✅
+    - [x] Toplu seçim ve sepete ekleme ✅ (checkbox'lar, bulk actions bar)
+    - [x] Tek kitap sepete ekleme ✅
+    - [x] Sepete hardcopy ekleme (ebook kontrolü yapılıyor) ✅
+    - [x] Sepet sayfasında hardcopy item'ları ✅
+    - [x] `POST /api/cart` - Sepete ürün ekleme (hardcopy) ✅
+    - [x] Backend kontrolü: API'de hardcopy eklenirken ebook kontrolü ✅
+  - [ ] **Ebook Satın Alma Akışı:** (Sonraki faz)
+    - [ ] Pricing sayfasından sepete ebook ekleme
+    - [ ] Checkout sayfası
+    - [ ] Ödeme entegrasyonu
+  - [ ] **Free Cover Oluşturma:** (Sonraki faz)
+    - [ ] Ücretsiz kapak oluşturma
+    - [ ] Draft status
+    - [ ] Satın alma sonrası kalan sayfalar generate
+  - [x] **Kurallar:** ✅
+    - [x] Ebook olmadan hardcopy satın alınamaz ✅ (API validation)
+    - [x] Hardcopy butonu sadece completed ebook'lar için görünür ✅
+    - [x] Sepet kontrolü: Hardcopy eklenirken ebook kontrolü yapılıyor ✅
+  - [x] **UI/UX:** ✅
+    - [x] Dashboard'da kitap kartında "Add to Cart (Hardcopy)" butonu ✅
+    - [x] Sadece completed kitaplar için buton gösterimi ✅
+    - [x] Toplu seçim için checkbox'lar ve bulk actions bar ✅
+- [ ] **4.4.6** Hardcopy sadece TR - Yabancı kullanıcılar için bilgilendirme (23 Ocak 2026)
+  - Hardcopy şu an için sadece Türkiye'de var
+  - Yabancı ülkeden girenler için: Kapat vs işlemleri gibi
+  - Ebook alabilir ama baskı alamaz - satın alma sırasında bu bilgi verilmeli
+  - Checkout sayfasında ülke kontrolü ve bilgilendirme mesajı
+  - **UI Bilgilendirmesi (26 Ocak 2026):**
+    - Pricing sayfasında hardcopy kartında "Currently available only in Turkey" bilgisi gösterilmeli
+    - Hardcopy butonları (My Library, Sepet, vb.) TR dışı kullanıcılar için disabled olmalı veya bilgilendirme mesajı gösterilmeli
+    - "Hardcopy is currently only available in Turkey. We're working on expanding to more countries soon!" gibi bir mesaj eklenmeli
+    - Diğer ülkelerde zamanla hardcopy desteği eklenecek, bu bilgi UI'da belirtilmeli
+- [ ] **4.4.7** Gelato.com Entegrasyonu - TR Dışı Hardcopy Baskı (26 Ocak 2026)
+  - **Gelato.com Print-on-Demand Entegrasyonu:** https://www.gelato.com/ üzerinden TR dışındaki bazı ülkelerde hardcopy baskı alıp satış yapabilme
+  - Gelato.com API entegrasyonu araştırılacak ve implementasyon planı yapılacak
+  - Desteklenen ülkeler listesi ve fiyatlandırma stratejisi belirlenecek
+  - Gelato.com üzerinden sipariş akışı tasarlanacak (kullanıcı sipariş verir → Gelato'ya yönlendirilir veya otomatik sipariş oluşturulur)
+  - Gelato.com ile entegrasyon sonrası TR dışı ülkeler için hardcopy satışı aktif hale gelecek
+  - UI'da ülkeye göre hardcopy kullanılabilirliği gösterilecek (TR: yerel baskı, diğer ülkeler: Gelato.com)
+
+---
+

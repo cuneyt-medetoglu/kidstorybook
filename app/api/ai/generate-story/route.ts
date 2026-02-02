@@ -1,8 +1,9 @@
 /**
  * Story Generation API
- * 
+ *
  * POST /api/ai/generate-story
- * Generates a complete children's story with image prompts
+ * Body: characterId, theme, illustrationStyle, customRequests?, language?
+ * Generates a complete children's story with image prompts (GPT-4o).
  */
 
 import { NextRequest, NextResponse } from 'next/server'

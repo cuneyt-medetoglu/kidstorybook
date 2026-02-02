@@ -25,6 +25,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.1.7,2,2.1,"""Create a children's book"" butonu header'da",Tamamlandı,Kritik,Frontend - Layout,,"✅ Gradient CTA button eklendi",,#2.1
 	2.1.8,2,2.1,"Dark/Light mode toggle butonu (header'da)",Tamamlandı,Kritik,Frontend - Layout,,"✅ next-themes entegre edildi, toggle butonu eklendi",,#2.1
 	2.1.9,2,2.1,"Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Layout,,"",,#2.1
+	2.1.10,2,2.1,"Mobil drawer (menü) tasarım iyileştirmesi (Şubat 2026)",Bekliyor,Kritik,Frontend - Layout,DO,"",,#2.1
 	2.2.1,2,2.2,"Hero section (başlık, CTA, görsel)",Tamamlandı,Kritik,Frontend - Ana Sayfa,,"✅ v0.app'den alındı ve entegre edildi",,#2.2
 	2.2.1.1,2,2.2,"""Your Child, The Hero"" – Real Photo & Story Character Görselleri (27 Ocak 2026)",Bekliyor,Kritik,Frontend - Ana Sayfa,,"",,#2.2
 	2.2.2,2,2.2,"""Nasıl Çalışır?"" bölümü (3 adım)",Tamamlandı,Kritik,Frontend - Ana Sayfa,,"✅ v0.app'den alındı ve entegre edildi",,#2.2
@@ -48,18 +49,22 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.4.2,2,2.4,"Step 2: Referans görsel yükleme (çocuk fotoğrafı)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ v0.app'den alındı ve entegre edildi",,#2.4
 	2.4.2.1,2,2.4,"Fotoğraf yükleme sistemi iyileştirmesi (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,,"",,#2.4
 	2.4.3,2,2.4,"Step 3: Tema ve yaş grubu seçimi (0-2, 3-5, 6-9)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ v0.app'den alındı ve entegre edildi",,#2.4
-	2.4.3.1,2,2.4,"Custom Theme Seçeneği (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,,"",,#2.4
+	2.4.3.1,2,2.4,"Custom Theme Seçeneği (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
 	2.4.4,2,2.4,"Step 4: Illustration style seçimi (görsel önizleme)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ v0.app'den alındı ve entegre edildi",,#2.4
 	2.4.5,2,2.4,"Step 5: Özel istekler",Tamamlandı,Kritik,Frontend - Wizard,,"✅ v0.app'den alındı ve entegre edildi",,#2.4
 	2.4.5.1,2,2.4,"Custom request örnekleri ekleme (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,,"",,#2.4
-	2.4.5.2,2,2.4,"Custom request dil desteği (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,,"",,#2.4
+	2.4.5.2,2,2.4,"Custom request dil desteği (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
+	2.4.5.3,2,2.4,"Debug boş iken 12 sayfa; kapak sadece Step 6'da (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
 	2.4.6,2,2.4,"Step 6: Önizleme ve onay",Tamamlandı,Kritik,Frontend - Wizard,,"✅ v0.app'den alındı ve entegre edildi",,#2.4
+	2.4.6.1,2,2.4,"Step 6 Illustration Style alanında Step 4 örnek görselleri (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
 	2.4.11,2,2.4,"Wizard adımlarını kısaltma (UX iyileştirme)",Bekliyor,Kritik,Frontend - Wizard,,"Şu an 6 adım var, daha kolay bir UX için adımlar birleştirilebilir veya kısaltılabilir. Düşünülecek.",,#2.4
 	2.4.7,2,2.4,"Progress indicator",Tamamlandı,Kritik,Frontend - Wizard,,"✅ Tüm step'lerde (1-6) mevcut, her step'te ""Step X of 6"" ve progress bar gösteriliyor",,#2.4
 	2.4.8,2,2.4,"Form validasyonu (Zod + React Hook Form)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ Tüm step'lerde mevcut (Step 1,3,4,5: Zod + RHF, Step 2: Custom file validation, Step 6: Preview sayfası)",,#2.4
 	2.4.9,2,2.4,"Ücretsiz kapak hakkı kontrolü ve gösterimi",Tamamlandı,Kritik,Frontend - Wizard,,"✅ UI tamamlandı (mock data ile, Faz 3'te gerçek kontrol)",,#2.4
 	2.4.10,2,2.4,"""Ücretsiz Kapak Oluştur"" butonu (hakkı varsa)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)",,#2.4
-	2.4.12,2,2.4,"Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,,"",,#2.4
+	2.4.12,2,2.4,"Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
+	2.4.13,2,2.4,"API tekrarlı çağrılar: GET /api/currency 2x ve sayfa gezerken log (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
+	2.4.14,2,2.4,"Next.js Image ve layout konsol uyarıları (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
 	2.5.1.1,2,2.5,"react-pageflip veya alternatif library araştırması ve seçimi",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Framer Motion ile custom implementation seçildi",,#2.5
 	2.5.1.2,2,2.5,"Flipbook animasyonu (sayfa çevirme efekti)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ v0.app'den alındı ve entegre edildi (Flip, Slide, Fade animasyonları)",,#2.5
 	2.5.1.3,2,2.5,"Sayfa navigasyonu (ileri, geri, sayfa atlama)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Buttons, keyboard, swipe, mouse click desteği",,#2.5
@@ -272,7 +277,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	5.7.6,5,5.7,"PDF Kapak Sayfası A5 Dikey Format (23 Ocak 2026)",Bekliyor,Önemli,PDF Tasarım,,"",,#5.7
 	5.7.7,5,5.7,"Arka Kapak Tasarımı (23 Ocak 2026)",Bekliyor,Önemli,PDF Tasarım,,"🔴 **YÜKSEK ÖNCELİK**",,#5.7
 	5.7.8,5,5.7,"PDF Layout Bug Düzeltmesi (25 Ocak 2026)",Bekliyor,Önemli,PDF Tasarım,,"🔴 **KRİTİK BUG**",,#5.7
-	5.6.1,5,5.6,"Örnek kitaplar oluştur (demo)",Bekliyor,Önemli,Lansman,,"",,#5.6
+	5.6.1,5,5.6,"Örnek kitaplar oluştur (demo)",Bekliyor,Önemli,Lansman,DO,"",,#5.6
 	5.6.2,5,5.6,"Sosyal medya hesapları",Bekliyor,Önemli,Lansman,,"",,#5.6
 	5.6.3,5,5.6,"Landing page son kontrolü",Bekliyor,Önemli,Lansman,,"",,#5.6
 	5.6.4,5,5.6,"Beta kullanıcılar ile test",Bekliyor,Önemli,Lansman,,"",,#5.6

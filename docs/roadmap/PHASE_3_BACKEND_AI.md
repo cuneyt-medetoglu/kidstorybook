@@ -1,0 +1,377 @@
+## ⚙️ FAZ 3: Backend ve AI Entegrasyonu
+**Öncelik:** 🔴 Kritik
+
+### 3.1 API Routes Kurulumu ✅
+- [x] **3.1.1** API klasör yapısı oluştur - ✅ `app/api/` yapısı mevcut
+- [x] **3.1.2** Middleware (auth, rate limiting, error handling) - ✅ Tamamlandı (15 Ocak 2026)
+  - ✅ Auth middleware: `middleware.ts` (Supabase Auth middleware)
+  - ✅ Error handling: `lib/api/response.ts` ile standardize edildi
+  - ✅ Rate limiting: Vercel'de mevcut (built-in)
+- [x] **3.1.3** API response formatı standardize et - ✅ `lib/api/response.ts` ile standardize edildi
+
+### 3.2 Kullanıcı API'leri ✅
+- [x] **3.2.1** `POST /api/auth/register` - Kayıt - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.2** `POST /api/auth/login` - Giriş - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.3** `POST /api/auth/logout` - Çıkış - ✅ Supabase Auth kullanılıyor
+- [x] **3.2.4** `GET /api/users/me` - Kullanıcı bilgileri - ✅ Supabase Auth `getUser()` kullanılıyor
+- [ ] **3.2.5** `PATCH /api/users/me` - Profil güncelleme - ⏸️ **MVP için gerekli değil** (Supabase Auth profile update yeterli)
+- [x] **3.2.6** `GET /api/auth/google` - Google OAuth callback - ✅ Supabase Auth OAuth kullanılıyor
+- [x] **3.2.7** `GET /api/auth/facebook` - Facebook OAuth callback - ✅ Supabase Auth OAuth kullanılıyor
+- [ ] **3.2.8** `GET /api/auth/instagram` - Instagram OAuth callback - ⏸️ **Opsiyonel, MVP'de gerekli değil**
+
+### 3.4 Karakter API'leri ✅
+- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu
+  - [x] Kullanıcı girdilerini doğrula
+  - [x] Fotoğraf analizi (OpenAI Vision API)
+  - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.)
+  - [x] Master Character olarak database'e kaydet
+- [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API
+- [x] **3.4.3** `GET /api/characters/:id` - Karakter detayları - ✅ Single character API
+- [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API
+- [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
+- [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
+- [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi
+  - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
+  - [x] User-provided data (hairColor, eyeColor) ile AI analizi merge
+  - [x] Toys için gender-neutral validation
+- [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
+- [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**
+  - [ ] `GET /api/characters` response'a `total_books` ekle (her karakter için)
+  - [ ] `GET /api/characters` response'a `last_used_at` ekle
+  - [ ] Book oluşturulduğunda `last_used_at` güncelleme (trigger)
+  - [ ] Character selection için optimize edilmiş response (thumbnail, summary)
+
+### 3.6 Kitap API'leri ✅
+- [x] **3.6.1** Books database helper functions - ✅ `lib/db/books.ts` (CRUD operations, stats, favorites)
+- [x] **3.6.2** `POST /api/books` - Yeni kitap başlat - ✅ Story generation API ile entegre (10 Ocak 2026)
+- [x] **3.6.3** `GET /api/books` - Kullanıcının kitapları - ✅ Pagination, filtering support (10 Ocak 2026)
+- [x] **3.6.4** `GET /api/books/:id` - Kitap detay - ✅ View count increment, ownership check (10 Ocak 2026)
+- [x] **3.6.5** `PATCH /api/books/:id` - Kitap güncelle - ✅ Favorite, status, images update (10 Ocak 2026)
+- [x] **3.6.6** `DELETE /api/books/:id` - Kitap sil - ✅ Ownership verification, cascade delete (10 Ocak 2026)
+- [ ] **3.6.7** Hikaye edit özelliği (23 Ocak 2026)
+  - Hikayeleri edit yapabilme özelliği eklenmeli
+  - Eğer bir hikaye içeriği edit yapıldı ise download PDF mevcut cache'i silip tekrar oluşturmalı
+  - PDF indirilmek istenirse yani
+  - Story content edit API endpoint'i
+  - PDF cache invalidation mekanizması
+
+### 3.5 AI Entegrasyonu ✅
+- [x] **3.5.10** Karakter Tutarlılığı İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Göz rengi (hazel) prompt iyileştirmesi: "hazel (brown-green mix, not pure green)" açıklaması
+  - [x] Elbise tutarlılığı: Cover'daki elbiseler sayfalarda da aynı olmalı - prompt vurgusu
+  - [x] /api/books route'unda cover image'ı page generation'da referans olarak kullan
+  - [x] Log iyileştirmeleri: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri
+  - **Detaylar:**
+    - `lib/prompts/image/character.ts`: Hazel göz rengi için açıklama eklendi
+    - `lib/prompts/image/scene.ts`: Cover ve sayfa elbise tutarlılığı prompt'ları güçlendirildi
+    - `app/api/books/route.ts`: Cover image page generation'da referans olarak kullanılıyor (pages 2+)
+    - Log'lar: Cover reference kullanımı, göz rengi, elbise tutarlılığı kontrolleri eklendi
+- [x] **3.5.11** Karakter Tutarlılığı İyileştirmeleri - Part 2 (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.12** Cover Generation ve Additional Characters İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Cover generation'da `isCover=true` parametresi eklendi
+  - [x] Family Members için saç stili detayları eklendi (hairStyle, hairLength, hairTexture)
+  - [x] Yaş/fiziksel özellikler vurgusu güçlendirildi (adult vurgusu, NOT a child)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG, IMAGE_PROMPT_TEMPLATE)
+  - [x] Page 1'de cover reference kullanımı: `isCoverPage` mantığı düzeltildi, tüm sayfalarda (1-10) cover reference kullanılıyor
+- [x] **3.5.13** Sahne Çeşitliliği ve Görsel Varyasyon İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.14** Retry Mekanizması ve Hata Yönetimi İyileştirmeleri (16 Ocak 2026) - ✅ **TAMAMLANDI**
+- [x] **3.5.15** El Ele Tutuşma Yasağı (16 Ocak 2026) - ✅ **TAMAMLANDI**
+  - [x] Anatomical correctness directives'a el ele tutuşma yasağı eklendi
+  - [x] Negative prompts'a el ele tutuşma terimleri eklendi
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.10, ANATOMICAL_ISSUES_GUIDE v1.0.1)
+  - [x] Retry wrapper fonksiyonları eklendi (max 3 retry, exponential backoff)
+  - [x] Hata kategorileri (geçici vs kalıcı)
+  - [x] Edits API retry mekanizması (cover + page generation)
+  - [x] Fallback stratejisi değiştirildi (retry başarısız olursa hata fırlat, fallback'e geçme)
+  - [x] Detaylı logging (retry attempts, error types)
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.9)
+  - [x] Story generation prompt'unda detaylı page-by-page structure (her sayfa için özel gereksinimler)
+  - [x] Visual diversity directives (location, time, weather, perspective, composition variety)
+  - [x] Image prompt requirements güçlendirildi (200+ karakter, detaylı sahne açıklamaları)
+  - [x] Scene description requirements güçlendirildi (150+ karakter, detaylı açıklamalar)
+  - [x] Scene diversity analysis fonksiyonları (`analyzeSceneDiversity`, `extractSceneElements`)
+  - [x] Perspective variety logic (`getPerspectiveForPage` - 7 farklı perspektif)
+  - [x] Composition variety logic (`getCompositionForPage` - 7 farklı kompozisyon)
+  - [x] Time/location extraction (Türkçe/İngilizce destekli)
+  - [x] `generateFullPagePrompt()` fonksiyonuna scene diversity tracking eklendi
+  - [x] API integration: Scene diversity tracking ve previous scenes passing
+  - [x] Dokümantasyon güncellemeleri (CHANGELOG v1.0.8, STORY_PROMPT_TEMPLATE v1.0.2)
+  - [x] Göz rengi (blue) prompt iyileştirmesi: "bright blue eyes (NOT brown, NOT hazel, NOT green, NOT grey - must be BLUE)" vurgusu
+  - [x] Geometric stil açıklaması güçlendirildi: "flat design", "minimalist", "angular", "vector art", "geometric abstraction", "low-poly" terimleri eklendi
+  - **Detaylar:**
+    - `app/api/books/route.ts`: Page 1'de de cover reference kullanılıyor (isCoverPage mantığı düzeltildi)
+    - `lib/prompts/image/character.ts`: Blue göz rengi için özel vurgu eklendi (main character + family members)
+    - `lib/prompts/image/style-descriptions.ts`: Geometric stil açıklaması güçlendirildi
+    - `lib/prompts/image/scene.ts`: Geometric stil direktifleri güçlendirildi
+- [x] **3.5.1** Prompt Management System - ✅ Versiyonlama, feedback, A/B testing altyapısı (`lib/prompts/`)
+- [x] **3.5.2** Story Generation Prompts v1.0.0 - ✅ Yaş gruplarına özel, safety rules, educational content
+  - ✅ **8 Dil Desteği Eklendi (24 Ocak 2026):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Çince, Portekizce, Rusça
+  - ✅ **Dil Karışıklığı Çözümü (24 Ocak 2026):** Prompt'lara güçlü dil talimatları eklendi, system message güçlendirildi
+    - "CRITICAL - LANGUAGE REQUIREMENT" bölümü eklendi
+    - "ONLY use [language] words" direktifi
+    - "DO NOT use ANY English words" yasağı
+    - Final check mekanizması eklendi
+    - System message'a dil talimatı eklendi
+- [x] **3.5.3** Image Generation Prompts v1.0.0 - ✅ Character consistency, scene generation, negative prompts
+- [x] **3.5.4** Character Consistency System - ✅ Master Character concept, multi-book tutarlılığı
+- [x] **3.5.5** `POST /api/ai/generate-story` - Hikaye üret - ✅ GPT-4o entegrasyonu, Master Character kullanımı
+  - [x] OpenAI GPT-4o entegrasyonu
+  - [ ] Google Gemini Pro entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Groq (Llama) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Claude entegrasyonu (opsiyonel) - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.6** `POST /api/ai/generate-images` - Tüm sayfalar için görsel üret - ✅ GPT-image API'ye geçildi (15 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Reference image support (master character photo)
+  - [x] **Multiple reference images support** (cover + pages için tüm karakterlerin reference image'ları) ✅ (16 Ocak 2026)
+  - [x] Master Character description kullanarak tutarlı görsel üret
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
+  - [x] Supabase Storage'a otomatik upload
+  - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
+  - [ ] Gemini Banana (Imagen 3) entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+  - [ ] Stable Diffusion entegrasyonu - ⏸️ **Ertelendi (daha sonra)**
+- [x] **3.5.7** `POST /api/ai/generate-cover` - Ücretsiz kapak oluştur (hakkı kontrol et) - ✅ API endpoint oluşturuldu (10 Ocak 2026)
+  - [x] ~~DALL-E 3 entegrasyonu~~ → **GPT-image API'ye geçildi** ✅ (15 Ocak 2026)
+  - [x] Endpoint: `/v1/images/edits` (multimodal input - FormData)
+  - [x] Multimodal input (text + reference image via FormData)
+  - [x] Base64 → Blob conversion (data URL support)
+  - [x] Model selection (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
+  - [x] Size selection (1024x1024, 1024x1792, 1792x1024)
+  - [x] Free cover credit kontrolü
+  - [x] Supabase Storage'a upload
+  - [x] Test butonu eklendi (Step 6)
+  - ⚠️ **Organization verification gerekli** (kullanıcı OpenAI'de doğrulama yapacak)
+  - 🎯 **Status:** API hazır, organization verification sonrası test edilecek
+- [x] **3.5.8** Prompt template'leri - ✅ POC'tan taşındı ve geliştirildi (`lib/prompts/`)
+- [x] **3.5.9** Create Book'da cover generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Cover generation API Create Book'da otomatik çağrılıyor
+  - [x] Cover image URL database'e kaydediliyor
+  - [x] Status: `generating` olarak güncelleniyor
+  - **Implementasyon:** `app/api/books/route.ts` - Cover generation story generation'dan sonra otomatik çağrılıyor
+  - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
+- [x] **3.5.10** Create Book'da page images generation entegrasyonu - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Page images generation API Create Book'da otomatik çağrılıyor
+  - [x] Her sayfa için image URL `story_data.pages[].imageUrl`'a kaydediliyor
+  - [x] Status: `completed` olarak güncelleniyor
+  - [x] Illustration style düzeltildi (generateFullPagePrompt parametreleri) ✅ (11 Ocak 2026)
+  - [x] b64_json response desteği eklendi (cover ve page images için) ✅ (11 Ocak 2026)
+  - [x] Sayfa sayısı enforcement (kullanıcı 3 sayfa istediğinde 3 sayfa oluşturuluyor) ✅ (11 Ocak 2026)
+  - [x] Detaylı log'lar eklendi (API call timing, response structure) ✅ (11 Ocak 2026)
+  - **Implementasyon:** `app/api/books/route.ts` - Page images generation cover generation'dan sonra otomatik çağrılıyor
+  - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
+- [x] **3.5.11** Book status management (draft → generating → completed) - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - [x] Status workflow: `draft` → `generating` → `completed`
+  - [x] Create Book'da: `draft` (story oluşturuldu)
+  - [x] Cover generation başladığında: `generating`
+  - [x] Tüm görseller hazır olduğunda: `completed`
+  - [x] Hata durumunda: `failed`
+  - [x] Cover-only mode desteği (pageCount = 0) ✅ (11 Ocak 2026)
+  - **Implementasyon:** `app/api/books/route.ts` - Status workflow tam olarak implement edildi
+  - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
+- [ ] **3.5.12** Queue sistemi (uzun işlemler için) (23 Ocak 2026)
+  - Aynı anda birden çok kullanıcı kitap oluşturmak isterse API alt yapımız bu durumda ne yapıyor?
+  - Nasıl bir queue yapısı var?
+  - Mevcut durum analizi gerekli
+  - Queue sistemi tasarımı ve implementasyonu
+  - Priority queue (ücretli kullanıcılar öncelikli)
+  - Rate limiting ve throttling
+- [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
+  - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
+  - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
+  - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
+  - Version control sistemi (prompt versiyonları)
+  - A/B testing için farklı prompt versiyonları
+  - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
+- [x] **3.5.14** AI provider seçimi için config sistemi - ✅ `lib/prompts/config.ts` (version management, A/B testing)
+- [x] **3.5.15** Prompt Kalite İyileştirmesi v2.0 - ✅ **TAMAMLANDI** (15 Ocak 2026)
+  - **Hedef:** Magical Children's Book kalitesini yakalamak
+  - **Story Prompts:**
+    - [x] Word count güncelleme (yaş gruplarına göre ORTALAMA değerler: 40/60/90/120)
+    - [x] Diyalog ve detaylı anlatım direktifleri eklendi
+    - [x] Writing style requirements (show don't tell, atmospheric description)
+    - [x] Page structure template (opening, action, emotion, transition)
+  - **Image Prompts:**
+    - [x] Cinematic composition elements (lighting, depth, camera angle)
+    - [x] 3-level environment descriptions (general → detailed → cinematic)
+    - [x] Hybrid prompt system (cinematic + descriptive combination)
+    - [x] Foreground/Midground/Background layer system
+    - [x] Clothing consistency system (same outfit unless story changes it)
+    - [x] Anatomical error prevention (100+ negative prompts for hands, fingers, limbs)
+    - [x] Anatomical correctness directives (5 fingers, 2 hands, proper proportions)
+  - **Documentation:**
+    - [x] `STORY_PROMPT_TEMPLATE.md` güncellendi
+    - [x] `IMAGE_PROMPT_TEMPLATE.md` güncellendi (v1.0.1 features)
+- [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
+  - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
+  - Feedback'lere ve çıkan sonuçlara göre sürekli güncellemeliyiz
+  - Prompt agent'ımız var bu konu ile ilgili, onu da geliştirmeliyiz
+  - Version control sistemi (prompt versiyonları)
+  - A/B testing için farklı prompt versiyonları
+  - Feedback loop (kullanıcı geri bildirimleri → prompt iyileştirme)
+- [ ] **3.5.18** Gemini Banana Model Entegrasyonu (23 Ocak 2026)
+  - İleriye dönük Gemini Banana model eklenmesi düşünülecek
+  - Deneme konusu iyi yada kötü mü olur bilinmiyor
+  - Maliyetler de belli değil
+  - Araştırma ve test gerekli
+- [ ] **3.5.19** Görsel Kompozisyon İyileştirmesi (23 Ocak 2026)
+  - Hikayelerdeki görsellere sahne ve derinlik kompozisyon ekledik
+  - Biraz düzelme oldu ama daha da geliştirme yapılabilir
+  - Üzerine düşünülebilir, sırası geldiğinde bakılacak
+  - Kompozisyon kuralları iyileştirmesi
+  - Depth perception artırma
+  - Scene composition guidelines
+- [ ] **3.5.20** Kapak ve İlk Sayfa Benzerliği Düzeltmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Şu anda kapak görseli ile 1. ve 2. sayfa genelde çok benzer oluyor
+  - Özellikle hikaye oluştururken ki prompt'u düzeltmek lazım
+  - Her sayfa farklı bir kompozisyon içermeli
+  - Aynı benzeyen görseller olmamalı
+  - Bu konu öncelikli, ilk bakılacaklar arasında
+  - Prompt'ta sayfa farklılığı direktifleri
+  - Composition variety enforcement
+- [ ] **3.5.21** Paragraf Yapısı İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Hikayelerde ebook formatında ve PDF export'ta paragraflar olsun
+  - Yaş grubuna göre 2-3-4 tane paragraf olacak içerik ayarlamamız lazım
+  - Story generation prompt'unda paragraf yapısı direktifleri
+  - PDF export'ta paragraf formatlaması
+  - Yaş gruplarına göre paragraf sayısı: 0-2 yaş: 2 paragraf, 3-5 yaş: 3 paragraf, 6-9 yaş: 4 paragraf
+- [ ] **3.5.22** Çocuk Boyları Prompt İyileştirmesi (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Çocukların boylarını yaşlara göre biraz ayarlamak lazım
+  - Bazen olduğundan uzun gösterebiliyor
+  - Prompt iyileştirmesi gerekli
+  - Yaş-boy oranı direktifleri eklenmeli
+  - Anatomical proportions yaş gruplarına göre
+- [ ] **3.5.23** AI Maliyet Optimizasyonu (23 Ocak 2026) - 🔴 **ACİL - ÖNEMLİ**
+  - Şu an AI ile image üretimi flow'umuz maliyeti fazla
+  - Bu maliyetleri nasıl düşürebiliriz diye araştırma yapılacak
+  - Hem hikaye hem görsel ayrıntılı düşünülecek
+  - Acil önemli konu
+  - Story generation maliyet optimizasyonu (model seçimi, token kullanımı)
+  - Image generation maliyet optimizasyonu (model seçimi, size, quality)
+  - Caching stratejileri (story cache, image cache)
+  - Batch processing optimizasyonu
+  - Alternative AI provider'lar (maliyet karşılaştırması)
+  - Cost tracking ve monitoring
+  - **Kategori:** Gelecek / Araştırma
+  - **Not:** Şu an için sadece fikir aşamasında, maliyet ve performans analizi yapılmalı
+    - ✅ Karakter kıyafet tutarlılığı
+    - ✅ Anatomik hatalar minimize edildi
+  - **İlham:** Magical Children's Book örnekleri analizi
+  - **Durum:** Production'da aktif ✅
+- [ ] **3.5.24** Kitap oluşturma – Herhangi bir hata durumunda tüm kitap fail (24 Ocak 2026)
+  - **Özet:** Story, master illüstrasyon, kapak veya sayfa görsellerinden **herhangi biri** hata verirse kitap **tamamen** fail sayılacak; **partial success** (örn. kapak yok ama sayfalar "completed") olmayacak.
+  - **Süreç (tanım, implementasyon "daha sonra"):**
+    - Story fail → zaten kitap oluşturulmuyor; mevcut davranış yeterli.
+    - Master illüstrasyon fail → cover/page'e geçilmez; kitap fail.
+    - **Cover fail** → **page images** üretimine **hiç geçilmez**; kitap `status: 'failed'`, client'a hata dönülür. (Mevcut: cover catch'te `failed` set edilip throw yok; akış page images'a devam ediyor.)
+    - Page image(s) fail → kitap `failed`; partial sayfa görselleriyle "completed" **asla** işaretlenmez. Gerekirse ilk sayfa hatasında batch abort vs. kurallar sonra netleştirilecek.
+  - **Implementasyon:** `app/api/books/route.ts` – cover fail durumunda **throw** (page images'a geçmeme); genel hata akışının "tüm kitap fail" ile uyumlu olması.
+  - **Not:** Bu madde ROADMAP'e eklenir; detaylı implementasyon **daha sonra** yapılır.
+- [x] **3.5.26** Image API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
+  - **Özet:** Image Generation API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
+  - **Faz 1: Inline Direktifleri Modülerleştir ✅**
+    - `buildCoverDirectives()` fonksiyonu oluşturuldu - cover generation direktiflerini yönetiyor
+    - `buildFirstInteriorPageDirectives()` fonksiyonu oluşturuldu - ilk iç sayfa direktiflerini yönetiyor
+    - `buildClothingDirectives()` fonksiyonu oluşturuldu - clothing direktiflerini (cover, useCoverReference, normal) yönetiyor
+    - `buildMultipleCharactersDirectives()` fonksiyonu oluşturuldu - çoklu karakter direktiflerini yönetiyor
+    - `buildCoverReferenceConsistencyDirectives()` fonksiyonu oluşturuldu - cover reference consistency direktifini yönetiyor
+    - `generateFullPagePrompt` içindeki inline kodlar bu fonksiyonlarla değiştirildi (~150 satır → ~100 satır)
+  - **Faz 2: Tekrar Eden Direktifleri Birleştir ✅**
+    - `buildCharacterConsistencyDirectives()` fonksiyonu oluşturuldu - tüm character consistency direktiflerini birleştiriyor
+    - `buildStyleDirectives()` fonksiyonu oluşturuldu - tüm style direktiflerini birleştiriyor
+    - `generateScenePrompt` ve `generateFullPagePrompt` içindeki tekrar eden direktifler birleştirildi
+  - **Faz 3: Prompt Bölümlerini Organize Et ✅**
+    - 12 Section Builder Fonksiyonu oluşturuldu (buildAnatomicalAndSafetySection, buildCompositionAndDepthSection, vb.)
+    - `generateFullPagePrompt()` refactor edildi - builder fonksiyonlarıyla yeniden yapılandırıldı
+    - Prompt sırası korundu (mevcut prompt çıktısı aynı kaldı)
+  - **Versiyon:** v1.6.0 → v1.7.0
+  - **Kod:** `lib/prompts/image/scene.ts`
+  - **Dokümantasyon:** `docs/guides/IMAGE_API_REFACTOR_ANALYSIS.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
+
+- [x] **3.5.25** Story API Refactor - Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**
+  - **Özet:** Story API'yi modüler, bakımı kolay ve test edilebilir hale getirmek için 3 fazlı refactor tamamlandı.
+  - **Faz 1: Clothing Direktiflerini Modülerleştir ✅**
+    - `getClothingDirectives()` fonksiyonu oluşturuldu - tüm clothing direktiflerini tek yerden yönetiyor
+    - `getClothingFewShotExamples()` helper fonksiyonu oluşturuldu - tema bazlı few-shot examples
+    - Prompt içinde 7 farklı yerdeki clothing direktifleri yeni fonksiyonlarla değiştirildi
+  - **Faz 2: Prompt'u Bölümlere Ayır ✅**
+    - 11 builder fonksiyonu oluşturuldu (buildCharacterSection, buildStoryRequirementsSection, vb.)
+    - `generateStoryPrompt()` fonksiyonu güncellendi - 700+ satırlık template literal yerine modüler bölümler
+    - Prompt içeriği korundu, sadece organizasyon iyileştirildi
+  - **Faz 3: Theme-Specific Logic'i Merkezileştir ✅**
+    - `getThemeConfig()` fonksiyonuna `clothingExamples` eklendi (7 tema)
+    - `getClothingFewShotExamples()` fonksiyonu güncellendi - artık `themeConfig.clothingExamples` kullanıyor
+  - **Sonuç:** Kod daha modüler ve bakımı kolay, her bölüm bağımsız test edilebilir, clothing direktifleri tek yerden yönetiliyor
+  - **Version:** Story prompt v1.3.2 → v1.4.0
+  - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/STORY_PROMPT_TEMPLATE.md`
+  - **Test:** ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
+- [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
+  - [x] Database migration (`011_add_image_edit_feature.sql`)
+    - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns
+    - [x] `image_edit_history` table (version tracking)
+    - [x] RLS policies ve SQL functions
+  - [x] API Endpoints:
+    - [x] `POST /api/ai/edit-image` - OpenAI Image Edit API entegrasyonu
+    - [x] `GET /api/books/[id]/edit-history` - Edit history endpoint
+    - [x] `POST /api/books/[id]/revert-image` - Version revert endpoint
+  - [x] Frontend Components:
+    - [x] `ImageEditModal` - Canvas-based mask drawing (ChatGPT-style)
+    - [x] `EditHistoryPanel` - Version history viewer
+    - [x] `BookSettingsPage` - Parent-only edit interface
+  - [x] Features:
+    - [x] Mask-based editing (transparent = edit, opaque = preserve)
+    - [x] 3 edits per book quota system
+    - [x] Full version history tracking
+    - [x] Revert to previous versions
+    - [x] Parent-only access (separated from child-safe Book Viewer)
+  - [x] OpenAI API Integration:
+    - [x] Model: `gpt-image-1.5`
+    - [x] Size: `1024x1536` (portrait)
+    - [x] Quality: `low`
+    - [x] `input_fidelity: high` (preserve original image)
+    - [x] Mask inversion logic (painted areas → transparent = edit zone)
+  - [x] Bug Fixes:
+    - [x] Mask logic inversion (transparent = edit, opaque = preserve)
+    - [x] Response format (b64_json only, no URL)
+    - [x] Logging optimization (no base64 dumps)
+    - [x] Variable name conflicts resolved
+  - [x] Version 0 (Original) Support:
+    - [x] Original images shown in edit history
+    - [x] Revert to original version (version 0)
+    - [x] UI improvements (Original badge, proper labeling)
+  - [x] Prompt Security Enhancements:
+    - [x] Positive prompt with anatomical correctness directives
+    - [x] Negative prompt integration (from main image generation)
+    - [x] Safety constraints to prevent unwanted edits
+    - [x] Age-group, style, and theme-specific restrictions
+  - **Documentation:** `docs/guides/IMAGE_EDIT_FEATURE_GUIDE.md`
+  - **Status:** ✅ Production ready, tested and working
+- [ ] **3.5.17** Görsel Revize UX İyileştirmesi (23 Ocak 2026)
+  - Ebeveynlerin 3 kere revize verebilecekleri alan mevcut (Image Edit Feature)
+  - Bu özelliği güzel bir UX ile sunmak gerekiyor
+  - Düşünülmesi gereken bir konu: Nasıl daha kullanıcı dostu hale getirilebilir?
+  - Mevcut: ImageEditModal, EditHistoryPanel, BookSettingsPage
+  - İyileştirmeler: Daha görsel, daha anlaşılır, daha kolay kullanım
+
+### 3.6 PDF Generation ✅
+- [x] **3.6.1** `POST /api/books/:id/generate-pdf` - PDF oluştur ✅ (10 Ocak 2026)
+- [x] **3.6.2** PDF template tasarımı ✅ (10 Ocak 2026) - **Not:** Temel tasarım tamamlandı, profesyonel tasarım iyileştirmesi Faz 5'te yapılacak
+- [x] **3.6.3** Supabase Storage'a kaydet ✅ (10 Ocak 2026)
+- [x] **3.6.4** İndirme linki oluştur ✅ (10 Ocak 2026)
+  - ✅ jsPDF kütüphanesi kuruldu
+  - ✅ Database migration eklendi (pdf_url, pdf_path columns)
+  - ✅ PDF Generator Helper oluşturuldu (`lib/pdf/generator.ts`)
+  - ✅ API Endpoint oluşturuldu (`app/api/books/[id]/generate-pdf/route.ts`)
+  - ✅ Cover page + iç sayfalar (image + text)
+  - ✅ Supabase Storage upload
+  - ✅ Database update
+  - ⏳ **PDF Tasarım İyileştirmesi:** Faz 5.7'de profesyonel PDF tasarımı yapılacak (11 Ocak 2026)
+  - ⏳ Testing - Test book ile PDF oluştur (sırada)
+
+### 3.7 Webhook'lar
+- [ ] **3.7.1** Stripe webhook handler
+- [ ] **3.7.2** İyzico webhook handler
+
+---
+

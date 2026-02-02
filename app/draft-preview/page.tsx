@@ -144,7 +144,7 @@ export default function DraftPreviewPage() {
   }
 
   const handleEmailShare = async () => {
-    // TODO: Implement email share modal/form
+    // ROADMAP: 4.3.6 - email share modal/form
     toast({
       title: "Coming soon",
       description: "Email sharing feature will be available soon",

@@ -1,12 +1,12 @@
 # 📊 ROADMAP CSV Kullanım Rehberi
 
-Bu dosya, `ROADMAP.md`'den otomatik oluşturulan `roadmap.csv` dosyasının kullanım rehberidir.
+Bu dosya, `docs/roadmap/` altındaki **faz dosyalarından** (PHASE_1_FOUNDATION.md … PHASE_6_PWA.md) otomatik oluşturulan `roadmap.csv` dosyasının kullanım rehberidir.
 
 ## 📁 Dosyalar
 
-- **`roadmap.csv`** - Google Sheets'e import edilebilir CSV dosyası
-- **`scripts/generate-roadmap-csv.js`** - CSV oluşturma script'i
-- **`roadmap-viewer.html`** - HTML tablo görüntüleyici (filtreleme, sıralama, arama) - **Gizli (docs/ klasöründe)**
+- **`docs/roadmap/roadmap.csv`** – Google Sheets'e import edilebilir CSV dosyası
+- **`scripts/generate-roadmap-csv.js`** – CSV oluşturma script'i (faz dosyalarını okur)
+- **`docs/roadmap/roadmap-viewer.html`** – HTML tablo görüntüleyici (filtreleme, sıralama, arama) – **Gizli**
 
 ## 🚀 Kullanım
 
@@ -18,13 +18,13 @@ npm run roadmap
 node scripts/generate-roadmap-csv.js
 ```
 
-Bu komut CSV dosyasını `docs/roadmap.csv` olarak oluşturur/günceller.
+Bu komut CSV dosyasını `docs/roadmap/roadmap.csv` olarak oluşturur/günceller. Script, `docs/roadmap/` altındaki PHASE_*.md dosyalarını okur.
 
 ### 2. HTML Viewer Kullanımı (Önerilen) ⭐
 
 **Daha kolay ve hızlı! Excel açmaya gerek yok.**
 
-1. `docs/roadmap-viewer.html` dosyasını tarayıcıda aç (dosya sisteminden doğrudan açabilirsin)
+1. `docs/roadmap/roadmap-viewer.html` dosyasını tarayıcıda aç (dosya sisteminden doğrudan açabilirsin)
 2. CSV dosyası otomatik yüklenir (aynı klasörde `roadmap.csv` varsa)
 3. Veya "📁 CSV Yükle" butonuna tıklayarak manuel yükle
 4. Filtreleme, sıralama ve arama yap!
@@ -39,7 +39,7 @@ Bu komut CSV dosyasını `docs/roadmap.csv` olarak oluşturur/günceller.
 - ✅ Renklendirme (Durum ve Öncelik bazlı)
 - ✅ Responsive tasarım (mobil uyumlu)
 
-**Güvenlik:** HTML viewer `docs/` klasöründe olduğu için son kullanıcılar erişemez. Sadece geliştiriciler için.
+**Güvenlik:** HTML viewer `docs/roadmap/` klasöründe olduğu için son kullanıcılar erişemez. Sadece geliştiriciler için.
 
 ### 3. Google Sheets'e Import (Alternatif)
 
@@ -99,7 +99,7 @@ Google Sheets'te şu filtreleri kullanabilirsin:
 | **Kategori** | İş kategorisi | `İş`, `Fikir`, `Bug` |
 | **Notlar** | Detaylı açıklama | `v0.app'den alındı ve entegre edildi` |
 | **Tarih** | Tamamlanma/Ekleme tarihi | `2026-01-23` |
-| **Link** | ROADMAP.md'deki anchor link | `#11-proje-kurulumu` |
+| **Link** | Faz dosyasındaki anchor link | `#11-proje-kurulumu` |
 
 ## ✏️ Draft Fikirler Ekleme
 
@@ -119,19 +119,19 @@ Google Sheets'te yeni satır ekleyerek draft fikirler ekleyebilirsin:
 
 ## 🔄 Sync (Senkronizasyon)
 
-### ROADMAP.md → CSV (Otomatik)
+### Faz dosyaları → CSV (Otomatik)
 ```bash
 npm run roadmap
 # veya
 node scripts/generate-roadmap-csv.js
 ```
 
-**Not:** CSV sadece `docs/` klasörüne yazılır (HTML Viewer aynı klasörde).
+**Not:** Script `docs/roadmap/PHASE_*.md` dosyalarını okur; CSV `docs/roadmap/roadmap.csv` olarak yazılır (HTML Viewer aynı klasörde).
 
-### CSV → ROADMAP.md (Manuel)
+### CSV → Faz dosyaları (Manuel)
 Şu an manuel yapılmalı. Gelecekte otomatik sync script'i eklenebilir.
 
-**Not:** CSV'deki değişiklikler (draft fikirler, durum güncellemeleri) ROADMAP.md'ye otomatik yansımaz. Manuel olarak ROADMAP.md'yi güncellemen gerekir.
+**Not:** CSV'deki değişiklikler (draft fikirler, durum güncellemeleri) faz dosyalarına otomatik yansımaz. İlgili faz dosyasını (örn. `docs/roadmap/PHASE_2_FRONTEND.md`) manuel güncellemen gerekir.
 
 ## 📊 Örnek Filtreler
 
@@ -161,11 +161,11 @@ Kategori = "Fikir" AND Durum = "Draft"
 
 ### CSV boş görünüyor
 - Script'i tekrar çalıştır: `npm run roadmap`
-- ROADMAP.md dosyasının doğru konumda olduğundan emin ol
+- `docs/roadmap/` altında PHASE_1_FOUNDATION.md … PHASE_6_PWA.md dosyalarının olduğundan emin ol
 
 ### Linkler çalışmıyor
-- Linkler ROADMAP.md'deki anchor linklerdir
-- Google Sheets'te tıklanabilir değildir, manuel olarak ROADMAP.md'de arama yapmalısın
+- Linkler faz dosyalarındaki anchor linklerdir
+- Google Sheets'te tıklanabilir değildir; ilgili faz dosyasında manuel arama yapmalısın
 
 ### Öncelik bilgileri yanlış
 - Script, faz başlıklarından öncelik bilgisini çıkarır
@@ -175,9 +175,9 @@ Kategori = "Fikir" AND Durum = "Draft"
 ## 📝 Notlar
 
 - CSV dosyası her çalıştırmada yeniden oluşturulur (mevcut dosya üzerine yazılır)
-- CSV sadece `docs/` klasörüne yazılır (güvenlik için `public/` klasöründe değil)
-- HTML Viewer `docs/roadmap-viewer.html` dosyası olarak `docs/` klasöründe (son kullanıcılar erişemez)
+- CSV ve HTML Viewer `docs/roadmap/` klasöründedir (güvenlik için `public/` klasöründe değil)
+- HTML Viewer `docs/roadmap/roadmap-viewer.html` (son kullanıcılar erişemez)
 - ID kolonunun başında tab karakteri var (Excel/Google Sheets'te tarih olarak algılanmaması için)
 - Draft fikirler CSV'ye manuel eklenmelidir
-- ROADMAP.md'deki değişiklikler CSV'ye otomatik yansımaz, script'i tekrar çalıştırman gerekir
+- Faz dosyalarındaki değişiklikler CSV'ye otomatik yansımaz; script'i tekrar çalıştırman gerekir
 - HTML Viewer aynı klasördeki `roadmap.csv` dosyasını otomatik yükler (sayfa açıldığında)

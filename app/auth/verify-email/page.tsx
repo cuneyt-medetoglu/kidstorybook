@@ -51,14 +51,7 @@ export default function VerifyEmailPage() {
   }, [searchParams, router])
 
   const handleResendEmail = async () => {
-    // Faz 3'te Supabase Auth resend email yapılacak
-    console.log("[Email Verification] Resend email clicked - Faz 3'te entegrasyon yapılacak")
-    // TODO: Faz 3'te Supabase Auth resend email
-    // const supabase = createClient()
-    // await supabase.auth.resend({
-    //   type: 'signup',
-    //   email: email,
-    // })
+    // ROADMAP: 2.3 Auth - Supabase auth.resend({ type: 'signup', email })
   }
 
   return (

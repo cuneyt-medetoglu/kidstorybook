@@ -28,7 +28,7 @@ export default function ExampleBookViewPage({
       bookId={params.id} 
       onClose={handleClose}
       // Note: BookViewer fetches book via API; RLS allows reading example books
-      // TODO: Add isExample prop if we need to conditionally hide edit/settings UI
+      // ROADMAP: 2.7.8 - isExample prop to conditionally hide edit/settings UI
     />
   )
 }

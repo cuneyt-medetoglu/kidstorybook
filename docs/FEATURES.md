@@ -1,9 +1,22 @@
 # ✨ Özellik Listesi ve Önceliklendirme
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 1.0  
-**Tarih:** 21 Aralık 2025  
-**Durum:** Planlama
+**Doküman Versiyonu:** 2.0  
+**Tarih:** 2 Şubat 2026  
+**Durum:** AKTİF – Güncel (FAZ 4 çıktısı)
+
+---
+
+## 📖 Kullanım Rehberi
+
+| Soru | Yanıt |
+|------|--------|
+| **Ne için kullanılır?** | Özellik **önceliklendirme** ve planlama; MVP kararları, hangi özelliğin ne zaman yapılacağı. |
+| **ROADMAP ile farkı?** | **ROADMAP:** Ne yapılacak (görev listesi, checkbox’lar). **FEATURES:** Neyin öncelikli olduğu (P0/P1/P2/P3). |
+| **Nasıl kullanılır?** | MVP tanımı, özellik seçimi, “önce ne?” kararlarında bu dokümana bak; detaylı iş takibi için [ROADMAP](ROADMAP.md) ve [docs/roadmap/](roadmap/) kullan. |
+
+**Detaylı iş takibi:** [ROADMAP.md](ROADMAP.md) (özet + faz dosyalarına linkler).  
+**Tamamlanan özellikler (kronolojik):** [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md).
 
 ---
 
@@ -14,334 +27,250 @@
 - 🟢 **P2 - Medium (MVP sonrası):** Faydalı ama bekleyebilir
 - ⚪ **P3 - Low (Nice to have):** İleride düşünülecek
 
+**Gösterim:** ✅ = Tamamlandı (mevcut sürümde var).
+
 ---
 
 ## 1. Kullanıcı ve Hesap Yönetimi
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Kullanıcı kaydı (Email) | 🟡 P1 | Email + şifre ile kayıt | MVP |
-| Google OAuth | 🟢 P2 | Google ile giriş | Post-MVP |
-| Facebook OAuth | ⚪ P3 | Facebook ile giriş | Gelecek |
-| Şifre sıfırlama | 🟡 P1 | Email ile şifre recovery | MVP |
-| Profil yönetimi | 🟡 P1 | İsim, email, avatar | MVP |
-| Kullanıcı dashboard'u | 🟡 P1 | Oluşturulan kitapları görme | MVP |
-| Sipariş geçmişi | 🟡 P1 | Geçmiş siparişler ve durumları | MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Kullanıcı kaydı (Email) | 🟡 P1 | ✅ | Email + şifre ile kayıt |
+| Google OAuth | 🟢 P2 | ✅ | Google ile giriş |
+| Facebook OAuth | ⚪ P3 | ✅ | Facebook ile giriş |
+| Instagram OAuth | ⚪ P3 | | Planlanıyor |
+| Şifre sıfırlama | 🟡 P1 | ✅ | Email ile şifre recovery |
+| Profil yönetimi | 🟡 P1 | ✅ | İsim, email, avatar |
+| Kullanıcı dashboard'u | 🟡 P1 | ✅ | Kitaplık, filtreleme, sipariş geçmişi |
+| Sipariş geçmişi | 🟡 P1 | ✅ | Geçmiş siparişler ve durumları |
 
-**MVP Kararı:** Basit email/şifre authentication yeterli. OAuth isteğe bağlı.
+**MVP Kararı:** Email/şifre + OAuth (Google, Facebook) yeterli. Instagram isteğe bağlı.
 
 ---
 
 ## 2. Karakter Oluşturma ve Kişiselleştirme
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Fotoğraf yükleme | 🔴 P0 | Çocuk fotoğrafı upload | MVP |
-| Fotoğraf önizleme ve kırpma | 🟡 P1 | Crop/resize özelliği | MVP |
-| Karakter adı girişi | 🔴 P0 | Zorunlu alan | MVP |
-| Yaş girişi | 🔴 P0 | 0-12 yaş arası | MVP |
-| Cinsiyet seçimi | 🔴 P0 | Erkek/Kız/Diğer | MVP |
-| Saç rengi seçimi | 🟡 P1 | Dropdown veya color picker | MVP |
-| Göz rengi seçimi | 🟡 P1 | Dropdown | MVP |
-| Fiziksel özellikler (gözlük, vb.) | 🟡 P1 | Multi-select checkboxes | MVP |
-| 5'e kadar karakter | 🟢 P2 | Çoklu karakter desteği | Post-MVP |
-| Karakter rolü (ana/yan) | 🟢 P2 | Hangisi ana karakter | Post-MVP |
-| Karakter şablonları | ⚪ P3 | Fotoğrafsız karakter yaratma | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Fotoğraf yükleme | 🔴 P0 | ✅ | Çocuk fotoğrafı upload |
+| Fotoğraf önizleme ve kırpma | 🟡 P1 | ✅ | Crop/resize |
+| Karakter adı girişi | 🔴 P0 | ✅ | Zorunlu alan |
+| Yaş girişi | 🔴 P0 | ✅ | 0-12 yaş arası |
+| Cinsiyet seçimi | 🔴 P0 | ✅ | Erkek/Kız/Diğer |
+| Saç/göz rengi, fiziksel özellikler | 🟡 P1 | ✅ | Dropdown / checkboxes |
+| **5'e kadar karakter** | 🟢 P2 | ✅ | Çoklu karakter (ana/yan) |
+| Karakter rolü (ana/yan) | 🟢 P2 | ✅ | Hangisi ana karakter |
+| Karakter şablonları | ⚪ P3 | | Fotoğrafsız karakter – Gelecek |
 
-**MVP Kararı:** 1 ana karakter ile başla. Multi-character desteği sonra eklenebilir.
+**MVP Kararı:** Multi-character (5 karakter) tamamlandı. Karakter şablonları sonra.
 
 ---
 
 ## 3. Pet ve Oyuncak Karakterleri
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Pet ekleme | 🟢 P2 | Evcil hayvan fotoğrafı ve adı | Post-MVP |
-| Pet türü seçimi | 🟢 P2 | Köpek, kedi, tavşan, vb. | Post-MVP |
-| Oyuncak/peluş ekleme | 🟢 P2 | Oyuncak tanımı ve fotoğrafı | Post-MVP |
-| Pet/oyuncak hikayede rolü | 🟢 P2 | AI hikayeye dahil etme | Post-MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Pet ekleme | 🟢 P2 | ✅ | Evcil hayvan fotoğrafı ve adı |
+| Pet türü / Oyuncak | 🟢 P2 | ✅ | Family, Pets, Other, Toys (AI analiz) |
+| Pet/oyuncak hikayede rolü | 🟢 P2 | ✅ | AI hikayeye dahil etme |
 
-**MVP Kararı:** MVP'de değil. V1.1'de eklenebilir.
+**MVP Kararı:** Pet ve oyuncak karakterleri tamamlandı (5 karakter kotası içinde).
 
 ---
 
 ## 4. Hikaye Oluşturma
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Tema seçimi | 🔴 P0 | Ana temalar (macera, peri masalı, vb.) | MVP |
-| Alt-tema/konu seçimi | 🔴 P0 | Spesifik konular (dinozor, uzay, vb.) | MVP |
-| Yaş grubuna uygun içerik | 🔴 P0 | 0-2, 3-5, 6-9 yaş grupları | MVP |
-| Özel istekler text alanı | 🟡 P1 | Serbest metin girişi | MVP |
-| 24 sayfa standart uzunluk | 🔴 P0 | Sabit sayfa sayısı | MVP |
-| Farklı sayfa uzunlukları | ⚪ P3 | 12, 24, 36 sayfa seçenekleri | Gelecek |
-| AI hikaye üretimi | 🔴 P0 | GPT-4o ile | MVP |
-| Hikaye önizleme | 🔴 P0 | Satın almadan önce görme | MVP |
-| Hikaye başlığı önerisi | 🟡 P1 | AI önerisi + manuel düzenleme | MVP |
-| Manuel başlık girişi | 🟡 P1 | Kullanıcı kendi başlığını yazar | MVP |
-| Hikaye template'leri | 🟢 P2 | Hazır hikaye iskeletleri | Post-MVP |
-| İnteraktif hikaye seçenekleri | ⚪ P3 | "Macera A mı B mi olsun?" | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Tema seçimi | 🔴 P0 | ✅ | Ana temalar |
+| Alt-tema/konu seçimi | 🔴 P0 | ✅ | Spesifik konular |
+| Yaş grubuna uygun içerik | 🔴 P0 | ✅ | 0-2, 3-5, 6-9 yaş grupları |
+| Özel istekler text alanı | 🟡 P1 | ✅ | Serbest metin |
+| 24 sayfa standart uzunluk | 🔴 P0 | ✅ | Sabit sayfa sayısı |
+| Farklı sayfa uzunlukları | ⚪ P3 | | 12, 24, 36 sayfa – Gelecek |
+| AI hikaye üretimi | 🔴 P0 | ✅ | GPT-4o ile |
+| Hikaye önizleme | 🔴 P0 | ✅ | Satın almadan önce görme |
+| **8 dil desteği (hikaye)** | 🔴 P0 | ✅ | TR, EN, DE, FR, ES, ZH, PT, RU |
+| Hikaye template'leri | 🟢 P2 | | Hazır iskeletler – Post-MVP |
 
-**MVP Kararı:** 
-- 5-7 ana tema
-- 20-30 alt tema
-- Özel istekler serbest text
-- AI otomatik üretim
+**MVP Kararı:** 5-7 tema, 20-30 alt tema, özel istekler, AI üretim – tamamlandı.
 
 ---
 
 ## 5. Görsel Stil ve Tasarım
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Illustration style seçimi | 🔴 P0 | Watercolor, 3D, cartoon, vb. | MVP |
-| Style önizleme | 🟡 P1 | Her stil için örnek görsel | MVP |
-| Font seçimi | 🟡 P1 | 3-5 font seçeneği | MVP |
-| Font önizleme | 🟡 P1 | Font'u görerek seçme | MVP |
-| Renk paleti seçimi | 🟢 P2 | Hikayenin renk tonları | Post-MVP |
-| Kapak tasarımı seçimi | 🟢 P2 | Farklı kapak layout'ları | Post-MVP |
-| Custom logo/isim ekleme | ⚪ P3 | Kendi logonu ekle | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Illustration style seçimi | 🔴 P0 | ✅ | Watercolor, 3D, cartoon, vb. |
+| Style önizleme | 🟡 P1 | ✅ | Her stil için örnek görsel |
+| Font seçimi | 🟡 P1 | | 3-5 font seçeneği – Orta öncelik |
+| **Image Edit (mask-based)** | 🟢 P2 | ✅ | ChatGPT-style görsel düzenleme, version history |
+| Kapak tasarımı | 🟢 P2 | ✅ | Kapak üretimi, ücretsiz kapak hakkı |
+| Renk paleti / Custom logo | ⚪ P3 | | Gelecek |
 
-**MVP Kararı:**
-- 4-6 illustration style (MVP için)
-- 3-4 font seçeneği
-- Renk paleti sabit (AI otomatik seçsin)
+**MVP Kararı:** 4-6 illustration style tamamlandı. Font seçimi sonra.
 
 ---
 
 ## 6. E-Book Görüntüleyici
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Flipbook animasyonu | 🔴 P0 | Sayfa çevirme efekti | MVP |
-| İleri/geri navigasyon | 🔴 P0 | Ok tuşları, butonlar | MVP |
-| Sayfa numarası gösterimi | 🟡 P1 | "4 / 30" şeklinde | MVP |
-| Direkt sayfa atlama | 🟡 P1 | Sayfa seçici | MVP |
-| Zoom in/out | 🟢 P2 | Görselleri büyütme | Post-MVP |
-| Tam ekran modu | 🟡 P1 | Fullscreen | MVP |
-| Mobil swipe desteği | 🔴 P0 | Touch gesture'lar | MVP |
-| Klavye kısayolları | 🟢 P2 | Arrow keys, space | Post-MVP |
-| Otomatik oynatma | ⚪ P3 | Slideshow modu | Gelecek |
-| Sesli okuma | ⚪ P3 | Text-to-speech | Gelecek |
-| Animasyonlu öğeler | ⚪ P3 | İnteraktif elementler | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Flipbook animasyonu | 🔴 P0 | ✅ | Sayfa çevirme efekti |
+| İleri/geri navigasyon | 🔴 P0 | ✅ | Ok tuşları, butonlar |
+| Sayfa numarası, direkt atlama | 🟡 P1 | ✅ | Sayfa seçici |
+| Zoom, tam ekran | 🟡 P1 | ✅ | Fullscreen |
+| Mobil swipe desteği | 🔴 P0 | ✅ | Touch gesture'lar |
+| **Sesli okuma (TTS)** | 🟢 P2 | ✅ | Text-to-speech |
+| **Otomatik oynatma** | 🟢 P2 | ✅ | Slideshow modu |
+| PDF indirme | 🔴 P0 | ✅ | Tamamlandı kitaplar için |
+| Animasyonlu öğeler | ⚪ P3 | ✅ | Görsel ve animasyonlar |
 
-**MVP Kararı:**
-- react-pageflip library
-- Temel navigasyon
-- Responsive (mobil + desktop)
+**MVP Kararı:** react-pageflip, TTS, otomatik oynatma, PDF – tamamlandı.
 
 ---
 
 ## 7. Kitap Düzenleme
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Metin düzenleme | 🟡 P1 | Sayfa metinlerini değiştirme | MVP |
-| Görsel yeniden üretme | 🟢 P2 | "Bu görseli değiştir" butonu | Post-MVP |
-| Sayfa ekleme/silme | ⚪ P3 | Dinamik sayfa yönetimi | Gelecek |
-| Sayfa sırasını değiştirme | ⚪ P3 | Drag & drop | Gelecek |
-| Font değiştirme (sayfa bazlı) | ⚪ P3 | Her sayfa farklı font | Gelecek |
-| Kişisel önsöz ekleme | 🟢 P2 | Özel mesaj yazma | Post-MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Metin düzenleme | 🟡 P1 | ✅ | Sayfa metinlerini değiştirme |
+| Görsel yeniden üretme / Edit | 🟢 P2 | ✅ | Mask-based edit, version history |
+| Sayfa ekleme/silme, sıra değiştirme | ⚪ P3 | | Gelecek |
+| Kişisel önsöz | 🟢 P2 | | Post-MVP |
 
-**MVP Kararı:**
-- Basit text editing yeterli
-- Görsel değiştirme manuel (support ticket)
-- V1.1'de otomatik görsel regeneration
+**MVP Kararı:** Metin düzenleme ve görsel edit tamamlandı.
 
 ---
 
 ## 8. Ödeme ve Satın Alma
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| E-book satın alma | 🔴 P0 | $7.99 dijital kitap | MVP |
-| Stripe entegrasyonu | 🔴 P0 | Kredi kartı ödemesi | MVP |
-| İyzico entegrasyonu (TR) | 🟡 P1 | Türkiye ödemeleri | MVP |
-| 3D Secure | 🔴 P0 | Güvenli ödeme | MVP |
-| Sipariş onay sayfası | 🔴 P0 | Özet ve confirm | MVP |
-| Sipariş onay emaili | 🔴 P0 | Otomatik email | MVP |
-| PDF indirme linki | 🔴 P0 | Email'de link | MVP |
-| Fatura oluşturma | 🟡 P1 | Otomatik fatura | MVP |
-| PayPal entegrasyonu | 🟢 P2 | Alternatif ödeme | Post-MVP |
-| Kupon/indirim kodu | 🟢 P2 | Promosyon kodları | Post-MVP |
-| Hediye kartı | ⚪ P3 | Gift card sistemi | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| **Currency detection** | 🟡 P1 | ✅ | IP-based, TRY/USD/EUR/GBP |
+| **Sepet sistemi** | 🔴 P0 | ✅ | CartContext, API, /cart, bulk selection |
+| **Pricing sayfası** | 🔴 P0 | ✅ | Planlar, E-book vs Basılı, karşılaştırma |
+| E-book satın alma | 🔴 P0 | | Stripe/İyzico – Planlanıyor |
+| Stripe entegrasyonu | 🔴 P0 | | Kredi kartı – Planlanıyor |
+| İyzico entegrasyonu (TR) | 🟡 P1 | | Türkiye ödemeleri – Planlanıyor |
+| 3D Secure, sipariş onay, email | 🔴 P0 | | Planlanıyor |
+| PDF indirme linki (satın alma sonrası) | 🔴 P0 | ✅ | Dashboard’dan indirme |
+| Kupon/indirim kodu | 🟢 P2 | | Post-MVP |
 
-**MVP Kararı:**
-- Stripe (global)
-- İyzico (Türkiye)
-- Sadece e-book satışı (MVP)
+**MVP Kararı:** Currency, sepet, pricing sayfası tamamlandı. Ödeme (Stripe/İyzico) sırada.
 
 ---
 
 ## 9. Basılı Kitap Sipariş
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Hardcover sipariş | 🟡 P1 | $34.99 basılı kitap | MVP |
-| Adres girişi | 🟡 P1 | Teslimat adresi | MVP |
-| Kapak seçimi (mat/parlak) | 🟡 P1 | Finish seçeneği | MVP |
-| Miktar seçimi | 🟡 P1 | 1, 3, 5, 10+ | MVP |
-| Paket fiyatlandırma | 🟢 P2 | 3+ kitap indirim | Post-MVP |
-| Print-on-demand entegrasyonu | 🟡 P1 | Printful API | MVP |
-| Kargo takibi | 🟡 P1 | Tracking number | MVP |
-| Sipariş durumu | 🟡 P1 | Printing, shipped, delivered | MVP |
-| Hızlı kargo seçeneği | 🟢 P2 | Express shipping | Post-MVP |
-| Uluslararası kargo | 🟡 P1 | 26 ülkeye teslimat | MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Hardcover sipariş | 🟡 P1 | | Planlanıyor |
+| Adres, kapak seçimi, miktar | 🟡 P1 | | Planlanıyor |
+| Print-on-demand entegrasyonu | 🟡 P1 | | Planlanıyor |
+| Kargo takibi, sipariş durumu | 🟡 P1 | | Planlanıyor |
 
-**MVP Kararı:**
-- Printful entegrasyonu
-- Temel sipariş akışı
-- Kargo takibi
+**MVP Kararı:** E-book önce; basılı kitap sonra.
 
 ---
 
 ## 10. Web Sitesi İçeriği
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| **Ana Sayfa** | 🔴 P0 | Landing page | MVP |
-| - Hero section | 🔴 P0 | Başlık, CTA | MVP |
-| - "Nasıl Çalışır?" | 🔴 P0 | 3 adım açıklama | MVP |
-| - Örnek kitaplar | 🟡 P1 | Carousel | MVP |
-| - Testimonials | 🟢 P2 | Kullanıcı yorumları | Post-MVP |
-| - FAQ | 🟡 P1 | Sık sorulan sorular | MVP |
-| **Features Sayfası** | 🟡 P1 | Özellikler detayı | MVP |
-| **Examples Sayfası** | 🟡 P1 | Örnek kitaplar | MVP |
-| **Ideas Sayfası** | 🟢 P2 | Hikaye fikirleri | Post-MVP |
-| **Pricing Sayfası** | 🔴 P0 | Fiyatlandırma | MVP |
-| **For Schools** | 🟢 P2 | Kurumsal satış | Post-MVP |
-| **Reviews Sayfası** | 🟢 P2 | Kullanıcı incelemeleri | Post-MVP |
-| **Blog** | 🟢 P2 | İçerik marketing | Post-MVP |
-| **Help Center** | 🟡 P1 | Yardım merkezi | MVP |
-| **About Us** | 🟡 P1 | Hakkımızda | MVP |
-| **Contact** | 🟡 P1 | İletişim formu | MVP |
-| **Privacy Policy** | 🔴 P0 | GDPR/KVKK uyum | MVP |
-| **Terms of Service** | 🔴 P0 | Kullanım şartları | MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Ana Sayfa (Hero, Nasıl Çalışır, FAQ) | 🔴 P0 | ✅ | Landing, örnek kitaplar, kampanya banner |
+| **Examples Sayfası** | 🟡 P1 | ✅ | Örnek kitaplar |
+| **Pricing Sayfası** | 🔴 P0 | ✅ | Fiyatlandırma, planlar |
+| Features / Ideas / Reviews / Help | 🟡 P1 | | Kısmen veya planlanıyor |
+| Pricing, Privacy, Terms, KVKK | 🔴 P0 | | Statik sayfalar – Planlanıyor |
+| Contact, About | 🟡 P1 | | Planlanıyor |
+| For Schools, Blog | 🟢 P2 | | Post-MVP |
 
-**MVP Kararı:**
-- Ana sayfa, Features, Pricing, Help zorunlu
-- Examples birkaç örnek yeterli
-- Blog ve Reviews sonra
+**MVP Kararı:** Ana sayfa, Examples, Pricing tamamlandı. Statik sayfalar (Features, Pricing detay, Privacy, Terms, KVKK, Contact) sırada.
 
 ---
 
 ## 11. Çok Dilli Destek
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Türkçe (TR) | 🔴 P0 | Ana dil | MVP |
-| İngilizce (EN) | 🔴 P0 | İkinci dil | MVP |
-| Dil değiştirici | 🔴 P0 | Language switcher | MVP |
-| URL yapısı (/tr/, /en/) | 🟡 P1 | SEO dostu URL'ler | MVP |
-| Otomatik dil algılama | 🟢 P2 | Browser locale | Post-MVP |
-| Almanca (DE) | 🟢 P2 | 3. dil | Post-MVP |
-| Fransızca (FR) | 🟢 P2 | 4. dil | Post-MVP |
-| İspanyolca (ES) | 🟢 P2 | 5. dil | Post-MVP |
-| Diğer diller | ⚪ P3 | Topluluk çevirileri | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| **Hikaye dili (8 dil)** | 🔴 P0 | ✅ | TR, EN, DE, FR, ES, ZH, PT, RU |
+| Website UI dili (/tr/, /en/) | 🟡 P1 | | Planlanıyor |
+| Dil değiştirici | 🔴 P0 | | Planlanıyor |
+| Otomatik dil algılama | 🟢 P2 | | Post-MVP |
 
-**MVP Kararı:**
-- TR ve EN yeterli
-- next-intl kullan
-- Diğer diller talebe göre
+**MVP Kararı:** Hikaye 8 dil tamamlandı. Site UI i18n sonra.
 
 ---
 
 ## 12. SEO ve Marketing
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Meta tags | 🔴 P0 | Title, description | MVP |
-| Open Graph tags | 🟡 P1 | Sosyal medya paylaşım | MVP |
-| Sitemap.xml | 🟡 P1 | SEO | MVP |
-| robots.txt | 🟡 P1 | SEO | MVP |
-| Google Analytics | 🟡 P1 | Trafik analizi | MVP |
-| Facebook Pixel | 🟢 P2 | Retargeting | Post-MVP |
-| Email newsletter | 🟢 P2 | Mailchimp/Sendgrid | Post-MVP |
-| Referral program | ⚪ P3 | Arkadaşını getir | Gelecek |
-| Affiliate program | ⚪ P3 | Ortaklık programı | Gelecek |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Meta tags, Open Graph | 🔴 P0 | | Planlanıyor |
+| Sitemap.xml, robots.txt | 🟡 P1 | | Planlanıyor |
+| Google Analytics | 🟡 P1 | | Planlanıyor |
+| Facebook Pixel, Newsletter | 🟢 P2 | | Post-MVP |
 
 ---
 
 ## 13. Admin Panel
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Sipariş yönetimi | 🔴 P0 | Siparişleri görme/yönetme | MVP |
-| Kullanıcı yönetimi | 🟡 P1 | Kullanıcıları görme | MVP |
-| Kitap yönetimi | 🟡 P1 | Oluşturulan kitapları görme | MVP |
-| İstatistikler | 🟡 P1 | Dashboard metrics | MVP |
-| Manuel sipariş oluşturma | 🟢 P2 | Destek için | Post-MVP |
-| İndirim kodu yönetimi | 🟢 P2 | Kupon oluşturma | Post-MVP |
-| Email şablonları | 🟢 P2 | Email template düzenleme | Post-MVP |
-| İçerik yönetimi (CMS) | 🟢 P2 | Blog, pages düzenleme | Post-MVP |
-
-**MVP Kararı:**
-- Medusa Admin kullan (built-in)
-- Custom dashboard sonra
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Sipariş yönetimi | 🔴 P0 | | Planlanıyor |
+| Kullanıcı / Kitap yönetimi | 🟡 P1 | | Planlanıyor |
+| İstatistikler, dashboard | 🟡 P1 | | Planlanıyor |
+| İndirim kodu, email şablonları | 🟢 P2 | | Post-MVP |
 
 ---
 
 ## 14. Teknik Özellikler
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Responsive tasarım | 🔴 P0 | Mobil uyumluluk | MVP |
-| Progressive Web App | 🟢 P2 | PWA özellikleri | Post-MVP |
-| SSL sertifikası | 🔴 P0 | HTTPS | MVP |
-| CDN kullanımı | 🟡 P1 | Hızlı yüklenme | MVP |
-| Image optimization | 🟡 P1 | Next.js Image | MVP |
-| Error tracking | 🟡 P1 | Sentry | MVP |
-| Automated backups | 🟡 P1 | Veritabanı yedekleme | MVP |
-| Rate limiting | 🟡 P1 | API abuse önleme | MVP |
-| GDPR uyumlu | 🔴 P0 | Veri koruma | MVP |
-| KVKK uyumlu | 🔴 P0 | Türkiye veri koruma | MVP |
-| Veri silme hakkı | 🔴 P0 | Kullanıcı isteği ile silme | MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Responsive tasarım | 🔴 P0 | ✅ | Mobil uyumluluk |
+| SSL (HTTPS) | 🔴 P0 | ✅ | Vercel |
+| Image optimization | 🟡 P1 | ✅ | Next.js Image |
+| Rate limiting | 🟡 P1 | ✅ | API koruması |
+| GDPR/KVKK uyumlu | 🔴 P0 | | İçerik planlanıyor |
+| PWA | 🟢 P2 | | Post-MVP |
 
 ---
 
 ## 15. Performans ve Kalite
 
-| Özellik | Öncelik | Açıklama | Faz |
-|---------|---------|----------|-----|
-| Hikaye üretim süresi < 3 dk | 🔴 P0 | Hızlı üretim | MVP |
-| Sayfa yüklenme < 3 sn | 🔴 P0 | Performans | MVP |
-| 100+ concurrent users | 🟡 P1 | Ölçeklenebilirlik | MVP |
-| Otomatik testing | 🟢 P2 | Unit + E2E tests | Post-MVP |
-| CI/CD pipeline | 🟡 P1 | Otomatik deployment | MVP |
+| Özellik | Öncelik | Durum | Açıklama |
+|---------|---------|--------|----------|
+| Hikaye üretim süresi < 3 dk | 🔴 P0 | ✅ | Hedef karşılanıyor |
+| Sayfa yüklenme < 3 sn | 🔴 P0 | ✅ | Performans |
+| Otomatik testing, CI/CD | 🟢 P2 | | Post-MVP |
 
 ---
 
-## MVP Özet Özellikleri
+## MVP Özet (Güncel)
 
-### Kesinlikle Olması Gerekenler (P0):
-1. ✅ Kullanıcı kaydı ve girişi
-2. ✅ 1 karakter oluşturma (fotoğraf + bilgi)
-3. ✅ Tema ve stil seçimi
-4. ✅ AI hikaye üretimi (24 sayfa)
-5. ✅ E-book görüntüleyici (flipbook)
-6. ✅ E-book satın alma ($7.99)
-7. ✅ Ödeme (Stripe + İyzico)
-8. ✅ PDF generation ve indirme
-9. ✅ Ana sayfa, Features, Pricing
-10. ✅ TR ve EN dil desteği
+### ✅ Tamamlanan (P0/P1)
+- Kullanıcı kaydı, giriş, OAuth (Google, Facebook), şifre sıfırlama, profil, kitaplık
+- 5 karaktere kadar (çocuk + pet/oyuncak), tema/stil, AI hikaye (24 sayfa, 8 dil)
+- E-book görüntüleyici (flipbook, TTS, otomatik oynatma, PDF indirme)
+- Image Edit (mask-based), version history
+- Currency detection, sepet, pricing sayfası, ücretsiz kapak hakkı
+- Ana sayfa, Examples, Pricing sayfası, cookie banner
+- Teknik: responsive, HTTPS, rate limiting, image optimization
 
-### Olması İyi Olur (P1):
-1. Hardcover sipariş
-2. Print-on-demand entegrasyonu
-3. Metin düzenleme
-4. Birkaç örnek kitap
-5. FAQ ve Help Center
+### 🔴 Sıradaki (MVP için)
+- Ödeme: Stripe, İyzico, checkout, sipariş onay, email
+- Statik sayfalar: Features, Pricing detay, Privacy, Terms, KVKK, Contact
+- Admin: sipariş/kullanıcı/kitap yönetimi (temel)
+- SEO: meta tags, sitemap, analytics
 
-### Sonra Eklenebilir (P2):
-1. Multi-character (5 karakter)
-2. Pet ve oyuncak
-3. Görsel yeniden üretme
-4. Reviews ve testimonials
-5. Ideas sayfası
-6. Blog
+### 🟢 Sonra (P2)
+- Hardcover, print-on-demand, kargo takibi
+- Website UI i18n (/tr/, /en/), dil değiştirici
+- PWA, otomatik test, CI/CD
 
 ---
 
-**Son Güncelleme:** 21 Aralık 2025  
-**Güncelleyen:** Proje Ekibi
-
+**Son Güncelleme:** 2 Şubat 2026  
+**Detaylı iş listesi:** [ROADMAP.md](ROADMAP.md) | **Tamamlanan özellikler:** [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md)

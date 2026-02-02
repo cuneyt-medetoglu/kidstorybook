@@ -60,7 +60,7 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
   const onSubmit = async (data: CheckoutFormData) => {
     setIsSubmitting(true)
     try {
-      // TODO: Payment integration will be added later (Faz 4.1 and 4.2)
+      // ROADMAP: 4.1 Stripe, 4.2 İyzico - payment integration
       // For now, mock the payment process
       console.log("[Checkout] Form submitted:", data)
       console.log("[Checkout] Cart items:", items)

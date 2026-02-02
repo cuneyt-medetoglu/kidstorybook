@@ -7,7 +7,7 @@ export default function BookViewPage({ params }: { params: { id: string } }) {
   const router = useRouter()
 
   const handleClose = () => {
-    // TODO: After /books route is added, redirect to /books
+    // ROADMAP: Redirect to /books list if needed
     // For now, redirect to dashboard
     router.push("/dashboard")
   }

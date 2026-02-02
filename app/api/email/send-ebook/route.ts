@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
  * POST /api/email/send-ebook
  * Mock email API for sending ebook download links
  * 
- * TODO: Integrate with real email service (SendGrid, Resend, etc.)
+ * ROADMAP: 4.3.6 Email bildirimleri - integrate SendGrid/Resend
  */
 export async function POST(request: NextRequest) {
   try {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     console.log("  - Ebook download links (if applicable)")
     console.log("  - Order details")
 
-    // TODO: Real email implementation
+    // ROADMAP: 4.3.6 - real email (SendGrid/Resend)
     // const emailService = new EmailService()
     // await emailService.sendEbookConfirmation({
     //   orderId,

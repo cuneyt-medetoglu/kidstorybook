@@ -38,19 +38,19 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '1',
     title: 'Luna\'s Magical Forest',
     description: 'Little Luna meets talking animals in a hidden forest and embarks on an unforgettable adventure.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '3-5',
     theme: 'Adventure',
     usedPhotos: [
       {
         id: '1-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Luna',
         transformedImage: '/little-girl-with-backpack-exploring-enchanted-fore.jpg'
       },
       {
         id: '1-2',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Friend Maya',
         transformedImage: '/little-girl-reading-glowing-book-surrounded-by-for.jpg'
       }
@@ -65,13 +65,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '2',
     title: 'Journey to the Stars',
     description: 'Brave astronaut Alex explores new planets in the depths of space.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '6-9',
     theme: 'Science Fiction',
     usedPhotos: [
       {
         id: '2-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/wise-owl-with-glasses-reading-book-to-forest-anima.jpg'
       }
@@ -86,24 +86,24 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '3',
     title: 'The Underwater Secret',
     description: 'Mermaid Emma searches for lost treasure in the ocean depths.',
-    coverImage: '/children-s-book-cover-with-magical-adventure-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-magical-adventure-theme.jpg',
     ageGroup: '3-5',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '3-1',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Emma',
         transformedImage: '/colorful-butterflies-leading-path-through-magical-.jpg'
       },
       {
         id: '3-2',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Helper Coral'
       },
       {
         id: '3-3',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Captain Dolphin'
       }
     ],
@@ -123,7 +123,7 @@ export const mockExampleBooks: ExampleBook[] = [
     usedPhotos: [
       {
         id: '4-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Baby',
         transformedImage: '/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg'
       }
@@ -138,19 +138,19 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '5',
     title: 'Digital Heroes',
     description: 'Tech-savvy kids battle evil software in the virtual world.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '10+',
     theme: 'Technology',
     usedPhotos: [
       {
         id: '5-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/ancient-tree-with-door-carved-into-trunk-magical-f.jpg'
       },
       {
         id: '5-2',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Zoe'
       }
     ],
@@ -164,13 +164,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '6',
     title: 'The Princess and the Dragon',
     description: 'Brave princess befriends the dragon instead of defeating it.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '6-9',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '6-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Princess Aria',
         transformedImage: '/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg'
       }
@@ -186,13 +186,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '7',
     title: 'Luna\'s Magical Forest',
     description: 'Little Luna meets talking animals in a hidden forest and embarks on an unforgettable adventure.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '3-5',
     theme: 'Adventure',
     usedPhotos: [
       {
         id: '7-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Luna',
         transformedImage: '/little-girl-with-backpack-exploring-enchanted-fore.jpg'
       }
@@ -207,13 +207,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '8',
     title: 'Journey to the Stars',
     description: 'Brave astronaut Alex explores new planets in the depths of space.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '6-9',
     theme: 'Science Fiction',
     usedPhotos: [
       {
         id: '8-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/wise-owl-with-glasses-reading-book-to-forest-anima.jpg'
       }
@@ -228,13 +228,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '9',
     title: 'The Underwater Secret',
     description: 'Mermaid Emma searches for lost treasure in the ocean depths.',
-    coverImage: '/children-s-book-cover-with-magical-adventure-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-magical-adventure-theme.jpg',
     ageGroup: '3-5',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '9-1',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Emma',
         transformedImage: '/colorful-butterflies-leading-path-through-magical-.jpg'
       }
@@ -255,7 +255,7 @@ export const mockExampleBooks: ExampleBook[] = [
     usedPhotos: [
       {
         id: '10-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Baby',
         transformedImage: '/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg'
       }
@@ -270,13 +270,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '11',
     title: 'Digital Heroes',
     description: 'Tech-savvy kids battle evil software in the virtual world.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '10+',
     theme: 'Technology',
     usedPhotos: [
       {
         id: '11-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/ancient-tree-with-door-carved-into-trunk-magical-f.jpg'
       }
@@ -291,13 +291,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '12',
     title: 'The Princess and the Dragon',
     description: 'Brave princess befriends the dragon instead of defeating it.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '6-9',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '12-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Princess Aria',
         transformedImage: '/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg'
       }
@@ -312,13 +312,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '13',
     title: 'Luna\'s Magical Forest',
     description: 'Little Luna meets talking animals in a hidden forest and embarks on an unforgettable adventure.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '3-5',
     theme: 'Adventure',
     usedPhotos: [
       {
         id: '13-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Luna',
         transformedImage: '/little-girl-with-backpack-exploring-enchanted-fore.jpg'
       }
@@ -333,13 +333,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '14',
     title: 'Journey to the Stars',
     description: 'Brave astronaut Alex explores new planets in the depths of space.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '6-9',
     theme: 'Science Fiction',
     usedPhotos: [
       {
         id: '14-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/wise-owl-with-glasses-reading-book-to-forest-anima.jpg'
       }
@@ -354,13 +354,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '15',
     title: 'The Underwater Secret',
     description: 'Mermaid Emma searches for lost treasure in the ocean depths.',
-    coverImage: '/children-s-book-cover-with-magical-adventure-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-magical-adventure-theme.jpg',
     ageGroup: '3-5',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '15-1',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Emma',
         transformedImage: '/colorful-butterflies-leading-path-through-magical-.jpg'
       }
@@ -381,7 +381,7 @@ export const mockExampleBooks: ExampleBook[] = [
     usedPhotos: [
       {
         id: '16-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Baby',
         transformedImage: '/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg'
       }
@@ -396,13 +396,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '17',
     title: 'Digital Heroes',
     description: 'Tech-savvy kids battle evil software in the virtual world.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '10+',
     theme: 'Technology',
     usedPhotos: [
       {
         id: '17-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/ancient-tree-with-door-carved-into-trunk-magical-f.jpg'
       }
@@ -417,13 +417,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '18',
     title: 'The Princess and the Dragon',
     description: 'Brave princess befriends the dragon instead of defeating it.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '6-9',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '18-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Princess Aria',
         transformedImage: '/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg'
       }
@@ -438,13 +438,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '19',
     title: 'Luna\'s Magical Forest',
     description: 'Little Luna meets talking animals in a hidden forest and embarks on an unforgettable adventure.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '3-5',
     theme: 'Adventure',
     usedPhotos: [
       {
         id: '19-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Luna',
         transformedImage: '/little-girl-with-backpack-exploring-enchanted-fore.jpg'
       }
@@ -459,13 +459,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '20',
     title: 'Journey to the Stars',
     description: 'Brave astronaut Alex explores new planets in the depths of space.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '6-9',
     theme: 'Science Fiction',
     usedPhotos: [
       {
         id: '20-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/wise-owl-with-glasses-reading-book-to-forest-anima.jpg'
       }
@@ -480,13 +480,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '21',
     title: 'The Underwater Secret',
     description: 'Mermaid Emma searches for lost treasure in the ocean depths.',
-    coverImage: '/children-s-book-cover-with-magical-adventure-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-magical-adventure-theme.jpg',
     ageGroup: '3-5',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '21-1',
-        originalPhoto: '/girl-with-blonde-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-blonde-hair.jpg',
         characterName: 'Emma',
         transformedImage: '/colorful-butterflies-leading-path-through-magical-.jpg'
       }
@@ -507,7 +507,7 @@ export const mockExampleBooks: ExampleBook[] = [
     usedPhotos: [
       {
         id: '22-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Baby',
         transformedImage: '/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg'
       }
@@ -522,13 +522,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '23',
     title: 'Digital Heroes',
     description: 'Tech-savvy kids battle evil software in the virtual world.',
-    coverImage: '/children-s-book-cover-with-space-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-space-theme.jpg',
     ageGroup: '10+',
     theme: 'Technology',
     usedPhotos: [
       {
         id: '23-1',
-        originalPhoto: '/boy-with-dark-hair.jpg',
+        originalPhoto: '/test-images/characters/boy-with-dark-hair.jpg',
         characterName: 'Alex',
         transformedImage: '/ancient-tree-with-door-carved-into-trunk-magical-f.jpg'
       }
@@ -543,13 +543,13 @@ export const mockExampleBooks: ExampleBook[] = [
     id: '24',
     title: 'The Princess and the Dragon',
     description: 'Brave princess befriends the dragon instead of defeating it.',
-    coverImage: '/children-s-book-cover-with-enchanted-forest-theme.jpg',
+    coverImage: '/test-images/books/children-s-book-cover-with-enchanted-forest-theme.jpg',
     ageGroup: '6-9',
     theme: 'Fantasy',
     usedPhotos: [
       {
         id: '24-1',
-        originalPhoto: '/girl-with-brown-hair.jpg',
+        originalPhoto: '/test-images/characters/girl-with-brown-hair.jpg',
         characterName: 'Princess Aria',
         transformedImage: '/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg'
       }

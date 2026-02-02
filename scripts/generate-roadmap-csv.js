@@ -1,19 +1,27 @@
 #!/usr/bin/env node
 
 /**
- * ROADMAP.md'den CSV oluşturma script'i
- * 
+ * Faz dosyalarından (docs/roadmap/PHASE_*.md) CSV oluşturma script'i
+ *
  * Kullanım:
  *   node scripts/generate-roadmap-csv.js
- * 
- * Çıktı: docs/roadmap.csv
+ *
+ * Çıktı: docs/roadmap/roadmap.csv
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const ROADMAP_PATH = path.join(__dirname, '../docs/ROADMAP.md');
-const CSV_PATH_DOCS = path.join(__dirname, '../docs/roadmap.csv');
+const ROADMAP_DIR = path.join(__dirname, '../docs/roadmap');
+const PHASE_FILES = [
+  'PHASE_1_FOUNDATION.md',
+  'PHASE_2_FRONTEND.md',
+  'PHASE_3_BACKEND_AI.md',
+  'PHASE_4_ECOMMERCE.md',
+  'PHASE_5_LAUNCH.md',
+  'PHASE_6_PWA.md',
+];
+const CSV_PATH = path.join(ROADMAP_DIR, 'roadmap.csv');
 
 // Öncelik mapping (faz başlıklarından çıkarılacak)
 const PRIORITY_MAP = {
@@ -84,7 +92,13 @@ function getCategory(faz, altFaz, currentAltFazName) {
 }
 
 function parseRoadmap() {
-  const content = fs.readFileSync(ROADMAP_PATH, 'utf-8');
+  let content = '';
+  for (const file of PHASE_FILES) {
+    const filePath = path.join(ROADMAP_DIR, file);
+    if (fs.existsSync(filePath)) {
+      content += fs.readFileSync(filePath, 'utf-8') + '\n';
+    }
+  }
   const lines = content.split('\n');
   
   const tasks = [];
@@ -254,17 +268,17 @@ function generateCSV(tasks) {
 
 // Ana işlem
 try {
-  console.log('📖 ROADMAP.md okunuyor...');
+  console.log('📖 Faz dosyaları okunuyor (docs/roadmap/PHASE_*.md)...');
   const tasks = parseRoadmap();
   console.log(`✅ ${tasks.length} iş bulundu`);
   
   console.log('📊 CSV oluşturuluyor...');
   const csv = generateCSV(tasks);
   
-  // CSV'yi docs/ klasörüne yaz
-  fs.writeFileSync(CSV_PATH_DOCS, csv, 'utf-8');
+  // CSV'yi docs/roadmap/ klasörüne yaz
+  fs.writeFileSync(CSV_PATH, csv, 'utf-8');
   console.log(`✅ CSV oluşturuldu:`);
-  console.log(`   - ${CSV_PATH_DOCS}`);
+  console.log(`   - ${CSV_PATH}`);
   console.log(`\n📋 İstatistikler:`);
   console.log(`   - Toplam iş: ${tasks.length}`);
   console.log(`   - Tamamlanan: ${tasks.filter(t => t.durum === 'Tamamlandı').length}`);

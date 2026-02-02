@@ -1,0 +1,352 @@
+## 🚀 FAZ 5: Polish ve Lansman
+**Öncelik:** 🟡 Önemli
+
+### 5.1 SEO Optimizasyonu
+- [ ] **5.1.1** Meta tags ve Open Graph
+- [ ] **5.1.2** Sitemap.xml
+- [ ] **5.1.3** robots.txt
+- [ ] **5.1.4** Structured data (JSON-LD)
+- [ ] **5.1.5** Performance optimizasyonu (Lighthouse)
+
+### 5.2 Analytics
+- [ ] **5.2.1** Google Analytics 4 kurulumu
+- [ ] **5.2.2** Event tracking (kitap oluşturma, satın alma)
+- [ ] **5.2.3** Conversion tracking
+- [ ] **5.2.4** Custom dashboard (opsiyonel)
+
+### 5.8 Admin Panel / Dashboard (23 Ocak 2026)
+- [ ] **5.8.1** Admin panel oluşturma
+  - Dashboard içeride her şey olacak
+  - Kullanıcılar ne yapmış, kim kaç kitap almış gibi istatistikler
+  - Sistem yönetimi için hayal edilebilecek tüm özellikler
+- [ ] **5.8.2** UI Kit seçimi
+  - Hazır bir UI kit kullanılabilir (v0.app'den UI yaptırılabilir)
+  - Veya hazır bir admin panel çözümü (analytics filan da olur içinde)
+  - Örnek: shadcn/ui + v0.app, veya Retool, AdminJS gibi hazır çözümler
+- [ ] **5.8.3** Analytics entegrasyonu
+  - Kullanıcı istatistikleri
+  - Kitap oluşturma metrikleri
+  - Satış analizi
+  - Kullanıcı davranış analizi
+- [ ] **5.8.4** Sipariş Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Sipariş listesi sayfası (tüm siparişler)
+  - [ ] Sipariş filtreleme (durum, tarih, kullanıcı, tutar)
+  - [ ] Sipariş arama (sipariş numarası, kullanıcı email, kitap adı)
+  - [ ] Sipariş detay sayfası (tam bilgiler, ödeme detayları, kitap bilgileri)
+  - [ ] Sipariş durumu güncelleme (pending, processing, completed, cancelled, refunded)
+  - [ ] Toplu işlemler (çoklu sipariş seçimi, durum güncelleme)
+  - [ ] Sipariş notları/etiketleri ekleme
+  - [ ] Sipariş export (CSV, Excel)
+  - [ ] Sipariş istatistikleri (günlük/haftalık/aylık satış, gelir, sipariş sayısı)
+  - [ ] Ödeme durumu takibi (başarılı, başarısız, bekleyen)
+  - [ ] İade/iptal yönetimi
+  - [ ] Sipariş geçmişi ve log takibi
+- [ ] **5.8.5** Kullanıcı Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Kullanıcı listesi sayfası (tüm kullanıcılar)
+  - [ ] Kullanıcı filtreleme (kayıt tarihi, aktivite durumu, üyelik tipi)
+  - [ ] Kullanıcı arama (email, isim, ID)
+  - [ ] Kullanıcı detay sayfası
+    - [ ] Temel bilgiler (profil, email, kayıt tarihi)
+    - [ ] Oluşturduğu kitaplar listesi
+    - [ ] Sipariş geçmişi
+    - [ ] Karakterleri
+    - [ ] Aktivite logları (ne zaman giriş yaptı, ne yaptı)
+    - [ ] Ödeme geçmişi
+    - [ ] Ücretsiz kapak hakkı durumu
+  - [ ] Kullanıcı durumu yönetimi (aktif, pasif, ban)
+  - [ ] Kullanıcı notları/etiketleri ekleme
+  - [ ] Kullanıcı ile iletişim (email gönderme)
+  - [ ] Kullanıcı istatistikleri (toplam kitap sayısı, toplam harcama, son aktivite)
+- [ ] **5.8.6** Kitap Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - [ ] Tüm kitaplar listesi
+  - [ ] Kitap filtreleme (durum, tema, yaş grubu, oluşturulma tarihi)
+  - [ ] Kitap arama (başlık, kullanıcı, ID)
+  - [ ] Kitap detay sayfası (tüm sayfalar, karakterler, sipariş bilgisi)
+  - [ ] Kitap durumu yönetimi (draft, processing, completed, published)
+  - [ ] Kitap silme/arşivleme
+  - [ ] Kitap istatistikleri (en çok oluşturulan temalar, yaş grupları)
+- [ ] **5.8.7** Dashboard İstatistikleri - 🆕 **25 Ocak 2026**
+  - [ ] Genel istatistikler kartları (toplam kullanıcı, toplam kitap, toplam sipariş, toplam gelir)
+  - [ ] Grafikler (günlük/haftalık/aylık trendler)
+  - [ ] En çok satan kitaplar/temalar
+  - [ ] Kullanıcı aktivite metrikleri
+  - [ ] Gelir analizi (günlük, haftalık, aylık, yıllık)
+  - [ ] Dönüşüm oranları (ziyaretçi → kayıt, kayıt → kitap oluşturma, kitap → satın alma)
+  - [ ] Coğrafi dağılım (ülkelere göre kullanıcı/sipariş)
+- [ ] **5.8.8** Sistem Yönetimi - 🆕 **25 Ocak 2026**
+  - [ ] Sistem ayarları (fiyatlandırma, özellik açma/kapama)
+  - [ ] Email şablonları yönetimi
+  - [ ] Bildirim ayarları
+  - [ ] Log görüntüleme (sistem logları, hata logları)
+  - [ ] Backup ve restore
+  - [ ] API kullanım istatistikleri (AI API çağrıları, maliyet takibi)
+  - [ ] Storage kullanım istatistikleri
+
+### 5.3 Güvenlik
+- [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik)
+- [ ] **5.3.2** Rate limiting
+- [ ] **5.3.3** Input validasyonu
+- [ ] **5.3.4** CSRF protection
+- [ ] **5.3.5** GDPR/KVKK uyumluluk kontrolü
+- [ ] **5.3.6** GDPR/KVKK Veri Silme ve Hesap Silme (23 Ocak 2026)
+  - Kullanıcıların "verilerimi sil", "hesabımı sil" gibi yerlere GDPR ve KVKK gizlilik konularında ne gerekiyorsa araştırılmalı
+  - Her şey kurallara uygun ilerlemeli
+  - Konular nedir bilinmiyor, araştırma yapılıp ona göre işler yapılmalı
+  - Veri silme API endpoint'i
+  - Hesap silme akışı
+  - Veri export özelliği (GDPR right to data portability)
+  - Onay mekanizmaları
+- [ ] **5.3.7** IP Bazlı Attack Detection (23 Ocak 2026)
+  - Aynı IP üzerinden bir şekilde attack gibi durumlar olursa algılamak ve alarm üretmek
+  - Engellemek vs.
+  - Rate limiting per IP
+  - Suspicious activity detection
+  - Alert system (email, Slack, vb.)
+  - IP blocking mekanizması
+- [ ] **5.3.8** Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026)
+  - Supabase'deki güvenlik ve dosya erişim konusu ele alınacak
+  - Örneğin kişisel bilgiler ve fotoğraflar olduğu için kullanıcıların birbirlerinin içeriğini görmemesi
+  - Bir hack durumunun önüne geçilecek önlemlerin alındığından emin olmalıyız
+  - RLS (Row Level Security) kuralları gözden geçirilecek
+  - Storage bucket erişim kontrolleri
+  - File access permissions
+  - Data isolation testleri
+  - Security audit
+- [ ] **5.3.9** API Key Güvenliği (23 Ocak 2026) - 🔴 **KRİTİK**
+  - API key güncelliğini gözden geçirmeliyiz
+  - Siteye girenlerin attack yaparak erişememesi gerekiyor
+  - Keylerimiz çok önemli
+  - Environment variables güvenliği
+  - API key rotation stratejisi
+  - Rate limiting per API key
+  - Key exposure detection
+  - Server-side only API calls (client-side'da key'ler olmamalı)
+
+### 5.4 Test
+- [ ] **5.4.1** Manuel test (tüm akışlar)
+- [ ] **5.4.2** Mobil test
+- [ ] **5.4.3** Cross-browser test
+- [ ] **5.4.4** Ödeme testleri (sandbox)
+
+### 5.5 Deployment
+- [ ] **5.5.1** Vercel production deployment
+- [ ] **5.5.2** Domain bağlantısı
+- [ ] **5.5.3** SSL sertifikası (Vercel otomatik, kontrol edilmeli)
+- [ ] **5.5.4** Monitoring kurulumu
+- [ ] **5.5.5** Error tracking (Sentry)
+- [ ] **5.5.6** Production Environment Variables Kontrolü (25 Ocak 2026)
+  - Tüm environment variable'ların Vercel'de doğru ayarlandığından emin ol
+  - API key'lerin production'da çalıştığını test et
+  - Supabase production URL ve keys kontrolü
+  - OpenAI API key production kontrolü
+  - Google Cloud TTS key production kontrolü
+  - Tüm secret'ların güvenli şekilde saklandığından emin ol
+
+### 5.7 PDF Tasarım İyileştirmesi
+- [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)
+  - [x] Cover page tasarımı (daha çekici, çocuk kitabına uygun)
+  - [x] Sayfa layout iyileştirmesi (görsel + metin düzeni) - A4 landscape, double-page spread
+  - [x] Font seçimi (çocuk dostu, okunabilir) - Başlık: Fredoka (Bold), Metin: Alegreya (Regular), 18pt font, 1.8 line height
+  - [x] Renk şeması ve tema uyumu - #fef9f3 arka plan rengi
+  - [x] Sayfa numaraları ve footer tasarımı - Sağ altta, sadece metin sayfalarına
+  - [x] Görsel kalitesi optimizasyonu - 1024x1536 aspect ratio korunuyor
+  - [x] **Puppeteer + HTML/CSS yaklaşımına geçiş** ✅ (17 Ocak 2026)
+    - [x] jsPDF yerine Puppeteer kullanımı (daha iyi kalite)
+    - [x] HTML/CSS template sistemi (profesyonel layout)
+    - [x] Double-page spread layout (A4 landscape, her yarı A5 dikey)
+    - [x] Alternatif görsel-metin pattern
+    - **Not:** jsPDF yaklaşımından vazgeçildi, Puppeteer ile HTML/CSS template kullanılıyor
+- [x] **5.7.1.1** PDF Layout İyileştirmeleri ✅ (25 Ocak 2026)
+  - [x] A5 dikey sayfa düzeni (her yarı 148.5mm x 210mm)
+  - [x] Görsel hizalama: Sol sayfa sola, sağ sayfa sağa hizalı
+  - [x] Metin hizalama: Sol yaslı, dikey ortalı
+  - [x] 4 köşe pattern: Text sayfalarında SVG pattern (her köşe rotate edilmiş)
+  - [x] Kesik çizgi ayırıcı: Sayfa ortasında dashed border
+  - [x] Pattern sadece text sayfalarında (image sayfalarında yok)
+- [ ] **5.7.2** PDF preview özelliği (indirmeden önce önizleme)
+- [ ] **5.7.3** PDF customization seçenekleri (opsiyonel)
+  - [ ] Farklı sayfa boyutları (A4, Letter, Square)
+  - [ ] Farklı layout seçenekleri
+- [ ] **5.7.4** Çeşitli arka plan desenleri seçenekleri
+  - [x] Temel 4 köşe pattern sistemi ✅ (25 Ocak 2026) - `public/pdf-backgrounds/children-pattern.svg`
+  - [ ] 3-5 farklı arka plan deseni tasarımı (yıldız, kalp, bulut, geometrik) - `public/pdf-backgrounds/` klasörüne eklenebilir
+- [ ] **5.7.5** PDF Title Font Türkçe Karakter Desteği (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - PDF oluşturduğumuz ilk sayfadaki title'daki font Türkçe karakter desteklemiyor
+  - Bunu değiştirmek yada düzeltmek lazım
+  - Mevcut text'teki font'un kalın olanını yazabiliriz
+  - Font olarak yine bakarız
+  - Ayrıca font konusunu daha sonra kullanıcının seçim yapabileceği hale de getirebiliriz
+  - Türkçe karakter desteği olan font seçimi (ğ, ı, ş, ü, ö, ç)
+  - Font fallback sistemi
+- [ ] **5.7.6** PDF Kapak Sayfası A5 Dikey Format (23 Ocak 2026) - 🔴 **ACİL - YÜKSEK ÖNCELİK**
+  - PDF'in ilk sayfası şu an yan dönmüş A4 gibi
+  - Sadece ilk kapak sayfaya ve son arka kapağa özel tek ortalı A5 dikey yapabilir miyiz?
+  - Örnekteki gibi tek ortalı A5 dikey format
+  - Cover page: A5 portrait (148.5mm x 210mm), centered
+  - Back cover: A5 portrait, centered
+  - Internal pages: Mevcut double-page spread layout korunur
+  - Bu konu acil ve yüksek öncelik
+- [ ] **5.7.7** Arka Kapak Tasarımı (23 Ocak 2026) - 🔴 **YÜKSEK ÖNCELİK**
+  - Arka kapak şu an yok ve eklenmeli
+  - Arka kapağa özel bir tasarım yapılmalı
+  - Örneğin farklı kitaplar içinde önceden hazırladığımız kişisel birkaç kitap kapağı olabilir
+  - Ayrıca ön kapak içinde yapılmalı
+  - Back cover template tasarımı
+  - Örnek back cover tasarımları
+  - PDF generation'a back cover ekleme
+  - [ ] Kullanıcı arka plan seçimi özelliği (PDF generation sırasında)
+  - [ ] Tema bazlı desenler (deniz, orman, uzay vb.)
+  - [ ] **Hikaye Temasına Göre Arka Plan Rengi:**
+    - [ ] Otomatik renk seçimi (macera: mavi tonları, orman: yeşil tonları, vb.)
+    - [ ] Kullanıcı arka plan rengi seçimi
+    - [ ] Tema bazlı renk paletleri
+- [ ] **5.7.5** PDF boyut optimizasyonu (gelecek iyileştirme) (17 Ocak 2026)
+  - [ ] Daha agresif compression teknikleri (SLOW mode vs MEDIUM)
+  - [ ] Görsel boyutlarını daha da küçültme (70-75% seviyesine)
+  - [ ] PDF boyut hedefi: 5-6 MB altı (10 sayfalık kitap için)
+  - [ ] Kalite vs boyut dengesi testleri
+  - **Not:** Şu an `pdfs` bucket (50 MB limit) kullanılıyor, optimizasyon opsiyonel
+- [x] **5.7.6** Cover Page İyileştirmeleri ✅ (25 Ocak 2026)
+- [ ] **5.7.8** PDF Layout Bug Düzeltmesi (25 Ocak 2026) - 🔴 **KRİTİK BUG**
+  - **Problem:** PDF generation'da eksik sayfalar ve son sayfa text problemi
+  - **Detaylar:** Faz 5.7 bölümünde "BİLİNEN SORUN" altında dokümante edildi
+  - **Çözüm:** `lib/pdf/generator.ts` → `prepareSpreads()` fonksiyonu yeniden yazılmalı
+  - **Öncelik:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
+  - [x] **Kapak Fotoğrafı Pozisyonlama:** ✅ (25 Ocak 2026)
+    - [x] Double-page spread layout (sol: görsel, sağ: başlık)
+    - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
+    - [x] Diğer sayfalardaki görsel hizalaması ile aynı mantık
+  - [ ] **Şirket Bilgisi Ekleme:**
+    - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi
+    - [ ] Logo ve şirket bilgileri yerleşimi
+    - [ ] Footer veya alt kısımda şirket bilgisi
+  - [x] **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026)
+    - [x] "adventure • collage" gibi seçilen bilgilerin yer aldığı bölümün kapaktan kaldırılması
+    - [x] Sadece başlık ve görsel kalacak şekilde sadeleştirme
+- **Not:** Temel PDF generation çalışıyor ✅ (11 Ocak 2026), Tasarım iyileştirmesi tamamlandı ✅ (17 Ocak 2026), Layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Cover page layout iyileştirmeleri tamamlandı ✅ (25 Ocak 2026), Bucket `pdfs` (50 MB) olarak güncellendi ✅ (17 Ocak 2026), Puppeteer + HTML/CSS yaklaşımına geçildi ✅ (17 Ocak 2026)
+  - **Teknoloji:** Puppeteer + HTML/CSS Template (jsPDF'den geçildi)
+  - **Format:** A4 landscape, double-page spread (her yarı A5 dikey: 148.5mm x 210mm)
+  - **Layout:** Alternatif görsel-metin düzeni (spread bazlı değişir)
+  - **Görseller:** 1024x1536 portrait, aspect ratio korunuyor, sayfa kenarına hizalı
+  - **Metin:** 18pt font (Alegreya Regular), 1.8 line height, sol yaslı, dikey ortalı
+  - **Başlık:** 36pt font (Fredoka Bold)
+  - **Pattern:** 4 köşede SVG pattern (sadece text sayfalarında, her köşe rotate edilmiş)
+  - **Arka Plan:** #fef9f3 (açık krem/bej)
+  - **Ayırıcı:** Kesik çizgi (dashed) ortada
+  - **Arka Plan:** CSS ile pastel noktalı desen
+  - **Sayfa Numaraları:** Sadece metin sayfalarında görünür
+  - **Font:** 16pt, 1.6 line height (çocuk dostu)
+- **🚨 BİLİNEN SORUN (25 Ocak 2026):** PDF Layout Bug - Eksik Sayfalar ve Son Sayfa Text Problemi
+  - **Tarih:** 25 Ocak 2026
+  - **Durum:** 🔴 Kritik Bug (Açık)
+  - **Öncelik:** 🔴 Yüksek
+  - **Açıklama:**
+    - **Problem 1: Eksik Sayfalar**
+      - 5 story page'li kitap → sadece 3 spread oluşuyor
+      - Bazı sayfalar PDF'de hiç görünmüyor
+      - Beklenen: 5 story page → 5 spread (her story page = 1 spread)
+      - Gerçekleşen: 5 story page → 3 spread (yanlış algoritma)
+    - **Problem 2: Son Sayfada Text Yok**
+      - Son story page'in text'i PDF'de görünmüyor
+      - Görsel görünüyor ama text kısmı boş/eksik
+    - **Kök Neden:**
+      - `prepareSpreads()` fonksiyonu yanlış mantık kullanıyor
+      - Mevcut kod: Her spread'de hem image hem text gösteriyor (aynı page'den)
+      - Ama spread alternasyonu yanlış uygulanmış
+      - Story page sayısı ile spread sayısı uyuşmuyor
+    - **Mevcut Kod Analizi:**
+      - `lib/pdf/generator.ts` → `prepareSpreads()` fonksiyonu (satır 211-243)
+      - `for (let i = 0; i < pages.length; i += 1)` → Her page için 1 spread oluşturuyor (DOĞRU)
+      - Ama spread layout'unda sorun var: Her spread'de aynı page'den hem image hem text gösteriliyor
+      - Alternatif pattern mantığı yanlış çalışıyor
+    - **Beklenen Davranış:**
+      - Her story page bir spread oluşturmalı (1 story page = 1 spread)
+      - Spread'de: Sol = Image, Sağ = Text (veya alternatif: Sol = Text, Sağ = Image)
+      - Her spread aynı story page'den gelmeli (aynı page'den hem image hem text)
+      - Alternatif pattern: Spread 0 = [Image | Text], Spread 1 = [Text | Image], Spread 2 = [Image | Text], ...
+    - **Test Senaryosu:**
+      - Kitap: 5 story page
+      - Beklenen PDF: 1 cover + 5 spread = 6 sayfa
+      - Gerçekleşen PDF: 1 cover + 3 spread = 4 sayfa (2 sayfa eksik)
+    - **Çözüm Gereksinimleri:**
+      - `prepareSpreads()` mantığı tamamen yeniden yazılmalı
+      - Her story page için 1 spread garantisi
+      - Alternatif pattern doğru uygulanmalı (spread index'e göre)
+      - Son sayfanın text'i mutlaka render edilmeli
+    - **İlgili Dosyalar:**
+      - `lib/pdf/generator.ts` (satır 198-243: `prepareSpreads()` fonksiyonu)
+      - `lib/pdf/templates/book-styles.css` (stil doğru, layout mantığı sorunlu)
+      - Terminal log: `[PDF] Spread 0 (i=0): page1=image, page2=text, isEvenSpread=true`
+    - **Not:** Bu bug PDF generation'ın temel işlevselliğini etkiliyor. Düzeltilmeden production'a geçilemez.
+    - **Çözüm Önceliği:** 🔴 Kritik - PDF indirme özelliği çalışmıyor doğru şekilde
+
+### 5.6 Lansman Hazırlıkları
+- [ ] **5.6.1** Örnek kitaplar oluştur (demo) | 🔴 DO
+- [ ] **5.6.2** Sosyal medya hesapları
+- [ ] **5.6.3** Landing page son kontrolü
+- [ ] **5.6.4** Beta kullanıcılar ile test
+
+### 5.9 Pazarlama ve Marketing (23 Ocak 2026)
+- [ ] **5.9.1** Product Hunt yayınlama planı
+- [ ] **5.9.2** "There's an AI for That" yayınlama planı
+- [ ] **5.9.3** Diğer pazarlama kanalları
+  - Social media marketing
+  - Content marketing
+  - Influencer partnerships
+  - SEO ve organic growth
+- [ ] **5.9.6** Ürün Değer Önerisi ve Pazarlama Mesajları (26 Ocak 2026)
+  - **Evergreen/Kalıcı Değer Vurgusu:** Ürünün "trend" olmaktan ziyade kalıcı/evergreen olduğu vurgulanmalı
+  - **Hediye + Hatıra Değeri:** Ürünün hediye ve hatıra değeri öne çıkarılmalı
+  - **Sürdürülebilir Talep:** Bu özellikler nedeniyle talebin sürdürülebilir olduğu pazarlama mesajlarında vurgulanmalı
+  - Ana sayfa, pricing sayfası, sosyal medya içeriklerinde bu mesajlar kullanılmalı
+  - Marketing materyallerinde "Timeless Gift" ve "Lasting Memories" vurguları yapılmalı
+
+### 5.10 Maliyet Takibi ve Muhasebe (23 Ocak 2026)
+- [ ] **5.10.1** Proje ile ilgili harcanan maliyetleri ele almak için bir bölüm olmalı
+  - Muhasebe gibi, onları da unutmamak için bir yapı kurmalıyız
+  - Maliyet kategorileri (hosting, AI API'ler, domain, tools, vb.)
+  - Aylık maliyet takibi
+  - Bütçe planlaması
+  - Cost tracking sistemi (spreadsheet veya tool)
+  - ROI analizi
+- [ ] **5.9.1** Product Hunt yayınlama
+  - Ürün hazır olup production olduğunda https://www.producthunt.com/ 'da yayınlanması gerekiyor
+  - Buradan trafik gelebilir
+  - Launch stratejisi hazırlanmalı
+- [ ] **5.9.2** There's an AI for That yayınlama
+  - https://theresanaiforthat.com/ sitesinde yayınlanması gerekiyor
+  - AI kategorisinde listelenmeli
+  - Buradan da trafik gelebilir
+- [ ] **5.9.3** Diğer pazarlama kanalları
+  - SEO optimizasyonu
+  - İçerik pazarlama (blog, sosyal medya)
+  - Influencer işbirlikleri
+  - Email pazarlama
+  - Reklam kampanyaları (Google Ads, Facebook Ads)
+- [ ] **5.9.4** Etsy ve Türkiye Pazar Yerleri Araştırması (23 Ocak 2026)
+  - Pazarlama satış için Etsy sitesi araştırılacak
+  - Alternatif yerel Türkiye'de satış yapılabilecek siteler pazar yerleri de araştırılacak
+  - Etsy hesabı açma ve ürün listeleme
+  - Türkiye pazar yerleri: GittiGidiyor, Trendyol, Hepsiburada, vb.
+  - Pazar yeri stratejisi ve fiyatlandırma
+- [ ] **5.9.5** Banner ve Promosyon Materyalleri (23 Ocak 2026)
+  - Ekteki gibi bir banner veya bu tarz bir şey yapılabilir
+  - Reklam ve sitenin ilgili yerlerinde sosyal medya hesaplarında kullanılabilir
+  - Promosyon banner tasarımı (before/after karakter dönüşümü gösterimi)
+  - Social media post templates
+  - Marketing material library
+- [ ] **5.9.7** Sesli Hikaye Özelliği Pazarlama ve İletişim (26 Ocak 2026)
+  - **Ana Sayfa Vurgusu:** Ana sayfada sesli hikaye özelliği öne çıkarılmalı (özellikler bölümünde)
+  - **Ebook Viewer Vurgusu:** Ebook görünümünde sesli hikaye özelliği daha prominent gösterilmeli
+  - **Pazarlama Mesajları:** "Interactive Audio Stories", "Listen Along", "Narrated Adventures" gibi mesajlar kullanılmalı
+  - **Fayda Odaklı İletişim:** Sesli okuma özelliğinin çocuklar için faydaları vurgulanmalı:
+    - Okuma öğrenme desteği
+    - Telaffuz geliştirme
+    - Bağımsız okuma deneyimi
+    - Çok dilli öğrenme (8 dil desteği)
+  - **Sosyal Medya İçerikleri:** Sesli hikaye özelliğini gösteren demo videoları ve görseller
+  - **Email Pazarlama:** Yeni kullanıcılara sesli hikaye özelliği tanıtımı
+  - **Product Hunt:** Launch sırasında sesli hikaye özelliği öne çıkarılmalı
+
+---
+

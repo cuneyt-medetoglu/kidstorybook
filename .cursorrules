@@ -1,7 +1,7 @@
 # KidStoryBook - Cursor AI Kuralları
 
 ## Proje Hakkında
-Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir SaaS platformudur.
+Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir SaaS platformudur. Next.js App Router, Supabase, OpenAI (GPT + görsel) ve TTS/ödeme entegrasyonları kullanılır.
 
 ## Dil
 - Her zaman Türkçe yanıt ver
@@ -9,52 +9,53 @@ Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli
 
 ## Teknoloji Stack
 - **Frontend:** Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui
-- **UI Builder:** v0.app
-- **Backend:** Next.js API Routes, Supabase
+- **Backend:** Next.js API Routes, Supabase (Auth, DB, Storage)
 - **Database:** PostgreSQL (Supabase)
-- **AI:** OpenAI GPT-4o, DALL-E 3, Groq
+- **AI:** OpenAI GPT-4o, GPT-image / DALL-E; (opsiyonel) Groq, Claude, Gemini
+- **TTS:** Google Cloud Text-to-Speech
 - **Ödeme:** Stripe, İyzico
 - **Hosting:** Vercel
 
 ## Proje Yapısı
 ```
 kidstorybook/
-├── docs/           # Dokümantasyon
-│   ├── ROADMAP.md  # Ana proje planı ve iş listesi
-│   ├── PRD.md      # Ürün gereksinimleri
-│   ├── FEATURES.md # Özellik listesi
-│   └── ...
-├── poc/            # Proof of Concept (çalışan demo)
-├── src/            # Kaynak kod (oluşturulacak)
-└── .cursor/        # Cursor AI kuralları
-    └── rules/
-        └── project-manager.mdc  # Proje yönetici agent
+├── app/            # Sayfalar ve API routes (App Router)
+├── components/     # UI, layout, sections
+├── lib/            # Supabase, db, prompts, pdf, tts, config
+├── hooks/          # React hooks
+├── contexts/       # Cart vb.
+├── public/         # Statik dosyalar (test-images, hero-transformation)
+├── scripts/        # roadmap CSV, hero transformation, style examples
+├── docs/           # Dokümantasyon (ROADMAP, PRD, guides, roadmap/, technical/, research/)
+└── .cursor/rules/  # Cursor agent kuralları (project-manager, api-manager, vb.)
 ```
 
 ## Agent Kullanımı
-Proje yönetimi için `@project-manager` agent'ını etiketleyebilirsin:
+Proje yönetimi için `@project-manager` (veya ilgili agent) etiketleyebilirsin:
 - İş takibi ve güncelleme
-- Sonraki adım önerileri
-- v0.app UI prompt'ları
+- ROADMAP / FEATURES uyumu
 - İlerleme raporları
 
 ## Önemli Dosyalar
-- `docs/ROADMAP.md` - Tüm işlerin listesi, buradan takip et
-- `docs/DOCUMENTATION.md` - Dokümantasyon indeksi
-- `docs/ai/AI_STRATEGY.md` - AI prompt stratejisi
-- `poc/server.js` - Çalışan prompt sistemi
+- `docs/ROADMAP.md` – Ana yol haritası (özet + docs/roadmap/ faz dosyalarına linkler)
+- `docs/DOCUMENTATION.md` – Dokümantasyon indeksi
+- `docs/DOCUMENTATION_MAP.md` – Hangi doküman nerede, güncel mi
+- `docs/PRD.md` – Ürün gereksinimleri
+- `docs/FEATURES.md` – Özellik listesi ve önceliklendirme
+- `docs/ARCHITECTURE.md` – Mimari ve API özeti
+- `docs/guides/ENVIRONMENT_SETUP.md` – Ortam değişkenleri
 
 ## Kodlama Kuralları
 1. TypeScript kullan
-2. Tailwind CSS kullan, custom CSS yazma
-3. shadcn/ui componentlerini kullan
+2. Tailwind CSS kullan; custom CSS’i sınırlı tut
+3. shadcn/ui bileşenlerini kullan
 4. Server Components tercih et (Next.js)
 5. Zod ile validasyon yap
-6. Error handling ekle
+6. Hata yönetimi ekle
+7. Yeni kodda `lib/logger.ts` kullan (console.log yerine); rehber: `docs/guides/LOGGING_GUIDE.md`
 
 ## Commit Mesajları
 Türkçe, açıklayıcı commit mesajları kullan:
-- `feat: Ana sayfa hero section eklendi`
-- `fix: Form validasyon hatası düzeltildi`
-- `docs: ROADMAP güncellendi`
-
+- `feat: ...`
+- `fix: ...`
+- `docs: ...`

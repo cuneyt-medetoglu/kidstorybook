@@ -85,29 +85,25 @@ export default function LoginPage() {
     }
   }
 
-  // OAuth handlers (placeholder - Faz 3'te Supabase Auth entegrasyonu yapılacak)
+  // OAuth: Supabase signInWithOAuth - redirect to callback (auth/callback handles token)
   const handleGoogleOAuth = async () => {
-    console.log("[OAuth] Google OAuth clicked - Faz 3'te entegrasyon yapılacak")
-    // TODO: Faz 3'te Supabase Auth signInWithOAuth('google') entegrasyonu
-    // const supabase = createClient()
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'google',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // })
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
   }
 
   const handleFacebookOAuth = async () => {
-    console.log("[OAuth] Facebook OAuth clicked - Faz 3'te entegrasyon yapılacak")
-    // TODO: Faz 3'te Supabase Auth signInWithOAuth('facebook') entegrasyonu
-    // const supabase = createClient()
-    // await supabase.auth.signInWithOAuth({
-    //   provider: 'facebook',
-    //   options: {
-    //     redirectTo: `${window.location.origin}/auth/callback`,
-    //   },
-    // })
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
   }
 
   // Floating animations for decorative elements

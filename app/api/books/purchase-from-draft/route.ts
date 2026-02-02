@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { getDraftFromLocalStorage } from "@/lib/draft-storage"
 import { updateBook } from "@/lib/db/books"
+import logger from "@/lib/logger"
 
 /**
  * POST /api/books/purchase-from-draft
@@ -55,10 +56,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: Payment verification (will be implemented in Faz 4.1 and 4.2)
-    // For now, mock payment success
-    console.log("[Purchase From Draft] Mock payment successful for draft:", draftId)
-    console.log("[Purchase From Draft] Plan type:", planType)
+    // ROADMAP: 4.1/4.2 Payment verification - for now mock success
+    logger.info("[Purchase From Draft] Mock payment successful for draft:", draftId)
+    logger.info("[Purchase From Draft] Plan type:", planType)
 
     // Find book by draft (if exists)
     // For now, we'll create a new book or update existing draft book
@@ -70,8 +70,7 @@ export async function POST(request: NextRequest) {
     // Calculate page count (planType: "10" = 10 pages, "15" = 15 pages, "20" = 20 pages)
     const pageCount = parseInt(planType)
 
-    // TODO: Call book generation API to generate remaining pages
-    // For now, return success with order ID
+    // ROADMAP: 3.6 - call book generation API for remaining pages; for now return order ID
     const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
     return NextResponse.json({
@@ -83,7 +82,7 @@ export async function POST(request: NextRequest) {
       pageCount,
     })
   } catch (error) {
-    console.error("[Purchase From Draft] Error:", error)
+    logger.error("[Purchase From Draft] Error:", error)
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

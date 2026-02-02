@@ -170,7 +170,7 @@ export default function CartPage() {
                   disabled={items.length === 0}
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600"
                   onClick={() => {
-                    // TODO: Navigate to checkout page (to be implemented)
+                    // ROADMAP: 4.3.1 Checkout sayfası - navigate to checkout
                     router.push("/checkout")
                   }}
                 >

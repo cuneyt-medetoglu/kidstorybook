@@ -1,7 +1,5 @@
 /**
- * Database operations for Books
- * 
- * Handles CRUD operations for user-generated books
+ * @file Book CRUD ve PDF üretimi için veritabanı yardımcıları (Supabase).
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'

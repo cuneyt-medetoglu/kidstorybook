@@ -1,10 +1,10 @@
 # Scripts
 
-Bu klasör, proje için yardımcı script'leri içerir.
+Bu klasör, proje için yardımcı script'leri içerir. Script çıktıları (üretilen görseller vb.) isteğe bağlı olarak `scripts/output/` altına yönlendirilebilir; bu klasör `.gitignore`'dadır.
 
 ## generate-roadmap-csv.js
 
-ROADMAP.md dosyasından CSV oluşturma script'i. Google Sheets'e import edilebilir veya HTML viewer'da görüntülenebilir.
+`docs/roadmap/` altındaki faz dosyalarından (PHASE_1_FOUNDATION.md … PHASE_6_PWA.md) CSV oluşturma script'i. Google Sheets'e import edilebilir veya HTML viewer'da görüntülenebilir.
 
 ### Kullanım
 
@@ -20,15 +20,15 @@ node scripts/generate-roadmap-csv.js
 
 ### Ne Yapar?
 
-- `docs/ROADMAP.md` dosyasını okur
+- `docs/roadmap/PHASE_*.md` dosyalarını okur
 - Tüm işleri parse eder (ID, Faz, Durum, Öncelik, vb.)
-- `docs/roadmap.csv` dosyasını oluşturur/günceller
-- HTML viewer (`docs/roadmap-viewer.html`) ile görüntülenebilir
+- `docs/roadmap/roadmap.csv` dosyasını oluşturur/günceller
+- HTML viewer (`docs/roadmap/roadmap-viewer.html`) ile görüntülenebilir
 - Google Sheets'e import edilebilir
 
 ### Çıktı
 
-- `docs/roadmap.csv` - CSV dosyası (10 kolon: ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Notlar, Tarih, Link)
+- `docs/roadmap/roadmap.csv` - CSV dosyası (ID, Faz, Alt Faz, Başlık, Durum, Öncelik, Kategori, Priority, Notlar, Tarih, Link)
 
 ### Notlar
 
@@ -135,18 +135,9 @@ npm run generate-hero-transformation -- --input=scripts/arya_1024x1024.png --pro
 | `--size` | Hayır | Çıktı boyutu. Varsayılan: `1024x1024` |
 | `--quality` | Hayır | `low`, `medium`, `high`, `auto`. Varsayılan: `low` |
 
-### Örnek --prompt (sahne) – 10 adet
+### Örnek --prompt (sahne)
 
-1. `"In a magical forest, holding a compass and map."`
-2. `"Space adventure, astronaut suit, stars and planets."`
-3. `"Under the ocean with colorful fish and a submarine."`
-4. `"In a fairy-tale castle, wearing a crown and holding a magic wand."`
-5. `"On a pirate ship, looking through a telescope at the sea."`
-6. `"In a snowy mountain village, holding a snow globe."`
-7. `"In a dinosaur jungle, next to a friendly dinosaur."`
-8. `"On a flying carpet over a desert city at sunset."`
-9. `"In a candy land with giant lollipops and a gingerbread house."`
-10. `"In a robot workshop, building a friendly little robot."`
+10 adet örnek sahne listesi için: **`docs/prompts/HERO_TRANSFORMATION_PROMPTS.md`**
 
 ### Çıktı
 
