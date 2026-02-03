@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.8.0',
-  releaseDate: new Date('2026-01-31'),
+  version: '1.11.0',
+  releaseDate: new Date('2026-02-03'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -61,6 +61,9 @@ export const VERSION: PromptVersion = {
     'v1.8.1: Faz 1 - Clothing lock en başta (CLOTHING_LOCK) - kıyafet direktifi Scene Establishment sonrası (31 Ocak 2026)',
     'v1.8.0: Faz 2 Görsel Kalite – Scene-First (buildSceneEstablishmentSection), Golden Hour Boost, Pose Variation (8 pose pool), Enhanced Atmospheric Depth, Character Integration directives (31 Ocak 2026)',
     'v1.8.2: Faz 3.4 Advanced Composition – getCharacterPlacementForPage (sol/sağ üçte bir), getAdvancedCompositionRules (rule of thirds, leading lines), getGazeDirectionForPage (bakış çeşitliliği); getCompositionRules interior için "character centered" kaldırıldı, isCover parametresi eklendi (30 Ocak 2026)',
+    'v1.9.0: SceneInput.expression (per-page from story); Facial expression in prompt when present. Clothing: "same outfit every page" when match_reference. (2 Şubat 2026)',
+    'v1.10.0: getCinematicNaturalDirectives() – interior pages: cinematic storybook moment, characters engaged with scene not viewer, do NOT look at camera; natural composition. (2 Şubat 2026)',
+    'v1.11.0: SceneInput.characterExpressions (per-character from story) – Replaces single expression field. buildCharacterExpressionsSection(): [CHARACTER_EXPRESSIONS] block with per-character visual descriptions; "Do not copy reference expression; match only face + outfit"; "No generic smile unless joy/laughter". Multi-character scenes: each character can have different expression. (3 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -80,6 +83,8 @@ export interface SceneInput {
   focusPoint: 'character' | 'environment' | 'balanced'
   /** Story-driven clothing (e.g. astronaut suit, swimwear). Plan: Kapak/Close-up/Kıyafet. */
   clothing?: string
+  /** v1.9.0: Per-character facial expressions from story. Key = character ID, value = visual description (eyes, brows, mouth). */
+  characterExpressions?: Record<string, string>
 }
 
 // NEW: Scene Diversity Analysis (16 Ocak 2026)
@@ -661,6 +666,46 @@ export function getCharacterIntegrationDirectives(): string {
   ].join(', ')
 }
 
+/**
+ * Cinematic, natural storybook moment – characters engaged with scene, not posing for viewer.
+ * Use for interior pages to avoid "looking at camera" and achieve immersive, natural composition.
+ * Reference: campfire/sunset style – characters looking at scene, each other, or objects (fire, sky, path).
+ */
+export function getCinematicNaturalDirectives(): string {
+  return [
+    'cinematic, storybook moment – as if capturing a moment in the story, not a photo shoot',
+    'characters engaged with the scene and each other, not posing for the viewer',
+    'do NOT have characters look directly at the viewer or camera; they look at the scene, at each other, or at objects (e.g. fire, sky, path, horizon)',
+    'natural composition, immersive atmosphere, natural lighting and depth'
+  ].join(', ')
+}
+
+/**
+ * Build character expressions section (v1.9.0)
+ * Per-character facial expression from story; specific visual details (eyes, brows, mouth)
+ */
+function buildCharacterExpressionsSection(
+  characterExpressions: Record<string, string>,
+  characters: Array<{ id: string; name: string }>
+): string[] {
+  if (Object.keys(characterExpressions).length === 0) return []
+  
+  const parts: string[] = []
+  parts.push('[CHARACTER_EXPRESSIONS]')
+  
+  Object.entries(characterExpressions).forEach(([charId, expr]) => {
+    const char = characters.find(c => c.id === charId)
+    const charName = char?.name || 'Character'
+    parts.push(`${charName}: ${expr}`)
+  })
+  
+  parts.push('CRITICAL: Do not copy the reference image\'s facial expression. Match only face identity (facial features, skin tone, hair, eyes structure) and outfit. Each character\'s expression for THIS scene is specified above; use those exact visual descriptions.')
+  parts.push('No generic open-mouthed smile unless the scene text clearly indicates joy, laughter, or excitement. Expression must match the character\'s emotion in THIS scene.')
+  parts.push('[/CHARACTER_EXPRESSIONS]')
+  
+  return parts
+}
+
 // ============================================================================
 // Enhanced Golden Hour Directives (Faz 2.2: Görsel Kalite İyileştirme)
 // ============================================================================
@@ -826,7 +871,7 @@ export function getStyleSpecificDirectives(illustrationStyle: string): string {
 function buildCoverDirectives(additionalCharactersCount: number): string[] {
   const charCount = additionalCharactersCount + 1
   return [
-    `COVER: Reference for all pages. Match reference photos exactly (hair/eyes/skin/features). All ${charCount} characters prominent. Professional, print-ready. Adults have adult proportions.`,
+    `COVER: Use reference images ONLY for character identity (face, hair, eyes, skin, body, outfit). Do NOT copy pose or expression from reference. Pose, expression, and composition must come from THIS cover scene description. All ${charCount} characters prominent. Professional, print-ready. Adults have adult proportions.`,
     'Cover = poster for the entire book; suggest key locations, theme, and journey in one image.',
     'Epic wide or panoramic composition; character(s) as guides into the world, environment shows the world of the story.',
     'Eye-catching, poster-like, movie-poster quality. Reserve clear space for title at top.',
@@ -860,7 +905,7 @@ function buildClothingDirectives(
   useCoverReference: boolean
 ): string {
   if (clothing === 'match_reference') {
-    return 'Clothing: Match reference image exactly (same outfit as in reference). No formal wear.'
+    return 'Clothing: Match reference image exactly (same outfit as in reference). Same outfit every page; do not change clothing. No formal wear.'
   }
   const themeClothing = getThemeAppropriateClothing(theme)
   const clothingDesc = clothing?.trim() || themeClothing
@@ -1218,7 +1263,8 @@ export function generateFullPagePrompt(
   isCover: boolean = false, // NEW: Cover generation için (CRITICAL quality)
   useCoverReference: boolean = false, // NEW: Pages 2-10 için cover reference
   previousScenes?: SceneDiversityAnalysis[], // NEW: For diversity tracking (16 Ocak 2026)
-  totalPages: number = 12 // v1.8.0: For pose variation distribution (Faz 2.3)
+  totalPages: number = 12, // v1.8.0: For pose variation distribution (Faz 2.3)
+  characterListForExpressions?: Array<{ id: string; name: string }> // v1.11.0: For [CHARACTER_EXPRESSIONS] labels (char ID → name)
 ): string {
   // Build scene prompt (hybrid: cinematic + descriptive)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
@@ -1240,10 +1286,10 @@ export function generateFullPagePrompt(
     promptParts.push(...buildSceneEstablishmentSection(environment))
   }
 
-  // 0.5. [Faz 1] Clothing lock - referans kullanılıyorsa "match reference", yoksa story clothing
+  // 0.5. [Faz 1] Reference = identity only; pose & expression from story (v1.11.0)
   const useMatchReference = sceneInput.clothing === 'match_reference'
   if (useMatchReference) {
-    promptParts.push('CRITICAL: Match reference image exactly (same face, body, and outfit). Do not change clothing.')
+    promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing.')
   } else if (sceneInput.clothing?.trim()) {
     promptParts.push(`CRITICAL: Character MUST wear EXACTLY: ${sceneInput.clothing.trim()}. This outfit is LOCKED for the entire book.`)
   }
@@ -1267,8 +1313,10 @@ export function generateFullPagePrompt(
   promptParts.push(...buildStyleSection(illustrationStyle))
 
   // 7. [NEW v1.8.0] Character Integration (karakter sahneye entegre, yapıştırılmış değil)
+  // 7.5. Cinematic & natural (interior only): characters engaged with scene, NOT looking at camera
   if (!isCover) {
     promptParts.push(...buildCharacterIntegrationSection())
+    promptParts.push(getCinematicNaturalDirectives())
   }
 
   // 8. Scene Content Section (v1.8.0: pose variation per page)
@@ -1279,6 +1327,14 @@ export function generateFullPagePrompt(
     sceneInput.pageNumber,
     totalPages
   ))
+
+  // 8.5. Per-character expressions from story (v1.9.0 – Feb 2026)
+  if (sceneInput.characterExpressions && Object.keys(sceneInput.characterExpressions).length > 0) {
+    const charList = characterListForExpressions && characterListForExpressions.length > 0
+      ? characterListForExpressions.filter(c => sceneInput.characterExpressions![c.id])
+      : Object.keys(sceneInput.characterExpressions).map((id, i) => ({ id, name: `Character ${i + 1}` }))
+    promptParts.push(...buildCharacterExpressionsSection(sceneInput.characterExpressions, charList))
+  }
 
   // 9. Special Page Directives Section
   promptParts.push(...buildSpecialPageDirectives(

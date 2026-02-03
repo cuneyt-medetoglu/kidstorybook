@@ -1,6 +1,7 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
+**Versiyon (kod):** 1.9.0  
 Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse doküman da güncellenmelidir; **base.ts = gerçek kaynak**.
 
 ---
@@ -223,6 +224,7 @@ Each page: ~[getWordCount(ageGroup)] words. Include dialogue, sensory details (s
 ```
 # ILLUSTRATION
 Per page: scene description + detailed image prompt ([illustrationStyle]). Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.
+For each page, describe EACH character's facial expression separately in the characterExpressions object. Use specific visual details of eyes, eyebrows, and mouth—NOT just emotion words. Vary expressions by character and scene (e.g. one surprised, another calm). No fixed list; derive from the narrative.
 ```
 
 ---
@@ -243,18 +245,21 @@ Return a valid JSON object:
       "imagePrompt": "Detailed [illustrationStyle] prompt (200+ chars): location, time of day, composition, character action. No appearance/clothing (master). Each page = distinct scene.",
       "sceneDescription": "Detailed scene (150+ chars): location, time, action, mood. No appearance/clothing.",
       "characterIds": ["id-from-CHARACTER-MAPPING"],
-      "sceneContext": "Short location/time/action only, e.g. 'forest clearing, morning, character approaching ball'"
+      "sceneContext": "Short location/time/action only, e.g. 'forest clearing, morning, character approaching ball'",
+      "characterExpressions": {
+        "character-id-1": "Visual description of THIS character's facial expression (eyes, eyebrows, mouth). Example: eyes wide with surprise, eyebrows raised, mouth slightly open",
+        "character-id-2": "… (one entry per character ID in characterIds for this page)"
+      }
     }
   ],
   "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
   "suggestedOutfits": { "[characterId1]": "one line English outfit", "[characterId2]": "one line English outfit" },
   "metadata": { "ageGroup": "[ageGroup]", "theme": "[theme]", "educationalThemes": [], "safetyChecked": true }
 }
-Pages array: EXACTLY [getPageCount(ageGroup, pageCount)] items. characterIds REQUIRED per page. suggestedOutfits REQUIRED: object with one key per character ID (from CHARACTER MAPPING), value = one line English outfit (used for master).
+Pages array: EXACTLY [getPageCount(ageGroup, pageCount)] items. characterIds REQUIRED per page. characterExpressions REQUIRED per page: object with one key per character ID appearing on that page; value = short English visual description of that character's facial expression (eyes, eyebrows, mouth; e.g. 'eyes wide with surprise' NOT just 'surprised'). suggestedOutfits REQUIRED: one key per character ID, value = one line English outfit (used for master).
 ```
 
-**Not:** Sayfa çıktısında **clothing** alanı yok. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. Birden fazla karakterde her biri için ayrı kıyafet. Eksik ID veya boş object ise tema sabiti kullanılır.
-
+**Not:** Sayfa çıktısında **clothing** alanı yok. **characterExpressions** (sayfa bazlı, karakter bazlı görsel ifade tarifi) story’den gelir; image pipeline’da [CHARACTER_EXPRESSIONS] bloğunda kullanılır. Master sadece kimlik referansıdır; poz, ifade ve sahne story çıktısından gelir. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. 
 ---
 
 ### 13. CRITICAL REMINDERS
@@ -265,7 +270,7 @@ Pages array: EXACTLY [getPageCount(ageGroup, pageCount)] items. characterIds REQ
 # CRITICAL REMINDERS
 - Return EXACTLY [getPageCount(ageGroup, pageCount)] pages. characterIds REQUIRED per page.
 - [characterName] = main character in every scene. Positive, age-appropriate, no scary/violent content.
-- Before returning: verify page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext in English; verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING.
+- Before returning: verify page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext are in English; verify characterExpressions has one entry per character ID in that page's characterIds (each value = visual facial description in English); verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING.
 ```
 
 ---
@@ -302,10 +307,16 @@ Generate the story now in valid JSON format with EXACTLY [getPageCount(ageGroup,
 ## Beklenen JSON çıktısı
 
 - **title:** string  
-- **pages[]:** pageNumber, text, imagePrompt, sceneDescription, **characterIds**, **sceneContext** (clothing yok)  
+- **pages[]:** pageNumber, text, imagePrompt, sceneDescription, **characterIds**, **sceneContext**, **characterExpressions** (clothing yok; characterExpressions = sayfa bazlı, karakter bazlı görsel ifade: char ID → eyes/eyebrows/mouth, İngilizce)  
 - **supportingEntities[]:** id, type (animal|object), name, description, appearsOnPages  
 - **suggestedOutfits:** object (karakter ID → kıyafet). Her CHARACTER MAPPING’teki karakter için bir anahtar: değer = tek satır İngilizce kıyafet. Master’lar oluşturulmadan önce her karakterin ne giyeceği belli olur.  
 - **metadata:** ageGroup, theme, educationalThemes, safetyChecked  
+
+---
+
+## Bilinen konular / İyileştirme alanları
+
+- **Tekrarlayan arka planlar:** Custom request girilmeden de görsellerde sık tekrar eden sahne (yol, etrafında çiçekler, arkada ev) gözlemlenebilir. Hikaye modeli rastgele hikaye üretiyor; görsel pipeline'da sahne çeşitliliği (location/time/atmosphere) story çıktısına daha sıkı bağlanabilir ve “avoid generic road+flowers+house unless story specifies” gibi direktifler değerlendirilebilir. Story tarafında VISUAL DIVERSITY ve tema bazlı setting zaten vurgulanıyor; görsel prompt'ta sahne betimlemesinin story'den birebir kullanılması ve tekrarlayan şablonların azaltılması iyileştirme alanıdır.
 
 ---
 

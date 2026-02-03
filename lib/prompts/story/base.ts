@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.7.0',
-  releaseDate: new Date('2026-01-30'),
+  version: '1.9.0',
+  releaseDate: new Date('2026-02-03'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -43,6 +43,8 @@ export const VERSION: PromptVersion = {
     'v1.5.0: Master-For-All-Entities – supportingEntities (hayvan/obje) eklendi; entity detection direktifleri; tüm varlıklar için master üretme (31 Ocak 2026)',
     'v1.6.0: SYSTEM REDESIGN (CLOTHING CONSISTENCY) – Story no longer generates clothing; master system = single source of truth for visual details. REMOVED: getClothingDirectives, ClothingDirectives interface, stripClothingFromSceneText. ADDED: "DO NOT DESCRIBE" directive (no clothing/appearance in story text), "sceneContext" field (replaces "clothing"), supportingEntities already present. IMPACT: Story focuses on narrative (actions, emotions, plot); all visual details from master illustrations. (30 Ocak 2026)',
     'v1.7.0: PROMPT SLIM – Request length reduced. System: one-line language rule. User: removed duplicate opening line; removed PERSONALITY block; removed Theme-Specific Examples; LANGUAGE section one line + verification; STORY STRUCTURE = short cover/interior/different-scenes; THEME + DO NOT DESCRIBE shortened; VISUAL DIVERSITY, WRITING STYLE, ILLUSTRATION, CRITICAL REMINDERS, OUTPUT FORMAT, SUPPORTING ENTITIES shortened. (30 Ocak 2026)',
+    'v1.8.0: Per-page expression field – Story output adds expression (one word or short phrase, English) per page; derived from page text; no fixed list. ILLUSTRATION + OUTPUT FORMAT + CRITICAL REMINDERS updated. Used by image pipeline for facial expression. (2 Şubat 2026)',
+    'v1.9.0: characterExpressions (per-character per-page) – Replaces single "expression" field. Story output now has characterExpressions object (char ID → visual facial description: eyes, brows, mouth). ILLUSTRATION section: detailed expression guidelines (sad/worried/curious/angry/focused/surprised/happy/calm), visual betimleme (not emotion words), multi-character scene support (each character can have different expression). OUTPUT FORMAT + CRITICAL REMINDERS updated. (3 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -704,7 +706,25 @@ function buildIllustrationSection(
   characters?: Array<{ name?: string; type: { displayName: string } }>
 ): string {
   return `# ILLUSTRATION
-Per page: scene description + detailed image prompt (${illustrationStyle}). Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.`
+Per page: scene description + detailed image prompt (${illustrationStyle}). Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.
+
+# CHARACTER FACIAL EXPRESSIONS (CRITICAL)
+For each page, describe EACH character's facial expression separately in the characterExpressions object. Use specific visual details of eyes, eyebrows, and mouth—NOT just emotion words.
+
+- GOOD: "eyes wide with surprise, eyebrows raised high, mouth slightly open in astonishment"
+- BAD: "surprised"
+
+Vary expressions by page and by character. Not every character should be 'happy' or 'smiling' on every page. Use expressions that match the scene mood:
+- Sad: downturned mouth, eyebrows raised at inner corners, eyes looking down
+- Worried/Concerned: furrowed eyebrows, tense face, mouth pressed in line
+- Curious: eyes wide, eyebrows slightly raised, head tilted
+- Angry: furrowed eyebrows, narrowed eyes, mouth turned down
+- Focused: narrowed eyes, eyebrows slightly furrowed, mouth closed neutral
+- Surprised: wide eyes, eyebrows raised, mouth open
+- Happy/Joyful: smile (describe if teeth showing, eyes crinkled, etc.)
+- Calm/Gentle: soft closed-mouth smile, relaxed eyebrows, calm eyes
+
+If multiple characters are in the scene, each can have a DIFFERENT expression. Example: one child surprised while adult is calm; or one character laughing while another looks concerned. Make it visual, like a film director's note.`
 }
 
 function buildOutputFormatSection(
@@ -731,14 +751,19 @@ Return a valid JSON object:
       "imagePrompt": "English only. Detailed ${illustrationStyle} prompt (200+ chars): location, time of day, composition, character action. No appearance/clothing (master). Each page = distinct scene.",
       "sceneDescription": "English only. Detailed scene (150+ chars): location, time, action, mood. No appearance/clothing.",
       "characterIds": ["id-from-CHARACTER-MAPPING"],
-      "sceneContext": "English only. Short location/time/action only, e.g. 'forest clearing, morning, character approaching'"
+      "sceneContext": "English only. Short location/time/action only, e.g. 'forest clearing, morning, character approaching'",
+      "characterExpressions": {
+        "character-id-1": "English only. Visual description of THIS character's facial expression for this page (eyes, eyebrows, mouth). Example: 'eyes wide with surprise, eyebrows raised, mouth slightly open'",
+        "character-id-2": "English only. Visual description for second character (if present). Example: 'calm gentle smile, eyes crinkled at corners, relaxed eyebrows'"
+      }
     }
   ],
   "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
   "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"character-id-from-MAPPING": "one line English outfit"'},
   "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
 }
-Pages array: EXACTLY ${getPageCount(ageGroup, pageCount)} items. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING). suggestedOutfits REQUIRED: object with one key per character ID from CHARACTER MAPPING, value = one line English outfit for that character (used for master illustration).`
+Pages array: EXACTLY ${getPageCount(ageGroup, pageCount)} items. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING). suggestedOutfits REQUIRED: object with one key per character ID from CHARACTER MAPPING, value = one line English outfit for that character (used for master illustration).
+characterExpressions REQUIRED per page: object with one key per character ID appearing on that page (from characterIds array). Value = short English visual description of that character's facial expression for THIS page (describe eyes, eyebrows, mouth specifically; e.g. 'eyes wide with surprise, eyebrows raised, mouth open' NOT just 'surprised'). Each character can have a different expression on the same page.`
 }
 
 function buildCriticalRemindersSection(
@@ -751,7 +776,7 @@ function buildCriticalRemindersSection(
   return `# CRITICAL REMINDERS
 - Return EXACTLY ${getPageCount(ageGroup, pageCount)} pages. characterIds REQUIRED per page.
 - ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.
-- Before returning: verify page "text" is in ${getLanguageName(language)}; verify imagePrompt, sceneDescription, sceneContext are in English; verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING (each value = one line English outfit, used for master).`
+- Before returning: verify page "text" is in ${getLanguageName(language)}; verify imagePrompt, sceneDescription, sceneContext are in English; verify characterExpressions has one entry per character ID in that page's characterIds array (each value = visual facial description in English); verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING (each value = one line English outfit, used for master).`
 }
 
 // ============================================================================

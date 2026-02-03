@@ -306,6 +306,31 @@
   - **Version:** Story prompt v1.3.2 → v1.4.0
   - **Dokümantasyon:** `docs/guides/STORY_API_REFACTOR_RECOMMENDATIONS.md`, `docs/prompts/STORY_PROMPT_TEMPLATE.md`
   - **Test:** ✅ Story generation başarılı, clothing tema-uygun (space → "çocuk boyutunda astronot kostümü ve kask")
+- [x] **3.5.27** Create Book Test İyileştirmeleri (2 Şubat 2026) - ✅ **TAMAMLANDI**
+  - [x] AI Analysis log: "AI analysis failed" → "Photo analysis failed"; "Performing AI analysis" → "Analyzing photo" (`app/api/characters/route.ts`)
+  - [x] Kıyafet A: Image prompt'ta "same outfit every page; do not change clothing" vurgusu (`lib/prompts/image/scene.ts` – buildClothingDirectives, clothing lock)
+  - [x] Story: Sayfa bazlı **expression** alanı – ILLUSTRATION + OUTPUT FORMAT + CRITICAL REMINDERS; story model sayfa duygusunu İngilizce yazar (`lib/prompts/story/base.ts` v1.8.0)
+  - [x] Image pipeline: Story'den gelen expression "Facial expression: [value]" olarak prompt'a eklenir; hardcoded ifade listesi yok (`lib/prompts/image/scene.ts` SceneInput.expression, generateFullPagePrompt; `app/api/books/route.ts` sceneInput.expression)
+  - [x] Yetişkin–çocuk boy farkı: "Adult character(s) clearly taller than child(ren); visible height/size difference. Adult body proportions (not child proportions)." Family Members için; hardcoded yaşlı tipi yok (`lib/prompts/image/character.ts` buildMultipleCharactersPrompt v1.4.0)
+  - **Dokümantasyon:** `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` güncellendi (expression, clothing, adult–child)
+- [x] **3.5.28** İfade Çeşitliliği ve Sinematik Hikaye Anlatımı (3 Şubat 2026) - ✅ **TAMAMLANDI**
+  - **Sorun:** Yüz ifadeleri sürekli "ağzı açık gülümseme"; master referans + tek kelime ifade → her sayfa aynı ifade; hikaye anlatmıyor, sanal kalıyor. Karakterler kameraya bakıyor, doğal/sinematik değil.
+  - **Çözüm Yaklaşımı:**
+    - Master nötr ifade: Gülümseme kilidini kır
+    - Story → görsel senaryo: "happy" değil, "eyes wide, brows raised, mouth open" (çizgi film senaryosu gibi somut betimleme)
+    - Karakter başına ifade: Çok karakterde her biri ayrı (şaşırmış/sakin/üzgün)
+    - Prompt vurgusu: "Do not copy reference expression; match only face + outfit"
+  - **Uygulama:**
+    - [x] Master: Nötr ifade talimatı – `[EXPRESSION] Neutral or gentle facial expression, closed mouth or soft closed-mouth smile, calm and relaxed face. Not a big open-mouthed smile.` (`app/api/books/route.ts` generateMasterCharacterIllustration)
+    - [x] Story şeması: `expression` → `characterExpressions` (char ID → visual description); her karakter ayrı ifade (`lib/prompts/story/base.ts` v1.9.0)
+    - [x] Story talimatları: Çeşitlilik (sad/worried/curious/angry/focused/surprised/happy/calm), somut betimleme (eyes/brows/mouth), çok karakter desteği (her biri farklı)
+    - [x] Sayfa generation: `characterExpressions` → `sceneInput` (`app/api/books/route.ts`)
+    - [x] Image prompt: `[CHARACTER_EXPRESSIONS]` bloğu; her karakter için "Name: [description]"; "Do not copy reference expression; match only face + outfit"; "No generic smile unless joy/laughter" (`lib/prompts/image/scene.ts` v1.11.0)
+    - [x] Log: Sayfa başına karakter ifadeleri (`Page N character expressions: - Name: [expr]`) (`app/api/books/route.ts`)
+  - **Test Custom Promptları:** 4 senaryo hazır (mutlu+şaşırmış, üzgün+endişeli, kızgın+sakin+gülen, meraklı+odaklı)
+  - **Sonuç:** Her karakter, her sahne farklı ifade (üzgün/meraklı/kızgın); hikaye anlatıyor, sinematik ve doğal his
+  - **Dokümantasyon:** `docs/TEMP_CREATE_BOOK_TEST_ANALYSIS.md` (analiz + plan + test senaryoları)
+  - **Version:** Story v1.8.0 → v1.9.0; Scene v1.10.0 → v1.11.0
 - [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
   - [x] Database migration (`011_add_image_edit_feature.sql`)
     - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns

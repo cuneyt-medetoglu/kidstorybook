@@ -157,6 +157,7 @@ async function generateMasterCharacterIllustration(
   const masterPrompt = [
     '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]',
     `[STYLE] ${styleDirective} [/STYLE]`,
+    '[EXPRESSION] Neutral or gentle facial expression, closed mouth or soft closed-mouth smile, calm and relaxed face. Not a big open-mouthed smile. [/EXPRESSION]',
     `Full body, standing, feet visible, neutral pose. Child from head to toe. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style (NOT photorealistic). Match reference photos for face and body.`,
   ].join(' ')
 
@@ -193,7 +194,17 @@ async function generateMasterCharacterIllustration(
   })
   
   if (!response.ok) {
-    throw new Error(`Master illustration generation failed: ${response.status}`)
+    const errorBody = await response.text()
+    let errorMessage = `Master illustration generation failed: ${response.status}`
+    try {
+      const errJson = JSON.parse(errorBody)
+      if (errJson?.error?.message) errorMessage += ` - ${errJson.error.message}`
+      else if (errorBody.length < 500) errorMessage += ` - ${errorBody}`
+    } catch {
+      if (errorBody.length < 300) errorMessage += ` - ${errorBody}`
+    }
+    console.error('[Create Book] ❌ Master illustration API error:', errorMessage)
+    throw new Error(errorMessage)
   }
   
   const result = await response.json()
@@ -1506,6 +1517,20 @@ export async function POST(request: NextRequest) {
         const pageImagesStartTime = Date.now()
         console.log(`[Create Book] 🎨 Starting page images generation...`)
         console.log(`[Create Book] 📄 Total pages to generate: ${storyData.pages.length}`)
+        // Log per-page character expressions from story (v1.9.0 – debug: verify expression flow)
+        storyData.pages.forEach((p: any, idx: number) => {
+          const num = p.pageNumber ?? idx + 1
+          console.log(`[Create Book] Page ${num} character expressions:`)
+          const exprs = p.characterExpressions || {}
+          if (Object.keys(exprs).length === 0) {
+            console.log(`  (none)`)
+          } else {
+            Object.entries(exprs).forEach(([charId, expr]) => {
+              const char = characters.find((c: any) => c.id === charId)
+              console.log(`  - ${char?.name || charId}: ${expr}`)
+            })
+          }
+        })
         console.log(`[Create Book] 🚀 Using PARALLEL batch processing (4 images per 90 seconds)`)
         console.log(`[Create Book] 📊 Model: ${imageModel} | Size: ${imageSize} | Quality: ${imageQuality}`)
         console.log(`[Create Book] ⏱️  Page images generation started at: ${new Date().toISOString()}`)
@@ -1565,6 +1590,20 @@ export async function POST(request: NextRequest) {
         const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'
         const mood = themeKey === 'adventure' ? 'exciting' : themeKey === 'fantasy' ? 'mysterious' : themeKey === 'space' ? 'inspiring' : themeKey === 'sports' ? 'exciting' : 'happy'
         const pageClothing = pageUseMasterClothing ? 'match_reference' : undefined // v1.6.0: no clothing from story
+        
+        // FIX: pageCharacters must be defined before characterExpressions (ReferenceError fix)
+        const pageCharacters = page.characterIds || []
+        
+        // v1.9.0: Per-character expressions from story
+        const characterExpressions: Record<string, string> = {}
+        const pageCharExprs = (page as any).characterExpressions || {}
+        pageCharacters.forEach((charId: string) => {
+          const expr = pageCharExprs[charId]?.trim()
+          if (expr) {
+            characterExpressions[charId] = expr
+          }
+        })
+        
         const sceneInput = {
           pageNumber,
           sceneDescription,
@@ -1573,6 +1612,7 @@ export async function POST(request: NextRequest) {
           characterAction,
           focusPoint,
           ...(pageClothing && { clothing: pageClothing }),
+          ...(Object.keys(characterExpressions).length > 0 && { characterExpressions }),
         }
 
         // Generate full page prompt (NEW: Master illustration only, no cover reference)
@@ -1581,9 +1621,6 @@ export async function POST(request: NextRequest) {
         
         // FIX: Page-specific character prompt (25 Ocak 2026)
         // Her page için sadece o page'deki karakterlerin prompt'unu oluştur
-        // Bu sayede prompt ve reference image eşleşmesi doğru olur
-        const pageCharacters = page.characterIds || []
-        
         // Ana karakteri bul (her zaman ilk karakter)
         const mainCharacter = characters.find(c => c.id === pageCharacters[0]) || character
         
@@ -1630,7 +1667,9 @@ export async function POST(request: NextRequest) {
           additionalCharactersCount, // NEW: Pass additional characters count (page-specific)
           isCoverPage, // isCover: false for all pages
           false, // useCoverReference: false - master illustration is used instead
-          sceneDiversityAnalysis.slice(0, -1) // Pass previous scenes (exclude current)
+          sceneDiversityAnalysis.slice(0, -1), // Pass previous scenes (exclude current)
+          totalPages, // totalPages for pose variation
+          pageCharacters.map((charId: string) => ({ id: charId, name: characters.find((c: any) => c.id === charId)?.name || 'Character' })) // v1.11.0: for [CHARACTER_EXPRESSIONS] labels
         )
 
         // Call GPT-image API

@@ -1,6 +1,7 @@
 # Image Generation Prompt Template
 
-**Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts` (tek kaynak; doküman bu kodla eşleşir)
+**Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts` (tek kaynak; doküman bu kodla eşleşir)  
+**Versiyon (scene):** 1.11.0
 
 ---
 
@@ -12,6 +13,14 @@
 2. **Cover Generation** → Tüm master'lar referans + scene prompt → kapak görseli
 3. **Page Generation** → O sayfadaki entity master'ları referans + scene prompt → sayfa görseli
 4. **Tutarlılık:** Her varlık için bir kez master, sonra hep o master referans
+
+---
+
+## Master = sadece referans (kimlik)
+
+- **Master görsel:** Sadece karakter kimliği referansıdır (yüz özellikleri, saç, göz, cilt, kıyafet). Poz, ifade ve kompozisyon master'dan kopyalanmaz.
+- **Poz / ifade / sahne:** Kapak ve sayfa görsellerinde duruş, yüz ifadesi ve sahne betimlemesi **story çıktısından** gelir. Story'den gelen `characterExpressions` (karakter bazlı görsel ifade tarifi) image prompt'ta [CHARACTER_EXPRESSIONS] bloğunda kullanılır.
+- **Kritik talimat:** "Do not copy the reference image's facial expression. Match only face identity (features, skin, eyes, hair) and outfit. Each character's expression for THIS scene is specified above; use those exact visual descriptions. No generic open-mouthed smile unless the scene text clearly indicates joy, laughter, or excitement."
 
 ---
 
@@ -87,18 +96,29 @@ Detaylı açıklamalar ve negative/positive direktifler `lib/prompts/image/style
 6. Karakter tutarlılığını her sayfada vurgula
 7. Cinematic elements (lighting, depth, composition)
 8. Foreground/Midground/Background layer sistemi
-9. Kıyafet tutarlılığı (hikayede değişim yoksa aynı kıyafet)
+9. Kıyafet tutarlılığı: match reference kullanıldığında "same outfit every page"; hikayede değişim yoksa aynı kıyafet
 10. Anatomik doğruluk (5 parmak, doğru limb sayısı)
+11. Sayfa bazlı, karakter bazlı yüz ifadesi: story’den gelen **characterExpressions** (char ID → görsel ifade tarifi) [CHARACTER_EXPRESSIONS] bloğunda kullanılır; referans ifadesi kopyalanmaz. (Eski: "Facial expression: [value]" olarak prompt’a eklenir (hardcoded liste yok)
+12. Çocuk–yetişkin boy farkı: Aynı sahnede yetişkin varsa "Adult character(s) clearly taller than child(ren); visible height/size difference. Adult body proportions (not child proportions)." (hardcoded yaşlı tipi yok)
 
 ---
 
 ## Cinematic Quality / Clothing Consistency / Anatomical Correctness
 
 - **Depth & Layers:** Foreground, midground, background; character ratio 25–35%; environment sharp.
-- **Clothing Consistency:** Hikayede kıyafet değişikliği yoksa aynı kıyafet.
+- **Clothing Consistency:** Match reference kullanıldığında "Match reference image exactly (same outfit as in reference). Same outfit every page; do not change clothing." Hikayede kıyafet değişikliği yoksa aynı kıyafet.
+- **Per-character expression:** Story’den gelen `characterExpressions` (sayfa bazlı, karakter bazlı görsel ifade) image prompt’a "Facial expression: [value]" olarak eklenir; hardcoded ifade listesi yok.
+- **Adult–child height:** Yetişkin karakter varsa "Adult character(s) clearly taller than child(ren); visible height/size difference. Adult body proportions (not child proportions)." Hardcoded yaşlı tipi yok.
 - **Anatomical:** Negative prompts (el/parmak/kol/bacak hataları); positive: 5 parmak, 2 el, 2 kol, 2 bacak, doğru oranlar.
 
 Detaylar `lib/prompts/image/scene.ts`, `negative.ts` içinde.
+
+---
+
+## Bilinen konular / İyileştirme alanları
+
+- **Tekrarlayan arka planlar:** Custom request girilmeden de kapak ve sayfa görsellerinde sık tekrar eden sahne (yol, etrafında çiçekler, arkada ev) gözlemlenebilir. Sahne betimlemesi story çıktısından geliyor; görsel modelin generic şablona düşmesi azaltılabilir (ör. "avoid generic road+flowers+house unless scene description specifies" veya story sceneDescription/imagePrompt çeşitliliğinin güçlendirilmesi).
+- **Bakış açıları:** Kamera açıları ve kompozisyon kuralları (getCameraAngleDirectives, getCompositionRules) güncel; kullanıcı geri bildirimi: bakış açıları şimdilik daha iyi.
 
 ---
 

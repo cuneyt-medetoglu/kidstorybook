@@ -30,11 +30,18 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 ### Commit Öncesi Temizlik
 - **Doküman:** Test amaçlı dokümantasyonları sil. Gerekli olanlar: ROADMAP, PRD, FEATURES, ARCHITECTURE, DOCUMENTATION, FAZ{X}_IMPLEMENTATION, guides/reports/strategies (aktif). Gereksiz analiz/plan (tek seferlik, tamamlanmış konular) silinir veya archive'e taşınır.
 - **Kod:** Gereksiz log (console.log/warn) varsa kaldır.
-- **Kalan faz tespiti:** ROADMAP'ta tamamlanmamış ilk işe bak; özellikle Faz 3.5.19 (Görsel Kompozisyon), 3.5.20 (Kapak–İlk Sayfa benzerliği) ve sahne kalitesi (çocuk ön planda yapışık görünme, yüz açıları) odak alanı olabilir.
+- **Kalan faz tespiti:** ROADMAP'ta tamamlanmamış ilk işe bak; özellikle Faz 3.5.19 (Görsel Kompozisyon), 3.5.20 (Kapak–İlk Sayfa benzerliği), sahne kalitesi (çocuk ön planda yapışık görünme, yüz açıları) ve **tekrarlayan arka planlar** (yol, çiçekler, ev şablonu; custom request olmadan benzer sahne) odak alanı olabilir.
+
+### Create Book – Görsel/Hikaye kalitesi (güncel)
+- **Master:** Sadece kimlik referansı (yüz, saç, kıyafet). Poz, ifade ve kompozisyon master'dan kopyalanmaz; kapak ve sayfa görsellerinde story çıktısından gelir.
+- **İfadeler:** Story çıktısında `characterExpressions` (sayfa bazlı, karakter bazlı görsel ifade tarifi); image pipeline'da [CHARACTER_EXPRESSIONS] bloğunda kullanılır; referans ifadesi kopyalanmaz.
+- **Bakış açıları:** Kullanıcı geri bildirimi: şimdilik daha iyi.
+- **Bilinen konu:** Tekrarlayan arka planlar (yol, çiçekler, arkada ev) custom request olmadan da görülebilir; iyileştirme alanı (story/görsel çeşitlilik). Doküman: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` (Bilinen konular bölümü).
 
 ### Diğer Önemli Dosyalar
 - `docs/ai/` - AI stratejisi ve dokümanları
 - `docs/technical/` - Teknik araştırma ve kararlar
+- `docs/prompts/` - Prompt şablonları (STORY_PROMPT_TEMPLATE.md, IMAGE_PROMPT_TEMPLATE.md); kod = `lib/prompts/`
 
 ## 🔧 Yapabileceklerin
 
@@ -136,7 +143,7 @@ Kullanıcı commit öncesi toparlanma istediğinde:
 1. **Doküman:** Test amaçlı ve tamamlanmış konuların geçici dokümanlarını sil (implementation/ içinde test guide, root cause, action phases, analiz dokümanları). Gerekli olanlar: FAZ{X}_IMPLEMENTATION.md, IMAGE_QUALITY_IMPROVEMENT_PLAN.md, docs/plans/ (sahne çeşitliliği vb.).
 2. **Birleştirme:** Birbirine benzeyen dokümanları tek özet halinde ilgili FAZ implementasyonuna ekle; gereksiz kopyaları sil.
 3. **Kod:** Gereksiz console.log/warn/error varsa kaldır.
-4. **Kalan faz:** ROADMAP.md'de sıradaki tamamlanmamış işi tespit et (örn. 3.5.19 Görsel Kompozisyon, 3.5.20 Kapak–İlk Sayfa benzerliği, sahne kalitesi / çocuk ön planda yapışık görünme, yüz açıları).
+4. **Kalan faz:** ROADMAP.md'de sıradaki tamamlanmamış işi tespit et (örn. 3.5.19 Görsel Kompozisyon, 3.5.20 Kapak–İlk Sayfa benzerliği, sahne kalitesi, **tekrarlayan arka planlar** – yol/çiçekler/ev şablonu).
 
 ### 8. CSV Yönetimi ve Google Sheets Entegrasyonu
 ROADMAP.md'den CSV oluşturma ve Google Sheets ile senkronizasyon:

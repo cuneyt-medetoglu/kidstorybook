@@ -16,8 +16,8 @@ import type { CharacterDescription, CharacterAnalysis, PromptVersion } from '../
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.2.0',
-  releaseDate: new Date('2026-01-24'),
+  version: '1.4.0',
+  releaseDate: new Date('2026-02-02'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -35,6 +35,7 @@ export const VERSION: PromptVersion = {
     'v1.1.0: Major optimization - buildCharacterPrompt simplified (800→300 chars), buildMultipleCharactersPrompt reduced (1500→500 chars), removed verbose descriptions, minimized CRITICAL/IMPORTANT emphasis, streamlined adult/child distinction (18 Ocak 2026)',
     'v1.2.0: Clothing excluded from master character and page character prompts - clothing comes from story per page (Plan: Kapak/Close-up/Kıyafet) (24 Ocak 2026)',
     'v1.3.0: Character analysis output adds defaultClothing - exact outfit from photo for story/image consistency (Faz 1 - CONSISTENCY_AND_QUALITY_ACTION_PHASES) (31 Ocak 2026)',
+    'v1.4.0: Adult–child height directives – When Family Members present: "Adult character(s) clearly taller than child(ren); visible height/size difference. Adult body proportions (not child proportions)." No hardcoded elderly stereotype. (2 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -246,7 +247,12 @@ export function buildMultipleCharactersPrompt(
 
   // Multiple reference images instruction (simplified)
   const totalChars = additionalCharacters ? additionalCharacters.length + 1 : 1
-  parts.push(`${totalChars} reference images provided (image 1-${totalChars}). Match each character's description with its reference image. Do NOT mix features between characters.\n`)
+  parts.push(`${totalChars} reference images provided (image 1-${totalChars}). Match each character's description with its reference image. Do NOT mix features between characters.`)
+  const hasAdult = additionalCharacters?.some(c => c.type.group === 'Family Members')
+  if (hasAdult) {
+    parts.push('Adult character(s) clearly taller than child(ren); visible height/size difference. Adult body proportions (not child proportions) for adult characters. NOT child body proportions; NOT same height as child when adult and child in same scene.')
+  }
+  parts.push('')
 
   // Main character
   parts.push(`CHAR 1: ${buildCharacterPrompt(mainCharacter, true, excludeClothing)}`)
@@ -273,10 +279,10 @@ export function buildMultipleCharactersPrompt(
         if (char.description) {
           const age = char.description.age
           if (age) {
-            const ageNote = age >= 18 ? 'adult proportions' : age >= 13 ? 'teen proportions' : ''
+            const ageNote = age >= 18 ? 'adult body proportions (not child proportions)' : age >= 13 ? 'teen proportions' : ''
             charParts.push(`${age}yo ${ageNote}`)
           } else if (char.type.value === "Mom" || char.type.value === "Dad") {
-            charParts.push('adult proportions')
+            charParts.push('adult body proportions (not child proportions)')
           }
           
           if (char.description.hairColor) {
@@ -288,7 +294,7 @@ export function buildMultipleCharactersPrompt(
             charParts.push(`${char.description.eyeColor} eyes (NOT same as Char 1)`)
           }
         } else {
-          charParts.push('adult proportions')
+          charParts.push('adult body proportions (not child proportions)')
         }
       }
       

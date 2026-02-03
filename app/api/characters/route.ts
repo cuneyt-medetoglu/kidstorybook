@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     if (needsAIAnalysis) {
       // Perform AI analysis for non-Child characters with photos
-      console.log(`[Character Creation] 🤖 Performing AI analysis for ${characterType.group} character`)
+      console.log(`[Character Creation] 📷 Analyzing photo for ${characterType.group} character`)
       
       try {
         const additionalStr = [hairColor && `Hair: ${hairColor}`, eyeColor && `Eyes: ${eyeColor}`].filter(Boolean).join(', ') || undefined
@@ -172,9 +172,9 @@ export async function POST(request: NextRequest) {
             : undefined)
         characterDescription = { ...rawDesc, ...(defaultCloth && { defaultClothing: defaultCloth }) }
 
-        console.log(`[Character Creation] ✅ AI analysis completed (confidence: ${analysisConfidence})`)
+        console.log(`[Character Creation] ✅ Photo analysis completed (confidence: ${analysisConfidence})`)
       } catch (analysisError) {
-        console.error('[Character Creation] ⚠️ AI analysis failed, falling back to basic description:', analysisError)
+        console.error('[Character Creation] ⚠️ Photo analysis failed, using basic description:', analysisError)
         // Fallback to basic description if analysis fails
         characterDescription = {
           age: parseInt(age) || 5,
