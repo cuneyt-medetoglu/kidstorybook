@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { generateBookPDF } from '@/lib/pdf/generator'
+import { compressImageForPdf } from '@/lib/pdf/image-compress'
 import { successResponse, errorResponse } from '@/lib/api/response'
 
 export async function POST(
@@ -129,11 +130,32 @@ export async function POST(
     console.log('[PDF Generation] - Cover Image:', coverImageUrl ? 'Yes' : 'No')
 
     // Prepare page data with image URLs
-    const pageData = pages.map((page: any) => ({
+    let pageData = pages.map((page: any) => ({
       pageNumber: page.pageNumber || 0,
       text: page.text || '',
       imageUrl: page.imageUrl || null,
     }))
+
+    // ====================================================================
+    // 3b. COMPRESS IMAGES FOR PDF (stay under 50 MB storage limit)
+    // ====================================================================
+    const TARGET_MAX_MB = 50
+    console.log('[PDF Generation] Compressing images for PDF (target <', TARGET_MAX_MB, 'MB)...')
+    let coverUrlForPdf: string | undefined = coverImageUrl
+    if (coverImageUrl) {
+      const coverResult = await compressImageForPdf(coverImageUrl)
+      coverUrlForPdf = coverResult.dataUrl
+      if (coverResult.usedCompression) console.log('[PDF Generation] Cover image compressed')
+    }
+    const compressedPages = await Promise.all(
+      pageData.map(async (p: { pageNumber: number; text: string; imageUrl: string | null }) => {
+        if (!p.imageUrl) return { ...p, imageUrl: null }
+        const result = await compressImageForPdf(p.imageUrl)
+        return { ...p, imageUrl: result.dataUrl }
+      })
+    )
+    pageData = compressedPages
+    console.log('[PDF Generation] Images compressed for PDF')
 
     // ====================================================================
     // 4. GENERATE PDF
@@ -142,7 +164,7 @@ export async function POST(
 
     const pdfBuffer = await generateBookPDF({
       title: book.title || book.story_data.title || 'Untitled Story',
-      coverImageUrl: coverImageUrl,
+      coverImageUrl: coverUrlForPdf,
       pages: pageData,
       theme: book.theme,
       illustrationStyle: book.illustration_style,

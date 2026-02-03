@@ -38,6 +38,12 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Bakış açıları:** Kullanıcı geri bildirimi: şimdilik daha iyi.
 - **Bilinen konu:** Tekrarlayan arka planlar (yol, çiçekler, arkada ev) custom request olmadan da görülebilir; iyileştirme alanı (story/görsel çeşitlilik). Doküman: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` (Bilinen konular bölümü).
 
+### PDF Generation (50 MB limit, sıkıştırma, timeout)
+- **Storage:** Supabase `pdfs` bucket – dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme 413 hatası verir.
+- **Görsel sıkıştırma:** `lib/pdf/image-compress.ts` – kapak ve sayfa görselleri PDF öncesi indirilir, **sharp** ile yeniden boyutlandırılır (MAX_WIDTH_PX) ve JPEG (JPEG_QUALITY) olarak sıkıştırılır; data URL ile PDF'e verilir. Hedef boyut ~30–40 MB (ayar: MAX_WIDTH_PX, JPEG_QUALITY).
+- **Timeout:** `lib/pdf/generator.ts` – Puppeteer sayfa yüklemesi için **setDefaultNavigationTimeout(90_000)** (90 saniye); büyük base64 görsellerde 30 s varsayılan yetmeyebilir.
+- **Rehber:** `docs/guides/PDF_GENERATION_GUIDE.md`
+
 ### Diğer Önemli Dosyalar
 - `docs/ai/` - AI stratejisi ve dokümanları
 - `docs/technical/` - Teknik araştırma ve kararlar

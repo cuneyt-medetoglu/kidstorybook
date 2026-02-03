@@ -69,6 +69,17 @@ KidStoryBook PDF generation sistemi, çocuk kitaplarını profesyonel bir format
 - ✅ Yüksek kaliteli render
 - ✅ Örnek PDF'lere benzer sonuç
 
+### Storage limit (50 MB) ve görsel sıkıştırma
+
+- **Supabase `pdfs` bucket:** Dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme **413** hatası verir.
+- **Görsel sıkıştırma:** `lib/pdf/image-compress.ts` – API route PDF üretmeden önce kapak ve tüm sayfa görsellerini indirir, **sharp** ile yeniden boyutlandırır (max genişlik) ve JPEG olarak sıkıştırır; data URL ile generator'a verir. Böylece PDF boyutu 50 MB altında kalır.
+- **Ayarlar:** `MAX_WIDTH_PX` (görsel max genişlik, px), `JPEG_QUALITY` (80–95). Hedef ~30–40 MB için örn. 2000 px, quality 92. Route: `app/api/books/[id]/generate-pdf/route.ts` (adım 3b).
+
+### Timeout (Puppeteer)
+
+- **Varsayılan:** Puppeteer sayfa yüklemesi için **30 saniye** (navigation timeout). HTML içinde çok sayıda büyük base64 görsel olduğunda `page.setContent()` 30 s içinde bitmeyebilir → **Navigation timeout of 30000 ms exceeded**.
+- **Çözüm:** `lib/pdf/generator.ts` içinde `page.setDefaultNavigationTimeout(90_000)` (90 saniye) ayarlandı.
+
 ---
 
 ## PDF Format ve Layout

@@ -188,7 +188,7 @@ kidstorybook/
 │   ├── currency.ts             # Currency detection (IP → TRY/USD/EUR/GBP)
 │   ├── db/                     # books.ts, characters.ts (Supabase helpers)
 │   ├── draft-storage.ts        # Taslak depolama
-│   ├── pdf/                    # generator, templates (PDF üretimi)
+│   ├── pdf/                    # generator, image-compress (50 MB limit), templates (PDF üretimi)
 │   ├── prompts/                # Prompt Management (config, story, image, tts v1.0.0 dil dosyaları)
 │   ├── queue/                  # image-generation-queue
 │   ├── supabase/               # client, server, server-auth, middleware

@@ -279,6 +279,9 @@ export async function generateBookPDF(options: PDFOptions): Promise<Buffer> {
   try {
     const page = await browser.newPage()
 
+    // PDF HTML içinde çok sayıda büyük base64 görsel olabiliyor; varsayılan 30s yetmeyebilir
+    page.setDefaultNavigationTimeout(120_000) // 120 saniye
+
     // Prepare spreads data
     const spreads = prepareSpreads(options.pages || [])
 
