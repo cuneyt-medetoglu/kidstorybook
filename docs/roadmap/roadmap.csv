@@ -197,6 +197,8 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	3.5.24,3,3.5,"Kitap oluşturma – Herhangi bir hata durumunda tüm kitap fail (24 Ocak 2026)",Bekliyor,Kritik,AI - Entegrasyon,,"",,#3.5
 	3.5.26,3,3.5,"Image API Refactor",Tamamlandı,Kritik,AI - Entegrasyon,,"Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**",,#3.5
 	3.5.25,3,3.5,"Story API Refactor",Tamamlandı,Kritik,AI - Entegrasyon,,"Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**",,#3.5
+	3.5.27,3,3.5,"Create Book Test İyileştirmeleri (2 Şubat 2026)",Tamamlandı,Kritik,AI - Entegrasyon,,"✅ **TAMAMLANDI**",,#3.5
+	3.5.28,3,3.5,"İfade Çeşitliliği ve Sinematik Hikaye Anlatımı (3 Şubat 2026)",Tamamlandı,Kritik,AI - Entegrasyon,,"✅ **TAMAMLANDI**",,#3.5
 	3.5.17,3,3.5,"Görsel Revize UX İyileştirmesi (23 Ocak 2026)",Bekliyor,Kritik,AI - Entegrasyon,,"",,#3.5
 	3.7.1,3,3.7,"Stripe webhook handler",Bekliyor,Kritik,Backend - Webhook,,"",,#3.7
 	3.7.2,3,3.7,"İyzico webhook handler",Bekliyor,Kritik,Backend - Webhook,,"",,#3.7
