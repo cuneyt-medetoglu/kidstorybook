@@ -386,8 +386,10 @@
     - [x] Test için 24 kitap mock data eklendi
   - [ ] **Before/After Toggle İyileştirmesi (Gelecek Faz):** Modal'da "After" görseli şu an boş. Gelecekte transformedImage'ları database'den çekip gösterecek sistem eklenecek.
   - [ ] **Swipe Navigation İyileştirmesi (Gelecek Faz):** Modal'da fotoğraflar arasında swipe gesture ile geçiş yapılabilir (şu an arrow butonları var, touch gesture geliştirilecek).
-  - [ ] **Karakter Ekleme Özelliği (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli. | 🔴 DO
+  - [x] **Karakter Ekleme Özelliği (Create Your Own from Example) (23 Ocak 2026):** Examples sayfasından kullanıcı hazır hikayeye sadece kendi karakterlerini ekleyip aynı görseller üzerine kendi karakterleri ile oluşturulmuş halini görebilmeli. Örnek kitabı seçip, kendi karakter fotoğraflarını yükleyerek aynı hikayeyi kendi karakterleriyle oluşturabilmeli. Custom request boş ise görseller birebir aynı olmalı, sadece karakter değişmeli. | 🔴 DO ✅ (3 Şubat 2026: from-example sayfası, API, characterIds eşleştirmesi, kapak Vision ile sahne zenginleştirme)
   - **Detaylı Plan:** `docs/guides/EXAMPLES_PAGE_V0_PROMPT.md`
+  - **Analiz:** `docs/analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md`
+  - **Strategy (Madde 2):** `docs/strategies/EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
 - [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)

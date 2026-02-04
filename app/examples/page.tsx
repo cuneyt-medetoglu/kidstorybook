@@ -401,7 +401,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
             View Example
           </Button>
         </Link>
-        <Link href="/create/step1" className="w-full">
+        <Link href={`/create/from-example?exampleId=${book.id}`} className="w-full">
           <Button variant="outline" className="w-full h-11 bg-transparent">
             <Plus className="w-4 h-4 mr-2" />
             Create Your Own Book

@@ -71,6 +71,10 @@
   - Otomatik backup ayarları
   - Daha sonra AWS'ye geçersek orada da bakılmalı
   - Backup stratejisi ve retention policy
+- [ ] **1.2.8** Supabase'ı AWS'de açılacak bir makineye migrate etme | 🔴 DO
+  - Supabase (PostgreSQL, Auth, Storage) servislerini AWS'de kurulacak bir makineye taşıma
+  - Self-hosted Postgres / alternatif DB, Auth ve Storage çözümleri
+  - Migration planı, veri taşıma ve kesinti yönetimi
 
 ### 1.3 Environment ve Yapılandırma ✅
 - [x] **1.3.1** `.env.local` dosyası oluştur - ✅ Kontrol edildi ve optimize edildi

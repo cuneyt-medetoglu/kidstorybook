@@ -141,6 +141,11 @@
   - OpenAI API key production kontrolü
   - Google Cloud TTS key production kontrolü
   - Tüm secret'ların güvenli şekilde saklandığından emin ol
+- [ ] **5.5.7** AWS'de production makine kurulumu | 🔴 DO
+  - AWS'de (EC2 vb.) production sunucusu kurulumu
+  - Sunucu güvenliği, firewall, SSH
+  - Node/Next.js veya Docker ile uygulama çalıştırma
+  - Domain, SSL ve monitoring ayarları
 
 ### 5.7 PDF Tasarım İyileştirmesi
 - [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)

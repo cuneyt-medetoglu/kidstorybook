@@ -33,6 +33,7 @@ export interface Book {
   created_at: Date
   updated_at: Date
   completed_at?: Date
+  is_example?: boolean
 }
 
 export interface CreateBookInput {
@@ -48,6 +49,8 @@ export interface CreateBookInput {
   images_data?: any[]
   generation_metadata?: any
   status?: 'draft' | 'generating' | 'completed'
+  /** When true, book is a public example (admin only). */
+  is_example?: boolean
 }
 
 export interface UpdateBookInput {

@@ -36,6 +36,28 @@ function normalizeThemeKey(theme: string): string {
   return t
 }
 
+/** From-example: örnek kapak görselinden sahne betimi (top, tavşan, kulübe vb.) alır; kapak prompt'unu zenginleştirmek için. */
+async function describeCoverSceneForPrompt(imageUrl: string): Promise<string> {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'text', text: 'Describe this children\'s book cover in 1-2 short sentences for an image generation prompt. Include: setting (e.g. path, cottage, trees, flowers), key objects (e.g. ball, bunny, toys), and composition. English only, concise. No character description.' },
+          { type: 'image_url', image_url: { url: imageUrl } },
+        ],
+      }],
+      max_tokens: 150,
+    })
+    const text = completion.choices[0]?.message?.content?.trim()
+    return text ? ` Scene must include these key elements: ${text}` : ''
+  } catch (e) {
+    console.warn('[Create Book] From-example cover description (Vision) failed:', (e as Error).message)
+    return ''
+  }
+}
+
 // ============================================================================
 // Retry Mechanism for API Calls (NEW: 16 Ocak 2026)
 // ============================================================================
@@ -398,6 +420,10 @@ export interface CreateBookRequest {
   storyModel?: string // Story generation model (default: 'gpt-4o-mini')
   /** When true, create book without payment. Only allowed when DEBUG_SKIP_PAYMENT or user is admin + skipPaymentForCreateBook. */
   skipPayment?: boolean
+  /** Create from example: use example book's story_data and images; only swap character via edits (image[] = [exampleImage, master]). */
+  fromExampleId?: string
+  /** When true, mark created book as public example (admin only; see step6 "Create example book"). */
+  isExample?: boolean
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
@@ -447,6 +473,8 @@ export async function POST(request: NextRequest) {
       language = 'en',
       storyModel = 'gpt-4o-mini', // Default: GPT-4o Mini (Önerilen)
       skipPayment,
+      fromExampleId, // Create from example: same story/scenes, only character swap via edits
+      isExample, // Mark as public example (admin only; step6 "Create example book")
     } = body
 
     // Skip-payment: only when DEBUG or admin + flag (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
@@ -468,7 +496,7 @@ export async function POST(request: NextRequest) {
 
     const themeKey = normalizeThemeKey(theme)
 
-    if (!themeKey || !illustrationStyle) {
+    if (!fromExampleId && (!themeKey || !illustrationStyle)) {
       return CommonErrors.badRequest(
         'theme and illustrationStyle are required'
       )
@@ -515,21 +543,118 @@ export async function POST(request: NextRequest) {
     const character = characters[0]
 
     // ====================================================================
-    // DETERMINE MODE: Cover Only or Full Book
+    // DETERMINE MODE: Cover Only, From Example, or Full Book
     // ====================================================================
-    const isCoverOnlyMode = !pageCount || pageCount === 0
-    
-    console.log(`[Create Book] 📋 Mode: ${isCoverOnlyMode ? 'Cover Only' : 'Full Book'} (pageCount: ${pageCount || 'undefined'})`)
-    console.log(`[Create Book] 🎯 Theme: ${theme} → ${themeKey}`)
+    const isCoverOnlyMode = !fromExampleId && (!pageCount || pageCount === 0)
+    const isFromExampleMode = !!fromExampleId
+
+    console.log(`[Create Book] 📋 Mode: ${isCoverOnlyMode ? 'Cover Only' : isFromExampleMode ? 'From Example' : 'Full Book'} (pageCount: ${pageCount || 'undefined'}, fromExampleId: ${fromExampleId || 'none'})`)
+    console.log(`[Create Book] 🎯 Theme: ${themeKey}`)
 
     let storyData: any = null
     let completion: any = null
     let book: any = null
+    let exampleBook: any = null
+    let masterIllustrations: Record<string, string> = {}
+    let entityMasterIllustrations: Record<string, string> = {}
 
+    // ====================================================================
+    // FROM EXAMPLE MODE: Use example book's story_data and images; swap character via edits
+    // ====================================================================
+    if (isFromExampleMode) {
+      const { data: exBook, error: exErr } = await getBookById(supabase, fromExampleId!)
+      if (exErr || !exBook) {
+        return CommonErrors.notFound('Example book not found')
+      }
+      if ((exBook as any).is_example !== true) {
+        return CommonErrors.forbidden('Book is not an example book')
+      }
+      if (exBook.status !== 'completed') {
+        return CommonErrors.badRequest('Example book is not completed')
+      }
+      exampleBook = exBook
+      storyData = JSON.parse(JSON.stringify(exBook.story_data))
+      if (!storyData?.pages?.length) {
+        return CommonErrors.badRequest('Example book has no story data')
+      }
+      // Replace example character name(s) with user's character name(s) in story text and title
+      const exPages = storyData.pages || []
+      const exampleCharOrder: string[] = []
+      const seen = new Set<string>()
+      for (const p of exPages) {
+        const ids = (p as any).characterIds || []
+        for (const id of ids) {
+          if (!seen.has(id)) {
+            seen.add(id)
+            exampleCharOrder.push(id)
+          }
+        }
+      }
+      if (exampleCharOrder.length > 0 && characterIds.length > 0) {
+        const oldNames = await Promise.all(
+          exampleCharOrder.map((id) => getCharacterById(supabase, id).then((r) => r.data?.name ?? ''))
+        )
+        const newNames = await Promise.all(
+          characterIds.map((id) => getCharacterById(supabase, id).then((r) => r.data?.name ?? ''))
+        )
+        const replaceCount = Math.min(oldNames.length, newNames.length)
+        for (let i = 0; i < replaceCount; i++) {
+          const oldName = (oldNames[i] || '').trim()
+          const newName = (newNames[i] || '').trim()
+          if (!oldName || !newName || oldName === newName) continue
+          if (storyData.title) storyData.title = (storyData.title as string).split(oldName).join(newName)
+          for (const page of storyData.pages || []) {
+            if ((page as any).text) (page as any).text = (page as any).text.split(oldName).join(newName)
+          }
+        }
+        console.log('[Create Book] 📝 From-example: replaced character names in story and title')
+      }
+      // Sayfa görsellerinde master kullanılsın: örnek karakter ID'lerini kullanıcı karakter ID'leri ile eşleştir (aynı sıra).
+      const charIdMapCount = Math.min(exampleCharOrder.length, characterIds.length)
+      if (charIdMapCount > 0) {
+        for (const page of storyData.pages || []) {
+          const ids = (page as any).characterIds as string[] | undefined
+          if (!ids?.length) continue
+          ;(page as any).characterIds = ids.map((id: string) => {
+            const idx = exampleCharOrder.indexOf(id)
+            return idx >= 0 && idx < characterIds.length ? characterIds[idx]! : id
+          })
+        }
+        console.log('[Create Book] 📝 From-example: replaced characterIds in pages for master lookup')
+      }
+      const exTheme = normalizeThemeKey(exBook.theme)
+      const exTitle = storyData.title || exBook.title
+      const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
+        character_id: character.id,
+        title: exTitle,
+        theme: exTheme,
+        illustration_style: exBook.illustration_style || illustrationStyle,
+        language: exBook.language || language,
+        age_group: exBook.age_group || 'preschool',
+        total_pages: storyData.pages.length,
+        story_data: storyData,
+        status: 'draft',
+        custom_requests: '',
+        images_data: [],
+        generation_metadata: {
+          imageModel: imageModel,
+          imageSize: imageSize,
+          mode: 'from-example',
+          fromExampleId: fromExampleId,
+          characterIds: characters.map(c => c.id),
+        },
+      })
+      if (bookError || !createdBook) {
+        console.error('[Create Book] from-example createBook error:', bookError)
+        throw new Error('Failed to create book from example')
+      }
+      book = createdBook
+      console.log(`[Create Book] ✅ Book created from example: ${book.id}`)
+    }
     // ====================================================================
     // COVER ONLY MODE: Skip story generation
     // ====================================================================
-    if (isCoverOnlyMode) {
+    else if (isCoverOnlyMode) {
       console.log('[Create Book] ⏭️  Skipping story generation (cover only mode)')
       console.log('[Create Book] 📝 Creating book with minimal data...')
 
@@ -552,6 +677,7 @@ export async function POST(request: NextRequest) {
         status: 'draft', // Will be updated after cover generation
         custom_requests: customRequests,
         images_data: [], // No page images in cover only mode
+        ...(isExample === true && { is_example: true }), // Admin "Create example book" (step6)
         generation_metadata: {
           model: storyModel,
           imageModel: imageModel,
@@ -757,6 +883,7 @@ export async function POST(request: NextRequest) {
         status: 'draft', // Story generated, images not yet
         custom_requests: customRequests,
         images_data: [], // Will be populated after image generation
+        ...(isExample === true && { is_example: true }), // Admin "Create example book" (step6)
         generation_metadata: {
           model: storyModel,
           imageModel: imageModel,
@@ -785,10 +912,97 @@ export async function POST(request: NextRequest) {
     }
 
     // ====================================================================
+    // FROM-EXAMPLE: master generation; cover/page use same pipeline below
+    // ====================================================================
+    if (isFromExampleMode && exampleBook) {
+      await updateBook(supabase, book.id, { status: 'generating' })
+
+      // Master illustrations (same face on every page)
+      const themeClothingForMaster: Record<string, string> = {
+        adventure: 'comfortable outdoor clothing, hiking clothes, sneakers (adventure outfit)',
+        space: 'child-sized astronaut suit or space exploration outfit',
+        underwater: 'swimwear, beach clothes',
+        sports: 'sportswear, athletic clothes',
+        fantasy: 'fantasy-appropriate casual clothing, adventure-style',
+        'daily-life': 'everyday casual clothing',
+      }
+      const exThemeKey = normalizeThemeKey(exampleBook.theme)
+      const themeClothing = themeClothingForMaster[exThemeKey] || 'age-appropriate casual clothing'
+      for (const char of characters) {
+        if (!char.reference_photo_url) continue
+        try {
+          const masterUrl = await generateMasterCharacterIllustration(
+            char.reference_photo_url,
+            char.description,
+            char.id,
+            exampleBook.illustration_style || illustrationStyle,
+            user.id,
+            supabase,
+            true,
+            char.gender,
+            themeClothing
+          )
+          masterIllustrations[char.id] = masterUrl
+          console.log(`[Create Book] ✅ From-example master for character ${char.id} (${char.name}): ${masterUrl}`)
+        } catch (err: any) {
+          console.warn(`[Create Book] ⚠️ From-example master failed for ${char.id}, using reference photo:`, err?.message)
+        }
+      }
+      if (Object.keys(masterIllustrations).length > 0) {
+        const currentMeta = book.generation_metadata || {}
+        await updateBook(supabase, book.id, {
+          generation_metadata: {
+            ...currentMeta,
+            masterIllustrations,
+            masterIllustrationCreated: true,
+          },
+        })
+        console.log(`[Create Book] 💾 From-example: saved ${Object.keys(masterIllustrations).length} master(s) to generation_metadata`)
+      }
+
+      // From-example: entity masters (example'da supportingEntities varsa üret; kapak/sayfa pipeline aynı)
+      if (storyData?.supportingEntities && storyData.supportingEntities.length > 0) {
+        const exIllustrationStyle = exampleBook.illustration_style || illustrationStyle
+        console.log(`[Create Book] 🐾 From-example: generating ${storyData.supportingEntities.length} supporting entity masters...`)
+        for (const entity of storyData.supportingEntities) {
+          try {
+            const entityMasterUrl = await generateSupportingEntityMaster(
+              entity.id,
+              entity.type,
+              entity.name,
+              entity.description,
+              exIllustrationStyle,
+              user.id,
+              supabase
+            )
+            entityMasterIllustrations[entity.id] = entityMasterUrl
+            console.log(`[Create Book] ✅ From-example entity master for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
+          } catch (err: any) {
+            console.warn(`[Create Book] ⚠️ From-example entity master failed for ${entity.name}:`, err?.message)
+          }
+        }
+        if (Object.keys(entityMasterIllustrations).length > 0) {
+          const currentMeta = book.generation_metadata || {}
+          await updateBook(supabase, book.id, {
+            generation_metadata: {
+              ...currentMeta,
+              entityMasterIllustrations,
+              entityMasterCreated: true,
+            },
+          })
+          console.log(`[Create Book] 💾 From-example: saved ${Object.keys(entityMasterIllustrations).length} entity master(s) to generation_metadata`)
+        }
+      }
+
+      console.log(`[Create Book] ✅ From-example: masters ready; cover/page will use pipeline below`)
+    }
+
+    // ====================================================================
     // STEP 2: GENERATE MASTER CHARACTER ILLUSTRATION (UPDATED: 18 Ocak 2026)
     // UPDATED: Each character gets its own master illustration
     // Master kıyafeti: tema ile uyumlu (adventure → outdoor gear; story clothing yok artık)
     // ====================================================================
+    if (!isFromExampleMode) {
     console.log(`[Create Book] 🎨 Starting master character illustration generation...`)
     
     const themeClothingForMaster: Record<string, string> = {
@@ -802,9 +1016,7 @@ export async function POST(request: NextRequest) {
     const themeClothing = themeClothingForMaster[themeKey] || 'age-appropriate casual clothing'
     const suggestedOutfits = storyData?.suggestedOutfits && typeof storyData.suggestedOutfits === 'object' ? storyData.suggestedOutfits as Record<string, string> : null
 
-    const masterIllustrations: Record<string, string> = {}
-    
-    // Generate master illustration for each character separately
+    // Generate master illustration for each character separately (uses outer masterIllustrations)
     for (const char of characters) {
       if (!char.reference_photo_url) {
         console.log(`[Create Book] ⚠️  Character ${char.id} (${char.name}) has no reference photo - skipping master illustration`)
@@ -883,9 +1095,7 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // STEP 2.5: GENERATE SUPPORTING ENTITY MASTERS (NEW: 31 Ocak 2026)
     // ====================================================================
-    // Generate master illustrations for animals and objects from story
-    const entityMasterIllustrations: Record<string, string> = {}
-    
+    // Generate master illustrations for animals and objects from story (uses outer entityMasterIllustrations)
     if (storyData?.supportingEntities && storyData.supportingEntities.length > 0) {
       console.log(`[Create Book] 🐾 Generating ${storyData.supportingEntities.length} supporting entity masters...`)
       
@@ -923,6 +1133,8 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('[Create Book] ℹ️  No supporting entities in story - skipping entity master generation')
     }
+
+    } // end if (!isFromExampleMode) — cover/page below run for both normal and from-example
 
     console.log(`[Create Book] 🎨 Starting cover generation...`)
 
@@ -963,6 +1175,15 @@ export async function POST(request: NextRequest) {
         coverSceneDescription = customRequests && customRequests.trim()
           ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
           : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+      }
+
+      // From-example: örnek kapak görselinden sahne öğelerini (top, tavşan vb.) Vision ile alıp prompt'a ekle
+      if (isFromExampleMode && exampleBook?.cover_image_url) {
+        const exampleSceneExtra = await describeCoverSceneForPrompt(exampleBook.cover_image_url)
+        if (exampleSceneExtra) {
+          coverSceneDescription += exampleSceneExtra
+          console.log('[Create Book] 📍 From-example: cover prompt enriched with example scene elements')
+        }
       }
 
       console.log('[Create Book] 📝 Cover scene description:', coverSceneDescription.substring(0, 150) + '...')

@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 2 Şubat 2026 (FAZ 10 – README ve dokümantasyon güncellemesi)
+**Son güncelleme:** 4 Şubat 2026 (Create Your Own from Example – analiz dokümanı eklendi)
 
 ---
 
@@ -188,6 +188,7 @@ docs/
 4. **prompts/** - Tüm prompt template'leri
 5. **analysis/STORY_AND_IMAGE_AI_FLOW.md** - Story ve Image için AI’a ne gönderildiği / ne döndüğü (request-response akışı, inceleme için)
 6. **analysis/SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md** - Kıyafet tutarlılığı sistem tasarımı (v1.6.0 single source of truth)
+7. **analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md** - Create Your Own from Example: akış, characterIds eşleştirmesi, kapak Vision
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

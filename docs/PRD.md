@@ -61,7 +61,7 @@ AI ile kullanıcı dostu arayüzden dakikalar içinde kişiselleştirilmiş, pro
 ### 2.4 Web Sitesi Sayfaları
 - **Ana sayfa:** [ ] Hero, Nasıl Çalışır, örnek kitaplar, testimonials, features/pricing özeti, FAQ, footer
 - **Features / Ideas / Reviews / Help:** [ ] Planlanıyor veya kısmen
-- **Examples:** [x] Örnek kitaplar, önizleme ✅
+- **Examples:** [x] Örnek kitaplar, önizleme, Create Your Own from Example ✅
 - **Pricing:** [x] Planlar, E-book vs Basılı, paket fiyatları, karşılaştırma tablosu, kurumsal, currency entegrasyonu ✅
 - **For Schools:** [ ] Post-MVP
 
