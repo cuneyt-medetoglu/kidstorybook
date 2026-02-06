@@ -3,7 +3,7 @@
 
 **Versiyon:** 1.5  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 2 Şubat 2026  
+**Son Güncelleme:** 4 Şubat 2026  
 **Durum:** TASLAK – FAZ 3 (MVP hazır; Multi-character, TTS, Currency, Cart, Image Edit, 8 dil, PDF, Debug/Feature Flags)
 
 > **Kısa PRD:** Teknik detaylar → [PRD Teknik Gereksinimler](technical/PRD_TECHNICAL_DETAILS.md). Tamamlanan özellikler → [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md).
@@ -78,7 +78,7 @@ AI ile kullanıcı dostu arayüzden dakikalar içinde kişiselleştirilmiş, pro
 ## 3. Teknik Gereksinimler (Özet)
 
 - **AI:** GPT-4o (hikaye), GPT-image-1.5 (görsel); prompt versioning ve kalite süreçleri aktif.
-- **E-Book:** PDF (A4 landscape), flipbook, Supabase Storage, indirme linki.
+- **E-Book:** PDF (A4 landscape), flipbook, AWS S3 storage, indirme linki.
 - **Performans:** Hikaye &lt; 3 dk, görsel 30–60 sn, sayfa &lt; 3 sn hedefleniyor.
 - **Güvenlik:** GDPR/KVKK, çocuk fotoğrafı şifreleme, veri silme hakkı hedefleniyor.
 - **Debug/Feature Flags:** `lib/config.ts` + `DEBUG_SKIP_PAYMENT`; admin rolü ile test ortamında ödemesiz kitap.
@@ -130,4 +130,4 @@ Mobil uygulama, video hikayeler, kullanıcı yorumları (başlangıç), affiliat
 ---
 
 **Doküman Sahibi:** Proje Ekibi  
-**Son Güncelleme:** 2 Şubat 2026
+**Son Güncelleme:** 4 Şubat 2026

@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 4 Şubat 2026 (Create Your Own from Example – analiz dokümanı eklendi)
+**Son güncelleme:** 4 Şubat 2026 (AWS Faz 4 tamamlandı; sıfırdan kurulum rehberi eklendi – plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md)
 
 ---
 
@@ -45,6 +45,10 @@ docs/
 │   ├── README.md               # Arşiv yapısı (FAZ 6)
 │   ├── 2026-q1/                # FAZ 6 ile taşınan 17 dosya (implementation, guides, reports, strategies, ai)
 │   │   └── README.md           # 2026-q1 özeti
+│   ├── 2026-02/                # AWS geçişi sonrası (Supabase legacy rehberler, AWS analiz/detay planları)
+│   │   ├── README.md           # 2026-02 özeti
+│   │   ├── supabase-legacy/    # SUPABASE_TEST_GUIDE, SUPABASE_MIGRATION_GUIDE, SUPABASE_PDFS_BUCKET_SETUP
+│   │   └── aws-plans/         # SUPABASE_TO_AWS_ANALYSIS, AWS_S3_SINGLE_BUCKET_PLAN, AWS_MIGRATIONS_ORDER
 │   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi (arşiv)
 │   ├── FAZ1_TEST_CHECKLIST.md  # Faz 1 test checklist (arşiv)
 │   ├── FAZ1_2_FINAL_REPORT.md  # Faz 1.2 final raporu (arşiv)
@@ -59,9 +63,7 @@ docs/
 │
 ├── guides/                     # Rehberler ve talimatlar
 │   ├── README.md               # Klasör açıklaması (FAZ 6)
-│   ├── SUPABASE_TEST_GUIDE.md  # Supabase test rehberi
 │   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
-│   ├── SUPABASE_MIGRATION_GUIDE.md # Supabase migration uygulama rehberi
 │   ├── V0_APP_WORKFLOW.md      # v0.app çalışma akışı rehberi
 │   ├── COLOR_PALETTE.md        # Renk paleti rehberi
 │   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
@@ -99,6 +101,14 @@ docs/
 │   ├── EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md # Examples: gerçek kitaplar + Create your own stratejisi
 │   ├── EXAMPLE_BOOKS_CUSTOM_REQUESTS.md # Example Books görsel kalite sorunları
 │   └── (STEP_1_2_MERGE, CHARACTER_CONSISTENCY_IMPROVEMENT → archive/2026-q1/strategies/)
+│
+├── plans/                       # Altyapı / geçiş planları
+│   ├── README.md                # Plans klasörü açıklaması
+│   ├── AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md # Tek dokümanda AWS ortamı sıfırdan kurulum (EC2 + PG + S3)
+│   ├── SUPABASE_TO_AWS_ANALYSIS.md # Supabase → AWS geçiş analizi (kararlar, maliyet)
+│   ├── SUPABASE_TO_AWS_IMPLEMENTATION_PLAN.md # Adım adım uygulama planı (ilerleme buradan takip)
+│   ├── AWS_S3_SINGLE_BUCKET_PLAN.md # S3 tek bucket + prefix'ler (photos, books, pdfs, covers) adım adım
+│   └── AWS_MIGRATIONS_ORDER.md # EC2 PostgreSQL migration sırası
 │
 ├── database/                   # Database schemas ve migration'lar
 │   └── SCHEMA.md               # Database schema dokümantasyonu
@@ -144,6 +154,7 @@ docs/
 - `implementation/` - Faz bazlı implementasyon takibi
 - `checklists/` - Kontrol listeleri
 - `guides/` - Rehberler
+- `plans/` - Altyapı / geçiş planları (örn. Supabase → AWS analizi)
 - `reports/` - Raporlar
 - `strategies/` - Strateji dokümanları
 
@@ -313,7 +324,12 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 2 Şubat 2026
+**Son Güncelleme:** 4 Şubat 2026
+
+- **4 Şubat 2026 (AWS geçiş – Faz 4, sıfırdan kurulum rehberi):**
+  - Supabase → AWS uygulama planında **Faz 4 (S3 tek bucket + prefix’ler)** tamamlandı olarak işaretlendi.
+  - **docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md** eklendi: EC2 + PostgreSQL + S3 ortamını tek dokümanda sıfırdan kurma rehberi (bölge, güvenlik grubu, migration sırası, IAM, bucket policy, AWS CLI kurulumu dahil).
+  - DOCUMENTATION.md ve docs/plans/README.md güncellendi (yeni rehber ve Faz 4 durumu).
 
 - **2 Şubat 2026 (FAZ 10 – README ve dokümantasyon):**
   - README.md güncellendi: proje yapısı (app/, components/, lib/), özellikler (TTS, Multi-character, Currency Detection), hızlı başlangıç (port 3001), dokümantasyon tablosu, teknoloji stack

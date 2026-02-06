@@ -39,7 +39,7 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Bilinen konu:** Tekrarlayan arka planlar (yol, çiçekler, arkada ev) custom request olmadan da görülebilir; iyileştirme alanı (story/görsel çeşitlilik). Doküman: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` (Bilinen konular bölümü).
 
 ### PDF Generation (50 MB limit, sıkıştırma, timeout)
-- **Storage:** Supabase `pdfs` bucket – dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme 413 hatası verir.
+- **Storage:** AWS S3 tek bucket, `pdfs/` prefix – dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme 413 hatası verir.
 - **Görsel sıkıştırma:** `lib/pdf/image-compress.ts` – kapak ve sayfa görselleri PDF öncesi indirilir, **sharp** ile yeniden boyutlandırılır (MAX_WIDTH_PX) ve JPEG (JPEG_QUALITY) olarak sıkıştırılır; data URL ile PDF'e verilir. Hedef boyut ~30–40 MB (ayar: MAX_WIDTH_PX, JPEG_QUALITY).
 - **Timeout:** `lib/pdf/generator.ts` – Puppeteer sayfa yüklemesi için **setDefaultNavigationTimeout(90_000)** (90 saniye); büyük base64 görsellerde 30 s varsayılan yetmeyebilir.
 - **Rehber:** `docs/guides/PDF_GENERATION_GUIDE.md`
@@ -236,8 +236,8 @@ Kullanıcı UI yapmak istediğinde şu akışı takip et:
 |--------|-----------|
 | Frontend | Next.js 14 + Tailwind + shadcn/ui |
 | UI Builder | v0.app |
-| Backend | Next.js API Routes + Supabase |
-| Database | Supabase (PostgreSQL) |
+| Backend | Next.js API Routes + AWS (EC2, S3) |
+| Database | PostgreSQL (EC2) |
 | AI | OpenAI GPT-4o + GPT-image-1.5 (1024x1536 portrait, quality: low) |
 | Ödeme | Stripe + İyzico |
 | Hosting | Vercel |
@@ -301,7 +301,7 @@ Kullanıcı şunları diyebilir:
   - `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
   - Prompt version sync ve takip (`lib/prompts/` ve `docs/prompts/` arasındaki senkronizasyon)
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
-- **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
+- **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` (migration detay: `docs/archive/2026-02/aws-plans/`)
 - **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
   - **Sorumluluk:** Prompt'ların sürekli geliştirilmesi, kalite iyileştirmeleri, feedback'lerin prompt'lara yansıtılması
   - Prompt'lar sürekli gelişen dokümanlardır ve @prompt-manager bu gelişimin sorumlusudur

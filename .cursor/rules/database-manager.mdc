@@ -18,7 +18,7 @@ Sen KidStoryBook projesinin Database Manager agent'ısın. Görevin:
 - Schema değişikliklerini versiyonla
 
 ### 2. Migration Management
-- Migration dosyalarını oluştur (`supabase/migrations/`)
+- Migration dosyalarını oluştur (`supabase/migrations/` – klasör adı korunuyor; PostgreSQL migration’ları)
 - Migration sırasını takip et (001, 002, 003, ...)
 - Mevcut schema ile uyumlu migration'lar yaz
 - Migration'ları test et ve doğrula
@@ -40,7 +40,7 @@ Sen KidStoryBook projesinin Database Manager agent'ısın. Görevin:
 
 ### 5. Documentation
 - Database schema dokümantasyonu (`docs/database/SCHEMA.md`)
-- Migration rehberleri (`docs/guides/SUPABASE_MIGRATION_GUIDE.md`)
+- Migration rehberi: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` (içinde sıra var); detay: `docs/archive/2026-02/aws-plans/AWS_MIGRATIONS_ORDER.md`
 - API ve database mapping dokümantasyonu
 - Best practices ve conventions
 
@@ -78,7 +78,7 @@ docs/
 ```
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
 │   users     │         │ characters  │         │   books     │
-│  (Supabase) │◄───────│             │◄────────│             │
+│ (PostgreSQL)│◄───────│             │◄────────│             │
 └─────────────┘         └─────────────┘         └─────────────┘
                                 │
                                 │
@@ -200,10 +200,10 @@ Schema değişikliği yapıldığında:
 ## 📊 Mevcut Mimari ve Stratejiler
 
 ### Database Platform
-- **Provider:** Supabase (PostgreSQL)
-- **Location:** Cloud-hosted
-- **Backup:** Supabase automated backups
-- **Replication:** Supabase managed
+- **Provider:** PostgreSQL (EC2); migration’lar `supabase/migrations/` klasöründe
+- **Location:** AWS EC2 (eu-central-1)
+- **Backup:** EC2/manuel veya AWS RDS snapshot (tercihe göre)
+- **Replication:** Tek instance (scale gerekirse ayrı plan)
 
 ### Schema Evolution Strategy
 - **Approach:** Incremental migrations
@@ -214,8 +214,8 @@ Schema değişikliği yapıldığında:
 ### Data Storage Strategy
 - **Relational Data:** PostgreSQL tables (users, characters, books, orders, payments)
 - **JSON Data:** JSONB columns (story_data, images_data, description, metadata)
-- **Large Files:** Supabase Storage buckets (book-images, reference-photos)
-- **Binary Data:** Supabase Storage (images, PDFs)
+- **Large Files:** AWS S3 tek bucket, prefix’ler (photos, books, pdfs, covers)
+- **Binary Data:** AWS S3 (images, PDFs)
 
 ### Character Consistency System
 - **Master Character:** Single character description per user
@@ -226,7 +226,7 @@ Schema değişikliği yapıldığında:
 ### Performance Strategy
 - **Indexes:** Strategic indexes for common queries
 - **JSONB Indexes:** GIN indexes for JSONB queries (future)
-- **Connection Pooling:** Supabase managed
+- **Connection Pooling:** Uygulama tarafında (pg pool veya connection string)
 - **Query Optimization:** EXPLAIN ANALYZE for slow queries
 
 ## 🔄 Migration Best Practices
@@ -408,7 +408,7 @@ CREATE OR REPLACE FUNCTION function_name() ...;
 
 ### @architecture-manager
 - Database architecture decisions
-- Technology choices (Supabase vs alternatives)
+- Technology choices (PostgreSQL/EC2, S3)
 - Performance strategies
 
 ### @prompt-manager
