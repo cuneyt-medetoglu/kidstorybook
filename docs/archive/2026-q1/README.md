@@ -16,4 +16,4 @@
 
 ## Referans
 
-Taşınan dosyaların listesi ve gerekçeleri: [docs/ARCHIVE_LIST.md](../../ARCHIVE_LIST.md).
+Taşınan dosyaların listesi ve gerekçeleri: [docs/archive/ARCHIVE_LIST.md](../../archive/ARCHIVE_LIST.md).

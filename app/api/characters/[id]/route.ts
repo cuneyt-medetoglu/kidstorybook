@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import {
   getCharacterById,
   updateCharacter,
@@ -19,22 +19,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check authentication
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
+    const user = await requireUser()
 
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get character (pass supabase client for Bearer token support)
-    const { data: character, error: dbError } = await getCharacterById(
-      supabase,
-      params.id
-    )
+    const { data: character, error: dbError } = await getCharacterById(params.id)
 
     if (dbError || !character) {
       return NextResponse.json(
@@ -69,16 +56,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check authentication
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const user = await requireUser()
 
     // Verify ownership
     const { data: existing } = await getCharacterById(params.id)
@@ -127,16 +105,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Check authentication
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const user = await requireUser()
 
     // Verify ownership
     const { data: existing } = await getCharacterById(params.id)

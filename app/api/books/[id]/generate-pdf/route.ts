@@ -6,8 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import { getBookById, updateBook } from '@/lib/db/books'
+import { uploadFile, getPublicUrl, fileExists } from '@/lib/storage/s3'
 import { generateBookPDF } from '@/lib/pdf/generator'
 import { compressImageForPdf } from '@/lib/pdf/image-compress'
 import { successResponse, errorResponse } from '@/lib/api/response'
@@ -19,25 +20,10 @@ export async function POST(
   const startTime = Date.now()
 
   try {
-    // ====================================================================
-    // 1. AUTHENTICATION & AUTHORIZATION
-    // ====================================================================
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return errorResponse('Unauthorized', undefined, 401)
-    }
-
+    const user = await requireUser()
     const bookId = params.id
 
-    // ====================================================================
-    // 2. FETCH BOOK DATA
-    // ====================================================================
-    const { data: book, error: bookError } = await getBookById(supabase, bookId)
+    const { data: book, error: bookError } = await getBookById(bookId)
 
     if (bookError || !book) {
       return errorResponse('Book not found', undefined, 404)
@@ -58,33 +44,17 @@ export async function POST(
     const { searchParams } = new URL(request.url)
     const forceRegenerate = searchParams.get('force') === 'true'
     
-    // Verify PDF actually exists in storage bucket
+    // Verify PDF actually exists in S3
     let pdfExistsInBucket = false
     if (!forceRegenerate && book.pdf_path) {
       try {
-        // Split path to get folder and filename
-        const pathParts = book.pdf_path.split('/')
-        const fileName = pathParts.pop() || ''
-        const folderPath = pathParts.join('/')
-        
-        // List files in the folder and check if our file exists
-        const { data: fileData, error: fileError } = await supabase.storage
-          .from('pdfs')
-          .list(folderPath || '', {
-            limit: 1000,
-          })
-        
-        if (!fileError && fileData) {
-          // Check if file exists in the list
-          pdfExistsInBucket = fileData.some((file) => file.name === fileName)
-        }
-        
+        const s3Key = book.pdf_path.startsWith('pdfs/') ? book.pdf_path : `pdfs/${book.pdf_path}`
+        pdfExistsInBucket = await fileExists(s3Key)
         if (!pdfExistsInBucket) {
-          console.log('[PDF Generation] PDF path in database but file not found in bucket, will regenerate')
+          console.log('[PDF Generation] PDF path in database but file not found in S3, will regenerate')
         }
       } catch (error) {
         console.error('[PDF Generation] Error checking file existence:', error)
-        // If check fails, assume file doesn't exist to be safe
         pdfExistsInBucket = false
       }
     }
@@ -106,10 +76,10 @@ export async function POST(
     
     // If PDF path exists in DB but file is missing from bucket, clear DB records
     if (book.pdf_path && !pdfExistsInBucket && !forceRegenerate) {
-      console.log('[PDF Generation] PDF missing from bucket, clearing database records')
-      await updateBook(supabase, bookId, {
-        pdf_url: null,
-        pdf_path: null,
+      console.log('[PDF Generation] PDF missing from S3, clearing database records')
+      await updateBook(bookId, {
+        pdf_url: undefined,
+        pdf_path: undefined,
       })
     }
     
@@ -174,33 +144,15 @@ export async function POST(
     console.log('[PDF Generation] - PDF Size:', (pdfBuffer.length / 1024).toFixed(2), 'KB')
 
     // ====================================================================
-    // 5. UPLOAD TO SUPABASE STORAGE
+    // 5. UPLOAD TO S3
     // ====================================================================
-    const fileName = `${book.title.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`
-    const filePath = `${user.id}/books/${bookId}/${fileName}`
+    const fileName = `${user.id}/books/${bookId}/${book.title.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.pdf`
 
-    console.log('[PDF Generation] Uploading PDF to Supabase Storage:', filePath)
+    console.log('[PDF Generation] Uploading PDF to S3:', fileName)
     console.log('[PDF Generation] - PDF Size:', (pdfBuffer.length / 1024 / 1024).toFixed(2), 'MB')
 
-    // Use 'pdfs' bucket (50 MB limit) instead of 'book-images' (10 MB limit)
-    const { error: uploadError } = await supabase.storage
-      .from('pdfs')
-      .upload(filePath, pdfBuffer, {
-        contentType: 'application/pdf',
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('[PDF Generation] Storage upload error:', uploadError)
-      return errorResponse('Failed to upload PDF to storage', uploadError.message, 500)
-    }
-
-    // Get public URL
-    const { data: publicUrlData } = supabase.storage
-      .from('pdfs')
-      .getPublicUrl(filePath)
-
-    const pdfUrl = publicUrlData?.publicUrl
+    const s3Key = await uploadFile('pdfs', fileName, Buffer.from(pdfBuffer), 'application/pdf')
+    const pdfUrl = getPublicUrl(s3Key)
 
     if (!pdfUrl) {
       return errorResponse('Failed to get PDF public URL', undefined, 500)
@@ -211,9 +163,9 @@ export async function POST(
     // ====================================================================
     // 6. UPDATE DATABASE
     // ====================================================================
-    const { error: updateError } = await updateBook(supabase, bookId, {
+    const { error: updateError } = await updateBook(bookId, {
       pdf_url: pdfUrl,
-      pdf_path: filePath,
+      pdf_path: s3Key,
     })
 
     if (updateError) {
@@ -233,7 +185,7 @@ export async function POST(
     return successResponse(
       {
         pdfUrl: pdfUrl,
-        pdfPath: filePath,
+        pdfPath: s3Key,
         cached: false,
       },
       'PDF generated successfully',

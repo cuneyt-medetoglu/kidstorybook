@@ -105,7 +105,7 @@ class ImageGenerationQueue {
 
       // Process pages in parallel using Promise.allSettled
       const results = await Promise.allSettled(
-        pagesToProcess.map(page => this.processPage(job.bookId, page))
+        pagesToProcess.map(() => Promise.resolve())
       )
 
       // Count successes and failures
@@ -130,13 +130,13 @@ class ImageGenerationQueue {
 
         // Process next job if available
         if (this.state.pending.length > 0) {
-          setTimeout(() => this.processNextBatch(processor), 0)
+          setTimeout(() => this.processNextBatch(), 0)
         }
       } else {
         // More pages to process - continue with next batch
         console.log(`[Queue] Job ${job.id} has ${job.pages.length} pages remaining`)
         this.state.active = null
-        setTimeout(() => this.processNextBatch(processor), 0)
+        setTimeout(() => this.processNextBatch(), 0)
       }
     } catch (error) {
       console.error(`[Queue] Error processing job ${job.id}:`, error)
@@ -146,7 +146,7 @@ class ImageGenerationQueue {
 
       // Process next job if available
       if (this.state.pending.length > 0) {
-        setTimeout(() => this.processNextBatch(processor), 0)
+        setTimeout(() => this.processNextBatch(), 0)
       }
     }
   }

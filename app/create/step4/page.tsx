@@ -39,9 +39,7 @@ const formSchema = z.object({
       "block_world",
       "sticker_art",
     ],
-    {
-      required_error: "Please select an illustration style",
-    },
+    { message: "Please select an illustration style" },
   ),
 })
 
@@ -205,7 +203,7 @@ export default function Step4Page() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }

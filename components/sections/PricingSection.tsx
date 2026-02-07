@@ -4,42 +4,11 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, Download, BookOpen, Info } from "lucide-react"
-import { useState, useEffect } from "react"
 import Link from "next/link"
-import type { CurrencyConfig } from "@/lib/currency"
+import { useCurrency } from "@/contexts/CurrencyContext"
 
 export function PricingSection() {
-  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>({
-    currency: "USD",
-    symbol: "$",
-    price: "$7.99",
-  })
-  const [isLoadingCurrency, setIsLoadingCurrency] = useState(true)
-
-  // Detect currency on mount
-  useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch("/api/currency")
-        const data = await response.json()
-        
-        if (data.success) {
-          setCurrencyConfig({
-            currency: data.currency,
-            symbol: data.symbol,
-            price: data.price,
-          })
-        }
-      } catch (error) {
-        console.error("[PricingSection] Error fetching currency:", error)
-        // Keep default USD
-      } finally {
-        setIsLoadingCurrency(false)
-      }
-    }
-
-    fetchCurrency()
-  }, [])
+  const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
   // Compact features for E-book (4 items)
   const ebookFeatures = [

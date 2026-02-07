@@ -1,7 +1,7 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { useRouter } from "next/navigation"
+import { Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useEffect, useState, useMemo, useCallback } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/lib/supabase/client"
+import { useSession } from "next-auth/react"
 import { ArrowLeft, Loader2, BookOpen, User, Heart, Eye, Scissors, Upload, Star, Sparkles, X, CheckCircle, ShoppingCart } from "lucide-react"
 import {
   Select,
@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import type { CurrencyConfig } from "@/lib/currency"
-import { getCurrencyConfig } from "@/lib/currency"
+import { useCurrency } from "@/contexts/CurrencyContext"
 
 const hairColorOptions = [
   { value: "light-blonde", label: "Light Blonde" },
@@ -92,7 +92,7 @@ const floatingVariants = {
   animate: (i: number) => ({
     y: [0, -15, 0],
     rotate: [0, 5, 0, -5, 0],
-    transition: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" },
+    transition: { duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut" as const },
   }),
 }
 
@@ -103,7 +103,7 @@ const decorativeElements = [
   { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
 ]
 
-export default function FromExamplePage() {
+function FromExampleContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -114,10 +114,10 @@ export default function FromExamplePage() {
   const [submitting, setSubmitting] = useState(false)
   const [characters, setCharacters] = useState<CharacterSlot[]>([])
   const [step, setStep] = useState<"form" | "summary">("form")
-  const [user, setUser] = useState<any>(null)
+  const { data: session } = useSession()
+  const user = session?.user ?? null
   const [canSkipPayment, setCanSkipPayment] = useState(false)
-  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>(getCurrencyConfig("USD"))
-  const [isLoadingCurrency, setIsLoadingCurrency] = useState(true)
+  const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
   const characterCount = useMemo(() => (example ? getExampleCharacterCount(example) : 0), [example])
   const isFormValid = characters.length > 0 && characters.every((c) => c.name.trim() && (c.gender === "boy" || c.gender === "girl") && c.photoFile && (c.hairColor ?? "").trim() !== "" && (c.eyeColor ?? "").trim() !== "")
@@ -159,23 +159,12 @@ export default function FromExamplePage() {
   }, [characterCount, characters.length])
 
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
-  }, [])
-
-  useEffect(() => {
     fetch("/api/debug/can-skip-payment")
       .then((r) => r.json())
       .then((data) => setCanSkipPayment(!!data?.canSkipPayment))
       .catch(() => setCanSkipPayment(false))
   }, [])
 
-  useEffect(() => {
-    fetch("/api/currency")
-      .then((r) => r.json())
-      .then((data) => data.currency && setCurrencyConfig(getCurrencyConfig(data.currency)))
-      .finally(() => setIsLoadingCurrency(false))
-  }, [])
 
   const updateCharacter = (index: number, patch: Partial<CharacterSlot>) => {
     setCharacters((prev) => {
@@ -635,5 +624,13 @@ export default function FromExamplePage() {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+export default function FromExamplePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /></div>}>
+      <FromExampleContent />
+    </Suspense>
   )
 }

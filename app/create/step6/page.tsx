@@ -24,11 +24,11 @@ import Image from "next/image"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/lib/supabase/client"
+import { useSession } from "next-auth/react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { CurrencyConfig } from "@/lib/currency"
-import { getCurrencyConfig } from "@/lib/currency"
+import { useCurrency } from "@/contexts/CurrencyContext"
 
 // Timeline step configuration
 const timelineSteps = [
@@ -68,8 +68,9 @@ export default function Step6Page() {
   const [wizardData, setWizardData] = useState<any>(null)
 
   // Auth and email state
-  const [user, setUser] = useState<any>(null)
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true)
+  const { data: session, status } = useSession()
+  const user = session?.user ?? null
+  const isLoadingAuth = status === "loading"
   const [email, setEmail] = useState<string>("")
   const [emailError, setEmailError] = useState<string>("")
   
@@ -80,46 +81,12 @@ export default function Step6Page() {
   // Debug / skip payment: only from API (admin role in DB or DEBUG_SKIP_PAYMENT server env)
   const [canSkipPayment, setCanSkipPayment] = useState(false)
 
-  // Currency state
-  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>(
-    getCurrencyConfig("USD")
-  )
-  const [isLoadingCurrency, setIsLoadingCurrency] = useState(true)
+  // Currency from context (tek seferlik fetch)
+  const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
   // Hover state for timeline nodes
   const [hoveredStep, setHoveredStep] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
-
-  // Check auth state
-  useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setIsLoadingAuth(false)
-    }
-    checkAuth()
-  }, [])
-
-  // Fetch currency
-  useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch("/api/currency")
-        const data = await response.json()
-
-        if (data.currency) {
-          setCurrencyConfig(getCurrencyConfig(data.currency))
-        }
-      } catch (error) {
-        console.error("Error fetching currency:", error)
-      } finally {
-        setIsLoadingCurrency(false)
-      }
-    }
-
-    fetchCurrency()
-  }, [])
 
   // Check free cover status: üyeli → API; üyesiz → 1 hak var varsayımı (API "zaten kullanıldı" dönebilir)
   useEffect(() => {
@@ -402,7 +369,7 @@ export default function Step6Page() {
       language,
       skipPayment: true,
     }
-    if (!payload.characterIds && !(payload as any).characterId) {
+    if (!(payload as { characterIds?: string[]; characterId?: string | null }).characterIds?.length && !(payload as any).characterId) {
       toast({
         title: "Characters required",
         description: "Save character(s) in previous steps first.",
@@ -469,7 +436,7 @@ export default function Step6Page() {
       skipPayment: true, // Also skip payment for example book creation
     }
 
-    if (!payload.characterIds && !(payload as any).characterId) {
+    if (!(payload as { characterIds?: string[]; characterId?: string | null }).characterIds?.length && !(payload as any).characterId) {
       toast({
         title: "Characters required",
         description: "Save character(s) in previous steps first.",
@@ -661,6 +628,7 @@ export default function Step6Page() {
                                   src={char.photo.url}
                                   alt={`${characterName} photo`}
                                   fill
+                                  sizes="80px"
                                   className="object-cover"
                                   unoptimized
                                 />
@@ -792,6 +760,7 @@ export default function Step6Page() {
                                   src={char.photo.url}
                                   alt={`${characterName} photo`}
                                   fill
+                                  sizes="(max-width: 768px) 100vw, 192px"
                                   className="object-cover"
                                   unoptimized
                                 />

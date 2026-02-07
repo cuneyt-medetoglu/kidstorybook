@@ -6,8 +6,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
+import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
 import { getBookById, updateBook } from '@/lib/db/books'
+import { insertEditHistory, getLatestPageVersion, getEditHistory } from '@/lib/db/edit-history'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/negative'
 
@@ -37,15 +39,7 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 1. AUTHENTICATION & AUTHORIZATION
     // ====================================================================
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return errorResponse('Unauthorized', 401)
-    }
+    const user = await requireUser()
 
     // ====================================================================
     // 2. PARSE & VALIDATE REQUEST
@@ -54,31 +48,31 @@ export async function POST(request: NextRequest) {
     const { bookId, pageNumber, maskImageBase64, editPrompt } = body
 
     if (!bookId || !pageNumber || !maskImageBase64 || !editPrompt) {
-      return errorResponse('Missing required fields: bookId, pageNumber, maskImageBase64, editPrompt', 400)
+      return errorResponse('Missing required fields: bookId, pageNumber, maskImageBase64, editPrompt', undefined, 400)
     }
 
     if (pageNumber < 1) {
-      return errorResponse('Invalid pageNumber: must be >= 1', 400)
+      return errorResponse('Invalid pageNumber: must be >= 1', undefined, 400)
     }
 
     if (!maskImageBase64.startsWith('data:image/png;base64,')) {
-      return errorResponse('maskImageBase64 must be a PNG in base64 format', 400)
+      return errorResponse('maskImageBase64 must be a PNG in base64 format', undefined, 400)
     }
 
     if (editPrompt.trim().length < 5) {
-      return errorResponse('editPrompt must be at least 5 characters', 400)
+      return errorResponse('editPrompt must be at least 5 characters', undefined, 400)
     }
 
     // ====================================================================
     // 3. FETCH BOOK & CHECK OWNERSHIP
     // ====================================================================
-    const { data: book, error: bookError } = await getBookById(supabase, bookId)
+    const { data: book, error: bookError } = await getBookById(bookId)
     if (bookError || !book) {
-      return errorResponse('Book not found', 404)
+      return errorResponse('Book not found', undefined, 404)
     }
 
     if (book.user_id !== user.id) {
-      return errorResponse('Unauthorized', 403)
+      return errorResponse('Unauthorized', undefined, 403)
     }
 
     console.log(`[Image Edit] Starting edit for book ${bookId}, page ${pageNumber}`)
@@ -125,7 +119,7 @@ export async function POST(request: NextRequest) {
     const quotaLimit = book.edit_quota_limit || 3
 
     if (quotaUsed >= quotaLimit) {
-      return errorResponse(`Edit quota exceeded. You have used all ${quotaLimit} edits for this book.`, 429)
+      return errorResponse(`Edit quota exceeded. You have used all ${quotaLimit} edits for this book.`, undefined, 429)
     }
 
     console.log(`[Image Edit] Quota check: ${quotaUsed}/${quotaLimit} used`)
@@ -134,19 +128,19 @@ export async function POST(request: NextRequest) {
     // 5. GET CURRENT IMAGE FOR THE PAGE
     // ====================================================================
     if (!book.story_data || !Array.isArray(book.story_data.pages)) {
-      return errorResponse('Book has no story data', 400)
+      return errorResponse('Book has no story data', undefined, 400)
     }
 
     const pageIndex = pageNumber - 1
     if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
-      return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, 400)
+      return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, undefined, 400)
     }
 
     const currentPage = book.story_data.pages[pageIndex]
     const currentImageUrl = currentPage.imageUrl
 
     if (!currentImageUrl) {
-      return errorResponse(`Page ${pageNumber} has no image to edit`, 400)
+      return errorResponse(`Page ${pageNumber} has no image to edit`, undefined, 400)
     }
 
     console.log(`[Image Edit] Current image URL: ${currentImageUrl}`)
@@ -154,17 +148,8 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 6. GET LATEST VERSION NUMBER
     // ====================================================================
-    const { data: latestVersionData, error: versionError } = await supabase.rpc('get_latest_page_version', {
-      p_book_id: bookId,
-      p_page_number: pageNumber,
-    })
-
-    if (versionError) {
-      console.error('[Image Edit] Error getting latest version:', versionError)
-      return errorResponse('Failed to get version history', 500)
-    }
-
-    const nextVersion = (latestVersionData || 0) + 1
+    const latestVersion = await getLatestPageVersion(bookId, pageNumber)
+    const nextVersion = latestVersion + 1
     console.log(`[Image Edit] Next version: ${nextVersion}`)
 
     // ====================================================================
@@ -264,36 +249,20 @@ export async function POST(request: NextRequest) {
     console.log('[Image Edit] ✅ OpenAI edit successful, converting base64 to buffer...')
 
     // ====================================================================
-    // 9. CONVERT BASE64 TO ARRAYBUFFER & UPLOAD TO SUPABASE STORAGE
+    // 9. CONVERT BASE64 TO BUFFER & UPLOAD TO S3
     // ====================================================================
-    // Convert base64 to ArrayBuffer for storage upload
+    // Convert base64 to Buffer for storage upload
     const editedBinaryStr = atob(editedImageBase64)
     const editedLen = editedBinaryStr.length
     const editedBytes = new Uint8Array(editedLen)
     for (let i = 0; i < editedLen; i++) {
       editedBytes[i] = editedBinaryStr.charCodeAt(i)
     }
-    const editedImageBuffer = editedBytes.buffer
-    const editedFileName = `page_${pageNumber}_v${nextVersion}_${Date.now()}.png`
-    const editedFilePath = `${user.id}/books/${bookId}/edits/${editedFileName}`
+    const editedImageBuffer = Buffer.from(editedBytes)
+    const editedFileName = `${user.id}/books/${bookId}/edits/page_${pageNumber}_v${nextVersion}_${Date.now()}.png`
 
-    const { error: uploadError } = await supabase.storage
-      .from('book-images')
-      .upload(editedFilePath, editedImageBuffer, {
-        contentType: 'image/png',
-        upsert: false,
-      })
-
-    if (uploadError) {
-      console.error('[Image Edit] Upload error:', uploadError)
-      throw new Error(`Failed to upload edited image: ${uploadError.message}`)
-    }
-
-    const { data: publicUrlData } = supabase.storage
-      .from('book-images')
-      .getPublicUrl(editedFilePath)
-
-    const editedImageUrl = publicUrlData?.publicUrl || editedTempUrl
+    const s3Key = await uploadFile('books', editedFileName, editedImageBuffer, 'image/png')
+    const editedImageUrl = getPublicUrl(s3Key)
 
     console.log('[Image Edit] ✅ Edited image uploaded:', editedImageUrl)
 
@@ -302,23 +271,11 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     let maskImageUrl: string | null = null
     try {
-      const maskFileName = `page_${pageNumber}_mask_v${nextVersion}_${Date.now()}.png`
-      const maskFilePath = `${user.id}/books/${bookId}/edits/${maskFileName}`
-
-      const { error: maskUploadError } = await supabase.storage
-        .from('book-images')
-        .upload(maskFilePath, maskBlob, {
-          contentType: 'image/png',
-          upsert: false,
-        })
-
-      if (!maskUploadError) {
-        const { data: maskPublicUrlData } = supabase.storage
-          .from('book-images')
-          .getPublicUrl(maskFilePath)
-
-        maskImageUrl = maskPublicUrlData?.publicUrl || null
-      }
+      const maskBuffer = Buffer.from(await maskBlob.arrayBuffer())
+      const maskFileName = `${user.id}/books/${bookId}/edits/page_${pageNumber}_mask_v${nextVersion}_${Date.now()}.png`
+      
+      const maskS3Key = await uploadFile('books', maskFileName, maskBuffer, 'image/png')
+      maskImageUrl = getPublicUrl(maskS3Key)
     } catch (error) {
       console.warn('[Image Edit] Failed to upload mask (non-critical):', error)
     }
@@ -328,27 +285,16 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     const processingTime = Date.now() - startTime
 
-    const { error: historyError } = await supabase
-      .from('image_edit_history')
-      .insert({
-        book_id: bookId,
-        page_number: pageNumber,
-        version: nextVersion,
-        original_image_url: currentImageUrl,
-        edited_image_url: editedImageUrl,
-        mask_image_url: maskImageUrl,
-        edit_prompt: editPrompt,
-        ai_model: 'gpt-image-1.5',
-        edit_metadata: {
-          processingTime,
-          maskSize: maskBlob.size,
-        },
-      })
-
-    if (historyError) {
-      console.error('[Image Edit] History insert error:', historyError)
-      throw new Error(`Failed to save edit history: ${historyError.message}`)
-    }
+    await insertEditHistory({
+      book_id: bookId,
+      page_number: pageNumber,
+      version_number: nextVersion,
+      previous_image_url: currentImageUrl,
+      new_image_url: editedImageUrl,
+      edit_prompt: editPrompt,
+      mask_image_url: maskImageUrl,
+      edited_by: user.id,
+    })
 
     console.log('[Image Edit] ✅ Edit history saved')
 
@@ -361,33 +307,25 @@ export async function POST(request: NextRequest) {
       imageUrl: editedImageUrl,
     }
 
-    await updateBook(supabase, bookId, {
+    await updateBook(bookId, {
       story_data: {
         ...book.story_data,
         pages: updatedPages,
       },
     })
 
-    // Update quota separately (to avoid race conditions)
-    await supabase
-      .from('books')
-      .update({ edit_quota_used: quotaUsed + 1 })
-      .eq('id', bookId)
-
     console.log('[Image Edit] ✅ Book updated with new image and quota')
 
     // ====================================================================
     // 13. FETCH EDIT HISTORY FOR RESPONSE
     // ====================================================================
-    const { data: historyData, error: historyFetchError } = await supabase.rpc('get_book_edit_history', {
-      p_book_id: bookId,
-    })
+    const historyData = await getEditHistory(bookId)
 
     const history = (historyData || [])
       .filter((h: any) => h.page_number === pageNumber)
       .map((h: any) => ({
-        version: h.version,
-        imageUrl: h.edited_image_url,
+        version: h.version_number,
+        imageUrl: h.new_image_url,
         editPrompt: h.edit_prompt,
         createdAt: h.created_at,
       }))
@@ -408,6 +346,6 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('[Image Edit] Error:', error)
-    return handleAPIError(error, 'Image edit failed')
+    return handleAPIError(error)
   }
 }

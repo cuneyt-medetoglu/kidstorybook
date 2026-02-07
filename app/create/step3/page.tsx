@@ -27,15 +27,9 @@ import { z } from "zod"
 
 // Validation schema
 const formSchema = z.object({
-  theme: z.enum(["adventure", "fairy_tale", "educational", "nature", "space", "sports"], {
-    required_error: "Please select a theme for your story",
-  }),
-  ageGroup: z.enum(["0-2", "3-5", "6-9"], {
-    required_error: "Please select an age group",
-  }),
-  language: z.enum(["en", "tr", "de", "fr", "es", "zh", "pt", "ru"], {
-    required_error: "Please select a language for your story",
-  }),
+  theme: z.enum(["adventure", "fairy_tale", "educational", "nature", "space", "sports"], { message: "Please select a theme for your story" }),
+  ageGroup: z.enum(["0-2", "3-5", "6-9"], { message: "Please select an age group" }),
+  language: z.enum(["en", "tr", "de", "fr", "es", "zh", "pt", "ru"], { message: "Please select a language for your story" }),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -306,7 +300,7 @@ export default function Step3Page() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }

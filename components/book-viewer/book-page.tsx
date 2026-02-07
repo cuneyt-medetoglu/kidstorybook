@@ -29,6 +29,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
             src={page.imageUrl || "https://via.placeholder.com/800x600"}
             alt={`Page ${page.pageNumber} illustration`}
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain"
             priority
             unoptimized
@@ -70,6 +71,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
                 src={page.imageUrl || "/placeholder.svg"}
                 alt={`Page ${page.pageNumber} illustration`}
                 fill
+                sizes="100vw"
                 className="object-contain"
                 priority
                 unoptimized
@@ -129,6 +131,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
           src={page.imageUrl || "/placeholder.svg"}
           alt={`Page ${page.pageNumber} illustration`}
           fill
+          sizes="(max-width: 768px) 100vw, 800px"
           className="object-cover"
           priority
           unoptimized

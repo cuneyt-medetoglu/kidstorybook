@@ -201,10 +201,11 @@
   - GET /api/currency aynı sayfada/akışta 2 kez çağrılıyor; diğer sayfalarda gezerken de sürekli log (Compiling, GET ...) görünüyor
   - Neden: Muhtemelen birden fazla component'ten veya layout'tan aynı API'nin tetiklenmesi
   - Çözüm: Currency çağrısını tek noktadan (provider/cache) yapmak, gereksiz tekrarları kaldırmak; development log seviyesi/formatı
-- [ ] **2.4.14** Next.js Image ve layout konsol uyarıları (Şubat 2026) | 🔴 DO
+- [x] **2.4.14** Next.js Image ve layout konsol uyarıları (Şubat 2026) | ✅ Çözüldü (4 Şubat 2026)
   - İlk açılışta/sayfa yüklenirken konsolda: next/image `fill` kullanılan yerde `sizes` eksik; LCP resminde `priority` eksik; container'da `position` (relative/fixed/absolute) uyarısı
   - Neden: next/image performans ve doğru boyut için `sizes` istiyor; LCP için `priority` öneriliyor; scroll offset için container position gerekli
   - Çözüm: İlgili Image bileşenlerine `sizes` eklemek; LCP (above-the-fold) resimlere `priority` eklemek; uyarı veren container'a uygun position vermek. Detay: Next.js docs (sizes, priority)
+  - **Yapılan:** Tüm `fill` kullanan Image bileşenlerine `sizes` eklendi (examples, ExampleBooksCarousel, book-page, draft-preview, step6, CartSummary, cart, books/settings, EditHistoryPanel, page-thumbnails); scroll konteynerine (examples filter chips) `relative` eklendi.
 
 ### 2.5 E-book Viewer ⭐ **KRİTİK - EN ÖNEMLİ BÖLÜM** ✅ **TAMAMLANDI VE ÇALIŞIYOR** (11 Ocak 2026)
 **Not:** Bu bölüm kullanıcının en çok etkileşimde bulunacağı kısım. Çok iyi planlanmalı ve harika bir UX sunmalı.  
@@ -391,6 +392,11 @@
   - **Analiz:** `docs/analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md`
   - **Strategy (Madde 2):** `docs/strategies/EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
+  - [ ] **2.7.8.1** Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026) | 🔴 DO
+    - "Example Books" hero/başlık alanı: daha çekici gradient, ikon ve tipografi
+    - Yaş grubu filtreleri: daha belirgin, çocuk dostu stil
+    - Empty state: büyüteç + mesaj alanı daha görsel ve davetkar
+    - **Not:** Yapılacak; sonra bakılacak.
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
 - [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)
 - [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8)

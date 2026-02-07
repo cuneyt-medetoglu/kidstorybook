@@ -1,12 +1,11 @@
 /**
- * Database operations for Characters
+ * Database operations for Characters (PostgreSQL)
  * 
  * Handles CRUD operations for master character descriptions
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { pool } from './pool'
 import type { CharacterDescription } from '@/lib/prompts/types'
-import { createClient } from '@/lib/supabase/server'
 
 // ============================================================================
 // Types
@@ -69,37 +68,38 @@ export interface UpdateCharacterInput {
 // ============================================================================
 
 export async function createCharacter(
-  supabase: SupabaseClient,
   userId: string,
   input: CreateCharacterInput
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('characters')
-      .insert({
-        user_id: userId,
-        name: input.name,
-        age: input.age,
-        gender: input.gender,
-        character_type: input.character_type, // NEW: Character type info
-        hair_color: input.hair_color,
-        eye_color: input.eye_color,
-        features: input.features || [],
-        reference_photo_url: input.reference_photo_url,
-        reference_photo_path: input.reference_photo_path,
-        ai_analysis: input.ai_analysis,
-        full_description: input.full_description,
-        description: input.description,
-        analysis_raw: input.analysis_raw,
-        analysis_confidence: input.analysis_confidence,
-        is_default: input.is_default ?? true, // First character is default
-      })
-      .select()
-      .single()
+    const result = await pool.query(
+      `INSERT INTO characters (
+        user_id, name, age, gender, character_type, hair_color, eye_color, features,
+        reference_photo_url, reference_photo_path, ai_analysis, full_description,
+        description, analysis_raw, analysis_confidence, is_default, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW())
+      RETURNING *`,
+      [
+        userId,
+        input.name,
+        input.age,
+        input.gender,
+        input.character_type ? JSON.stringify(input.character_type) : null,
+        input.hair_color,
+        input.eye_color,
+        input.features || [],
+        input.reference_photo_url || null,
+        input.reference_photo_path || null,
+        input.ai_analysis ? JSON.stringify(input.ai_analysis) : null,
+        input.full_description || null,
+        JSON.stringify(input.description),
+        input.analysis_raw ? JSON.stringify(input.analysis_raw) : null,
+        input.analysis_confidence || null,
+        input.is_default ?? true,
+      ]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows[0], error: null }
   } catch (error) {
     console.error('Error creating character:', error)
     return { data: null, error: error as Error }
@@ -111,19 +111,15 @@ export async function createCharacter(
 // ============================================================================
 
 export async function getCharacterById(
-  supabase: SupabaseClient,
   characterId: string
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('id', characterId)
-      .single()
+    const result = await pool.query(
+      'SELECT * FROM characters WHERE id = $1',
+      [characterId]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching character:', error)
     return { data: null, error: error as Error }
@@ -131,21 +127,17 @@ export async function getCharacterById(
 }
 
 export async function getUserCharacters(
-  supabase: SupabaseClient,
   userId: string
 ): Promise<{ data: Character[] | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('user_id', userId)
-      .order('is_default', { ascending: false })
-      .order('total_books', { ascending: false })
-      .order('created_at', { ascending: false })
+    const result = await pool.query(
+      `SELECT * FROM characters 
+       WHERE user_id = $1 
+       ORDER BY is_default DESC, total_books DESC, created_at DESC`,
+      [userId]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows, error: null }
   } catch (error) {
     console.error('Error fetching characters:', error)
     return { data: null, error: error as Error }
@@ -156,21 +148,12 @@ export async function getDefaultCharacter(
   userId: string
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = await createClient()
+    const result = await pool.query(
+      'SELECT * FROM characters WHERE user_id = $1 AND is_default = true LIMIT 1',
+      [userId]
+    )
 
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_default', true)
-      .single()
-
-    if (error && error.code !== 'PGRST116') {
-      // PGRST116 = no rows returned, which is ok (no default character yet)
-      throw error
-    }
-
-    return { data: data || null, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching default character:', error)
     return { data: null, error: error as Error }
@@ -186,11 +169,9 @@ export async function updateCharacter(
   input: UpdateCharacterInput
 ): Promise<{ data: Character | null; error: Error | null }> {
   try {
-    const supabase = await createClient()
-
     // If updating description, save current version to history
     if (input.description) {
-      const { data: current } = await getCharacterById(supabase, characterId)
+      const { data: current } = await getCharacterById(characterId)
       if (current) {
         const previousVersions = current.previous_versions || []
         previousVersions.push({
@@ -199,33 +180,86 @@ export async function updateCharacter(
           updated_at: current.updated_at,
         })
 
-        const { data, error } = await supabase
-          .from('characters')
-          .update({
-            ...input,
-            version: current.version + 1,
-            previous_versions: previousVersions,
-          })
-          .eq('id', characterId)
-          .select()
-          .single()
+        const fields: string[] = []
+        const values: any[] = []
+        let paramCount = 1
 
-        if (error) throw error
-        return { data, error: null }
+        if (input.name !== undefined) {
+          fields.push(`name = $${paramCount++}`)
+          values.push(input.name)
+        }
+        if (input.age !== undefined) {
+          fields.push(`age = $${paramCount++}`)
+          values.push(input.age)
+        }
+        if (input.gender !== undefined) {
+          fields.push(`gender = $${paramCount++}`)
+          values.push(input.gender)
+        }
+        if (input.description !== undefined) {
+          fields.push(`description = $${paramCount++}`)
+          values.push(JSON.stringify(input.description))
+        }
+        if (input.is_default !== undefined) {
+          fields.push(`is_default = $${paramCount++}`)
+          values.push(input.is_default)
+        }
+
+        fields.push(`version = $${paramCount++}`)
+        values.push(current.version + 1)
+        fields.push(`previous_versions = $${paramCount++}`)
+        values.push(JSON.stringify(previousVersions))
+        fields.push(`updated_at = NOW()`)
+        values.push(characterId)
+
+        const result = await pool.query(
+          `UPDATE characters SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+          values
+        )
+
+        return { data: result.rows[0] || null, error: null }
       }
     }
 
     // Normal update without versioning
-    const { data, error } = await supabase
-      .from('characters')
-      .update(input)
-      .eq('id', characterId)
-      .select()
-      .single()
+    const fields: string[] = []
+    const values: any[] = []
+    let paramCount = 1
 
-    if (error) throw error
+    if (input.name !== undefined) {
+      fields.push(`name = $${paramCount++}`)
+      values.push(input.name)
+    }
+    if (input.age !== undefined) {
+      fields.push(`age = $${paramCount++}`)
+      values.push(input.age)
+    }
+    if (input.gender !== undefined) {
+      fields.push(`gender = $${paramCount++}`)
+      values.push(input.gender)
+    }
+    if (input.character_type !== undefined) {
+      fields.push(`character_type = $${paramCount++}`)
+      values.push(JSON.stringify(input.character_type))
+    }
+    if (input.is_default !== undefined) {
+      fields.push(`is_default = $${paramCount++}`)
+      values.push(input.is_default)
+    }
 
-    return { data, error: null }
+    if (fields.length === 0) {
+      return getCharacterById(characterId)
+    }
+
+    fields.push(`updated_at = NOW()`)
+    values.push(characterId)
+
+    const result = await pool.query(
+      `UPDATE characters SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
+    )
+
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error updating character:', error)
     return { data: null, error: error as Error }
@@ -243,21 +277,34 @@ export async function markCharacterUsed(
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = await createClient()
-
     // The trigger will handle updating used_in_books array
     // We just need to update the book's character_id
-    const { error } = await supabase
-      .from('books')
-      .update({ character_id: characterId })
-      .eq('id', bookId)
-
-    if (error) throw error
+    await pool.query(
+      'UPDATE books SET character_id = $1 WHERE id = $2',
+      [characterId, bookId]
+    )
 
     return { error: null }
   } catch (error) {
     console.error('Error marking character as used:', error)
     return { error: error as Error }
+  }
+}
+
+export async function updateCharacterLastUsed(
+  characterId: string
+): Promise<{ success: boolean; error: Error | null }> {
+  try {
+    await pool.query(
+      'UPDATE characters SET last_used_at = NOW() WHERE id = $1',
+      [characterId]
+    )
+
+    console.log('[Character] Updated last_used_at for character:', characterId)
+    return { success: true, error: null }
+  } catch (error) {
+    console.error('[Character] Error updating last_used_at:', error)
+    return { success: false, error: error as Error }
   }
 }
 
@@ -269,10 +316,8 @@ export async function deleteCharacter(
   characterId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const supabase = await createClient()
-
     // Check if character is used in any books
-    const { data: character } = await getCharacterById(supabase, characterId)
+    const { data: character } = await getCharacterById(characterId)
     if (character && character.total_books > 0) {
       return {
         error: new Error(
@@ -281,12 +326,7 @@ export async function deleteCharacter(
       }
     }
 
-    const { error } = await supabase
-      .from('characters')
-      .delete()
-      .eq('id', characterId)
-
-    if (error) throw error
+    await pool.query('DELETE FROM characters WHERE id = $1', [characterId])
 
     return { error: null }
   } catch (error) {
@@ -308,15 +348,12 @@ export async function getCharacterStats(characterId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = await createClient()
+    const result = await pool.query(
+      'SELECT * FROM get_character_stats($1)',
+      [characterId]
+    )
 
-    const { data, error } = await supabase.rpc('get_character_stats', {
-      p_character_id: characterId,
-    })
-
-    if (error) throw error
-
-    return { data: data?.[0] || null, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching character stats:', error)
     return { data: null, error: error as Error }
@@ -334,41 +371,14 @@ export async function getBooksByCharacter(characterId: string): Promise<{
   error: Error | null
 }> {
   try {
-    const supabase = await createClient()
+    const result = await pool.query(
+      'SELECT * FROM get_books_by_character($1)',
+      [characterId]
+    )
 
-    const { data, error } = await supabase.rpc('get_books_by_character', {
-      p_character_id: characterId,
-    })
-
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows, error: null }
   } catch (error) {
     console.error('Error fetching books by character:', error)
     return { data: null, error: error as Error }
-  }
-}
-
-/**
- * Update character's last_used_at timestamp
- * Call this when a book is created with this character
- */
-export async function updateCharacterLastUsed(
-  supabase: SupabaseClient,
-  characterId: string
-): Promise<{ success: boolean; error: Error | null }> {
-  try {
-    const { error } = await supabase
-      .from('characters')
-      .update({ last_used_at: new Date().toISOString() })
-      .eq('id', characterId)
-
-    if (error) throw error
-
-    console.log('[Character] Updated last_used_at for character:', characterId)
-    return { success: true, error: null }
-  } catch (error) {
-    console.error('[Character] Error updating last_used_at:', error)
-    return { success: false, error: error as Error }
   }
 }

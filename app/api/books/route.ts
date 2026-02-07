@@ -6,10 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
+import { uploadFile, getPublicUrl, getObjectBuffer } from '@/lib/storage/s3'
 import { appConfig } from '@/lib/config'
-// Note: createClient now supports Bearer token from Authorization header
 import { getCharacterById } from '@/lib/db/characters'
+import { getUserRole } from '@/lib/db/users'
 import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
@@ -160,7 +161,6 @@ async function generateMasterCharacterIllustration(
   characterId: string,
   illustrationStyle: string,
   userId: string,
-  supabase: any,
   includeAge: boolean = true,
   characterGender?: 'boy' | 'girl' | 'other',
   storyClothing?: string // Hikayeden gelen kıyafet – master bu kıyafetle çizilir (referans sadece yüz/vücut)
@@ -194,10 +194,32 @@ async function generateMasterCharacterIllustration(
   console.log('[Create Book] 📤 MASTER REQUEST sent (model, prompt length:', masterPrompt.length, ')')
   stopAfter('master_request')
 
-  // Download character photo as blob
+  // Get character photo as buffer with correct image type (OpenAI accepts only image/jpeg, image/png, image/webp)
+  let refImageBuffer: Buffer
+  let imageMime: string
   const imageResponse = await fetch(characterPhoto)
-  const imageBlob = await imageResponse.blob()
-  
+  const contentType = imageResponse.headers.get('content-type') || ''
+  const isImage = /^image\/(jpeg|png|webp)/i.test(contentType)
+  if (isImage) {
+    const arrBuf = await imageResponse.arrayBuffer()
+    refImageBuffer = Buffer.from(arrBuf)
+    imageMime = contentType.split(';')[0].trim().toLowerCase() || 'image/png'
+  } else {
+    // Fetch returned XML (e.g. S3 error) or non-image – get from S3 directly
+    try {
+      const url = new URL(characterPhoto)
+      const key = url.pathname.startsWith('/') ? url.pathname.slice(1) : url.pathname
+      const obj = await getObjectBuffer(key)
+      if (!obj) throw new Error('S3 object not found')
+      refImageBuffer = obj.buffer
+      imageMime = /^image\/(jpeg|png|webp)/i.test(obj.contentType) ? obj.contentType.split(';')[0].trim() : 'image/png'
+    } catch (e) {
+      throw new Error(`Referans fotoğraf yüklenemedi (fetch: ${contentType?.slice(0, 30) || 'unknown'}). S3 erişimini kontrol edin.`)
+    }
+  }
+  const imageBlob = new Blob([new Uint8Array(refImageBuffer)], { type: imageMime })
+  const ext = imageMime.includes('jpeg') ? 'jpg' : imageMime.includes('webp') ? 'webp' : 'png'
+
   // Prepare FormData
   const formData = new FormData()
   formData.append('model', 'gpt-image-1.5')
@@ -205,7 +227,7 @@ async function generateMasterCharacterIllustration(
   formData.append('size', '1024x1536')
   formData.append('quality', 'low')
   formData.append('input_fidelity', 'high')
-  formData.append('image[]', imageBlob, 'character.png')
+  formData.append('image[]', imageBlob, `character.${ext}`)
   
   // Call /v1/images/edits API
   const apiKey = process.env.OPENAI_API_KEY
@@ -239,25 +261,13 @@ async function generateMasterCharacterIllustration(
   console.log('[Create Book] 📥 MASTER RESPONSE received (image data present)')
   stopAfter('master_response')
   
-  // Upload to Supabase with character ID in filename
-  const imageBuffer = Buffer.from(b64Image, 'base64')
+  // Upload to S3 with character ID in filename
+  const masterImageBuffer = Buffer.from(b64Image, 'base64')
   const timestamp = Date.now()
-  const filename = `master_${characterId}_${timestamp}.png`
-  const filePath = `${userId}/masters/${filename}`
+  const filename = `${userId}/masters/master_${characterId}_${timestamp}.png`
   
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('book-images')
-    .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: false })
-  
-  if (uploadError) {
-    throw new Error(`Failed to upload master illustration: ${uploadError.message}`)
-  }
-  
-  const { data: urlData } = supabase.storage
-    .from('book-images')
-    .getPublicUrl(filePath)
-  
-  const masterUrl = urlData.publicUrl
+  const s3Key = await uploadFile('books', filename, masterImageBuffer, 'image/png')
+  const masterUrl = getPublicUrl(s3Key)
   return masterUrl
 }
 
@@ -273,8 +283,7 @@ async function generateSupportingEntityMaster(
   entityName: string,
   entityDescription: string,
   illustrationStyle: string,
-  userId: string,
-  supabase: any
+  userId: string
 ): Promise<string> {
   // Build prompt for entity master (text-only, no reference photo)
   const styleDirective = illustrationStyle === '3d_animation' 
@@ -319,23 +328,9 @@ async function generateSupportingEntityMaster(
 
   const imageBuffer = Buffer.from(b64Image, 'base64')
   const timestamp = Date.now()
-  const filename = `entity_master_${entityId}_${timestamp}.png`
-  const filePath = `${userId}/entity-masters/${filename}`
-  
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('book-images')
-    .upload(filePath, imageBuffer, { contentType: 'image/png', upsert: false })
-  
-  if (uploadError) {
-    throw new Error(`Failed to upload entity master: ${uploadError.message}`)
-  }
-  
-  const { data: urlData } = supabase.storage
-    .from('book-images')
-    .getPublicUrl(filePath)
-  
-  const masterUrl = urlData.publicUrl
-  return masterUrl
+  const filename = `${userId}/entity-masters/entity_master_${entityId}_${timestamp}.png`
+  const s3Key = await uploadFile('books', filename, imageBuffer, 'image/png')
+  return getPublicUrl(s3Key)
 }
 
 /**
@@ -440,6 +435,7 @@ export interface CreateBookResponse {
   }
   generationTime: number
   tokensUsed: number
+  story_data?: any
 }
 
 // ============================================================================
@@ -450,16 +446,7 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
   try {
-    // Authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please login to continue')
-    }
+    const user = await requireUser()
 
     // Parse & Validate Request
     const body: CreateBookRequest = await request.json()
@@ -480,8 +467,8 @@ export async function POST(request: NextRequest) {
     // Skip-payment: only when DEBUG or admin + flag (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
     if (skipPayment === true) {
       const debugSkip = process.env.DEBUG_SKIP_PAYMENT === 'true'
-      const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
-      const isAdmin = profile?.role === 'admin'
+      const role = await getUserRole(user.id)
+      const isAdmin = role === 'admin'
       const flagOn = appConfig.features.dev.skipPaymentForCreateBook
       const canSkip = debugSkip || (isAdmin && flagOn)
       if (!canSkip) {
@@ -508,7 +495,7 @@ export async function POST(request: NextRequest) {
     if (characterIds && characterIds.length > 0) {
       // NEW: Multiple characters
       for (const charId of characterIds) {
-        const { data: char, error: charError } = await getCharacterById(supabase, charId)
+        const { data: char, error: charError } = await getCharacterById( charId)
         
         if (charError || !char) {
           return CommonErrors.notFound(`Character ${charId}`)
@@ -523,7 +510,7 @@ export async function POST(request: NextRequest) {
       }
     } else if (characterId) {
       // Backward compatibility: Single character
-      const { data: char, error: charError } = await getCharacterById(supabase, characterId)
+      const { data: char, error: charError } = await getCharacterById( characterId)
       
       if (charError || !char) {
         return CommonErrors.notFound('Character')
@@ -562,7 +549,7 @@ export async function POST(request: NextRequest) {
     // FROM EXAMPLE MODE: Use example book's story_data and images; swap character via edits
     // ====================================================================
     if (isFromExampleMode) {
-      const { data: exBook, error: exErr } = await getBookById(supabase, fromExampleId!)
+      const { data: exBook, error: exErr } = await getBookById( fromExampleId!)
       if (exErr || !exBook) {
         return CommonErrors.notFound('Example book not found')
       }
@@ -577,6 +564,7 @@ export async function POST(request: NextRequest) {
       if (!storyData?.pages?.length) {
         return CommonErrors.badRequest('Example book has no story data')
       }
+      const fromExampleCharIds = characterIds ?? characters.map((c: { id: string }) => c.id)
       // Replace example character name(s) with user's character name(s) in story text and title
       const exPages = storyData.pages || []
       const exampleCharOrder: string[] = []
@@ -590,12 +578,12 @@ export async function POST(request: NextRequest) {
           }
         }
       }
-      if (exampleCharOrder.length > 0 && characterIds.length > 0) {
+      if (exampleCharOrder.length > 0 && fromExampleCharIds.length > 0) {
         const oldNames = await Promise.all(
-          exampleCharOrder.map((id) => getCharacterById(supabase, id).then((r) => r.data?.name ?? ''))
+          exampleCharOrder.map((id) => getCharacterById( id).then((r) => r.data?.name ?? ''))
         )
         const newNames = await Promise.all(
-          characterIds.map((id) => getCharacterById(supabase, id).then((r) => r.data?.name ?? ''))
+          fromExampleCharIds.map((id) => getCharacterById( id).then((r) => r.data?.name ?? ''))
         )
         const replaceCount = Math.min(oldNames.length, newNames.length)
         for (let i = 0; i < replaceCount; i++) {
@@ -610,21 +598,21 @@ export async function POST(request: NextRequest) {
         console.log('[Create Book] 📝 From-example: replaced character names in story and title')
       }
       // Sayfa görsellerinde master kullanılsın: örnek karakter ID'lerini kullanıcı karakter ID'leri ile eşleştir (aynı sıra).
-      const charIdMapCount = Math.min(exampleCharOrder.length, characterIds.length)
+      const charIdMapCount = Math.min(exampleCharOrder.length, fromExampleCharIds.length)
       if (charIdMapCount > 0) {
         for (const page of storyData.pages || []) {
           const ids = (page as any).characterIds as string[] | undefined
           if (!ids?.length) continue
           ;(page as any).characterIds = ids.map((id: string) => {
             const idx = exampleCharOrder.indexOf(id)
-            return idx >= 0 && idx < characterIds.length ? characterIds[idx]! : id
+            return idx >= 0 && idx < fromExampleCharIds.length ? fromExampleCharIds[idx]! : id
           })
         }
         console.log('[Create Book] 📝 From-example: replaced characterIds in pages for master lookup')
       }
       const exTheme = normalizeThemeKey(exBook.theme)
       const exTitle = storyData.title || exBook.title
-      const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
+      const { data: createdBook, error: bookError } = await createBook(user.id, {
         character_id: character.id,
         title: exTitle,
         theme: exTheme,
@@ -665,7 +653,7 @@ export async function POST(request: NextRequest) {
       console.log('[Create Book] 📝 Book title (default format):', bookTitle)
       console.log('[Create Book] ℹ️  Note: customRequests will be used in story generation prompt (not as title)')
       
-      const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
+      const { data: createdBook, error: bookError } = await createBook(user.id, {
         character_id: character.id, // Main character ID (backward compatibility)
         title: bookTitle,
         theme: themeKey,
@@ -871,7 +859,7 @@ export async function POST(request: NextRequest) {
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
 
       // Create Book in Database
-      const { data: createdBook, error: bookError } = await createBook(supabase, user.id, {
+      const { data: createdBook, error: bookError } = await createBook(user.id, {
         character_id: character.id, // Main character ID (backward compatibility)
         title: storyData.title,
         theme,
@@ -915,7 +903,7 @@ export async function POST(request: NextRequest) {
     // FROM-EXAMPLE: master generation; cover/page use same pipeline below
     // ====================================================================
     if (isFromExampleMode && exampleBook) {
-      await updateBook(supabase, book.id, { status: 'generating' })
+      await updateBook(book.id, { status: 'generating' })
 
       // Master illustrations (same face on every page)
       const themeClothingForMaster: Record<string, string> = {
@@ -937,7 +925,6 @@ export async function POST(request: NextRequest) {
             char.id,
             exampleBook.illustration_style || illustrationStyle,
             user.id,
-            supabase,
             true,
             char.gender,
             themeClothing
@@ -950,7 +937,7 @@ export async function POST(request: NextRequest) {
       }
       if (Object.keys(masterIllustrations).length > 0) {
         const currentMeta = book.generation_metadata || {}
-        await updateBook(supabase, book.id, {
+        await updateBook(book.id, {
           generation_metadata: {
             ...currentMeta,
             masterIllustrations,
@@ -972,8 +959,7 @@ export async function POST(request: NextRequest) {
               entity.name,
               entity.description,
               exIllustrationStyle,
-              user.id,
-              supabase
+              user.id
             )
             entityMasterIllustrations[entity.id] = entityMasterUrl
             console.log(`[Create Book] ✅ From-example entity master for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
@@ -983,7 +969,7 @@ export async function POST(request: NextRequest) {
         }
         if (Object.keys(entityMasterIllustrations).length > 0) {
           const currentMeta = book.generation_metadata || {}
-          await updateBook(supabase, book.id, {
+          await updateBook(book.id, {
             generation_metadata: {
               ...currentMeta,
               entityMasterIllustrations,
@@ -1052,7 +1038,6 @@ export async function POST(request: NextRequest) {
           char.id,
           illustrationStyle,
           user.id,
-          supabase,
           includeAge,
           char.gender,
           charOutfit
@@ -1072,7 +1057,7 @@ export async function POST(request: NextRequest) {
     // Update generation_metadata with master illustrations map
     if (Object.keys(masterIllustrations).length > 0) {
       const currentMetadata = book.generation_metadata || {}
-      await updateBook(supabase, book.id, {
+      await updateBook(book.id, {
         generation_metadata: {
           ...currentMetadata,
           masterIllustrations: masterIllustrations,
@@ -1083,7 +1068,7 @@ export async function POST(request: NextRequest) {
     } else {
       console.log('[Create Book] ⚠️  No master illustrations created - all characters will use original photos')
       const currentMetadata = book.generation_metadata || {}
-      await updateBook(supabase, book.id, {
+      await updateBook(book.id, {
         generation_metadata: {
           ...currentMetadata,
           masterIllustrationCreated: false,
@@ -1107,8 +1092,7 @@ export async function POST(request: NextRequest) {
             entity.name,
             entity.description,
             illustrationStyle,
-            user.id,
-            supabase
+            user.id
           )
           entityMasterIllustrations[entity.id] = entityMasterUrl
           console.log(`[Create Book] ✅ Entity master created for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
@@ -1121,7 +1105,7 @@ export async function POST(request: NextRequest) {
       // Update generation_metadata with entity master illustrations
       if (Object.keys(entityMasterIllustrations).length > 0) {
         const currentMetadata = book.generation_metadata || {}
-        await updateBook(supabase, book.id, {
+        await updateBook(book.id, {
           generation_metadata: {
             ...currentMetadata,
             entityMasterIllustrations: entityMasterIllustrations,
@@ -1146,7 +1130,7 @@ export async function POST(request: NextRequest) {
     
     try {
       // Update status to 'generating'
-      await updateBook(supabase, book.id, { status: 'generating' })
+      await updateBook(book.id, { status: 'generating' })
       console.log(`[Create Book] Status updated to 'generating'`)
 
       // Build cover generation request using generateFullPagePrompt (POC style)
@@ -1629,9 +1613,9 @@ export async function POST(request: NextRequest) {
       if (!coverImageUrl && !coverImageB64) {
         console.error('[Create Book] ❌ No cover image URL returned from API')
         console.error('[Create Book] 📊 Summary:')
-        console.error('[Create Book]   - Reference image URL:', referenceImageUrl ? 'Provided' : 'Not provided')
-        console.error('[Create Book]   - Reference image blob created:', referenceImageBlobCreated ? 'Yes' : 'No')
-        console.error('[Create Book]   - Reference image blob size:', referenceImageBlobSizeBytes ?? 'N/A')
+        console.error('[Create Book]   - Reference image URL:', referenceImageUrls.length > 0 ? 'Provided' : 'Not provided')
+        console.error('[Create Book]   - Reference image blob created:', referenceImageBlobCount > 0 ? 'Yes' : 'No')
+        console.error('[Create Book]   - Reference image blob size:', referenceImageBlobTotalBytes ?? 'N/A')
         console.error('[Create Book]   - Edits API attempted:', referenceImageUrls.length > 0 ? 'Yes' : 'No')
         console.error('[Create Book]   - Generations API called:', 'Yes')
         console.error('[Create Book]   - Final coverImageUrl:', coverImageUrl ? 'Yes' : 'No')
@@ -1670,31 +1654,15 @@ export async function POST(request: NextRequest) {
       if (ext === 'jpg' || ext === 'jpeg') contentType = 'image/jpeg'
       if (ext === 'webp') contentType = 'image/webp'
 
-      const fileName = `cover_${Date.now()}.${ext || 'png'}`
-      const filePath = `${user.id}/covers/${fileName}`
+      const fileName = `${user.id}/covers/cover_${Date.now()}.${ext || 'png'}`
 
-      console.log('[Create Book] 📤 Uploading cover to Supabase Storage...')
+      console.log('[Create Book] 📤 Uploading cover to S3...')
 
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('book-images')
-        .upload(filePath, uploadBytes, {
-          contentType,
-          upsert: false,
-        })
+      const uploadBuffer = Buffer.isBuffer(uploadBytes) ? uploadBytes : Buffer.from(uploadBytes as ArrayBuffer)
+      const s3Key = await uploadFile('covers', fileName, uploadBuffer, contentType)
+      const storageCoverUrl = getPublicUrl(s3Key)
 
-      if (uploadError) {
-        console.error('[Create Book] Error uploading cover to storage:', uploadError)
-        throw uploadError
-      }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('book-images')
-        .getPublicUrl(filePath)
-
-      const storageCoverUrl = publicUrlData?.publicUrl
-
-      console.log('[Create Book] ✅ Cover uploaded to Supabase Storage')
+      console.log('[Create Book] ✅ Cover uploaded to S3')
       
       // Store cover URL for page generation (NEW: 16 Ocak 2026)
       generatedCoverImageUrl = storageCoverUrl
@@ -1708,9 +1676,9 @@ export async function POST(request: NextRequest) {
       // Status: Always 'generating' after cover (will be 'completed' only after page images in full-book mode)
       // Cover-only mode: Keep as 'generating' (in-progress) since book has no content
       // Full-book mode: Keep as 'generating' until page images are done
-      await updateBook(supabase, book.id, {
+      await updateBook(book.id, {
         cover_image_url: storageCoverUrl,
-        cover_image_path: filePath,
+        cover_image_path: s3Key,
         status: 'generating', // Always 'generating' after cover (completed only after full book)
       })
 
@@ -1723,7 +1691,7 @@ export async function POST(request: NextRequest) {
     } catch (coverError) {
       console.error('[Create Book] Cover generation failed:', coverError)
       // Update status to 'failed' but don't throw - book can still be used without cover
-      await updateBook(supabase, book.id, { status: 'failed' })
+      await updateBook(book.id, { status: 'failed' })
       // Continue to response - story is still generated
     }
 
@@ -1792,7 +1760,7 @@ export async function POST(request: NextRequest) {
           console.log(`[Create Book] 🔄 Processing batch ${Math.floor(batchStart / BATCH_SIZE) + 1}: pages ${batchStart + 1}-${batchEnd} (${batchPages.length} images in parallel)`)
 
           // Process batch in parallel using Promise.allSettled
-          const batchPromises = batchPages.map(async (page, batchIndex) => {
+          const batchPromises = batchPages.map(async (page: { pageNumber?: number; text?: string; characterIds?: string[]; imagePrompt?: string; sceneDescription?: string; imageUrl?: string }, batchIndex: number) => {
             const i = batchStart + batchIndex
             const pageNumber = page.pageNumber || (i + 1)
 
@@ -1805,8 +1773,8 @@ export async function POST(request: NextRequest) {
         const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
         // Note: stripClothingFromSceneText REMOVED (v1.6.0) - story doesn't produce clothing text anymore
         
-        const characterActionRaw = page.text || sceneDescription
-        const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
+        const characterActionRaw = page.text || sceneDescription || ''
+        const riskAnalysis = detectRiskySceneElements(sceneDescription ?? '', characterActionRaw)
         let characterAction = riskAnalysis.hasRisk ? getSafeSceneAlternative(characterActionRaw) : characterActionRaw
         const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'
         const mood = themeKey === 'adventure' ? 'exciting' : themeKey === 'fantasy' ? 'mysterious' : themeKey === 'space' ? 'inspiring' : themeKey === 'sports' ? 'exciting' : 'happy'
@@ -1827,10 +1795,10 @@ export async function POST(request: NextRequest) {
         
         const sceneInput = {
           pageNumber,
-          sceneDescription,
+          sceneDescription: sceneDescription ?? '',
           theme: themeKey,
           mood,
-          characterAction,
+          characterAction: characterAction ?? '',
           focusPoint,
           ...(pageClothing && { clothing: pageClothing }),
           ...(Object.keys(characterExpressions).length > 0 && { characterExpressions }),
@@ -1843,13 +1811,13 @@ export async function POST(request: NextRequest) {
         // FIX: Page-specific character prompt (25 Ocak 2026)
         // Her page için sadece o page'deki karakterlerin prompt'unu oluştur
         // Ana karakteri bul (her zaman ilk karakter)
-        const mainCharacter = characters.find(c => c.id === pageCharacters[0]) || character
+        const mainCharacter = characters.find((c: { id: string }) => c.id === pageCharacters[0]) || character
         
         // Sadece bu page'deki ek karakterleri bul
         const pageAdditionalCharacters = pageCharacters
           .slice(1) // Ana karakter hariç
-          .map(charId => {
-            const char = characters.find(c => c.id === charId)
+          .map((charId: string) => {
+            const char = characters.find((c: { id: string }) => c.id === charId)
             if (!char) return null
             return {
               type: char.character_type || {
@@ -1874,7 +1842,7 @@ export async function POST(request: NextRequest) {
         
         // NEW: Analyze scene diversity (16 Ocak 2026)
         const currentSceneAnalysis = analyzeSceneDiversity(
-          sceneDescription,
+          sceneDescription ?? '',
           page.text || '',
           pageNumber,
           sceneDiversityAnalysis
@@ -2016,7 +1984,7 @@ export async function POST(request: NextRequest) {
             console.log(`[Create Book] Page ${pageNumber} -   - Prompt included: Yes ✅`)
             console.log(`[Create Book] Page ${pageNumber} -   - Reference images included: Yes ✅ (${imageBlobs.length} as Blobs)`)
             if (pageMasterUrls.length > 0) {
-              console.log(`[Create Book] Page ${pageNumber} -   - 🎨 MASTER ILLUSTRATIONS ACTIVE: Using masters for characters: ${pageCharacters.map(id => characters.find(c => c.id === id)?.name || id).join(', ')}`)
+              console.log(`[Create Book] Page ${pageNumber} -   - 🎨 MASTER ILLUSTRATIONS ACTIVE: Using masters for characters: ${pageCharacters.map((id: string) => characters.find((c: { id: string }) => c.id === id)?.name || id).join(', ')}`)
             }
 
             // NEW: Retry mechanism for edits API (16 Ocak 2026)
@@ -2243,44 +2211,29 @@ export async function POST(request: NextRequest) {
         
         if (ext === 'jpg' || ext === 'jpeg') contentType = 'image/jpeg'
         if (ext === 'webp') contentType = 'image/webp'
-        const fileName = `page_${pageNumber}_${Date.now()}.${ext || 'png'}`
-        const filePath = `${user.id}/books/${book.id}/${fileName}`
+        const fileName = `${user.id}/books/${book.id}/page_${pageNumber}_${Date.now()}.${ext || 'png'}`
 
         const uploadStart = Date.now()
-        console.log(`[Create Book] 📤 Page ${pageNumber} - Uploading to Supabase Storage...`)
-        console.log(`[Create Book]   File path:`, filePath)
+        console.log(`[Create Book] 📤 Page ${pageNumber} - Uploading to S3...`)
+        console.log(`[Create Book]   File name:`, fileName)
         console.log(`[Create Book]   Content type:`, contentType)
         console.log(`[Create Book]   Buffer size:`, imageBuffer.byteLength || (imageBuffer as Buffer).length, 'bytes')
 
-        const { data: uploadData, error: uploadError} = await supabase.storage
-          .from('book-images')
-          .upload(filePath, imageBuffer, {
-            contentType,
-            upsert: false,
-          })
+        const pageImageBuffer = Buffer.isBuffer(imageBuffer) ? imageBuffer : Buffer.from(imageBuffer as ArrayBuffer)
+        const s3Key = await uploadFile('books', fileName, pageImageBuffer, contentType)
         
         const uploadMs = Date.now() - uploadStart
         console.log(`[Create Book] ⏱️  Page ${pageNumber} - Upload time:`, uploadMs, 'ms')
 
-        if (uploadError) {
-          console.error(`[Create Book] ❌ Page ${pageNumber} - Error uploading image:`, uploadError?.message ?? uploadError)
-          return null
-        }
+        console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded to S3 successfully`)
 
-        console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded to storage successfully`)
-
-        // Get public URL
-        const { data: publicUrlData } = supabase.storage
-          .from('book-images')
-          .getPublicUrl(filePath)
-
-        const storageImageUrl = publicUrlData?.publicUrl
+        const storageImageUrl = getPublicUrl(s3Key)
 
         console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded:`, storageImageUrl)
         console.log(`[Create Book] 📊 Page ${pageNumber} - Storage URL length:`, storageImageUrl?.length || 0, 'chars')
 
             // Update page with image URL
-            const pageIndex = pages.findIndex(p => (p.pageNumber || pages.indexOf(p) + 1) === pageNumber)
+            const pageIndex = pages.findIndex((p: { pageNumber?: number }) => (p.pageNumber || pages.indexOf(p) + 1) === pageNumber)
             if (pageIndex !== -1) {
               pages[pageIndex].imageUrl = storageImageUrl
             }
@@ -2288,7 +2241,7 @@ export async function POST(request: NextRequest) {
             return {
               pageNumber,
               imageUrl: storageImageUrl,
-              storagePath: filePath,
+              storagePath: s3Key,
               prompt: fullPrompt,
             }
           })
@@ -2300,7 +2253,7 @@ export async function POST(request: NextRequest) {
           for (const result of batchResults) {
             if (result.status === 'fulfilled' && result.value) {
               generatedImages.push(result.value)
-              const pageIndex = pages.findIndex(p => (p.pageNumber || pages.indexOf(p) + 1) === result.value.pageNumber)
+              const pageIndex = pages.findIndex((p: { pageNumber?: number }) => (p.pageNumber || pages.indexOf(p) + 1) === result.value.pageNumber)
               if (pageIndex !== -1) {
                 pages[pageIndex].imageUrl = result.value.imageUrl
               }
@@ -2340,7 +2293,7 @@ export async function POST(request: NextRequest) {
 
       const allImagesGenerated = generatedImages.length === totalPages
       
-      await updateBook(supabase, book.id, {
+      await updateBook(book.id, {
         story_data: {
           ...storyData,
           pages: pages,
@@ -2365,12 +2318,12 @@ export async function POST(request: NextRequest) {
       } catch (imagesError) {
         console.error('[Create Book] Page images generation failed:', imagesError)
         // Update status to 'failed'
-        await updateBook(supabase, book.id, { status: 'failed' })
+        await updateBook(book.id, { status: 'failed' })
       }
     }
 
     // Prepare Response - Fetch updated book to get latest status and cover_image_url
-    const { data: updatedBook, error: fetchError } = await getBookById(supabase, book.id)
+    const { data: updatedBook, error: fetchError } = await getBookById( book.id)
     
     const finalBook = updatedBook || book // Fallback to original book if fetch fails
     
@@ -2416,16 +2369,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please login to continue')
-    }
+    const user = await requireUser()
 
     // Parse Query Parameters
     const { searchParams } = new URL(request.url)
@@ -2434,7 +2378,7 @@ export async function GET(request: NextRequest) {
     const offset = searchParams.get('offset')
 
     // Get User's Books
-    const { data: books, error: dbError } = await getUserBooks(supabase, user.id, {
+    const { data: books, error: dbError } = await getUserBooks(user.id, {
       status: status || undefined,
       limit: limit ? parseInt(limit) : undefined,
       offset: offset ? parseInt(offset) : undefined,

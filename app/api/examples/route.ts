@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { pool } from '@/lib/db/pool'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/examples
@@ -17,7 +19,6 @@ import { createClient } from '@/lib/supabase/server'
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
     const { searchParams } = new URL(request.url)
     
     const ageGroup = searchParams.get('ageGroup') || undefined
@@ -26,28 +27,29 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10)
 
     // Build query
-    let query = supabase
-      .from('books')
-      .select('*')
-      .eq('is_example', true)
-      .eq('status', 'completed') // Only show completed example books
-      .order('created_at', { ascending: false })
+    let query = 'SELECT * FROM books WHERE is_example = true AND status = $1'
+    const params: any[] = ['completed']
+    let paramCount = 2
 
     // Filters
     if (ageGroup) {
-      query = query.eq('age_group', ageGroup)
+      query += ` AND age_group = $${paramCount++}`
+      params.push(ageGroup)
     }
     if (theme) {
-      query = query.eq('theme', theme)
+      query += ` AND theme = $${paramCount++}`
+      params.push(theme)
     }
 
-    // Pagination
-    query = query.range(offset, offset + limit - 1)
+    query += ' ORDER BY created_at DESC'
+    query += ` LIMIT $${paramCount++} OFFSET $${paramCount++}`
+    params.push(limit, offset)
 
-    const { data: books, error } = await query
+    const result = await pool.query(query, params)
+    const books = result.rows
 
-    if (error) {
-      console.error('[GET /api/examples] Error fetching example books:', error)
+    if (!books) {
+      console.error('[GET /api/examples] No books found')
       return NextResponse.json(
         { success: false, error: 'Failed to fetch example books' },
         { status: 500 }

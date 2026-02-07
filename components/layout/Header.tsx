@@ -27,7 +27,7 @@ import {
   Settings,
 } from "lucide-react"
 import Link from "next/link"
-import { createClient } from "@/lib/supabase/client"
+import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useCart } from "@/contexts/CartContext"
 
@@ -47,40 +47,18 @@ const navLinks = [
 export function Header() {
   const { theme, setTheme } = useTheme()
   const router = useRouter()
+  const { data: session, status } = useSession()
+  const user = session?.user ?? null
+  const isLoading = status === "loading"
   const [isScrolled, setIsScrolled] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(countries[0])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
   const { getCartCount } = useCart()
   const cartCount = getCartCount()
 
-  // Check auth state
-  useEffect(() => {
-    const checkAuth = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
-      setIsLoading(false)
-    }
-    
-    checkAuth()
-
-    // Listen for auth state changes
-    const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    setUser(null)
-    router.push("/")
+  const handleLogout = () => {
+    signOut({ callbackUrl: "/" })
     router.refresh()
   }
 
@@ -249,9 +227,9 @@ export function Header() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2 font-medium">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                        {user.user_metadata?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                        {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                       </div>
-                      <span className="hidden lg:inline">{user.user_metadata?.name || user.email?.split("@")[0]}</span>
+                      <span className="hidden lg:inline">{user.name || user.email?.split("@")[0]}</span>
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -456,11 +434,11 @@ export function Header() {
                       <>
                         <div className="mb-4 flex items-center gap-3 rounded-lg bg-white/60 p-3 backdrop-blur-sm dark:bg-slate-800/60">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-                            {user.user_metadata?.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                            {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                           </div>
                           <div className="flex-1">
                             <p className="font-semibold text-gray-900 dark:text-slate-100">
-                              {user.user_metadata?.name || "User"}
+                              {user.name || "User"}
                             </p>
                             <p className="text-sm text-gray-600 dark:text-slate-400">{user.email}</p>
                           </div>

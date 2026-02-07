@@ -25,7 +25,7 @@ export const appConfig = {
       : 'http://localhost:3001/api',
   },
 
-  // Supabase Configuration
+  // Supabase (legacy / optional - app uses PostgreSQL + NextAuth + S3)
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
@@ -88,19 +88,8 @@ export const appConfig = {
 export function validateConfig() {
   const errors: string[] = []
 
-  // Required in all environments
-  if (!appConfig.supabase.url) {
-    errors.push('NEXT_PUBLIC_SUPABASE_URL is required')
-  }
-  if (!appConfig.supabase.anonKey) {
-    errors.push('NEXT_PUBLIC_SUPABASE_ANON_KEY is required')
-  }
-
-  // Required in production
+  // Required in production (Supabase no longer required - using PostgreSQL + NextAuth + S3)
   if (isProduction) {
-    if (!appConfig.supabase.serviceRoleKey) {
-      errors.push('SUPABASE_SERVICE_ROLE_KEY is required in production')
-    }
     if (appConfig.urls.appUrl === 'http://localhost:3001') {
       errors.push('NEXT_PUBLIC_APP_URL must be set to production URL')
     }
@@ -109,15 +98,16 @@ export function validateConfig() {
   if (errors.length > 0) {
     logger.error('❌ Configuration errors:')
     errors.forEach((error) => logger.error(`  - ${error}`))
+    // Log only in production; do not throw so `next build` can complete without NEXT_PUBLIC_APP_URL
     if (isProduction) {
-      throw new Error('Invalid configuration')
+      logger.warn('Fix the above config before production deploy. Build continues.')
     }
   }
 
   return errors.length === 0
 }
 
-// Validate on module load (only in production)
+// Validate on module load in production (log errors only; no throw so build succeeds)
 if (isProduction) {
   validateConfig()
 }

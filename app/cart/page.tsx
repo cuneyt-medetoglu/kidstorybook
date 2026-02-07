@@ -91,6 +91,7 @@ export default function CartPage() {
                                 src={item.coverImage}
                                 alt={item.bookTitle}
                                 fill
+                                sizes="(max-width: 768px) 96px, 112px"
                                 className="object-cover"
                                 unoptimized
                               />

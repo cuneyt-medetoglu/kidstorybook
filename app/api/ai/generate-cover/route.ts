@@ -6,7 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
+import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
+import { getUserById, updateUser } from '@/lib/db/users'
 import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/character'
 
 export async function POST(request: NextRequest) {
@@ -14,18 +16,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // Authentication
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     // Parse request body
     const body = await request.json()
@@ -64,21 +55,17 @@ export async function POST(request: NextRequest) {
 
     // Check free cover credit if requested
     if (useFreeCredit) {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('free_cover_used')
-        .eq('id', user.id)
-        .single()
+      const userData = await getUserById(user.id)
 
-      if (userError) {
-        console.error('[Cover Generation] Error fetching user data:', userError)
+      if (!userData) {
+        console.error('[Cover Generation] User not found:', user.id)
         return NextResponse.json(
           { success: false, error: 'Failed to check free cover credit' },
           { status: 500 }
         )
       }
 
-      if (userData?.free_cover_used) {
+      if (userData.free_cover_used) {
         return NextResponse.json(
           {
             success: false,
@@ -172,22 +159,35 @@ export async function POST(request: NextRequest) {
         // ... (rest of the code for upload/response)
         console.log('[Cover Generation] Cover generated successfully:', coverUrl)
 
-        // Download image and upload to Supabase Storage
+        // Download image and upload to S3
         const imageBuffer = await fetch(coverUrl).then((res) => res.arrayBuffer())
-        const fileName = `cover_${Date.now()}.png`
-        const filePath = `${user.id}/covers/${fileName}`
+        const fileName = `${user.id}/covers/cover_${Date.now()}.png`
 
-        console.log('[Cover Generation] Uploading to Supabase Storage:', filePath)
+        console.log('[Cover Generation] Uploading to S3:', fileName)
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('book-images')
-          .upload(filePath, imageBuffer, {
-            contentType: 'image/png',
-            upsert: false,
+        try {
+          const s3Key = await uploadFile('covers', fileName, Buffer.from(imageBuffer), 'image/png')
+          const storageCoverUrl = getPublicUrl(s3Key)
+
+          return NextResponse.json({
+            success: true,
+            data: {
+              coverUrl: storageCoverUrl,
+              model: model,
+              originalPrompt: textPrompt,
+              revisedPrompt: genResult.data[0].revised_prompt || textPrompt,
+              referenceImageUsed: false,
+              storage: {
+                uploaded: true,
+                path: fileName,
+              },
+              generationTime: Date.now() - startTime,
+              usedFreeCredit: useFreeCredit,
+            },
+            message: 'Cover generated successfully'
           })
-
-        if (uploadError) {
-          console.error('[Cover Generation] Error uploading to Supabase Storage:', uploadError)
+        } catch (uploadError) {
+          console.error('[Cover Generation] Error uploading to S3:', uploadError)
           return NextResponse.json({
             success: true,
             data: {
@@ -195,36 +195,12 @@ export async function POST(request: NextRequest) {
               model: model,
               storage: {
                 uploaded: false,
-                error: uploadError.message,
+                error: (uploadError as Error).message,
               },
             },
             warning: 'Cover generated but failed to upload to storage',
           })
         }
-
-        const { data: publicUrlData } = supabase.storage
-          .from('book-images')
-          .getPublicUrl(filePath)
-
-        const storageCoverUrl = publicUrlData?.publicUrl || coverUrl
-
-        return NextResponse.json({
-          success: true,
-          data: {
-            coverUrl: storageCoverUrl,
-            model: model,
-            originalPrompt: textPrompt,
-            revisedPrompt: genResult.data[0].revised_prompt || textPrompt,
-            referenceImageUsed: false,
-            storage: {
-              uploaded: true,
-              path: filePath,
-            },
-            generationTime: Date.now() - startTime,
-            usedFreeCredit: useFreeCredit,
-          },
-          message: 'Cover generated successfully'
-        })
       }
     }
 
@@ -320,80 +296,52 @@ export async function POST(request: NextRequest) {
 
     console.log('[Cover Generation] Cover generated successfully:', coverUrl)
 
-    // Download image and upload to Supabase Storage
+    // Download image and upload to S3
     const imageBuffer = await fetch(coverUrl).then((res) => res.arrayBuffer())
-    const fileName = `cover_${Date.now()}.png`
-    const filePath = `${user.id}/covers/${fileName}`
+    const fileName = `${user.id}/covers/cover_${Date.now()}.png`
 
-    console.log('[Cover Generation] Uploading to Supabase Storage:', filePath)
+    console.log('[Cover Generation] Uploading to S3:', fileName)
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('book-images')
-      .upload(filePath, imageBuffer, {
-        contentType: 'image/png',
-        upsert: false,
-      })
+    try {
+      const s3Key = await uploadFile('covers', fileName, Buffer.from(imageBuffer), 'image/png')
+      const storageCoverUrl = getPublicUrl(s3Key)
 
-    if (uploadError) {
-      console.error('[Cover Generation] Error uploading to Supabase Storage:', uploadError)
-      // Return API URL even if upload fails
+      console.log('[Cover Generation] Cover uploaded to S3:', storageCoverUrl)
+
+      // Mark free cover as used if requested
+      if (useFreeCredit) {
+        try {
+          await updateUser(user.id, { free_cover_used: true })
+          console.log('[Cover Generation] Free cover credit marked as used for user:', user.id)
+        } catch (updateError) {
+          console.error('[Cover Generation] Error marking free cover as used:', updateError)
+        }
+      }
+
+      const generationTime = Date.now() - startTime
+
       return NextResponse.json({
         success: true,
         data: {
-          coverUrl: coverUrl,
+          coverUrl: storageCoverUrl,
           model: model,
+          originalPrompt: textPrompt,
+          referenceImageUsed: !!referenceImageUrl,
           storage: {
-            uploaded: false,
-            error: uploadError.message,
+            uploaded: true,
+            path: s3Key,
           },
+          generationTime,
+          usedFreeCredit: useFreeCredit,
         },
-        warning: 'Cover generated but failed to upload to storage',
-      })
-    }
-
-    // Get public URL from Supabase Storage
-    const { data: publicUrlData } = supabase.storage
-      .from('book-images')
-      .getPublicUrl(filePath)
-
-    const storageCoverUrl = publicUrlData?.publicUrl || coverUrl
-
-    console.log('[Cover Generation] Cover uploaded to storage:', storageCoverUrl)
-
-    // Mark free cover as used if requested
-    if (useFreeCredit) {
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ free_cover_used: true })
-        .eq('id', user.id)
-
-      if (updateError) {
-        console.error('[Cover Generation] Error marking free cover as used:', updateError)
-      } else {
-        console.log('[Cover Generation] Free cover credit marked as used for user:', user.id)
-      }
-    }
-
-    const generationTime = Date.now() - startTime
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        coverUrl: storageCoverUrl,
-        model: model,
-        originalPrompt: textPrompt,
-        referenceImageUsed: !!referenceImageUrl,
-        storage: {
-          uploaded: true,
-          path: filePath,
-        },
-        generationTime,
-        usedFreeCredit: useFreeCredit,
-      },
-      message: useFreeCredit
-        ? 'Cover generated successfully using free credit'
+        message: useFreeCredit
+          ? 'Cover generated successfully using free credit'
         : 'Cover generated successfully',
     })
+    } catch (uploadErr) {
+      console.error('[Cover Generation] Upload error:', uploadErr)
+      throw uploadErr
+    }
   } catch (error) {
     console.error('[Cover Generation] Error:', error)
     return NextResponse.json(

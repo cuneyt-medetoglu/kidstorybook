@@ -179,6 +179,7 @@ function PhotoModal({
                     : currentPhoto.originalPhoto}
                   alt={currentPhoto.characterName}
                   fill
+                  sizes="(max-width: 768px) 100vw,  min(80vw, 800px)"
                   className="object-cover"
                 />
               </motion.div>
@@ -270,6 +271,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
             src={book.coverImage}
             alt={book.title}
             fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 280px"
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
               const target = e.target as HTMLImageElement
@@ -319,6 +321,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
                         src={photo.originalPhoto}
                         alt={photo.characterName}
                         fill
+                        sizes="56px"
                         className="object-cover"
                         onError={(e) => {
                           // Görsel yüklenemezse parent'a placeholder class ekle
@@ -364,6 +367,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
                     src={book.coverImage}
                     alt="Kitap kapağı"
                     fill
+                    sizes="56px"
                     className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
@@ -523,7 +527,7 @@ function ExamplesPageContent() {
       {/* Filter chips */}
       <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
         <div className="container px-4 md:px-6 lg:px-8 py-3 md:py-4">
-          <div className="flex gap-1.5 md:gap-2 overflow-x-auto pb-2 -mb-2 scrollbar-hide flex-nowrap">
+          <div className="relative flex gap-1.5 md:gap-2 overflow-x-auto pb-2 -mb-2 scrollbar-hide flex-nowrap">
             {ageFilters.map((filter) => (
               <button
                 key={filter.value}

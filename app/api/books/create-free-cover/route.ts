@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
-import { createBook } from "@/lib/db/books"
+import { getUser } from "@/lib/auth/api-auth"
+import { pool } from "@/lib/db/pool"
+import { getUserById, updateUser } from "@/lib/db/users"
+import { createBook, updateBook } from "@/lib/db/books"
+import { createDraft } from "@/lib/db/drafts"
 import { buildDetailedCharacterPrompt } from "@/lib/prompts/image/character"
 import type { CharacterDescription } from "@/lib/prompts/types"
 import type { CharacterFormData } from "@/lib/draft-storage"
@@ -91,17 +94,12 @@ function generateDraftId(): string {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
+    const user = await getUser()
     const body = await request.json().catch(() => ({}))
     const fields = getBodyFields(body)
 
     // --- Guest branch ---
-    if (authError || !user) {
+    if (!user) {
       const email = body?.email && String(body.email).trim()
       if (!email) {
         return NextResponse.json(
@@ -118,12 +116,11 @@ export async function POST(request: NextRequest) {
           { status: 429 }
         )
       }
-      const { data: used } = await supabase
-        .from("guest_free_cover_used")
-        .select("id")
-        .eq("email", email.toLowerCase())
-        .maybeSingle()
-      if (used) {
+      const used = await pool.query(
+        "SELECT id FROM guest_free_cover_used WHERE email = $1 LIMIT 1",
+        [email.toLowerCase()]
+      )
+      if (used.rows.length > 0) {
         return NextResponse.json(
           { success: false, error: "Bu e-posta ile ücretsiz kapak hakkı zaten kullanıldı." },
           { status: 400 }
@@ -147,7 +144,7 @@ export async function POST(request: NextRequest) {
         quality: "low",
         n: 1,
       })
-      const coverImageUrl = coverRes.data[0]?.url
+      const coverImageUrl = coverRes.data?.[0]?.url
       if (!coverImageUrl) {
         return NextResponse.json(
           { success: false, error: "Kapak görseli oluşturulamadı." },
@@ -157,23 +154,24 @@ export async function POST(request: NextRequest) {
 
       const draftId = generateDraftId()
       const now = new Date()
-      const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
 
-      await supabase.from("drafts").insert({
-        user_id: null,
+      await createDraft({
         draft_id: draftId,
-        cover_image: coverImageUrl,
-        character_data: characterData,
+        user_id: null,
+        user_email: email.toLowerCase(),
+        character_ids: (characterData as any)?.characterIds ?? [],
         theme,
-        sub_theme: null,
-        style,
-        expires_at: expiresAt.toISOString(),
+        sub_theme: "",
+        age_group: "3-5",
+        illustration_style: style,
+        language: "tr",
+        custom_requests: JSON.stringify({ coverImage: coverImageUrl, characterData, email: email.toLowerCase() }),
       })
 
-      await supabase.from("guest_free_cover_used").insert({
-        email: email.toLowerCase(),
-        used_at: now.toISOString(),
-      })
+      await pool.query(
+        "INSERT INTO guest_free_cover_used (email, used_at) VALUES ($1, $2)",
+        [email.toLowerCase(), now.toISOString()]
+      )
 
       list.push(Date.now())
       guestIpStore.set(ip, list)
@@ -186,17 +184,11 @@ export async function POST(request: NextRequest) {
     }
 
     // --- Authenticated branch ---
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("free_cover_used")
-      .eq("id", user.id)
-      .single()
-
-    if (userError) {
-      console.error("[Create Free Cover] Error fetching user:", userError)
+    const userData = await getUserById(user.id)
+    if (!userData) {
       return NextResponse.json({ success: false, error: "Kullanıcı verisi alınamadı." }, { status: 500 })
     }
-    if (userData?.free_cover_used) {
+    if (userData.free_cover_used) {
       return NextResponse.json(
         { success: false, error: "Free cover credit already used" },
         { status: 400 }
@@ -222,7 +214,7 @@ export async function POST(request: NextRequest) {
       quality: "low",
       n: 1,
     })
-    const coverImageUrl = coverRes.data[0]?.url
+    const coverImageUrl = coverRes.data?.[0]?.url
     if (!coverImageUrl) {
       return NextResponse.json(
         { success: false, error: "Failed to generate cover image" },
@@ -230,7 +222,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data: book, error: bookErr } = await createBook(supabase, user.id, {
+    const { data: book, error: bookErr } = await createBook(user.id, {
       title: `${characterData.name}'s Story`,
       theme,
       illustration_style: style,
@@ -244,28 +236,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: "Kitap oluşturulamadı." }, { status: 500 })
     }
 
-    await supabase
-      .from("books")
-      .update({
-        cover_image_path: coverImageUrl,
-        images_data: [{ pageNumber: 1, imageUrl: coverImageUrl, isCover: true }],
-      })
-      .eq("id", book.id)
+    await updateBook(book.id, {
+      cover_image_url: coverImageUrl,
+      images_data: [{ pageNumber: 1, imageUrl: coverImageUrl, isCover: true }],
+    })
 
-    await supabase.from("users").update({ free_cover_used: true }).eq("id", user.id)
+    await updateUser(user.id, { free_cover_used: true })
 
     const draftId = generateDraftId()
-    const now = new Date()
-    const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
-    await supabase.from("drafts").insert({
-      user_id: user.id,
+    await createDraft({
       draft_id: draftId,
-      cover_image: coverImageUrl,
-      character_data: characterData,
+      user_id: user.id,
+      user_email: user.email,
+      character_ids: (characterData as any)?.characterIds ?? [],
       theme,
-      sub_theme: null,
-      style,
-      expires_at: expiresAt.toISOString(),
+      sub_theme: "",
+      age_group: "3-5",
+      illustration_style: style,
+      language: "tr",
+      custom_requests: JSON.stringify({ coverImage: coverImageUrl, characterData }),
     })
 
     return NextResponse.json({

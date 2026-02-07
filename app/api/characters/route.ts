@@ -6,8 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { createCharacter } from '@/lib/db/characters'
+import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
+import { getUser } from '@/lib/auth/api-auth'
 import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import type { CharacterDescription } from '@/lib/prompts/types'
 import OpenAI from 'openai'
@@ -18,16 +19,11 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
-    // Authentication
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const user = await getUser()
+    if (!user?.id) {
+      return NextResponse.json({ error: 'Oturum açmanız gerekiyor. Lütfen giriş yapın.' }, { status: 401 })
     }
+    const userId = user.id
 
     // Parse request body
     const body = await request.json()
@@ -220,7 +216,7 @@ export async function POST(request: NextRequest) {
     let referencePhotoUrl: string | undefined
     let referencePhotoPath: string | undefined
 
-    // Upload photo to Supabase Storage if provided
+    // Upload photo to AWS S3 if provided
     if (photoBase64) {
       try {
         // Convert base64 to buffer
@@ -230,7 +226,7 @@ export async function POST(request: NextRequest) {
         
         const buffer = Buffer.from(base64Data, 'base64')
 
-        // Supabase Storage keys are strict; sanitize name to avoid invalid characters (e.g., "Venüs")
+        // Sanitize name to avoid invalid characters
         const safeName = name
           .toString()
           .trim()
@@ -241,33 +237,16 @@ export async function POST(request: NextRequest) {
           .replace(/^_+|_+$/g, '')
           .slice(0, 40) || 'child'
 
-        const fileName = `character_${Date.now()}_${safeName}.png`
-        const filePath = `${user.id}/characters/${fileName}`
+        const fileName = `${userId}/characters/character_${Date.now()}_${safeName}.png`
 
-        console.log('[Character Creation] Uploading photo to Supabase Storage:', filePath)
+        console.log('[Character Creation] Uploading photo to S3:', fileName)
 
-        // Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('book-images')
-          .upload(filePath, buffer, {
-            contentType: 'image/png',
-            upsert: false,
-          })
+        // Upload to S3 (photos/ prefix)
+        const s3Key = await uploadFile('photos', fileName, buffer, 'image/png')
+        referencePhotoUrl = getPublicUrl(s3Key)
+        referencePhotoPath = s3Key
 
-        if (uploadError) {
-          console.error('[Character Creation] Storage upload error:', uploadError)
-          // Continue without photo if upload fails
-        } else {
-          // Get public URL
-          const { data: publicUrlData } = supabase.storage
-            .from('book-images')
-            .getPublicUrl(filePath)
-
-          referencePhotoUrl = publicUrlData?.publicUrl
-          referencePhotoPath = filePath
-
-          console.log('[Character Creation] Photo uploaded successfully:', referencePhotoUrl)
-        }
+        console.log('[Character Creation] Photo uploaded successfully:', referencePhotoUrl)
       } catch (photoError) {
         console.error('[Character Creation] Error processing photo:', photoError)
         // Continue without photo if processing fails
@@ -283,8 +262,7 @@ export async function POST(request: NextRequest) {
 
     // Create character in database
     const { data: character, error: dbError } = await createCharacter(
-      supabase,
-      user.id,
+      userId,
       {
         name,
         age: parseInt(age) || 5,
@@ -299,9 +277,9 @@ export async function POST(request: NextRequest) {
         is_default: true, // First character is default
         // AI analysis fields (only for non-Child characters with photos)
         ai_analysis: aiAnalysisData,
-        full_description: aiAnalysisData ? JSON.stringify(aiAnalysisData) : null,
+        full_description: aiAnalysisData ? JSON.stringify(aiAnalysisData) : undefined,
         analysis_raw: aiAnalysisData,
-        analysis_confidence: analysisConfidence,
+        analysis_confidence: analysisConfidence ?? undefined,
       }
     )
 

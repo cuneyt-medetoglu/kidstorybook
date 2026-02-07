@@ -284,6 +284,7 @@ function BookCard({ book }: BookCardProps) {
               src={firstPhoto.originalPhoto}
               alt={firstPhoto.characterName}
               fill
+              sizes="(max-width: 768px) 80vw, 500px"
               className="object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
@@ -322,6 +323,7 @@ function BookCard({ book }: BookCardProps) {
               src={book.coverImage}
               alt={book.title}
               fill
+              sizes="(max-width: 768px) 40vw, 240px"
               className="object-cover"
               onError={(e) => {
                 const target = e.target as HTMLImageElement

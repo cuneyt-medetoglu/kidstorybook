@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle, Mail, BookOpen, ArrowRight } from "lucide-react"
 import Link from "next/link"
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const orderId = searchParams.get("orderId")
@@ -135,5 +135,13 @@ export default function CheckoutSuccessPage() {
         </motion.div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }

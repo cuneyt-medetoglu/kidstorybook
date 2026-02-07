@@ -6,7 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
+import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { getCharacterById } from '@/lib/db/characters'
 import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
@@ -42,15 +43,7 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 1. AUTHENTICATION & AUTHORIZATION
     // ====================================================================
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return errorResponse('Unauthorized', 401)
-    }
+    const user = await requireUser()
 
     // ====================================================================
     // 2. PARSE & VALIDATE REQUEST
@@ -64,30 +57,34 @@ export async function POST(request: NextRequest) {
     const quality = 'low'
 
     if (!bookId) {
-      return errorResponse('Missing required field: bookId', 400)
+      return errorResponse('Missing required field: bookId', undefined, 400)
     }
 
     // ====================================================================
     // 3. FETCH BOOK & CHARACTER DATA
     // ====================================================================
-    const book = await getBookById(supabase, bookId)
-    if (!book) {
-      return errorResponse('Book not found', 404)
+    const { data: book, error: bookError } = await getBookById(bookId)
+    if (bookError || !book) {
+      return errorResponse('Book not found', undefined, 404)
     }
 
     // Check ownership
     if (book.user_id !== user.id) {
-      return errorResponse('Unauthorized', 403)
+      return errorResponse('Unauthorized', undefined, 403)
     }
 
     // Check if book has story data
     if (!book.story_data || !book.story_data.pages) {
-      return errorResponse('Book has no story data. Generate story first.', 400)
+      return errorResponse('Book has no story data. Generate story first.', undefined, 400)
     }
 
-    const character = await getCharacterById(supabase, book.character_id)
-    if (!character) {
-      return errorResponse('Character not found', 404)
+    const characterId = book.character_id
+    if (!characterId) {
+      return errorResponse('Book has no character', undefined, 404)
+    }
+    const { data: character, error: charError } = await getCharacterById(characterId)
+    if (charError || !character) {
+      return errorResponse('Character not found', undefined, 404)
     }
 
     // ====================================================================
@@ -98,18 +95,18 @@ export async function POST(request: NextRequest) {
     const actualEndPage = endPage || totalPages
 
     if (startPage < 1 || startPage > totalPages) {
-      return errorResponse(`Invalid startPage: ${startPage}. Must be between 1 and ${totalPages}`, 400)
+      return errorResponse(`Invalid startPage: ${startPage}. Must be between 1 and ${totalPages}`, undefined, 400)
     }
 
     if (actualEndPage < startPage || actualEndPage > totalPages) {
-      return errorResponse(`Invalid endPage: ${actualEndPage}. Must be between ${startPage} and ${totalPages}`, 400)
+      return errorResponse(`Invalid endPage: ${actualEndPage}. Must be between ${startPage} and ${totalPages}`, undefined, 400)
     }
 
     // Get ALL characters for this book (main + additional)
     const characterIds = book.story_data?.metadata?.characterIds || [book.character_id]
     const characters = await Promise.all(
       characterIds.map(async (charId: string) => {
-        const { data } = await getCharacterById(supabase, charId)
+        const { data } = await getCharacterById(charId)
         return data
       })
     )
@@ -290,33 +287,19 @@ export async function POST(request: NextRequest) {
       
       // Upload cover to Supabase Storage
       const coverImageBuffer = await fetch(coverTempUrl).then((res) => res.arrayBuffer())
-      const coverFileName = `cover_${Date.now()}.png`
-      const coverFilePath = `${user.id}/books/${bookId}/${coverFileName}`
+      const coverFileName = `${user.id}/books/${bookId}/cover_${Date.now()}.png`
 
-      const { error: coverUploadError } = await supabase.storage
-        .from('book-images')
-        .upload(coverFilePath, coverImageBuffer, {
-          contentType: 'image/png',
-          upsert: false,
-        })
+      const coverS3Key = await uploadFile('covers', coverFileName, Buffer.from(coverImageBuffer), 'image/png')
+      const coverStorageUrl = getPublicUrl(coverS3Key)
+      const coverFinalUrl = coverStorageUrl || coverTempUrl
+      coverImageUrl = coverFinalUrl
 
-      if (coverUploadError) {
-        console.error(`[Image Generation] Cover upload failed:`, coverUploadError)
-        throw new Error(`Failed to upload cover: ${coverUploadError.message}`)
-      }
-
-      const { data: coverPublicUrlData } = supabase.storage
-        .from('book-images')
-        .getPublicUrl(coverFilePath)
-
-      coverImageUrl = coverPublicUrlData?.publicUrl || coverTempUrl
-
-      console.log(`[Image Generation] ✅ Cover uploaded to storage:`, coverImageUrl)
+      console.log(`[Image Generation] ✅ Cover uploaded to storage:`, coverFinalUrl)
       
       generatedImages.push({
         pageNumber: coverPageNumber,
-        imageUrl: coverImageUrl,
-        storagePath: coverFilePath,
+        imageUrl: coverFinalUrl,
+        storagePath: coverS3Key,
         prompt: coverPrompt,
       })
 
@@ -326,10 +309,10 @@ export async function POST(request: NextRequest) {
       const updatedPagesAfterCover = [...pages]
       updatedPagesAfterCover[0] = {
         ...updatedPagesAfterCover[0],
-        imageUrl: coverImageUrl,
+        imageUrl: coverStorageUrl,
       }
 
-      await updateBook(supabase, bookId, {
+      await updateBook(bookId, {
         story_data: {
           ...book.story_data,
           pages: updatedPagesAfterCover,
@@ -484,36 +467,19 @@ export async function POST(request: NextRequest) {
 
       console.log(`[Image Generation] Page ${pageNumber} image generated:`, imageUrl)
 
-      // Download and upload to Supabase Storage
+      // Download and upload to S3
       const imageBuffer = await fetch(imageUrl).then((res) => res.arrayBuffer())
-      const fileName = `page_${pageNumber}_${Date.now()}.png`
-      const filePath = `${user.id}/books/${bookId}/${fileName}`
+      const fileName = `${user.id}/books/${bookId}/page_${pageNumber}_${Date.now()}.png`
 
-      const { error: uploadError } = await supabase.storage
-        .from('book-images')
-        .upload(filePath, imageBuffer, {
-          contentType: 'image/png',
-          upsert: false,
-        })
+      const s3Key = await uploadFile('books', fileName, Buffer.from(imageBuffer), 'image/png')
+      const storageUrl = getPublicUrl(s3Key)
 
-      if (uploadError) {
-        console.error(`[Image Generation] Storage upload error for page ${pageNumber}:`, uploadError)
-        throw new Error(`Failed to upload image for page ${pageNumber}: ${uploadError.message}`)
-      }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('book-images')
-        .getPublicUrl(filePath)
-
-      const storageUrl = publicUrlData?.publicUrl || imageUrl
-
-      console.log(`[Image Generation] Page ${pageNumber} uploaded to storage:`, storageUrl)
+      console.log(`[Image Generation] Page ${pageNumber} uploaded to S3:`, storageUrl)
 
       generatedImages.push({
         pageNumber,
         imageUrl: storageUrl,
-        storagePath: filePath,
+        storagePath: s3Key,
         prompt: fullPrompt,
       })
 
@@ -526,7 +492,7 @@ export async function POST(request: NextRequest) {
         imageUrl: storageUrl,
       }
 
-      await updateBook(supabase, bookId, {
+      await updateBook(bookId, {
         story_data: {
           ...book.story_data,
           pages: updatedPages,
@@ -539,7 +505,7 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     const allPagesHaveImages = pages.every((p: any) => p.imageUrl)
     if (allPagesHaveImages) {
-      await updateBook(supabase, bookId, {
+      await updateBook(bookId, {
         status: 'completed',
       })
       console.log(`[Image Generation] Book ${bookId} marked as completed`)
@@ -563,6 +529,6 @@ export async function POST(request: NextRequest) {
     )
   } catch (error) {
     console.error('[Image Generation] Error:', error)
-    return handleAPIError(error, 'Image generation failed')
+    return handleAPIError(error)
   }
 }

@@ -40,6 +40,18 @@ npm run dev
 
 Tarayıcıda **http://localhost:3001** adresini açın.
 
+### Veritabanı bağlantısı (Local / Production)
+
+- **Local (kendi bilgisayarında prod DB’ye bağlanmak):**  
+  Önce SSH tüneli aç (bir terminalde açık kalsın):  
+  `ssh -i kidstorybook-key.pem -L 5432:localhost:5432 ubuntu@EC2_IP`  
+  .env’de: `DATABASE_URL=postgresql://kidstorybook:SIFRE@localhost:5432/kidstorybook`  
+  Sonra `npm run dev`. DBeaver’da da aynı tüneli kullanıp Host: localhost, Port: 5432 yapabilirsin.
+
+- **Production (EC2’de çalışan uygulama):**  
+  .env’de: `DATABASE_URL=postgresql://kidstorybook:SIFRE@localhost:5432/kidstorybook`  
+  (Uygulama EC2’de olduğu için DB aynı makinede, localhost kullanılır.)
+
 ### Dokümantasyon Yapısı
 
 | Ne arıyorsunuz? | Dosya |

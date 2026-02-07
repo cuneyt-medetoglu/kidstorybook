@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { getDraftById } from "@/lib/db/drafts"
 
 /**
  * GET /api/drafts/[draftId]
@@ -10,7 +10,6 @@ export async function GET(
   { params }: { params: { draftId: string } }
 ) {
   try {
-    const supabase = await createClient(request)
     const { draftId } = params
 
     if (!draftId) {
@@ -20,33 +19,27 @@ export async function GET(
       )
     }
 
-    // Get draft from database (public access by draft_id)
-    const { data: draft, error } = await supabase
-      .from("drafts")
-      .select("*")
-      .eq("draft_id", draftId)
-      .gte("expires_at", new Date().toISOString()) // Only non-expired drafts
-      .single()
+    const draft = await getDraftById(draftId)
 
-    if (error || !draft) {
+    if (!draft) {
       return NextResponse.json(
         { success: false, error: "Draft not found or expired" },
         { status: 404 }
       )
     }
 
-    // Format response to match DraftData interface
+    const custom = draft.custom_requests ? JSON.parse(draft.custom_requests) : {}
     return NextResponse.json({
       success: true,
       draft: {
         draftId: draft.draft_id,
-        coverImage: draft.cover_image,
-        characterData: draft.character_data,
+        coverImage: custom.coverImage ?? null,
+        characterData: custom.characterData ?? { characterIds: draft.character_ids },
         theme: draft.theme,
         subTheme: draft.sub_theme,
-        style: draft.style,
+        style: draft.illustration_style,
         createdAt: draft.created_at,
-        expiresAt: draft.expires_at,
+        expiresAt: custom.expiresAt ?? null,
       },
     })
   } catch (error) {

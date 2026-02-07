@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { requireUser } from "@/lib/auth/api-auth"
+import { getBooksByIds } from "@/lib/db/books"
 
 /**
  * Cart API Routes
@@ -14,15 +15,7 @@ const HARDCOPY_PRICE = 34.99 // $34.99 per hardcopy
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     // For now, cart is stored in localStorage on client-side
     // In the future, we can store it in database
@@ -44,15 +37,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     const body = await request.json()
     const { action, book_ids } = body
@@ -67,11 +52,7 @@ export async function POST(request: NextRequest) {
 
       // Validate that books exist and belong to user
       // Check if books are purchased E-Books (required for hardcopy)
-      const { data: books, error: booksError } = await supabase
-        .from("books")
-        .select("id, title, cover_image_url, status")
-        .in("id", book_ids)
-        .eq("user_id", user.id)
+      const { data: books, error: booksError } = await getBooksByIds(user.id, book_ids)
 
       if (booksError) {
         console.error("[Cart API] Error fetching books:", booksError)
@@ -81,7 +62,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      if (books.length !== book_ids.length) {
+      if (!books || books.length !== book_ids.length) {
         return NextResponse.json(
           { error: "Some books not found or don't belong to you" },
           { status: 404 }
@@ -139,15 +120,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     const body = await request.json()
     const { item_id } = body

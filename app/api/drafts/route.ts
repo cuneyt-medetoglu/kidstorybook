@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { requireUser } from "@/lib/auth/api-auth"
+import { getUserDrafts, getDraftById, createDraft, updateDraft } from "@/lib/db/drafts"
 import type { DraftData } from "@/lib/draft-storage"
 
 /**
@@ -8,36 +9,9 @@ import type { DraftData } from "@/lib/draft-storage"
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
+    const user = await requireUser()
 
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
-
-    // Get user's drafts from database
-    const { data: drafts, error } = await supabase
-      .from("drafts")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("expires_at", new Date().toISOString()) // Only non-expired drafts
-      .order("created_at", { ascending: false })
-
-    if (error) {
-      console.error("[Drafts API] Error fetching drafts:", error)
-      return NextResponse.json(
-        { success: false, error: "Failed to fetch drafts" },
-        { status: 500 }
-      )
-    }
+    const drafts = await getUserDrafts(user.id)
 
     return NextResponse.json({
       success: true,
@@ -58,20 +32,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     const body: DraftData = await request.json()
 
@@ -83,31 +44,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if draft already exists
-    const { data: existingDraft } = await supabase
-      .from("drafts")
-      .select("id")
-      .eq("draft_id", body.draftId)
-      .single()
+    const characterIds = body.characterData?.characterIds ?? []
+    const ageGroup = body.characterData?.ageGroup ?? "3-5"
+    const customRequests = JSON.stringify({
+      coverImage: body.coverImage,
+      characterData: body.characterData,
+      expiresAt: body.expiresAt,
+    })
+
+    const existingDraft = await getDraftById(body.draftId)
 
     if (existingDraft) {
-      // Update existing draft
-      const { data, error } = await supabase
-        .from("drafts")
-        .update({
-          cover_image: body.coverImage,
-          character_data: body.characterData,
-          theme: body.theme,
-          sub_theme: body.subTheme,
-          style: body.style,
-          expires_at: body.expiresAt,
-        })
-        .eq("draft_id", body.draftId)
-        .select()
-        .single()
+      const updated = await updateDraft(body.draftId, {
+        character_ids: characterIds,
+        theme: body.theme,
+        sub_theme: body.subTheme ?? '',
+        illustration_style: body.style,
+        custom_requests: customRequests,
+      })
 
-      if (error) {
-        console.error("[Drafts API] Error updating draft:", error)
+      if (!updated) {
         return NextResponse.json(
           { success: false, error: "Failed to update draft" },
           { status: 500 }
@@ -116,38 +72,26 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        draft: data,
+        draft: updated,
       })
     }
 
-    // Create new draft
-    const { data, error } = await supabase
-      .from("drafts")
-      .insert({
-        user_id: user.id,
-        draft_id: body.draftId,
-        cover_image: body.coverImage,
-        character_data: body.characterData,
-        theme: body.theme,
-        sub_theme: body.subTheme,
-        style: body.style,
-        created_at: body.createdAt,
-        expires_at: body.expiresAt,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.error("[Drafts API] Error creating draft:", error)
-      return NextResponse.json(
-        { success: false, error: "Failed to create draft" },
-        { status: 500 }
-      )
-    }
+    const created = await createDraft({
+      draft_id: body.draftId,
+      user_id: user.id,
+      user_email: user.email,
+      character_ids: characterIds,
+      theme: body.theme,
+      sub_theme: body.subTheme ?? '',
+      age_group: ageGroup,
+      illustration_style: body.style,
+      language: "tr",
+      custom_requests: customRequests,
+    })
 
     return NextResponse.json({
       success: true,
-      draft: data,
+      draft: created,
     })
   } catch (error) {
     console.error("[Drafts API] Error:", error)

@@ -140,6 +140,10 @@ ALTER TABLE public.drafts DISABLE ROW LEVEL SECURITY;
 EOF
 ```
 
+## 3.5 Local'den prod DB'ye bağlantı
+
+Local'de uygulama veya DBeaver ile prod DB'ye bağlanmak için **SSH tüneli** kullan (5432'yi açmak/pg_hba gerekmez; IP değişse de aynı). Adımlar: **README.md → "Veritabanı bağlantısı (Local / Production)"**.
+
 ---
 
 # 4. S3 (Tek Bucket + Prefix’ler)

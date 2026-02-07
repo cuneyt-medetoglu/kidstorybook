@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { useSession } from "next-auth/react"
 import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2, ShoppingCart, CheckSquare, Square } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -65,30 +65,27 @@ export default function LibraryPage() {
   const [sortBy, setSortBy] = useState<string>("date-newest")
   const [searchQuery, setSearchQuery] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [downloadingBookId, setDownloadingBookId] = useState<string | null>(null)
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated"
   
   // Bulk selection state
   const [selectedBooks, setSelectedBooks] = useState<string[]>([])
   const [isSelectMode, setIsSelectMode] = useState(false)
 
-  // Check authentication and fetch books
+  // Fetch books when authenticated
   useEffect(() => {
-    const checkAuthAndFetchBooks = async () => {
+    if (status !== "authenticated") {
+      if (status === "unauthenticated") {
+        router.push("/auth/login")
+      }
+      setIsLoading(false)
+      return
+    }
+
+    const fetchBooks = async () => {
       try {
-        const supabase = createClient()
-        const { data: { user }, error } = await supabase.auth.getUser()
-        
-        if (error || !user) {
-          // Not authenticated, redirect to login
-          console.log("[Dashboard] Not authenticated, redirecting to login")
-          router.push("/auth/login")
-          return
-        }
-        
-        // Authenticated, allow access
-        console.log("[Dashboard] Authenticated user:", user.email)
-        setIsAuthenticated(true)
+        console.log("[Dashboard] Authenticated user:", session?.user?.email)
 
         // Fetch books from API
         console.log("[Dashboard] Fetching books from API...")
@@ -141,8 +138,8 @@ export default function LibraryPage() {
       }
     }
     
-    checkAuthAndFetchBooks()
-  }, [router, toast])
+    fetchBooks()
+  }, [router, toast, session, status])
 
   // Filter and search (moved before early return to fix hooks order)
   const filteredBooks = useMemo(() => {

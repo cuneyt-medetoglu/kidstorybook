@@ -168,7 +168,7 @@ export function checkSyncStatus(): SyncStatus[] {
         if (versionMatch) docVersion = versionMatch[1]
         
         // Try to extract changelog from doc
-        const changelogMatch = docContent.match(/### v[\d.]+[^#]*/s)
+        const changelogMatch = docContent.match(/### v[\d.]+[\s\S]*?(?=###|$)/)
         if (changelogMatch) {
           // Simple extraction - could be improved
           docChangelog = []

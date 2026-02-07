@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import { createCharacter } from '@/lib/db/characters'
 import OpenAI from 'openai'
@@ -17,16 +17,7 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    const user = await requireUser()
 
     // Parse request body
     const body = await request.json()
@@ -185,7 +176,6 @@ export async function POST(request: NextRequest) {
 
     // Create character in database
     const { data: character, error: dbError } = await createCharacter(
-      supabase,
       user.id,
       {
         name: characterData.name || name,

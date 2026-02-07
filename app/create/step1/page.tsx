@@ -8,7 +8,7 @@ import { User, Heart, Eye, Scissors, ArrowRight, Sparkles, Star, BookOpen } from
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, type Resolver, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
@@ -16,14 +16,12 @@ import * as z from "zod"
 const characterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   age: z.coerce.number().min(0, "Age must be at least 0").max(12, "Age must be at most 12"),
-  gender: z.enum(["boy", "girl"], {
-    required_error: "Please select a gender",
-  }),
+  gender: z.enum(["boy", "girl"], { message: "Please select a gender" }),
   hairColor: z.string().min(1, "Please select a hair color"),
   eyeColor: z.string().min(1, "Please select an eye color"),
 })
 
-type CharacterFormData = z.infer<typeof characterSchema>
+type CharacterFormData = { name: string; age: number; gender: "boy" | "girl"; hairColor: string; eyeColor: string }
 
 const hairColorOptions = [
   { value: "light-blonde", label: "Light Blonde" },
@@ -52,7 +50,7 @@ export default function Step1Page() {
     watch,
     formState: { errors, isValid },
   } = useForm<CharacterFormData>({
-    resolver: zodResolver(characterSchema),
+    resolver: zodResolver(characterSchema) as Resolver<CharacterFormData>,
     mode: "onChange",
   })
 
@@ -93,7 +91,7 @@ export default function Step1Page() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }
@@ -178,7 +176,7 @@ export default function Step1Page() {
             </motion.div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit as SubmitHandler<CharacterFormData>)} className="space-y-6">
               {/* Name Input */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}

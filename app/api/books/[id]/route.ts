@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import {
   getBookById,
   updateBook,
@@ -26,16 +26,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please login to continue')
-    }
+    const user = await requireUser()
 
     const bookId = params.id
 
@@ -43,8 +34,7 @@ export async function GET(
       return CommonErrors.badRequest('Book ID is required')
     }
 
-    // Get Book
-    const { data: book, error: dbError } = await getBookById(supabase, bookId)
+    const { data: book, error: dbError } = await getBookById(bookId)
 
     if (dbError || !book) {
       return CommonErrors.notFound('Book')
@@ -79,7 +69,7 @@ export async function GET(
     }
 
     // Increment view count (non-blocking)
-    incrementBookViews(supabase, bookId).catch((error) => {
+    incrementBookViews(bookId).catch((error) => {
       console.error('Failed to increment view count:', error)
     })
 
@@ -99,16 +89,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please login to continue')
-    }
+    const user = await requireUser()
 
     const bookId = params.id
 
@@ -116,8 +97,7 @@ export async function PATCH(
       return CommonErrors.badRequest('Book ID is required')
     }
 
-    // Get Book (to verify ownership)
-    const { data: existingBook, error: getError } = await getBookById(supabase, bookId)
+    const { data: existingBook, error: getError } = await getBookById(bookId)
 
     if (getError || !existingBook) {
       return CommonErrors.notFound('Book')
@@ -162,7 +142,6 @@ export async function PATCH(
 
     // Update Book
     const { data: updatedBook, error: updateError } = await updateBook(
-      supabase,
       bookId,
       updateInput
     )
@@ -188,16 +167,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Authentication (supports both Bearer token and session cookies)
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please login to continue')
-    }
+    const user = await requireUser()
 
     const bookId = params.id
 
@@ -205,8 +175,7 @@ export async function DELETE(
       return CommonErrors.badRequest('Book ID is required')
     }
 
-    // Get Book (to verify ownership)
-    const { data: existingBook, error: getError } = await getBookById(supabase, bookId)
+    const { data: existingBook, error: getError } = await getBookById(bookId)
 
     if (getError || !existingBook) {
       return CommonErrors.notFound('Book')
@@ -218,7 +187,7 @@ export async function DELETE(
     }
 
     // Delete Book
-    const { error: deleteError } = await deleteBook(supabase, bookId)
+    const { error: deleteError } = await deleteBook(bookId)
 
     if (deleteError) {
       console.error('Delete error:', deleteError)

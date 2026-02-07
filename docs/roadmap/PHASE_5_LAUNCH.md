@@ -83,7 +83,7 @@
   - [ ] Storage kullanım istatistikleri
 
 ### 5.3 Güvenlik
-- [ ] **5.3.1** HTTPS sertifikası (Vercel otomatik)
+- [ ] **5.3.1** HTTPS sertifikası (Nginx + Let's Encrypt; bkz. 5.5.3)
 - [ ] **5.3.2** Rate limiting
 - [ ] **5.3.3** Input validasyonu
 - [ ] **5.3.4** CSRF protection
@@ -103,13 +103,11 @@
   - Suspicious activity detection
   - Alert system (email, Slack, vb.)
   - IP blocking mekanizması
-- [ ] **5.3.8** Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026)
-  - Supabase'deki güvenlik ve dosya erişim konusu ele alınacak
-  - Örneğin kişisel bilgiler ve fotoğraflar olduğu için kullanıcıların birbirlerinin içeriğini görmemesi
-  - Bir hack durumunun önüne geçilecek önlemlerin alındığından emin olmalıyız
-  - RLS (Row Level Security) kuralları gözden geçirilecek
-  - Storage bucket erişim kontrolleri
-  - File access permissions
+- [ ] **5.3.8** AWS / S3 Güvenlik ve Dosya Erişim Kontrolü
+  - S3 bucket policy (photos/ private, books/pdfs/covers/ public read) gözden geçirilecek
+  - Kişisel bilgiler ve fotoğraflar: kullanıcıların birbirlerinin içeriğini görmemesi
+  - PostgreSQL RLS / uygulama seviyesi yetki kontrolleri
+  - IAM policy minimum yetki kontrolü
   - Data isolation testleri
   - Security audit
 - [ ] **5.3.9** API Key Güvenliği (23 Ocak 2026) - 🔴 **KRİTİK**
@@ -128,24 +126,57 @@
 - [ ] **5.4.3** Cross-browser test
 - [ ] **5.4.4** Ödeme testleri (sandbox)
 
-### 5.5 Deployment
-- [ ] **5.5.1** Vercel production deployment
-- [ ] **5.5.2** Domain bağlantısı
-- [ ] **5.5.3** SSL sertifikası (Vercel otomatik, kontrol edilmeli)
+### 5.4.5 Genel Hata Yönetimi (Production UX)
+- [ ] **5.4.5.1** Production'da kullanıcı dostu hata yönetimi (Şubat 2026)
+  - Kullanıcıya teknik hata mesajları (örn. "Failed to create user", 500 Internal Server Error) veya ham stack trace gösterilmemeli.
+  - API/form hatalarında kullanıcı dostu mesajlar (toast veya inline), tarayıcı `alert()` veya teknik popup kullanılmamalı.
+  - Hata türüne göre mesaj eşlemesi (ağ hatası, veritabanı, doğrulama, yetki vb.) ve gerekirse "Daha sonra tekrar deneyin" gibi genel mesaj.
+  - Error boundary ile beklenmeyen hatalarda çökme yerine fallback UI; production'da hata loglama (Sentry vb.) ayrı tutulmalı.
+  - İlgili yerler: register/login, form submit, API çağrıları (kitap oluşturma, ödeme vb.).
+
+### 5.5 Deployment (AWS EC2) | 🔴 DO
+- [x] **5.5.7** AWS'de production makine kurulumu ✅ (Şubat 2026)
+  - EC2 t3.medium, Ubuntu 24.04, güvenlik grubu (SSH, 80, 443), PostgreSQL, S3
+  - Rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`
+- [ ] **5.5.1** EC2'de Next.js uygulaması deploy | 🔴 DO
+  - Node.js 20 LTS kurulumu (EC2)
+  - Proje dosyalarını EC2'ye alma (git clone veya scp)
+  - `npm install && npm run build && npm start` (veya PM2 ile)
+  - PM2 veya systemd ile process management (restart, auto-start)
+  - `.env` dosyasını EC2'de oluşturma (production değerleri)
+  - `NODE_ENV=production`, `NEXT_PUBLIC_APP_URL=https://domain.com`
+- [ ] **5.5.2** Domain bağlantısı | 🔴 DO
+  - Domain satın alma / DNS ayarları
+  - A record → EC2 Elastic IP
+  - www subdomain ayarları
+- [ ] **5.5.3** SSL sertifikası (Let's Encrypt + Nginx) | 🔴 DO
+  - Nginx reverse proxy kurulumu (80 → 3000/3001)
+  - Certbot ile Let's Encrypt SSL (otomatik yenileme)
+  - HTTPS zorunlu (HTTP → HTTPS redirect)
 - [ ] **5.5.4** Monitoring kurulumu
+  - CloudWatch veya basit health check script
+  - Uptime monitoring (UptimeRobot veya benzeri)
+  - Disk / CPU / memory alarm
 - [ ] **5.5.5** Error tracking (Sentry)
-- [ ] **5.5.6** Production Environment Variables Kontrolü (25 Ocak 2026)
-  - Tüm environment variable'ların Vercel'de doğru ayarlandığından emin ol
-  - API key'lerin production'da çalıştığını test et
-  - Supabase production URL ve keys kontrolü
+- [ ] **5.5.6** Production Environment Variables Kontrolü
+  - `.env` dosyasındaki tüm key'lerin production'da doğru ayarlandığından emin ol
+  - `DATABASE_URL` (EC2 localhost PostgreSQL)
+  - `AWS_S3_BUCKET`, `AWS_REGION` (IAM role ile)
   - OpenAI API key production kontrolü
   - Google Cloud TTS key production kontrolü
   - Tüm secret'ların güvenli şekilde saklandığından emin ol
-- [ ] **5.5.7** AWS'de production makine kurulumu | 🔴 DO
-  - AWS'de (EC2 vb.) production sunucusu kurulumu
-  - Sunucu güvenliği, firewall, SSH
-  - Node/Next.js veya Docker ile uygulama çalıştırma
-  - Domain, SSL ve monitoring ayarları
+- [ ] **5.5.8** CI/CD Pipeline (Otomatik Deployment) | 🟡 PLAN
+  - GitHub Actions ile otomatik build + deploy
+  - `main` branch'e push → EC2'ye SSH ile deploy (veya rsync)
+  - Alternatif: Docker image build → EC2'de pull + run
+  - Zero-downtime deployment stratejisi (PM2 reload veya rolling)
+  - Staging ortamı (opsiyonel; aynı EC2'de farklı port veya ayrı instance)
+  - Rollback mekanizması (önceki build'e geri dönme)
+- [ ] **5.5.9** Docker ile Deployment (Opsiyonel) | 🟡 PLAN
+  - Dockerfile oluşturma (Next.js production image)
+  - docker-compose.yml (app + nginx)
+  - Container restart policy
+  - Docker image registry (ECR veya Docker Hub)
 
 ### 5.7 PDF Tasarım İyileştirmesi
 - [x] **5.7.1** Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)

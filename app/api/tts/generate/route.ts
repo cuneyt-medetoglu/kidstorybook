@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 import { TextToSpeechClient } from "@google-cloud/text-to-speech"
-import { createClient } from "@supabase/supabase-js"
 import crypto from "crypto"
-import { getLanguageCode, getPromptForLanguage, isLanguageSupported } from "@/lib/prompts/tts/v1.0.0"
+import { getLanguageCode, getPromptForLanguage } from "@/lib/prompts/tts/v1.0.0"
+import { uploadFile, getPublicUrl, fileExists } from "@/lib/storage/s3"
 
-// Initialize Supabase client (for cache)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const TTS_CACHE_PREFIX = "tts-cache"
 
 // Initialize Google Cloud TTS client
 let client: TextToSpeechClient | null = null
@@ -62,29 +58,14 @@ function generateCacheHash(text: string, voiceId: string, speed: number, prompt:
 }
 
 /**
- * Check if audio exists in cache
+ * Check if audio exists in cache (S3)
  */
 async function getCachedAudio(hash: string): Promise<string | null> {
   try {
-    const filePath = `${hash}.mp3`
-    
-    // Check if file exists
-    const { data: files, error: listError } = await supabase.storage
-      .from('tts-cache')
-      .list('', {
-        search: filePath
-      })
-
-    if (listError || !files || files.length === 0) {
-      return null
-    }
-
-    // Get public URL
-    const { data } = supabase.storage
-      .from('tts-cache')
-      .getPublicUrl(filePath)
-
-    return data.publicUrl
+    const key = `${TTS_CACHE_PREFIX}/${hash}.mp3`
+    const exists = await fileExists(key)
+    if (!exists) return null
+    return getPublicUrl(key)
   } catch (error) {
     console.error('[TTS Cache] Error checking cache:', error)
     return null
@@ -92,30 +73,13 @@ async function getCachedAudio(hash: string): Promise<string | null> {
 }
 
 /**
- * Save audio to cache
+ * Save audio to cache (S3)
  */
 async function saveCachedAudio(hash: string, audioBuffer: Buffer): Promise<string | null> {
   try {
-    const filePath = `${hash}.mp3`
-    
-    const { error: uploadError } = await supabase.storage
-      .from('tts-cache')
-      .upload(filePath, audioBuffer, {
-        contentType: 'audio/mpeg',
-        upsert: true
-      })
-
-    if (uploadError) {
-      console.error('[TTS Cache] Error uploading to cache:', uploadError)
-      return null
-    }
-
-    // Get public URL
-    const { data } = supabase.storage
-      .from('tts-cache')
-      .getPublicUrl(filePath)
-
-    return data.publicUrl
+    const fileName = `${hash}.mp3`
+    const key = await uploadFile(TTS_CACHE_PREFIX, fileName, audioBuffer, 'audio/mpeg')
+    return getPublicUrl(key)
   } catch (error) {
     console.error('[TTS Cache] Error saving to cache:', error)
     return null

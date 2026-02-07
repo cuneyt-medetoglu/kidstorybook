@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Check, BookOpen } from "lucide-react"
 import type { CurrencyConfig } from "@/lib/currency"
-import { getCurrencyConfig } from "@/lib/currency"
+import { useCurrency } from "@/contexts/CurrencyContext"
 
 interface PlanSelectionModalProps {
   isOpen: boolean
@@ -43,46 +43,10 @@ export function PlanSelectionModal({
   onSelectPlan,
   currencyConfig: externalCurrencyConfig,
 }: PlanSelectionModalProps) {
-  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>(
-    externalCurrencyConfig || {
-      currency: "USD",
-      symbol: "$",
-      price: "$7.99",
-    }
-  )
+  const { currencyConfig: contextCurrency, isLoading: contextLoading } = useCurrency()
+  const currencyConfig = externalCurrencyConfig ?? contextCurrency
+  const isLoadingCurrency = !externalCurrencyConfig && contextLoading
   const [selectedPlan, setSelectedPlan] = useState<"10" | "15" | "20">("10")
-  const [isLoadingCurrency, setIsLoadingCurrency] = useState(!externalCurrencyConfig)
-
-  // Fetch currency if not provided
-  useEffect(() => {
-    if (externalCurrencyConfig) {
-      setCurrencyConfig(externalCurrencyConfig)
-      setIsLoadingCurrency(false)
-      return
-    }
-
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch("/api/currency")
-        const data = await response.json()
-
-        if (data.success) {
-          setCurrencyConfig({
-            currency: data.currency,
-            symbol: data.symbol,
-            price: data.price,
-          })
-        }
-      } catch (error) {
-        console.error("[PlanSelectionModal] Error fetching currency:", error)
-        // Keep default USD
-      } finally {
-        setIsLoadingCurrency(false)
-      }
-    }
-
-    fetchCurrency()
-  }, [externalCurrencyConfig])
 
   // Calculate price for selected plan
   const getPlanPrice = (planType: "10" | "15" | "20"): number => {

@@ -1,7 +1,7 @@
 # 🗺️ KidStoryBook - Proje Yol Haritası
 
-**Versiyon:** 2.0  
-**Tarih:** 2 Şubat 2026  
+**Versiyon:** 2.1  
+**Tarih:** 4 Şubat 2026  
 **Durum:** AKTİF – Modüler yapı (detaylar `docs/roadmap/` altında)
 
 ---
@@ -27,7 +27,7 @@ Tüm iş maddeleri, açıklamalar ve notlar **faz dosyalarında** tutulur; ana R
 
 | Faz | Dosya | Açıklama |
 |-----|-------|----------|
-| **Faz 1** | [PHASE_1_FOUNDATION.md](roadmap/PHASE_1_FOUNDATION.md) | Temel altyapı (Next.js, Supabase, env) |
+| **Faz 1** | [PHASE_1_FOUNDATION.md](roadmap/PHASE_1_FOUNDATION.md) | Temel altyapı (Next.js, AWS EC2+PG+S3, env) |
 | **Faz 2** | [PHASE_2_FRONTEND.md](roadmap/PHASE_2_FRONTEND.md) | Frontend (layout, ana sayfa, auth, wizard, e-book viewer, dashboard, statik sayfalar) |
 | **Faz 3** | [PHASE_3_BACKEND_AI.md](roadmap/PHASE_3_BACKEND_AI.md) | Backend ve AI (API, karakterler, kitaplar, PDF, webhook) |
 | **Faz 4** | [PHASE_4_ECOMMERCE.md](roadmap/PHASE_4_ECOMMERCE.md) | E-ticaret ve ödeme (Stripe, İyzico, sipariş, fiyatlandırma) |
@@ -46,12 +46,14 @@ Tüm iş maddeleri, açıklamalar ve notlar **faz dosyalarında** tutulur; ana R
 
 ## 📊 Güncel Durum Özeti
 
-- **Faz 1:** ✅ Tamamlandı (proje kurulumu, Supabase, env)  
+- **Faz 1:** ✅ Tamamlandı (proje kurulumu, AWS EC2+PostgreSQL+S3, env)  
 - **Faz 2:** 🟡 Büyük oranda tamamlandı (layout, ana sayfa, auth, wizard, e-book viewer, dashboard); statik sayfalar ve birkaç iyileştirme açık  
 - **Faz 3:** 🟡 Büyük oranda tamamlandı (API, AI, kitaplar, PDF); webhook ve bazı iyileştirmeler açık  
 - **Faz 4:** ⬜ Bekliyor (Stripe, İyzico, sipariş, fiyatlandırma)  
-- **Faz 5:** ⬜ Kısmen (PDF tasarım iyileştirmeleri yapıldı); SEO, analytics, admin, lansman açık  
+- **Faz 5:** 🔴 **Aktif** — AWS deployment (5.5), SEO, analytics, admin, lansman açık  
 - **Faz 6:** ⬜ Bekliyor (PWA, mağaza yayını)
+
+> **Sıradaki:** 5.5 AWS Deployment (EC2'de Next.js deploy, domain, SSL, CI/CD)
 
 Detaylı görev listesi ve checkbox’lar için ilgili **faz dosyasına** bakın.
 

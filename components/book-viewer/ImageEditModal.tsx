@@ -31,6 +31,10 @@ export function ImageEditModal({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [maskDataUrl, setMaskDataUrl] = useState<string | null>(null)
 
+  useEffect(() => {
+    canvasRef.current?.eraseMode(tool === 'eraser')
+  }, [tool])
+
   const handleClearCanvas = () => {
     canvasRef.current?.clearCanvas()
   }
@@ -193,7 +197,6 @@ export function ImageEditModal({
                   height="100%"
                   strokeWidth={brushSize}
                   strokeColor="rgba(255, 50, 50, 0.6)"
-                  eraseMode={tool === 'eraser'}
                   canvasColor="transparent"
                   exportWithBackgroundImage={false}
                   style={{

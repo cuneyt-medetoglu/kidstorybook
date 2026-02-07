@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 4 Şubat 2026 (AWS Faz 4 tamamlandı; sıfırdan kurulum rehberi eklendi – plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md)
+**Son güncelleme:** 7 Şubat 2026 (Commit öncesi: migration/temp dokümanlar archive'a taşındı; docs sadeleştirildi.)
 
 ---
 
@@ -11,8 +11,7 @@ Bu klasör projenin tüm dokümantasyonunu içerir.
 ```
 docs/
 ├── DOCUMENTATION.md             # Bu dosya - Dokümantasyon indeksi
-├── DOCUMENTATION_MAP.md         # Tüm dokümanların kategorisi ve özeti (FAZ 1 çıktısı)
-├── ARCHIVE_LIST.md              # Archive'a taşınacak dosyalar listesi (FAZ 1 çıktısı)
+├── DOCUMENTATION_MAP.md         # Tüm dokümanların kategorisi ve özeti
 ├── ROADMAP.md                   # Ana proje planı (özet + faz dosyalarına linkler)
 ├── roadmap/                     # Faz bazlı iş listesi ve CSV/viewer
 │   ├── PHASE_1_FOUNDATION.md    # Faz 1: Temel altyapı
@@ -166,8 +165,8 @@ docs/
 1. **ROADMAP.md** - Tüm işlerin listesi, buradan takip et
 2. **PRD.md** - Ürün gereksinimleri
 3. **FEATURES.md** - Özellik listesi ve önceliklendirme
-4. **DOCUMENTATION_MAP.md** - Tüm dokümanların kategorisi (AKTİF / GÜNCELLENECEK / ESKİ); hangi dosya nerede, güncel mi?
-5. **ARCHIVE_LIST.md** - Archive'a taşınacak dosyalar (FAZ 6'da kullanılacak)
+4. **DOCUMENTATION_MAP.md** - Tüm dokümanların kategorisi; hangi dosya nerede, güncel mi?
+5. **archive/** - Tamamlanmış/tek seferlik dokümanlar (2026-q1, 2026-02; ARCHIVE_LIST archive içinde)
 
 ### İş Takibi ve CSV Yönetimi
 1. **roadmap.csv** - Google Sheets'e import edilebilir CSV dosyası (Gizli - `docs/roadmap/` klasöründe)
@@ -246,7 +245,7 @@ docs/
 - Sürekli güncellenmeli
 - Türkçe yazılmalı (kod yorumları İngilizce olabilir)
 
-**Archive stratejisi:** Tamamlanmış veya tek seferlik analiz dokümanları `docs/archive/` altına taşınır. Tarih bazlı alt klasör kullanılır (örn. `archive/2026-q1/`). Hangi dosyanın nerede olduğu için [DOCUMENTATION_MAP.md](DOCUMENTATION_MAP.md) ve [ARCHIVE_LIST.md](ARCHIVE_LIST.md) kullanılır.
+**Archive stratejisi:** Tamamlanmış veya tek seferlik analiz dokümanları `docs/archive/` altına taşınır (örn. `archive/2026-q1/`, `archive/2026-02/`). Hangi dosyanın nerede olduğu için [DOCUMENTATION_MAP.md](DOCUMENTATION_MAP.md) ve archive içindeki README/ARCHIVE_LIST kullanılır.
 
 ---
 
@@ -324,7 +323,12 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
     - `docs/reports/GPT_IMAGE_COVER_GENERATION_ERROR_ANALYSIS.md` oluşturuldu
     - `docs/reports/CURRENT_STATUS_ANALYSIS.md` oluşturuldu (mevcut durum ve eksikler)
 
-**Son Güncelleme:** 4 Şubat 2026
+**Son Güncelleme:** 7 Şubat 2026
+
+- **7 Şubat 2026 (Commit öncesi doküman toparlama):**
+  - Root ve docs altındaki migration/temp dosyalar archive'a taşındı: MIGRATION_SESSION_2_SUMMARY, MIGRATION_STATUS, MIGRATION_BUILD_FIXES → docs/archive/2026-02/; TEMP_CREATE_BOOK_TEST_ANALYSIS → archive/2026-02; ARCHIVE_LIST → docs/archive/ARCHIVE_LIST.md.
+  - Auth/migration rehberleri archive'a taşındı: AUTH_USERS_VS_PUBLIC_USERS, DELETE_AUTH_SCHEMA, RUN_MIGRATION_ON_EC2 → docs/archive/2026-02/guides-auth/.
+  - DOCUMENTATION.md güncellendi (ARCHIVE_LIST referansları kaldırıldı, archive notu eklendi).
 
 - **4 Şubat 2026 (AWS geçiş – Faz 4, sıfırdan kurulum rehberi):**
   - Supabase → AWS uygulama planında **Faz 4 (S3 tek bucket + prefix’ler)** tamamlandı olarak işaretlendi.

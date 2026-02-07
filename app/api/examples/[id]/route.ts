@@ -7,7 +7,7 @@
  */
 
 import { NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import { getBookById } from '@/lib/db/books'
 import { successResponse, CommonErrors } from '@/lib/api/response'
 
@@ -16,22 +16,14 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient(request)
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return CommonErrors.unauthorized('Please log in to create your own book from this example.')
-    }
+    const user = await requireUser()
 
     const exampleId = params.id
     if (!exampleId) {
       return CommonErrors.badRequest('Example book ID is required')
     }
 
-    const { data: book, error: dbError } = await getBookById(supabase, exampleId)
+    const { data: book, error: dbError } = await getBookById(exampleId)
 
     if (dbError || !book) {
       return CommonErrors.notFound('Example book not found')
@@ -63,6 +55,6 @@ export async function GET(
     )
   } catch (error) {
     console.error('[GET /api/examples/[id]] Error:', error)
-    return CommonErrors.internal('Failed to fetch example book')
+    return CommonErrors.internalError('Failed to fetch example book')
   }
 }

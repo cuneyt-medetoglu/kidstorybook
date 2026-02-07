@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
@@ -23,7 +23,7 @@ import {
 } from "@/lib/draft-storage"
 import { useCart } from "@/contexts/CartContext"
 import { useToast } from "@/hooks/use-toast"
-import { createClient } from "@/lib/supabase/client"
+import { useSession } from "next-auth/react"
 import {
   Dialog,
   DialogContent,
@@ -33,16 +33,17 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-export default function DraftPreviewPage() {
+function DraftPreviewContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const draftId = searchParams.get("draftId")
   const { addToCart } = useCart()
   const { toast } = useToast()
 
+  const { data: session } = useSession()
+  const isAuthenticated = !!session?.user
   const [draft, setDraft] = useState<DraftData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<"10" | "15" | "20">("10")
   const [showPlanModal, setShowPlanModal] = useState(false)
 
@@ -88,13 +89,6 @@ export default function DraftPreviewPage() {
         }
 
         setDraft(draftData)
-
-        // Check if user is authenticated
-        const supabase = createClient()
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        setIsAuthenticated(!!user)
       } catch (error) {
         console.error("[DraftPreview] Error loading draft:", error)
         toast({
@@ -202,6 +196,7 @@ export default function DraftPreviewPage() {
                     src={draft.coverImage}
                     alt={`${draft.characterData.name}'s book cover`}
                     fill
+                    sizes="(max-width: 768px) 100vw, 360px"
                     className="object-cover"
                     unoptimized
                   />
@@ -342,5 +337,13 @@ export default function DraftPreviewPage() {
         </Dialog>
       </div>
     </div>
+  )
+}
+
+export default function DraftPreviewPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>}>
+      <DraftPreviewContent />
+    </Suspense>
   )
 }

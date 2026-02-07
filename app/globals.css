@@ -65,12 +65,14 @@
   }
   html {
     @apply overflow-x-hidden;
+    position: relative; /* Framer Motion useScroll container uyarısı */
     width: 100%;
     max-width: 100%;
   }
   body {
     @apply bg-background text-foreground;
     @apply overflow-x-hidden;
+    position: relative; /* Framer Motion useScroll: scroll offset hesaplaması için */
     width: 100%;
     max-width: 100%;
   }

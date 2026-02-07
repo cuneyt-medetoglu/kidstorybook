@@ -96,47 +96,46 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
       if (char.type.group === "Pets") {
         characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
         // Add appearance details if available
-        if (char.description) {
-          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} fur`
-          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+        const desc = (char as { description?: { hairColor?: string; eyeColor?: string; uniqueFeatures?: string[]; age?: number } }).description
+        if (desc) {
+          if (desc.hairColor) characterDesc += ` with ${desc.hairColor} fur`
+          if (desc.eyeColor) characterDesc += `, ${desc.eyeColor} eyes`
+          if (desc.uniqueFeatures && desc.uniqueFeatures.length > 0) {
+            characterDesc += `, ${desc.uniqueFeatures.join(', ')}`
           }
         }
         characterDesc += ` - A friendly and playful companion`
       } else if (char.type.group === "Toys") {
         characterDesc += `\n${charNumber}. ${charName} (a ${char.type.value.toLowerCase()})`
-        // Add appearance details if available
-        if (char.description) {
-          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} color`
-          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} details`
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+        const desc = (char as { description?: { hairColor?: string; eyeColor?: string; uniqueFeatures?: string[] } }).description
+        if (desc) {
+          if (desc.hairColor) characterDesc += `, ${desc.hairColor} color`
+          if (desc.eyeColor) characterDesc += `, ${desc.eyeColor} details`
+          if (desc.uniqueFeatures && desc.uniqueFeatures.length > 0) {
+            characterDesc += `, ${desc.uniqueFeatures.join(', ')}`
           }
         }
         characterDesc += ` - A beloved and special toy`
       } else if (char.type.group === "Family Members") {
-        // NEW: Detailed family member description
         characterDesc += `\n${charNumber}. ${charName} (${characterName}'s ${char.type.value.toLowerCase()})`
-        // Add appearance details if available
-        if (char.description) {
-          if (char.description.age) characterDesc += `, ${char.description.age} years old`
-          if (char.description.hairColor) characterDesc += `, ${char.description.hairColor} hair`
-          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+        const desc = (char as { description?: { age?: number; hairColor?: string; eyeColor?: string; uniqueFeatures?: string[] } }).description
+        if (desc) {
+          if (desc.age) characterDesc += `, ${desc.age} years old`
+          if (desc.hairColor) characterDesc += `, ${desc.hairColor} hair`
+          if (desc.eyeColor) characterDesc += `, ${desc.eyeColor} eyes`
+          if (desc.uniqueFeatures && desc.uniqueFeatures.length > 0) {
+            characterDesc += `, ${desc.uniqueFeatures.join(', ')}`
           }
         }
         characterDesc += ` - A warm and caring family member`
       } else {
-        // Other
         characterDesc += `\n${charNumber}. ${charName}`
-        // Add appearance details if available
-        if (char.description) {
-          if (char.description.hairColor) characterDesc += ` with ${char.description.hairColor} hair`
-          if (char.description.eyeColor) characterDesc += `, ${char.description.eyeColor} eyes`
-          if (char.description.uniqueFeatures && char.description.uniqueFeatures.length > 0) {
-            characterDesc += `, ${char.description.uniqueFeatures.join(', ')}`
+        const desc = (char as { description?: { hairColor?: string; eyeColor?: string; uniqueFeatures?: string[] } }).description
+        if (desc) {
+          if (desc.hairColor) characterDesc += ` with ${desc.hairColor} hair`
+          if (desc.eyeColor) characterDesc += `, ${desc.eyeColor} eyes`
+          if (desc.uniqueFeatures && desc.uniqueFeatures.length > 0) {
+            characterDesc += `, ${desc.uniqueFeatures.join(', ')}`
           }
         }
       }
@@ -189,18 +188,18 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
   // Faz 2: Prompt bölümlerini oluştur (açılış system'de; tekrar yok)
   const sections = [
     buildCharacterSection(characterDesc, characters),
-    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount, language, illustrationStyle, customRequests),
+    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 10, language, illustrationStyle, customRequests),
     buildSupportingEntitiesSection(theme), // NEW: Supporting entities for master generation
     buildLanguageSection(language),
     buildAgeAppropriateSection(ageGroup),
-    buildStoryStructureSection(characterName, ageGroup, pageCount, characters),
+    buildStoryStructureSection(characterName, ageGroup, pageCount ?? 10, characters),
     buildThemeSpecificSection(themeConfig, ageGroup, theme),
     buildVisualDiversitySection(),
     buildWritingStyleSection(ageGroup, language, characterName, characters),
     buildSafetySection(ageGroup),
     buildIllustrationSection(illustrationStyle, characterName, characters),
-    buildOutputFormatSection(ageGroup, pageCount, illustrationStyle, theme, themeConfig, characters || [], characterName),
-    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount, language),
+    buildOutputFormatSection(ageGroup, pageCount ?? 10, illustrationStyle, theme, themeConfig, characters || [], characterName),
+    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount ?? 10, language),
     `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
   ]
   

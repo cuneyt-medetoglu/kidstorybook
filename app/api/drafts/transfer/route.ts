@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { requireUser } from "@/lib/auth/api-auth"
+import { getDraftById, createDraft, updateDraft } from "@/lib/db/drafts"
 import type { DraftData } from "@/lib/draft-storage"
 
 /**
@@ -8,20 +9,7 @@ import type { DraftData } from "@/lib/draft-storage"
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     const body: { drafts: DraftData[] } = await request.json()
 
@@ -39,51 +27,34 @@ export async function POST(request: NextRequest) {
     for (const draft of body.drafts) {
       try {
         // Check if draft already exists
-        const { data: existingDraft } = await supabase
-          .from("drafts")
-          .select("id")
-          .eq("draft_id", draft.draftId)
-          .single()
+        const existingDraft = await getDraftById(draft.draftId)
 
         if (existingDraft) {
           // Update existing draft with user_id
-          const { data, error } = await supabase
-            .from("drafts")
-            .update({
-              user_id: user.id,
-              cover_image: draft.coverImage,
-              character_data: draft.characterData,
-              theme: draft.theme,
-              sub_theme: draft.subTheme,
-              style: draft.style,
-              expires_at: draft.expiresAt,
-            })
-            .eq("draft_id", draft.draftId)
-            .select()
-            .single()
+          const updated = await updateDraft(draft.draftId, {
+            user_id: user.id,
+            character_ids: draft.characterData?.characterIds || [],
+            theme: draft.theme,
+            sub_theme: draft.subTheme ?? '',
+            illustration_style: draft.style,
+          })
 
-          if (error) throw error
-          transferredDrafts.push(data)
+          if (updated) transferredDrafts.push(updated)
         } else {
           // Create new draft
-          const { data, error } = await supabase
-            .from("drafts")
-            .insert({
-              user_id: user.id,
-              draft_id: draft.draftId,
-              cover_image: draft.coverImage,
-              character_data: draft.characterData,
-              theme: draft.theme,
-              sub_theme: draft.subTheme,
-              style: draft.style,
-              created_at: draft.createdAt,
-              expires_at: draft.expiresAt,
-            })
-            .select()
-            .single()
+          const created = await createDraft({
+            draft_id: draft.draftId,
+            user_id: user.id,
+            user_email: user.email,
+            character_ids: draft.characterData?.characterIds || [],
+            theme: draft.theme,
+            sub_theme: draft.subTheme ?? '',
+            age_group: draft.characterData?.ageGroup || '3-5',
+            illustration_style: draft.style,
+            language: 'tr',
+          })
 
-          if (error) throw error
-          transferredDrafts.push(data)
+          transferredDrafts.push(created)
         }
       } catch (error) {
         console.error(`[Drafts Transfer] Error transferring draft ${draft.draftId}:`, error)

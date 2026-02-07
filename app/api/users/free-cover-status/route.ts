@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { requireUser } from "@/lib/auth/api-auth"
+import { getUserById } from "@/lib/db/users"
+
+export const dynamic = 'force-dynamic'
 
 /**
  * GET /api/users/free-cover-status
@@ -7,38 +10,21 @@ import { createClient } from "@/lib/supabase/server"
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     // Get user's free cover status from database
-    const { data: userData, error } = await supabase
-      .from("users")
-      .select("free_cover_used")
-      .eq("id", user.id)
-      .single()
+    const userData = await getUserById(user.id)
 
-    if (error) {
-      console.error("[Free Cover Status API] Error fetching user:", error)
+    if (!userData) {
+      console.error("[Free Cover Status API] User not found")
       return NextResponse.json(
-        { success: false, error: "Failed to fetch user data" },
-        { status: 500 }
+        { success: false, error: "User not found" },
+        { status: 404 }
       )
     }
 
-    const hasFreeCover = !userData?.free_cover_used
-    const used = userData?.free_cover_used || false
+    const hasFreeCover = !userData.free_cover_used
+    const used = userData.free_cover_used || false
 
     return NextResponse.json({
       success: true,

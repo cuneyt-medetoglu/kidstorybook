@@ -12,7 +12,7 @@ import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { createClient } from "@/lib/supabase/client"
+import { signIn } from "next-auth/react"
 
 // Form validation schema
 const registerSchema = z
@@ -64,97 +64,55 @@ export default function RegisterPage() {
     setIsLoading(true)
     try {
       console.log("[Register] Attempting registration for:", data.email)
-      
-      // Use Supabase client-side auth
-      const { createClient } = await import("@/lib/supabase/client")
-      const supabase = createClient()
-      
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            name: data.name,
-          },
-        },
+
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          name: data.name,
+        }),
       })
 
-      if (authError) {
-        throw new Error(authError.message)
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(json.error || "Registration failed")
       }
 
-      if (authData.user) {
-        console.log("[Register] Success:", authData.user.email)
-        
-        // Check if email verification is required
-        // Supabase signUp returns session only if email verification is disabled
-        if (authData.session) {
-          // Session exists (email verification disabled or auto-confirmed)
-          // User is automatically logged in
-          console.log("[Register] Session exists, user is logged in")
-          
-          // Update public.users with name if provided (trigger creates record automatically)
-          // Note: Trigger will create public.users record, but name might be null
-          // We'll update it here if provided
-          if (data.name) {
-            try {
-              // Wait a bit for trigger to complete (trigger is async)
-              await new Promise(resolve => setTimeout(resolve, 500))
-              
-              const { error: updateError } = await supabase
-                .from('users')
-                .update({ name: data.name })
-                .eq('id', authData.user.id)
-              
-              if (updateError) {
-                console.warn("[Register] Failed to update user name:", updateError)
-                // Non-critical error, continue with redirect
-                // Trigger might not have created record yet, or RLS might be blocking
-              }
-            } catch (updateErr) {
-              console.warn("[Register] Error updating user name:", updateErr)
-              // Non-critical error, continue with redirect
-            }
-          }
-          
-          // Redirect to dashboard (session exists, user is logged in)
-          router.push("/dashboard")
-          router.refresh()
-        } else {
-          // No session - email verification required
-          // Redirect to verify-email page with email parameter
-          console.log("[Register] No session, email verification required")
-          router.push(`/auth/verify-email?email=${encodeURIComponent(data.email)}`)
-        }
+      console.log("[Register] Success:", data.email)
+
+      const result = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      })
+
+      if (result?.ok) {
+        router.push("/dashboard")
+        router.refresh()
+        return
       }
+      if (result?.error) {
+        throw new Error(result.error)
+      }
+      router.push("/auth/login")
+      router.refresh()
     } catch (err) {
       console.error("Register error:", err)
       const errorMessage = err instanceof Error ? err.message : "Registration failed. Please try again."
-      alert(errorMessage) // ROADMAP: Replace with toast notification (ToastProvider)
+      alert(errorMessage)
     } finally {
       setIsLoading(false)
     }
   }
 
-  // OAuth: Supabase signInWithOAuth - same as login (auth/callback handles token)
-  const handleGoogleOAuth = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+  const handleGoogleOAuth = () => {
+    signIn("google", { callbackUrl: "/dashboard" })
   }
 
-  const handleFacebookOAuth = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+  const handleFacebookOAuth = () => {
+    signIn("facebook", { callbackUrl: "/dashboard" })
   }
 
   // Floating animations for decorative elements
@@ -165,7 +123,7 @@ export default function RegisterPage() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }

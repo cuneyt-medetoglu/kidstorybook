@@ -17,42 +17,11 @@ import {
   Paintbrush,
 } from "lucide-react"
 import { PricingFAQSection } from "@/components/sections/PricingFAQSection"
-import { useState, useEffect } from "react"
 import Link from "next/link"
-import type { CurrencyConfig } from "@/lib/currency"
+import { useCurrency } from "@/contexts/CurrencyContext"
 
 export default function PricingPage() {
-  const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig>({
-    currency: "USD",
-    symbol: "$",
-    price: "$7.99",
-  })
-  const [isLoadingCurrency, setIsLoadingCurrency] = useState(true)
-
-  // Detect currency on mount
-  useEffect(() => {
-    const fetchCurrency = async () => {
-      try {
-        const response = await fetch("/api/currency")
-        const data = await response.json()
-        
-        if (data.success) {
-          setCurrencyConfig({
-            currency: data.currency,
-            symbol: data.symbol,
-            price: data.price,
-          })
-        }
-      } catch (error) {
-        console.error("[Pricing] Error fetching currency:", error)
-        // Keep default USD
-      } finally {
-        setIsLoadingCurrency(false)
-      }
-    }
-
-    fetchCurrency()
-  }, [])
+  const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
   return (
     <div className="min-h-screen">

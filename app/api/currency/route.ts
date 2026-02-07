@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { getUserCurrency, getCurrencyConfig } from "@/lib/currency"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: Request) {
   try {
     // Get headers from request

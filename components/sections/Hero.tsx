@@ -38,10 +38,10 @@ export function Hero() {
   ]
 
   return (
-    <section
-      ref={heroRef}
-      className="relative min-h-[85vh] overflow-x-hidden overflow-y-visible bg-gradient-to-br from-purple-50 via-white to-pink-50 sm:min-h-[80vh] md:min-h-0 md:overflow-hidden lg:min-h-0 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
-    >
+    <div ref={heroRef} style={{ position: "relative" }}>
+      <section
+        className="relative min-h-[85vh] overflow-x-hidden overflow-y-visible bg-gradient-to-br from-purple-50 via-white to-pink-50 sm:min-h-[80vh] md:min-h-0 md:overflow-hidden lg:min-h-0 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
+      >
       {/* Decorative floating elements - hidden on mobile for performance */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -173,5 +173,6 @@ export function Hero() {
         </svg>
       </div>
     </section>
+    </div>
   )
 }

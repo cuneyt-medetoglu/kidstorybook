@@ -10,6 +10,10 @@ export interface CharacterFormData {
   gender: "boy" | "girl"
   hairColor: string
   eyeColor: string
+  /** Optional; present when syncing from wizard (multiple characters) */
+  characterIds?: string[]
+  /** Optional; from step3 */
+  ageGroup?: string
 }
 
 // Draft data structure

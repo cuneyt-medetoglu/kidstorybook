@@ -7,8 +7,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
+import { createBook, getBookById } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import OpenAI from 'openai'
@@ -56,15 +57,7 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 1. Authentication
     // ====================================================================
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return errorResponse('Unauthorized', 'Please login to continue', 401)
-    }
+    const user = await requireUser()
 
     // ====================================================================
     // 2. Parse & Validate Request
@@ -104,8 +97,9 @@ export async function POST(request: NextRequest) {
     // 4. Generate Story Prompt
     // ====================================================================
     // Faz 1: defaultClothing from master character (exact outfit for story consistency)
+    const desc = character.description as unknown as Record<string, unknown>
     const defaultClothing =
-      (character.description as Record<string, unknown>)?.defaultClothing as string | undefined ||
+      (desc?.defaultClothing as string | undefined) ||
       (character.description?.clothingStyle && Array.isArray(character.description?.clothingColors)
         ? `${character.description.clothingStyle} in ${character.description.clothingColors.join(' and ')}`
         : undefined)
@@ -118,7 +112,15 @@ export async function POST(request: NextRequest) {
       illustrationStyle,
       customRequests,
       referencePhotoAnalysis: {
-        detectedFeatures: character.description.physicalFeatures || {},
+        detectedFeatures: {
+          age: character.description.age,
+          gender: character.description.gender,
+          skinTone: character.description.skinTone,
+          hairColor: character.description.hairColor,
+          hairStyle: character.description.hairStyle,
+          eyeColor: character.description.eyeColor,
+          faceShape: character.description.faceShape,
+        },
         finalDescription: character.description,
         confidence: character.analysis_confidence || 0.8,
       },
@@ -225,29 +227,24 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
     // ====================================================================
     // 7. Save to Database
     // ====================================================================
-    const { data: book, error: bookError } = await supabase
-      .from('books')
-      .insert({
-        user_id: user.id,
-        character_id: characterId,
-        title: storyData.title,
-        theme,
-        illustration_style: illustrationStyle,
-        language,
-        age_group: storyData.metadata?.ageGroup || 'preschool',
-        total_pages: storyData.pages.length,
-        story_data: storyData,
-        status: 'draft', // Story generated, images not yet
-        custom_requests: customRequests,
-        generation_metadata: {
-          model: 'gpt-4o-mini',
-          promptVersion: '1.0.0',
-          tokensUsed: completion.usage?.total_tokens || 0,
-          generationTime: Date.now() - startTime,
-        },
-      })
-      .select()
-      .single()
+    const { data: book, error: bookError } = await createBook(user.id, {
+      character_id: characterId,
+      title: storyData.title,
+      theme,
+      illustration_style: illustrationStyle,
+      language,
+      age_group: storyData.metadata?.ageGroup || 'preschool',
+      total_pages: storyData.pages.length,
+      story_data: storyData,
+      status: 'draft', // Story generated, images not yet
+      custom_requests: customRequests,
+      generation_metadata: {
+        model: 'gpt-4o-mini',
+        promptVersion: '1.0.0',
+        tokensUsed: completion.usage?.total_tokens || 0,
+        generationTime: Date.now() - startTime,
+      },
+    })
 
     if (bookError || !book) {
       console.error('Database error:', bookError)
@@ -308,25 +305,16 @@ export async function GET(request: NextRequest) {
       return errorResponse('Missing storyId', 'storyId query parameter is required', 400)
     }
 
-    const supabase = createClient()
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
+    const user = await requireUser()
 
-    if (authError || !user) {
-      return errorResponse('Unauthorized', 'Please login to continue', 401)
-    }
-
-    const { data: book, error } = await supabase
-      .from('books')
-      .select('id, title, status, total_pages, created_at')
-      .eq('id', storyId)
-      .eq('user_id', user.id)
-      .single()
+    const { data: book, error } = await getBookById(storyId)
 
     if (error || !book) {
       return errorResponse('Story not found', 'Invalid story ID', 404)
+    }
+
+    if (book.user_id !== user.id) {
+      return errorResponse('Unauthorized', 'You can only view your own stories', 403)
     }
 
     return successResponse(book)

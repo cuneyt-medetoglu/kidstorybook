@@ -12,7 +12,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { createClient } from "@/lib/supabase/client"
+import { signIn } from "next-auth/react"
 
 // Form validation schema
 const loginSchema = z.object({
@@ -48,35 +48,29 @@ export default function LoginPage() {
     setError(null)
     try {
       console.log("[Login] Attempting login for:", data.email)
-      
-      // Use Supabase client-side auth
-      const supabase = createClient()
-      
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+
+      const result = await signIn("credentials", {
         email: data.email,
         password: data.password,
+        redirect: false,
       })
 
-      if (authError) {
-        // Check if it's an email verification error
-        if (authError.message.includes("email not confirmed") || authError.message.includes("Email not confirmed")) {
+      if (result?.error) {
+        const msg = result.error
+        if (msg.includes("email not confirmed") || msg.includes("Email not confirmed")) {
           throw new Error("Please verify your email address before logging in. Check your inbox for the verification link.")
         }
-        throw new Error(authError.message || "Invalid email or password")
+        throw new Error(msg || "Invalid email or password")
       }
 
-      if (!authData.user) {
-        throw new Error("User not found. Please register first.")
+      if (result?.ok) {
+        console.log("[Login] Success:", data.email)
+        router.push("/dashboard")
+        router.refresh()
+        return
       }
 
-      if (!authData.session) {
-        throw new Error("Session not created. Please verify your email address first.")
-      }
-
-      // Success - redirect to dashboard
-      console.log("[Login] Success:", authData.user.email)
-      router.push("/dashboard")
-      router.refresh()
+      throw new Error("Login failed. Please try again.")
     } catch (err) {
       console.error("Login error:", err)
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please try again."
@@ -85,25 +79,12 @@ export default function LoginPage() {
     }
   }
 
-  // OAuth: Supabase signInWithOAuth - redirect to callback (auth/callback handles token)
-  const handleGoogleOAuth = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+  const handleGoogleOAuth = () => {
+    signIn("google", { callbackUrl: "/dashboard" })
   }
 
-  const handleFacebookOAuth = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+  const handleFacebookOAuth = () => {
+    signIn("facebook", { callbackUrl: "/dashboard" })
   }
 
   // Floating animations for decorative elements
@@ -114,7 +95,7 @@ export default function LoginPage() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }

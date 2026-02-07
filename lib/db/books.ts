@@ -1,8 +1,8 @@
 /**
- * @file Book CRUD ve PDF üretimi için veritabanı yardımcıları (Supabase).
+ * @file Book CRUD ve PDF üretimi için veritabanı yardımcıları (PostgreSQL).
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js'
+import { pool } from './pool'
 
 // ============================================================================
 // Types
@@ -34,6 +34,8 @@ export interface Book {
   updated_at: Date
   completed_at?: Date
   is_example?: boolean
+  edit_quota_used?: number
+  edit_quota_limit?: number
 }
 
 export interface CreateBookInput {
@@ -49,13 +51,13 @@ export interface CreateBookInput {
   images_data?: any[]
   generation_metadata?: any
   status?: 'draft' | 'generating' | 'completed'
-  /** When true, book is a public example (admin only). */
   is_example?: boolean
 }
 
 export interface UpdateBookInput {
   title?: string
   status?: 'draft' | 'generating' | 'completed' | 'failed' | 'archived'
+  story_data?: any
   images_data?: any[]
   cover_image_url?: string
   cover_image_path?: string
@@ -63,6 +65,8 @@ export interface UpdateBookInput {
   pdf_path?: string
   is_favorite?: boolean
   generation_metadata?: any
+  edit_quota_used?: number
+  edit_quota_limit?: number
 }
 
 // ============================================================================
@@ -70,23 +74,36 @@ export interface UpdateBookInput {
 // ============================================================================
 
 export async function createBook(
-  supabase: SupabaseClient,
   userId: string,
   input: CreateBookInput
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('books')
-      .insert({
-        user_id: userId,
-        ...input,
-      })
-      .select()
-      .single()
+    const result = await pool.query(
+      `INSERT INTO books (
+        user_id, character_id, title, theme, illustration_style, language, age_group,
+        story_data, total_pages, custom_requests, images_data, generation_metadata,
+        status, is_example, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW(), NOW())
+      RETURNING *`,
+      [
+        userId,
+        input.character_id || null,
+        input.title,
+        input.theme,
+        input.illustration_style,
+        input.language || 'tr',
+        input.age_group || null,
+        JSON.stringify(input.story_data),
+        input.total_pages,
+        input.custom_requests || null,
+        JSON.stringify(input.images_data || []),
+        JSON.stringify(input.generation_metadata || {}),
+        input.status || 'draft',
+        input.is_example || false,
+      ]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows[0], error: null }
   } catch (error) {
     console.error('Error creating book:', error)
     return { data: null, error: error as Error }
@@ -98,19 +115,15 @@ export async function createBook(
 // ============================================================================
 
 export async function getBookById(
-  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('books')
-      .select('*')
-      .eq('id', bookId)
-      .single()
+    const result = await pool.query(
+      'SELECT * FROM books WHERE id = $1',
+      [bookId]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching book:', error)
     return { data: null, error: error as Error }
@@ -118,7 +131,6 @@ export async function getBookById(
 }
 
 export async function getUserBooks(
-  supabase: SupabaseClient,
   userId: string,
   options?: {
     status?: string
@@ -127,50 +139,65 @@ export async function getUserBooks(
   }
 ): Promise<{ data: Book[] | null; error: Error | null }> {
   try {
-    let query = supabase
-      .from('books')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+    let query = 'SELECT * FROM books WHERE user_id = $1'
+    const params: any[] = [userId]
+    let paramCount = 2
 
     if (options?.status) {
-      query = query.eq('status', options.status)
+      query += ` AND status = $${paramCount++}`
+      params.push(options.status)
     }
 
+    query += ' ORDER BY created_at DESC'
+
     if (options?.limit) {
-      query = query.limit(options.limit)
+      query += ` LIMIT $${paramCount++}`
+      params.push(options.limit)
     }
 
     if (options?.offset) {
-      query = query.range(options.offset, options.offset + (options.limit || 10) - 1)
+      query += ` OFFSET $${paramCount++}`
+      params.push(options.offset)
     }
 
-    const { data, error } = await query
+    const result = await pool.query(query, params)
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows, error: null }
   } catch (error) {
     console.error('Error fetching books:', error)
     return { data: null, error: error as Error }
   }
 }
 
+export async function getBooksByIds(
+  userId: string,
+  bookIds: string[]
+): Promise<{ data: Book[] | null; error: Error | null }> {
+  if (!bookIds.length) {
+    return { data: [], error: null }
+  }
+  try {
+    const result = await pool.query(
+      'SELECT * FROM books WHERE user_id = $1 AND id = ANY($2::uuid[])',
+      [userId, bookIds]
+    )
+    return { data: result.rows, error: null }
+  } catch (error) {
+    console.error('Error fetching books by ids:', error)
+    return { data: null, error: error as Error }
+  }
+}
+
 export async function getUserFavoriteBooks(
-  supabase: SupabaseClient,
   userId: string
 ): Promise<{ data: Book[] | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('books')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_favorite', true)
-      .order('created_at', { ascending: false })
+    const result = await pool.query(
+      'SELECT * FROM books WHERE user_id = $1 AND is_favorite = true ORDER BY created_at DESC',
+      [userId]
+    )
 
-    if (error) throw error
-
-    return { data, error: null }
+    return { data: result.rows, error: null }
   } catch (error) {
     console.error('Error fetching favorite books:', error)
     return { data: null, error: error as Error }
@@ -182,21 +209,76 @@ export async function getUserFavoriteBooks(
 // ============================================================================
 
 export async function updateBook(
-  supabase: SupabaseClient,
   bookId: string,
   input: UpdateBookInput
 ): Promise<{ data: Book | null; error: Error | null }> {
   try {
-    const { data, error } = await supabase
-      .from('books')
-      .update(input)
-      .eq('id', bookId)
-      .select()
-      .single()
+    const fields: string[] = []
+    const values: any[] = []
+    let paramCount = 1
 
-    if (error) throw error
+    if (input.title !== undefined) {
+      fields.push(`title = $${paramCount++}`)
+      values.push(input.title)
+    }
+    if (input.status !== undefined) {
+      fields.push(`status = $${paramCount++}`)
+      values.push(input.status)
+    }
+    if (input.story_data !== undefined) {
+      fields.push(`story_data = $${paramCount++}`)
+      values.push(JSON.stringify(input.story_data))
+    }
+    if (input.images_data !== undefined) {
+      fields.push(`images_data = $${paramCount++}`)
+      values.push(JSON.stringify(input.images_data))
+    }
+    if (input.cover_image_url !== undefined) {
+      fields.push(`cover_image_url = $${paramCount++}`)
+      values.push(input.cover_image_url)
+    }
+    if (input.cover_image_path !== undefined) {
+      fields.push(`cover_image_path = $${paramCount++}`)
+      values.push(input.cover_image_path)
+    }
+    if (input.pdf_url !== undefined) {
+      fields.push(`pdf_url = $${paramCount++}`)
+      values.push(input.pdf_url)
+    }
+    if (input.pdf_path !== undefined) {
+      fields.push(`pdf_path = $${paramCount++}`)
+      values.push(input.pdf_path)
+    }
+    if (input.is_favorite !== undefined) {
+      fields.push(`is_favorite = $${paramCount++}`)
+      values.push(input.is_favorite)
+    }
+    if (input.generation_metadata !== undefined) {
+      fields.push(`generation_metadata = $${paramCount++}`)
+      values.push(JSON.stringify(input.generation_metadata))
+    }
+    if (input.edit_quota_used !== undefined) {
+      fields.push(`edit_quota_used = $${paramCount++}`)
+      values.push(input.edit_quota_used)
+    }
+    if (input.edit_quota_limit !== undefined) {
+      fields.push(`edit_quota_limit = $${paramCount++}`)
+      values.push(input.edit_quota_limit)
+    }
 
-    return { data, error: null }
+    if (fields.length === 0) {
+      return getBookById(bookId)
+    }
+
+    fields.push(`updated_at = NOW()`)
+    values.push(bookId)
+
+    const result = await pool.query(
+      `UPDATE books SET ${fields.join(', ')} WHERE id = $${paramCount} RETURNING *`,
+      values
+    )
+
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error updating book:', error)
     return { data: null, error: error as Error }
@@ -204,23 +286,20 @@ export async function updateBook(
 }
 
 export async function toggleFavorite(
-  supabase: SupabaseClient,
   bookId: string,
   isFavorite: boolean
 ): Promise<{ data: Book | null; error: Error | null }> {
-  return updateBook(supabase, bookId, { is_favorite: isFavorite })
+  return updateBook(bookId, { is_favorite: isFavorite })
 }
 
 export async function incrementBookViews(
-  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const { error } = await supabase.rpc('increment_book_views', {
-      p_book_id: bookId,
-    })
-
-    if (error) throw error
+    await pool.query(
+      'SELECT increment_book_views($1)',
+      [bookId]
+    )
 
     return { error: null }
   } catch (error) {
@@ -234,13 +313,10 @@ export async function incrementBookViews(
 // ============================================================================
 
 export async function deleteBook(
-  supabase: SupabaseClient,
   bookId: string
 ): Promise<{ error: Error | null }> {
   try {
-    const { error } = await supabase.from('books').delete().eq('id', bookId)
-
-    if (error) throw error
+    await pool.query('DELETE FROM books WHERE id = $1', [bookId])
 
     return { error: null }
   } catch (error) {
@@ -254,7 +330,6 @@ export async function deleteBook(
 // ============================================================================
 
 export async function getUserBookStats(
-  supabase: SupabaseClient,
   userId: string
 ): Promise<{
   data: {
@@ -268,13 +343,12 @@ export async function getUserBookStats(
   error: Error | null
 }> {
   try {
-    const { data, error } = await supabase.rpc('get_user_book_stats', {
-      p_user_id: userId,
-    })
+    const result = await pool.query(
+      'SELECT * FROM get_user_book_stats($1)',
+      [userId]
+    )
 
-    if (error) throw error
-
-    return { data: data?.[0] || null, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching book stats:', error)
     return { data: null, error: error as Error }
@@ -282,7 +356,6 @@ export async function getUserBookStats(
 }
 
 export async function getBookWithCharacter(
-  supabase: SupabaseClient,
   bookId: string
 ): Promise<{
   data: {
@@ -297,13 +370,12 @@ export async function getBookWithCharacter(
   error: Error | null
 }> {
   try {
-    const { data, error } = await supabase.rpc('get_book_with_character', {
-      p_book_id: bookId,
-    })
+    const result = await pool.query(
+      'SELECT * FROM get_book_with_character($1)',
+      [bookId]
+    )
 
-    if (error) throw error
-
-    return { data: data?.[0] || null, error: null }
+    return { data: result.rows[0] || null, error: null }
   } catch (error) {
     console.error('Error fetching book with character:', error)
     return { data: null, error: error as Error }

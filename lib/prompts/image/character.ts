@@ -412,7 +412,7 @@ export function formatCharacterForStorage(
   return {
     id: `char_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     userId,
-    name: analysis.finalDescription.name || 'Character',
+    name: (analysis.finalDescription as unknown as { name?: string }).name || 'Character',
     age: analysis.finalDescription.age,
     gender: analysis.finalDescription.gender,
     referencePhotoUrl: photoUrl,

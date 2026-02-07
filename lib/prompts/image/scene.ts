@@ -314,7 +314,7 @@ export function getCinematicElements(
   const elements: string[] = []
   
   // Lighting based on time of day and mood
-  if (timeOfDay === 'evening' || timeOfDay === 'sunset') {
+  if (timeOfDay === 'evening') {
     elements.push('golden hour lighting')
     elements.push('warm amber tones, golden glow')
     elements.push('backlighting with rim light around character')
@@ -1304,7 +1304,7 @@ export function generateFullPagePrompt(
   promptParts.push(...buildLightingAndAtmosphereSection(sceneInput.timeOfDay, sceneInput.mood))
 
   // 4. Camera & Perspective Section (Faz 3.4: isCover for composition – character NOT centered on interior)
-  promptParts.push(...buildCameraAndPerspectiveSection(sceneInput.pageNumber, sceneInput.focusPoint, previousScenes, isCover))
+  promptParts.push(...buildCameraAndPerspectiveSection(sceneInput.pageNumber, sceneInput.focusPoint, previousScenes))
 
   // 5. Character-Environment Ratio Section
   promptParts.push(...buildCharacterEnvironmentRatioSection())

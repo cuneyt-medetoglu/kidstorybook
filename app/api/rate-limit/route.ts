@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { getUser } from "@/lib/auth/api-auth"
 
 /**
  * Rate limiting API for bot protection
@@ -60,8 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is authenticated
-    const supabase = await createClient(request)
-    const { data: { user } } = await supabase.auth.getUser()
+    const user = await getUser()
 
     // If authenticated, use user ID for tracking (unlimited for logged-in users)
     if (user) {

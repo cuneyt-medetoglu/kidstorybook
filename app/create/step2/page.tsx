@@ -744,7 +744,7 @@ export default function Step2Page() {
       transition: {
         duration: 3 + i * 0.5,
         repeat: Number.POSITIVE_INFINITY,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     }),
   }
@@ -899,7 +899,7 @@ export default function Step2Page() {
                       </div>
 
                       {/* Conditional: Pets Dropdown */}
-                      {character.characterType.group === "Pets" && (
+                      {(character.characterType.group as string) === "Pets" && (
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
                             Select Pet
@@ -1156,7 +1156,7 @@ export default function Step2Page() {
                       {character.characterType.group !== "Child" && (
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-gray-700 dark:text-slate-300">
-                            {character.characterType.group === "Pets" 
+                            {(character.characterType.group as string) === "Pets" 
                               ? "Pet Name (optional)" 
                               : character.characterType.group === "Family Members" 
                               ? "Name (optional)" 
@@ -1165,7 +1165,7 @@ export default function Step2Page() {
                           <Input
                             type="text"
                             placeholder={
-                              character.characterType.group === "Pets" 
+                              (character.characterType.group as string) === "Pets" 
                                 ? "e.g., Buddy, Max, Luna" 
                                 : character.characterType.group === "Family Members" 
                                 ? "e.g., Sarah, John" 
@@ -1176,7 +1176,7 @@ export default function Step2Page() {
                             className="border-purple-300 dark:border-purple-600"
                           />
                           <p className="text-xs text-gray-500 dark:text-slate-400">
-                            {character.characterType.group === "Pets" 
+                            {(character.characterType.group as string) === "Pets" 
                               ? "Give your pet a name, or leave empty to use 'Dog', 'Cat', etc." 
                               : character.characterType.group === "Family Members" 
                               ? "Give a name, or leave empty to use 'Mom', 'Grandma', etc." 
@@ -1202,7 +1202,7 @@ export default function Step2Page() {
                             {/* Hair/Fur Color */}
                             <div className="space-y-2">
                               <Label className="text-xs font-medium text-gray-700 dark:text-slate-300">
-                                {character.characterType.group === "Pets" 
+                                {(character.characterType.group as string) === "Pets" 
                                   ? "Fur Color" 
                                   : character.characterType.group === "Toys"
                                   ? "Color"
@@ -1221,7 +1221,7 @@ export default function Step2Page() {
                                       {option.label}
                                     </SelectItem>
                                   ))}
-                                  {character.characterType.group === "Pets" && (
+                                  {(character.characterType.group as string) === "Pets" && (
                                     <>
                                       <SelectItem value="white">White</SelectItem>
                                       <SelectItem value="gray">Gray</SelectItem>

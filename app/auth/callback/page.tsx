@@ -1,38 +1,27 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { BookOpen, CheckCircle, XCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 
-export default function OAuthCallbackPage() {
+function OAuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [errorMessage, setErrorMessage] = useState<string>("")
 
   useEffect(() => {
-    // Faz 3'te Supabase Auth callback handling yapılacak
-    // const code = searchParams.get("code")
-    // const error = searchParams.get("error")
-    // const errorDescription = searchParams.get("error_description")
-
-    // Simulate OAuth callback processing
-    const timer = setTimeout(() => {
-      const error = searchParams.get("error")
-      if (error) {
-        setStatus("error")
-        setErrorMessage(searchParams.get("error_description") || "OAuth authentication failed")
-      } else {
-        setStatus("success")
-        // Faz 3'te: Redirect to dashboard or home page after successful authentication
-        // router.push("/dashboard")
-      }
-    }, 2000)
-
-    return () => clearTimeout(timer)
+    const error = searchParams.get("error")
+    if (error) {
+      setStatus("error")
+      setErrorMessage(searchParams.get("error_description") || "OAuth authentication failed")
+    } else {
+      setStatus("success")
+      router.replace("/dashboard")
+    }
   }, [searchParams, router])
 
   return (
@@ -198,3 +187,10 @@ export default function OAuthCallbackPage() {
   )
 }
 
+export default function OAuthCallbackPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /></div>}>
+      <OAuthCallbackContent />
+    </Suspense>
+  )
+}

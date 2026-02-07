@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { requireUser } from "@/lib/auth/api-auth"
 import { getDraftFromLocalStorage } from "@/lib/draft-storage"
 import { updateBook } from "@/lib/db/books"
 import logger from "@/lib/logger"
@@ -11,20 +11,7 @@ import logger from "@/lib/logger"
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient(request)
-
-    // Get authenticated user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      )
-    }
+    const user = await requireUser()
 
     const body = await request.json()
     const { draftId, planType }: { draftId: string; planType: "10" | "15" | "20" } = body

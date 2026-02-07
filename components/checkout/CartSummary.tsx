@@ -10,7 +10,7 @@ export function CartSummary() {
   const { items, getCartTotal } = useCart()
   const total = getCartTotal()
   const hasHardcopy = items.some((item) => item.type === "hardcopy")
-  const hasEbook = items.some((item) => item.type === "ebook" || item.type === "ebook_plan")
+  const hasEbook = items.some((item) => item.type === "ebook_plan")
 
   return (
     <div className="space-y-4">
@@ -32,12 +32,13 @@ export function CartSummary() {
                   src={item.coverImage}
                   alt={item.bookTitle}
                   fill
+                  sizes="48px"
                   className="object-cover"
                   unoptimized
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
-                  {item.type === "ebook_plan" || item.type === "ebook" ? (
+                  {item.type === "ebook_plan" ? (
                     <Download className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                   ) : (
                     <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -53,8 +54,7 @@ export function CartSummary() {
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {item.type === "hardcopy" && "Hardcover Book"}
-                {item.type === "ebook" && "E-Book"}
-                {item.type === "ebook_plan" && `E-Book Plan (${item.planType || "10"} pages)`}
+                {item.type === "ebook_plan" && `E-Book Plan (${item.planType ?? "10"} pages)`}
               </p>
               <p className="mt-1 text-sm font-bold text-purple-600 dark:text-purple-400">
                 ${item.price.toFixed(2)}

@@ -61,6 +61,7 @@ export function PageThumbnails({ pages, currentPage, onSelectPage, onClose }: Pa
                 src={page.imageUrl || "https://via.placeholder.com/300x400"}
                 alt={`Page ${page.pageNumber} thumbnail`}
                 fill
+                sizes="120px"
                 className="object-cover"
                 unoptimized
               />

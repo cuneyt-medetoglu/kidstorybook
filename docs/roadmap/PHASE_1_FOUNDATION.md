@@ -8,8 +8,8 @@
 - [x] **1.1.4** ESLint + Prettier ayarla
 - [x] **1.1.5** Git repo ve branch stratejisi belirle
 
-### 1.2 Supabase Kurulumu ✅
-- [x] **1.2.1** Supabase projesi oluştur
+### 1.2 Database ve Storage Kurulumu ✅ (Supabase → AWS geçişi tamamlandı)
+- [x] **1.2.1** ~~Supabase projesi oluştur~~ → AWS EC2 + PostgreSQL + S3 kuruldu ✅
 - [x] **1.2.2** Veritabanı şeması tasarla ve oluştur
   - users (kullanıcılar)
     - id (UUID, primary key)
@@ -54,31 +54,24 @@
   - books (kitaplar)
   - orders (siparişler)
   - payments (ödemeler)
-- [x] **1.2.3** Supabase Auth entegrasyonu (email/password + OAuth) - Client setup tamamlandı
-- [x] **1.2.4** Storage bucket'ları oluştur (photos, books, pdfs, covers)
+- [x] **1.2.3** Auth entegrasyonu (email/password + OAuth) - Supabase Auth client kullanılıyor; Faz 5'te alternatif planlanıyor
+- [x] **1.2.4** Storage: AWS S3 tek bucket + prefix'ler (photos, books, pdfs, covers) ✅
 - [x] **1.2.5** Row Level Security (RLS) kuralları - Migration'da hazır
-- [ ] **1.2.6** Supabase vs AWS Değerlendirmesi (23 Ocak 2026)
-  - Supabase kullanmak yerine AWS'de bir makine açıp mı devam etmeliyiz değerlendirilecek
-  - Supabase limitlerine göre hareket edilecek
-  - Supabase dashboard anlaşılacak
-  - Örnek: Realtime izleme filan var, nedir bakılacak
-  - Supabase limitleri analizi (storage, bandwidth, database size, vb.)
-  - AWS alternatifi maliyet analizi
-  - Migration planı (eğer gerekirse)
-- [ ] **1.2.7** Database Backup Sistemi (23 Ocak 2026)
-  - Şimdilik Supabase'de olduğumuz için nedir ve nasıl açacağız
-  - Supabase backup özellikleri araştırılacak
-  - Otomatik backup ayarları
-  - Daha sonra AWS'ye geçersek orada da bakılmalı
+- [x] **1.2.6** ~~Supabase vs AWS Değerlendirmesi~~ → AWS'ye geçiş kararı verildi ve uygulandı ✅ (Şubat 2026)
+  - Analiz: `docs/archive/2026-02/aws-plans/SUPABASE_TO_AWS_ANALYSIS.md`
+  - Karar: Tek EC2 (t3.medium) + PostgreSQL + S3; aylık ~35–45 USD
+- [ ] **1.2.7** Database Backup Sistemi | 🟡 PLAN
+  - EC2 PostgreSQL için `pg_dump` cron veya AWS Backup
   - Backup stratejisi ve retention policy
-- [ ] **1.2.8** Supabase'ı AWS'de açılacak bir makineye migrate etme | 🔴 DO
-  - Supabase (PostgreSQL, Auth, Storage) servislerini AWS'de kurulacak bir makineye taşıma
-  - Self-hosted Postgres / alternatif DB, Auth ve Storage çözümleri
-  - Migration planı, veri taşıma ve kesinti yönetimi
+  - S3'e backup dosyaları yükleme
+- [x] **1.2.8** ~~Supabase'ı AWS'de açılacak bir makineye migrate etme~~ → AWS altyapı Faz 1–4 tamamlandı ✅ (Şubat 2026)
+  - EC2 Ubuntu 24.04, PostgreSQL 16, S3, IAM role, migration'lar uygulandı
+  - Rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`
+  - Kalan: Auth alternatifi (Faz 5) ve uygulama deploy (Faz 6)
 
 ### 1.3 Environment ve Yapılandırma ✅
 - [x] **1.3.1** `.env.local` dosyası oluştur - ✅ Kontrol edildi ve optimize edildi
-- [x] **1.3.2** Tüm API key'leri ekle (OpenAI, Groq, Supabase) - ✅ `.env.example` template hazır
+- [x] **1.3.2** Tüm API key'leri ekle (OpenAI, Groq, AWS/DB) - ✅ `.env.example` template hazır
 - [x] **1.3.3** Vercel environment variables ayarla - ✅ Dokümante edildi (`docs/guides/ENVIRONMENT_SETUP.md`)
 - [x] **1.3.4** Development/Production config ayrımı - ✅ `lib/config.ts` oluşturuldu
 - [ ] **1.3.5** Log Yapısı (23 Ocak 2026)

@@ -25,10 +25,9 @@
 | ROADMAP.md | ✅ AKTİF | 2 Şubat 2026 | Proje yol haritası (özet + docs/roadmap/ faz dosyalarına linkler). Detaylar roadmap/ altında. |
 | FEATURES.md | ✅ AKTİF | 2 Şubat 2026 | Özellik listesi ve önceliklendirme. Kullanım rehberi + ROADMAP ilişkisi (FAZ 4). |
 | ARCHITECTURE.md | ✅ AKTİF | 2 Şubat 2026 | Mimari kararlar. Proje yapısı, 29 API, Prompt/TTS/Currency/Cart/Image Edit/Multi-char (FAZ 5). |
-| DOCUMENTATION.md | ✅ AKTİF | 27 Ocak 2026 | Dokümantasyon indeksi. Temizlik sonrası güncellenecek. |
+| DOCUMENTATION.md | ✅ AKTİF | 7 Şubat 2026 | Dokümantasyon indeksi. |
 | ROADMAP_CSV_README.md | ✅ AKTİF | - | roadmap.csv ve HTML viewer kullanım rehberi. |
-| DOCUMENTATION_MAP.md | ✅ AKTİF | 2 Şubat 2026 | Bu dosya – doküman haritası. |
-| ARCHIVE_LIST.md | ✅ AKTİF | 2 Şubat 2026 | Archive'a taşınacak dosyalar listesi. |
+| DOCUMENTATION_MAP.md | ✅ AKTİF | 7 Şubat 2026 | Bu dosya – doküman haritası. |
 | COMPLETED_FEATURES.md | ✅ AKTİF | 2 Şubat 2026 | Tamamlanan özellikler changelog (PRD'den taşındı). |
 | API_KEYS.md | ✅ AKTİF | - | API key'ler (gitignore'da – referans için .env.example). |
 
@@ -244,10 +243,10 @@
 |----------|------------------------------------|
 | ✅ AKTİF | ~55 |
 | 📝 GÜNCELLENECEK | 5 (PRD, ROADMAP, FEATURES, ARCHITECTURE, README) |
-| ⏳ ESKİ (archive'a taşınacak) | ~20 (ARCHIVE_LIST.md'de detay) |
+| ⏳ ESKİ (archive'da) | archive/2026-q1, 2026-02 (archive/ARCHIVE_LIST.md'de detay) |
 | 🗑️ GEREKSİZ | 0 |
 
 ---
 
-**Son Güncelleme:** 2 Şubat 2026  
+**Son Güncelleme:** 7 Şubat 2026  
 **Oluşturan:** FAZ 1 - Dokümantasyon Analizi

@@ -321,6 +321,7 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
                         src={page.imageUrl}
                         alt={`Page ${page.pageNumber}`}
                         fill
+                        sizes="(max-width: 768px) 50vw, 200px"
                         className="object-cover"
                         unoptimized
                       />

@@ -193,6 +193,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
                                 src={item.imageUrl}
                                 alt={`Page ${pageNumber} - Version ${item.version}`}
                                 fill
+                                sizes="(max-width: 768px) 50vw, 180px"
                                 className="object-cover"
                                 unoptimized
                               />

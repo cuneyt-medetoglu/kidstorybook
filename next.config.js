@@ -3,12 +3,7 @@ const nextConfig = {
   // Image optimization
   images: {
     remotePatterns: [
-      // Supabase Storage
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-        pathname: '/storage/v1/object/public/**',
-      },
+      // S3 / custom storage (use your bucket domain if needed)
       // DALL-E 3 images
       {
         protocol: 'https',

@@ -14,4 +14,4 @@ Tamamlanmış işlere ait veya tek seferlik analiz dokümanları; referans için
 
 ## Kullanım
 
-Bu klasördeki dosyalar güncel iş takibi için kullanılmaz; geçmiş karar ve implementasyon referansı içindir. Detay: [ARCHIVE_LIST.md](../ARCHIVE_LIST.md).
+Bu klasördeki dosyalar güncel iş takibi için kullanılmaz; geçmiş karar ve implementasyon referansı içindir. Detay: [ARCHIVE_LIST.md](ARCHIVE_LIST.md) (bu klasörde).
