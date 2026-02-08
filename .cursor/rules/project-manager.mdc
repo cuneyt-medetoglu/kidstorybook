@@ -38,11 +38,11 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Bakış açıları:** Kullanıcı geri bildirimi: şimdilik daha iyi.
 - **Bilinen konu:** Tekrarlayan arka planlar (yol, çiçekler, arkada ev) custom request olmadan da görülebilir; iyileştirme alanı (story/görsel çeşitlilik). Doküman: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` (Bilinen konular bölümü).
 
-### Prompt optimizasyon planı (analiz – A5 öncesi commit noktası)
+### Prompt optimizasyon planı (analiz – güncel)
 - **Kaynak:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
-- **Durum:** A1–A9 tamamlandı. A6 (Master quality) plandan çıkarıldı. Allow relighting Sıra 18 eklendi. Prompt linter plana alınmadı.
-- **Sıradaki:** A5 – shotPlan schema (LLM’den yapılandırılmış shotPlan objesi almak; büyük mimari değişiklik).
-- **Sonra:** A12 (karar: gpt-image-1.5 ile devam), Sıra 13 (Prompts doküman = kod eşitlemesi), Sıra 14–18 (Trace takip aksiyonları).
+- **Durum:** A1–A9, A5, Sıra 13 (doküman–kod eşitlemesi) tamamlandı. A6 plandan çıkarıldı. A12 karar verildi. Allow relighting Sıra 18 eklendi.
+- **Doküman–kod (Sıra 13 tamamlandı):** STORY (2.3.0) ve IMAGE (1.17.0) şablonları kodla eşitlendi.
+- **Sıradaki:** Bölüm 14 – Trace aksiyonları 14–18. **Doküman–kod:** STORY (2.3.0) ve IMAGE (1.17.0) template'leri kodla eşitlendi.
 
 ### PDF Generation (50 MB limit, sıkıştırma, timeout)
 - **Storage:** AWS S3 tek bucket, `pdfs/` prefix – dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme 413 hatası verir.

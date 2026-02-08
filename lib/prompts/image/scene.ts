@@ -1,4 +1,4 @@
-import type { PromptVersion } from '../types'
+import type { PromptVersion, ShotPlan } from '../types'
 import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes, getCinematicPack, getGlobalArtDirection } from './style-descriptions'
 import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStrategy } from './negative'
 
@@ -16,7 +16,7 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStr
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.16.0',
+  version: '1.17.0',
   releaseDate: new Date('2026-02-08'),
   status: 'active',
   changelog: [
@@ -69,6 +69,7 @@ export const VERSION: PromptVersion = {
     'v1.14.0: [A7] GLOBAL_ART_DIRECTION – getGlobalArtDirection(illustrationStyle) in style-descriptions; injected after PRIORITY in generateFullPagePrompt. Single global block (3D Animation / other styles), kısa tekrar + uzun sahne şablonu. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.1, 8 Şubat 2026)',
     'v1.15.0: [A8] SHOT PLAN – buildShotPlanBlock(sceneInput, isCover, previousScenes): shotType, lens, cameraAngle, placement, characterScale 25-30%, timeOfDay, mood. [A1] Image prompt konsolidasyonu: SHOT PLAN + COMPOSITION RULES short + AVOID short; Composition&Depth, Camera&Perspective, CharacterEnvironmentRatio blokları kaldırıldı (içerik SHOT PLAN + tek satırlara taşındı). (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.2–9.3, 8 Şubat 2026)',
     'v1.16.0: [A11] Parmak stratejisi – getDefaultHandStrategy() (negative.ts) buildAnatomicalAndSafetySection içinde: hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v1.17.0: [A5] shotPlan schema – SceneInput.shotPlan (optional). buildShotPlanBlock uses LLM shotPlan when present (shotType, lens, cameraAngle, placement, timeOfDay, mood) with code fallbacks. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -90,6 +91,8 @@ export interface SceneInput {
   clothing?: string
   /** v1.9.0: Per-character facial expressions from story. Key = character ID, value = visual description (eyes, brows, mouth). */
   characterExpressions?: Record<string, string>
+  /** A5: Optional shot plan from LLM; when set, SHOT PLAN block uses these (with code fallbacks for missing fields). */
+  shotPlan?: ShotPlan
 }
 
 // NEW: Scene Diversity Analysis (16 Ocak 2026)
@@ -1289,22 +1292,31 @@ function getShotPlanPlacementLabel(pageNumber: number, previousScenes?: SceneDiv
 /**
  * Build SHOT PLAN block: shotType, lens, cameraAngle, characterScale, placement, timeOfDay, mood.
  * A8: Sinematik dilin deterministik ve kısa kalması; mevcut sceneInput'tan koddan türetilir.
+ * A5: When sceneInput.shotPlan is present, use its fields with code fallbacks for missing/empty values.
  */
 function buildShotPlanBlock(
   sceneInput: SceneInput,
   isCover: boolean,
   previousScenes?: SceneDiversityAnalysis[]
 ): string {
-  const shotType = isCover
-    ? 'wide establishing'
-    : sceneInput.focusPoint === 'environment'
-      ? 'wide establishing'
-      : 'wide shot'
-  const lens = sceneInput.focusPoint === 'environment' ? '24-28mm' : '35mm'
-  const cameraAngle = getCameraAngleDirectives(sceneInput.pageNumber, previousScenes)
-  const placement = getShotPlanPlacementLabel(sceneInput.pageNumber, previousScenes)
-  const timeOfDay = sceneInput.timeOfDay ?? 'day'
-  const mood = sceneInput.mood || 'wonder'
+  const sp = sceneInput.shotPlan
+  const shotType =
+    (sp?.shotType?.trim()) ||
+    (isCover ? 'wide establishing' : sceneInput.focusPoint === 'environment' ? 'wide establishing' : 'wide shot')
+  const lens =
+    (sp?.lens?.trim()) ||
+    (sceneInput.focusPoint === 'environment' ? '24-28mm' : '35mm')
+  const cameraAngle =
+    (sp?.cameraAngle?.trim()) ||
+    getCameraAngleDirectives(sceneInput.pageNumber, previousScenes)
+  const placement =
+    (sp?.placement?.trim()) ||
+    getShotPlanPlacementLabel(sceneInput.pageNumber, previousScenes)
+  const timeOfDay =
+    (sp?.timeOfDay?.trim()) ||
+    sceneInput.timeOfDay ||
+    'day'
+  const mood = (sp?.mood?.trim()) || sceneInput.mood || 'wonder'
   return `SHOT PLAN: ${shotType}. ${lens} lens look. Camera: ${cameraAngle}. Characters are SMALL (25-30% of frame height). Placement: ${placement}. Not centered. Time: ${timeOfDay}. Mood: ${mood}.`
 }
 

@@ -1,10 +1,12 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
-**Versiyon (kod):** 2.1.0  
+**Versiyon (kod):** 2.3.0  
 Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse doküman da güncellenmelidir; **base.ts = gerçek kaynak**.
 
-**v2.1.0 (7 Şubat 2026):** Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.
+**v2.2.0 (8 Şubat 2026):** Tüm doğrulama maddeleri tek blokta: `# VERIFICATION CHECKLIST`. LANGUAGE'dan "Before returning..." kaldırıldı; OUTPUT FORMAT kuyruğu "see # VERIFICATION CHECKLIST below" ile kısaltıldı.  
+**v2.3.0 (8 Şubat 2026):** shotPlan sayfa başına **zorunlu**; OUTPUT FORMAT ve VERIFICATION CHECKLIST güncellendi.  
+(v2.1.0: Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.)
 
 ---
 
@@ -120,10 +122,10 @@ Identify ALL animals and important objects that appear in the story; each gets a
 
 ```
 # LANGUAGE
-- Page "text" only: story narrative in [langName].
-- imagePrompt, sceneDescription, sceneContext: English only.
-Before returning: verify "text" in [langName]; verify imagePrompt, sceneDescription, sceneContext in English.
+- **Page "text" only:** Write the story narrative (the "text" field for each page) in [langName] only. This is what appears in the book. Do not use words from other languages in "text".
+- **imagePrompt, sceneDescription, sceneContext:** Always in English only. These fields are used for image generation APIs and must be in English.
 ```
+(Doğrulama maddeleri artık sadece `# VERIFICATION CHECKLIST` içinde; LANGUAGE'da "Before returning" yok.)
 
 ---
 
@@ -147,8 +149,10 @@ Before returning: verify "text" in [langName]; verify imagePrompt, sceneDescript
 
 ```
 # STORY STRUCTURE
-- **Cover:** One page for the book cover. Like a movie poster: main character + essence of the whole story. Professional, striking.
-- **Interior pages:** Each page = one scene from the story (location, moment, action). No repeating scenes; vary location, time, composition. Same approach for page 1 and all other interior pages.
+- **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
+- **pages[]:** EXACTLY [getPageCount] items (interior pages only). No cover in this array.
+- **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
+- **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
 - Vary locations and time of day across pages so the story feels like a progression.
 ```
 
@@ -176,7 +180,9 @@ Story = narrative only. Visual details (appearance, clothing, object colors) = m
 
 ```
 # VISUAL DIVERSITY
-Each page = different scene. Vary location, time of day, perspective, composition, action. Page 1 (first interior) must differ from the cover (different moment or angle). Scene description and imagePrompt: detailed (150+ and 200+ chars).
+Each page = different scene. Vary location, time of day, perspective, composition, and character action/pose.
+- Do NOT repeat the same pose or action on consecutive pages. Each page must have a distinctly different character action or pose (e.g. one page running, next page sitting or looking around).
+- Scene description and imagePrompt: detailed (150+ and 200+ chars).
 ```
 
 ---
@@ -251,28 +257,35 @@ Return a valid JSON object:
       "characterExpressions": {
         "character-id-1": "Visual description of THIS character's facial expression (eyes, eyebrows, mouth). Example: eyes wide with surprise, eyebrows raised, mouth slightly open",
         "character-id-2": "… (one entry per character ID in characterIds for this page)"
-      }
+      },
+      "shotPlan": { "shotType": "wide establishing", "lens": "24-28mm", "cameraAngle": "eye-level", "placement": "left third", "timeOfDay": "golden hour", "mood": "wonder" }
     }
   ],
   "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
   "suggestedOutfits": { "[characterId1]": "one line English outfit", "[characterId2]": "one line English outfit" },
   "metadata": { "ageGroup": "[ageGroup]", "theme": "[theme]", "educationalThemes": [], "safetyChecked": true }
 }
-Pages array: EXACTLY [getPageCount(ageGroup, pageCount)] items. characterIds REQUIRED per page. characterExpressions REQUIRED per page: object with one key per character ID appearing on that page; value = short English visual description of that character's facial expression (eyes, eyebrows, mouth; e.g. 'eyes wide with surprise' NOT just 'surprised'). suggestedOutfits REQUIRED: one key per character ID, value = one line English outfit (used for master).
+shotPlan REQUIRED per page (shotType, lens, cameraAngle, placement, timeOfDay, mood) — English only; used for image composition. Vary per page for visual diversity.
+Required fields and checks: see # VERIFICATION CHECKLIST below.
 ```
 
-**Not:** Sayfa çıktısında **clothing** alanı yok. **characterExpressions** (sayfa bazlı, karakter bazlı görsel ifade tarifi) story’den gelir; image pipeline’da [CHARACTER_EXPRESSIONS] bloğunda kullanılır. Master sadece kimlik referansıdır; poz, ifade ve sahne story çıktısından gelir. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. 
+**Not:** Sayfa çıktısında **clothing** alanı yok. **shotPlan** (shotType, lens, cameraAngle, placement, timeOfDay, mood) sayfa başına **zorunlu**; görsel pipeline'da SHOT PLAN bloğunda kullanılır (yoksa kod fallback üretir; bkz. PROMPT_OPTIMIZATION_GUIDE.md "shotPlan yoksa fallback"). **characterExpressions** (sayfa bazlı, karakter bazlı görsel ifade tarifi) story’den gelir; image pipeline’da [CHARACTER_EXPRESSIONS] bloğunda kullanılır. Master sadece kimlik referansıdır; poz, ifade ve sahne story çıktısından gelir. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. 
 ---
 
-### 13. CRITICAL REMINDERS
+### 13. VERIFICATION CHECKLIST
 
-**Kod:** `buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount, language)`
+**Kod:** `buildVerificationChecklistSection(ageGroup, characterName, themeConfig, pageCount, language)`
+
+Tüm doğrulama maddeleri tek blokta (A3); LANGUAGE veya OUTPUT FORMAT içinde tekrarlanmaz.
 
 ```
-# CRITICAL REMINDERS
-- Return EXACTLY [getPageCount(ageGroup, pageCount)] pages. characterIds REQUIRED per page.
+# VERIFICATION CHECKLIST (before returning JSON)
+- Return EXACTLY [n] pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
+- suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
+- characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
+- Verify every page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext are in English.
+- shotPlan REQUIRED per page: include shotType, lens, cameraAngle, placement, timeOfDay, mood (English only; vary per page for visual diversity).
 - [characterName] = main character in every scene. Positive, age-appropriate, no scary/violent content.
-- Before returning: verify page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext are in English; verify characterExpressions has one entry per character ID in that page's characterIds (each value = visual facial description in English); verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING.
 ```
 
 ---

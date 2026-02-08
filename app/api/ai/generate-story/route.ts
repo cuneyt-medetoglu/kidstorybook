@@ -11,6 +11,7 @@ import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getBookById } from '@/lib/db/books'
 import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
+import type { ShotPlan } from '@/lib/prompts/types'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import OpenAI from 'openai'
 
@@ -38,6 +39,8 @@ export interface StoryGenerationResponse {
     text: string
     imagePrompt: string
     sceneDescription: string
+    /** A5: Optional shot plan from LLM; used for image prompt when present. */
+    shotPlan?: ShotPlan
   }>
   metadata: {
     ageGroup: string

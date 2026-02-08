@@ -358,6 +358,10 @@ export async function POST(request: NextRequest) {
                    themeKey === 'sports' ? 'exciting' :
                    'happy'
       
+      // A5: Optional shotPlan from story; pass through if present
+      const pageShotPlan = (page as { shotPlan?: { shotType?: string; lens?: string; cameraAngle?: string; placement?: string; timeOfDay?: string; mood?: string } }).shotPlan
+      const hasValidShotPlan = pageShotPlan && typeof pageShotPlan === 'object' && !Array.isArray(pageShotPlan)
+
       // Create SceneInput object for generateFullPagePrompt
       const sceneInput = {
         pageNumber,
@@ -366,6 +370,7 @@ export async function POST(request: NextRequest) {
         mood,
         characterAction,
         focusPoint,
+        ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
       }
 
       // Generate full page prompt with useCoverReference=true

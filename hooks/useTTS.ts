@@ -96,14 +96,39 @@ export function useTTS(): UseTTSReturn {
 
       const data = await response.json()
 
+      if (!data?.audioUrl || typeof data.audioUrl !== "string") {
+        throw new Error("API did not return a valid audio URL")
+      }
+
       if (!audioRef.current) {
         throw new Error("Audio element not initialized")
       }
 
-      // Set audio source
-      audioRef.current.src = data.audioUrl
-      audioRef.current.volume = Math.max(0, Math.min(1, volume))
-      audioRef.current.playbackRate = speed
+      // Set volume/rate first; then set source and wait for load (fixes playback / CORS visibility)
+      const el = audioRef.current
+      el.volume = Math.max(0, Math.min(1, volume))
+      el.playbackRate = speed
+
+      await new Promise<void>((resolve, reject) => {
+        let settled = false
+        const settle = (fn: () => void) => {
+          if (settled) return
+          settled = true
+          clearTimeout(tid)
+          el.removeEventListener("canplaythrough", onCanPlay)
+          el.removeEventListener("error", onError)
+          fn()
+        }
+        const onCanPlay = () => settle(() => resolve())
+        const onError = () => settle(() => reject(new Error("Ses yüklenemedi. Ağ veya CORS hatası olabilir.")))
+        el.addEventListener("canplaythrough", onCanPlay, { once: true })
+        el.addEventListener("error", onError, { once: true })
+        const tid = setTimeout(() => {
+          if (!settled) settle(() => reject(new Error("Ses yükleme zaman aşımı.")))
+        }, 15000)
+        el.src = data.audioUrl
+        el.load()
+      })
 
       // Play audio
       await audioRef.current.play()

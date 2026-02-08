@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.2.0',
-  releaseDate: new Date('2026-02-07'),
+  version: '2.3.0',
+  releaseDate: new Date('2026-02-08'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -48,6 +48,7 @@ export const VERSION: PromptVersion = {
     'v2.0.0: STORY_PROMPT_ACTION_PLAN – Cover netliği (cover ayrı, pages = interior only). CHARACTER MAPPING + CHARACTER_ID_MAP (liste + map, gerçek UUID). Yaş/kelime: getWordCountRange (toddler 10-25, preschool 25-45, vb.), getSentenceLength doğal kurallar. DO NOT DESCRIBE iki maddeli: (a) text = görsel yok, (b) imagePrompt = appearance yasak, ışık/kompozisyon serbest. OUTPUT FORMAT suggestedOutfits placeholder düzeltmesi. (7 Şubat 2026)',
     'v2.1.0: GPT trace aksiyonları – VISUAL DIVERSITY: Do NOT repeat same pose/action on consecutive pages; each page distinctly different action/pose. Word count: getWordCountRange artırıldı (toddler 30-45 … pre-teen 130-180), getWordCountMin export; CRITICAL: Each page text at least X words. generate-story: kelime sayımı + kısa sayfa repair pass. (7 Şubat 2026)',
     'v2.2.0: [A3] VERIFICATION CHECKLIST – Tüm verify/check maddeleri tek blokta. LANGUAGE: "Before returning JSON verify..." kaldırıldı. OUTPUT FORMAT: Tekrarlayan "characterIds/suggestedOutfits/characterExpressions REQUIRED" satırları kısaltıldı, "see # VERIFICATION CHECKLIST" referansı. buildCriticalRemindersSection → buildVerificationChecklistSection. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v2.3.0: [A5] shotPlan (optional) – OUTPUT FORMAT: per-page optional shotPlan (shotType, lens, cameraAngle, placement, timeOfDay, mood). English only; used for image composition when provided. Omit if not needed. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -785,13 +786,15 @@ Return a valid JSON object:
       "characterExpressions": {
         "character-id-1": "English only. Visual description of THIS character's facial expression for this page (eyes, eyebrows, mouth). Example: 'eyes wide with surprise, eyebrows raised, mouth slightly open'",
         "character-id-2": "English only. Visual description for second character (if present). Example: 'calm gentle smile, eyes crinkled at corners, relaxed eyebrows'"
-      }
+      },
+      "shotPlan": { "shotType": "wide establishing", "lens": "24-28mm", "cameraAngle": "eye-level", "placement": "left third", "timeOfDay": "golden hour", "mood": "wonder" }
     }
   ],
   "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
   "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"<uuid-from-CHARACTER_ID_MAP>": "one line English outfit"'},
   "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
 }
+shotPlan REQUIRED per page (shotType, lens, cameraAngle, placement, timeOfDay, mood) — English only; used for image composition. Vary per page for visual diversity.
 Required fields and checks: see # VERIFICATION CHECKLIST below.`
 }
 
@@ -810,6 +813,7 @@ function buildVerificationChecklistSection(
 - suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
 - Verify every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.
+- shotPlan REQUIRED per page: include shotType, lens, cameraAngle, placement, timeOfDay, mood (English only; vary per page for visual diversity).
 - ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.`
 }
 

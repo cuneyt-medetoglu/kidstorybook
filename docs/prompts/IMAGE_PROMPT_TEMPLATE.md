@@ -1,7 +1,7 @@
 # Image Generation Prompt Template
 
-**Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts` (tek kaynak; doküman bu kodla eşleşir)  
-**Versiyon (scene):** 1.11.0 | **Versiyon (negative/anatomi):** 1.2.0 (7 Şubat 2026 – el/parmak pozitif ve negatif direktifler)
+**Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts`, `master.ts` (tek kaynak; doküman bu kodla eşleşir)  
+**Versiyon (scene):** 1.17.0 | **Versiyon (negative):** 1.3.0 (8 Şubat 2026 – el/parmak stratejisi, anatomik direktifler)
 
 ---
 
@@ -31,7 +31,8 @@ Bu template, **gpt-image-1.5** (default) / **1024x1536** (portrait) / **quality:
 **Production Defaults:**
 - Model: `gpt-image-1.5`
 - Size: `1024x1536` (portrait)
-- Quality: `low`
+- Quality: `low` (master, cover, sayfa hep low)
+- input_fidelity: `high` (referans sadakati; master/cover/sayfa çağrılarında kullanılır)
 - Rate Limit: 5 images per 90 seconds (Tier 1: 5 IPM)
 
 **Kritik Hedef:** Yüklenen çocuk fotoğrafındaki çocuğa mümkün olduğunca benzeyen karakterler üretmek.
@@ -61,9 +62,29 @@ Bu template, **gpt-image-1.5** (default) / **1024x1536** (portrait) / **quality:
 
 ---
 
-## Template Structure
+## Template Structure (generateFullPagePrompt sırası)
 
-Base template, karakter tutarlılığı (hair length/style, eye color, skin tone, facial features), çoklu karakter referans eşlemesi, cover talimatları (flat illustration, NO TEXT in image), interior sayfa talimatları ve JSON çıktı formatı için `lib/prompts/image/` altındaki kodlara bakın.
+Sayfa görseli prompt'u `lib/prompts/image/scene.ts` → `generateFullPagePrompt()` ile üretilir. Bölüm sırası (kodla aynı):
+
+1. **PRIORITY** – Çatışma çözüm sırası: 1) Scene composition & character scale, 2) Environment richness & depth, 3) Character action & expression, 4) Reference identity match. (A4)
+2. **GLOBAL_ART_DIRECTION** – Stil bazlı tek blok (getGlobalArtDirection; 3D Animation / diğer stiller). (A7)
+3. **SHOT PLAN** – buildShotPlanBlock: shotType, lens, cameraAngle, placement, characterScale 25–30%, timeOfDay, mood. Story'den gelen shotPlan kullanılır; yoksa kod fallback (bkz. PROMPT_OPTIMIZATION_GUIDE.md “shotPlan yoksa fallback”). (A8, A5)
+4. **CRITICAL** – Referans = sadece kimlik / veya “Character MUST wear EXACTLY: [clothing]”.
+5. **Anatomical & Safety** – buildAnatomicalAndSafetySection (el stratejisi, parmak, anatomi). (A11)
+6. **Lighting & Atmosphere** – buildLightingAndAtmosphereSection.
+7. **COMPOSITION RULES** – Tek kısa satır (environment 65–75%, rule of thirds, no zoom-in). (A1)
+8. **Style** – buildStyleSection.
+9. **CINEMATIC_PACK** – getCinematicPack().
+10. **Character Integration** + **Cinematic Natural** (interior only).
+11. **SCENE** – buildSceneContentSection (layered composition, scene prompt, pose, age rules).
+12. **CHARACTER_EXPRESSIONS** – buildCharacterExpressionsSection (story'den characterExpressions).
+13. **Special Page Directives** – buildSpecialPageDirectives.
+14. **Character Consistency** – buildCharacterConsistencySection.
+15. **Scene Diversity** – buildSceneDiversitySection.
+16. **Clothing** – buildClothingSection.
+17. **AVOID** – buildAvoidShort (tek satır negatifler). (A1)
+
+Master, kapak ve entity prompt'ları aynı modülde veya `character.ts` / `master.ts` içinde üretilir. Karakter tutarlılığı (hair, eyes, skin, facial features), çoklu karakter referans eşlemesi, cover talimatları (NO TEXT), interior sayfa talimatları için ilgili builder fonksiyonlarına bakın.
 
 ---
 
@@ -125,3 +146,5 @@ Detaylar `lib/prompts/image/scene.ts`, `negative.ts` içinde.
 ## İlgili dokümanlar
 
 - `STORY_PROMPT_TEMPLATE.md` – Hikaye üretimi prompt şablonu
+- `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md` – shotPlan, fallback, GLOBAL_ART_DIRECTION, relighting
+- `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md` – A1–A12 aksiyon planı ve uygulama durumu

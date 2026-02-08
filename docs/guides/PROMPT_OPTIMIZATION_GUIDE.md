@@ -278,6 +278,29 @@ console.log('Negative prompts version:', negativeVersion.version) // v1.1.0
 
 **Plana eklendi (Sıra 18):** Prompt’a “Use reference for face/hair/outfit only; do NOT copy lighting/background; allow relighting.” (Sıra 18 – Sıra 13 sonrası yapılacaklar listesinde).
 
+### shotPlan nedir? (A5 – sayfa görseli kompozisyonu)
+
+**shotPlan ne demek?** Her sayfa görseli için **kamera ve sahne ayarlarının kısa tarifi**: çekim türü (geniş açı mı, yakın plan mı), objektif (24mm mi 35mm mi), kamera açısı (göz hizası, alttan, üstten), karakterin kadrajdaki yeri (sol üçte bir, sağ alt), günün saati (sabah, golden hour, gece), mood (merak, heyecan, sakin). Yani film/dizi çekerken yönetmenin "bu sahne şöyle çekilsin" dediği teknik kararların metin hali.
+
+**Neden var?** Story LLM hikayeyi yazarken sahne de kuruyor. Bu sahnenin **görsel olarak nasıl kadrajlanacağı** (geniş açı, golden hour, sol üçte bir) yapılandırılmış alanlarla (shotType, lens, cameraAngle, placement, timeOfDay, mood) verilirse, sayfa image prompt'u daha tutarlı olur. shotPlan bu alanları sağlar; kod bunu "SHOT PLAN: …" satırında kullanır.
+
+**Akış:** Story JSON'da her sayfa için isteğe bağlı `shotPlan` objesi. LLM doldurursa image pipeline bu değerleri kullanır; doldurmazsa kod mevcut mantıkla kendi değerlerini üretir (geriye dönük uyumlu).
+
+**Özet:** shotPlan = sayfa görseli için "nasıl çekilsin?" bilgisi (kamera, ışık, yerleşim, mood). A5 ile story çıktısına eklendi; artık sayfa başına **zorunlu** (LLM her sayfada doldurur). Eski story verisinde shotPlan yoksa kod fallback kullanır (aşağıda).
+
+**shotPlan yoksa fallback tam olarak ne?** LLM shotPlan döndürmezse veya alan boşsa, görsel prompt’taki **SHOT PLAN** satırı tamamen **koddan türetilir**:
+
+| Alan | Fallback kaynağı |
+|------|-------------------|
+| **shotType** | Kapak ise "wide establishing"; sayfa ise focusPoint'e göre (environment → "wide establishing", yoksa "wide shot"). books/route’ta focusPoint şu an hep "balanced" → "wide shot". |
+| **lens** | focusPoint === 'environment' ise "24-28mm", değilse "35mm". |
+| **cameraAngle** | `getCameraAngleDirectives(pageNumber, previousScenes)` — sayfa numarasına göre dönen liste: "wide shot", "medium shot", "low-angle view (child's perspective)", "eye-level" vb. Sayfa 1’de bir değer, 2’de başka, böylece sayfalar arası çeşitlilik. |
+| **placement** | `getShotPlanPlacementLabel(pageNumber, previousScenes)` — sayfa index’ine göre sırayla "left third", "right third", "lower third", "left with leading lines", "right balanced", "off-center" döner. |
+| **timeOfDay** | sceneInput.timeOfDay varsa o, yoksa "day". books/route’ta timeOfDay set edilmiyor → hep "day". |
+| **mood** | sceneInput.mood — books/route’ta temadan: adventure→exciting, fantasy→mysterious, space→inspiring, sports→exciting, diğer→happy. |
+
+Yani fallback = **sabit kurallar**: sayfa numarası + tema + focusPoint ile tekrarlanabilir bir SHOT PLAN. LLM shotPlan verirse sahneye özel (örn. "golden hour", "left third") değerler kullanılır; vermezse bu varsayılanlar kullanılır. Eski kitaplar veya API’den shotPlan gelmeyen durumlar için bu fallback devreye girer.
+
 ### Prompt linter nedir? (Madde 7 – basit açıklama)
 
 **En kısa hali:** Yazım denetimi gibi, ama **prompt metni** için. Aynı prompt’ta birbirine zıt talimatlar var mı diye bakar.

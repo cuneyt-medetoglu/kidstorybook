@@ -1939,6 +1939,10 @@ export async function POST(request: NextRequest) {
           }
         })
         
+        // A5: Optional shotPlan from story LLM; pass through if present and object-shaped
+        const pageShotPlan = (page as { shotPlan?: { shotType?: string; lens?: string; cameraAngle?: string; placement?: string; timeOfDay?: string; mood?: string } }).shotPlan
+        const hasValidShotPlan = pageShotPlan && typeof pageShotPlan === 'object' && !Array.isArray(pageShotPlan)
+
         const sceneInput = {
           pageNumber,
           sceneDescription: sceneDescription ?? '',
@@ -1948,6 +1952,7 @@ export async function POST(request: NextRequest) {
           focusPoint,
           ...(pageClothing && { clothing: pageClothing }),
           ...(Object.keys(characterExpressions).length > 0 && { characterExpressions }),
+          ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
         }
 
         // Generate full page prompt (NEW: Master illustration only, no cover reference)

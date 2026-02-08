@@ -73,6 +73,16 @@ export interface SupportingEntity {
   appearsOnPages: number[] // Which pages this entity appears on
 }
 
+/** A5: Optional per-page shot plan from story LLM. When present, image prompt uses these instead of code-derived values. */
+export interface ShotPlan {
+  shotType?: string // e.g. "wide establishing", "wide shot"
+  lens?: string // e.g. "24-28mm", "35mm"
+  cameraAngle?: string // e.g. "eye-level", "slightly above ground"
+  placement?: string // e.g. "left third", "lower-right third"
+  timeOfDay?: string // e.g. "morning", "golden hour", "day", "dusk"
+  mood?: string // e.g. "wonder", "exciting", "calm"
+}
+
 export interface StoryPage {
   pageNumber: number
   text: string
@@ -81,6 +91,8 @@ export interface StoryPage {
   characterIds: string[] // NEW: Which character(s) appear on this page (character IDs) - REQUIRED
   /** Story-driven clothing per page (e.g. astronaut suit, swimwear). Plan: Kapak/Close-up/Kıyafet. */
   clothing?: string
+  /** A5: Optional shot plan from LLM; when set, image prompt uses these for SHOT PLAN block. */
+  shotPlan?: ShotPlan
 }
 
 export interface AgeGroupRules {

@@ -20,10 +20,11 @@
 | **A8** – SHOT_PLAN alanları | ✅ Yapıldı | 8 Şubat 2026 | buildShotPlanBlock(sceneInput, isCover, previousScenes): shotType, lens, cameraAngle, placement, 25-30% scale, timeOfDay, mood. v1.15.0. |
 | **A11** – Parmak stratejisi | ✅ Yapıldı | 8 Şubat 2026 | negative.ts: getDefaultHandStrategy(), getHandDirectivesWhenVisible(). scene.ts: buildAnatomicalAndSafetySection içinde varsayılan el stratejisi. v1.16.0 / negative v1.3.0. |
 | **A9** – Layout-safe master | ✅ Yapıldı | 8 Şubat 2026 | config: masterLayout.characterScaleMin/Max (25–30). lib/prompts/image/master.ts: getLayoutSafeMasterDirectives(). route.ts master prompt’a eklendi. Testte çok küçük kalırsa config’ten büyüt (örn. 30–35). |
-| Diğerleri (A5, A12) | Bekliyor | — | |
-| **Prompts doküman = kod eşitlemesi** | Bekliyor | — | En son (Sıra 13). docs/prompts/*.md ↔ lib/prompts/*. |
+| **A5** – shotPlan schema (LLM) | ✅ Yapıldı | 8 Şubat 2026 | Story: shotPlan OUTPUT FORMAT + VERIFICATION’da zorunlu. types: ShotPlan, StoryPage.shotPlan. scene.ts: buildShotPlanBlock(sceneInput.shotPlan); API shotPlan geçiriyor; yoksa fallback. |
+| **A12** – input_fidelity | Karar verildi | — | Bkz. Bölüm 14, Madde 17: Master’da zaten high; gpt-image-1’e geçilmez. |
+| **Prompts doküman = kod eşitlemesi** | ✅ Yapıldı | 8 Şubat 2026 | docs/prompts/STORY_PROMPT_TEMPLATE.md (2.3.0, shotPlan zorunlu, VERIFICATION CHECKLIST) ve IMAGE_PROMPT_TEMPLATE.md (1.17.0, PRIORITY/SHOT PLAN yapısı) kodla eşitlendi. |
 
-**Sıradaki adım:** A5 / A12.
+**Sıradaki adım:** Sıra 13 tamamlandı. Sıradaki: Bölüm 14 (Trace takip aksiyonları 14–18).
 
 ---
 
@@ -172,9 +173,9 @@ PRIORITY: If any conflict, follow this order: 1) Scene composition & character s
 
 Bu, modelin "referans kopyalama vs sahne kompozisyonu" çatışmasında doğru seçimi yapmasını sağlar.
 
-### A5 – LLM'den shotPlan Almak (S5) – İleride
+### A5 – LLM'den shotPlan Almak (S5) ✅ Yapıldı (8 Şubat 2026)
 
-**Ne:** GPT'nin önerdiği gibi, LLM'den imagePrompt yerine yapılandırılmış `shotPlan` objesi almak:
+**Ne:** LLM'den sayfa başına yapılandırılmış `shotPlan` objesi almak (story JSON'da zorunlu); `buildShotPlanBlock` bunu kullanır, yoksa fallback. Örnek schema:
 
 ```json
 {
@@ -189,9 +190,9 @@ Bu, modelin "referans kopyalama vs sahne kompozisyonu" çatışmasında doğru s
 }
 ```
 
-Sonra `buildFullPagePrompt` bu yapılandırılmış veriyi kullanarak deterministik, kısa, sinematik prompt üretir.
+`buildShotPlanBlock(sceneInput, isCover, previousScenes)` bu veriyi kullanarak SHOT PLAN satırını üretir; shotPlan yoksa sayfa/tema/previousScenes ile fallback.
 
-**Neden ileride:** LLM output schema değişikliği + validator + mevcut tüm prompt builder refactor gerektirir. Bunu A1-A4 sonrası değerlendirmek daha güvenli.
+**Uygulama:** Story OUTPUT FORMAT + VERIFICATION’da shotPlan zorunlu; types ShotPlan/StoryPage; scene.ts buildShotPlanBlock; API sceneInput.shotPlan geçiriyor. Fallback: PROMPT_OPTIMIZATION_GUIDE.md “shotPlan yoksa fallback” bölümü.
 
 *(A6 – Master quality: plandan çıkarıldı; konu prompt ile ilgili değil.)*
 
@@ -393,7 +394,7 @@ Aşağıdakiler mevcut A1–A6’ya ek; öncelik sırası güncel tabloda.
 
 ## 11. Güncel Öncelik ve Sıralama
 
-**Tamamlanan:** A4, A2, A3, A10, A7, A1, A8, A11, A9 (8 Şubat 2026). **Sıradaki:** A5 → A12.
+**Tamamlanan:** A4, A2, A3, A10, A7, A1, A8, A11, A9, A5, **Sıra 13** (8 Şubat 2026). **Sıradaki:** Bölüm 14 (Trace aksiyonları 14–18).
 
 | Sıra | Aksiyon | Etki | Risk | Durum |
 |------|---------|------|------|--------|
@@ -403,12 +404,12 @@ Aşağıdakiler mevcut A1–A6’ya ek; öncelik sırası güncel tabloda.
 | 4 | **A10** – Referans görsel sırası | Kolay, dokümantasyon + kod kontrolü | Çok düşük | ✅ Yapıldı |
 | 5 | **A7** – GLOBAL_ART_DIRECTION + template | Sinematik paketi koda taşır; A1 ile uyumlu | Orta | ✅ Yapıldı |
 | 6 | **A1** – Image prompt konsolidasyonu | En büyük kazanım; A7/A8 ile birlikte düşünülmeli | Orta | ✅ Yapıldı |
-| 7 | **A8** – SHOT_PLAN alanları | A5 (shotPlan schema) ile birleştirilebilir | Orta | ✅ Yapıldı |
+| 7 | **A8** – SHOT_PLAN alanları | A5 ile birlikte: buildShotPlanBlock kullanıyor | Orta | ✅ Yapıldı |
 | 8 | **A11** – Parmak stratejisi | Varsayılan prompt; opsiyonel mask repair ileride | Düşük | ✅ Yapıldı |
 | 9 | **A9** – Layout-safe master | “Kocaman karakter” azalır | Orta | ✅ Yapıldı |
-| 10 | **A5** – shotPlan schema (LLM) | Büyük mimari değişiklik | Yüksek | Bekliyor |
-| 11 | **A12** – input_fidelity denemesi | Master kimlik kalitesi | Düşük | Bekliyor |
-| 13 | **Prompts doküman = kod eşitlemesi** | docs/prompts/*.md ile lib/prompts/* aynı olmalı | Düşük | En son |
+| 10 | **A5** – shotPlan schema (LLM) | Story'de shotPlan zorunlu; API → scene; yoksa fallback | Yüksek | ✅ Yapıldı |
+| 11 | **A12** – input_fidelity denemesi | Bölüm 14 Madde 17: karar verildi, aksiyon yok | — | Karar verildi |
+| 13 | **Prompts doküman = kod eşitlemesi** | docs/prompts/*.md ile lib/prompts/* aynı olmalı | Düşük | ✅ Yapıldı (8 Şubat 2026) |
 
 ---
 
@@ -449,8 +450,46 @@ Trace incelemesi (kidstorybook-trace-2026-02-08T13-48-30.json) ve kod karşıla�
 | 14 | **Sayfa prompt’unda Türkçe metin (FOREGROUND)** | characterAction = page.text (Türkçe) → FOREGROUND’a gidiyor; stil/token bozuyor. **Fix:** characterAction için İngilizce kaynak (sceneContext veya sceneDescription); page.text fallback olmamalı veya en son. | Düşük | Bekliyor |
 | 15 | **Çelişkili stil ifadeleri** | Aynı prompt’ta "vibrant saturated" + "controlled saturation", "soft cinematic" + "high contrast dramatic". Tek stil profili (örn. FILMIC_WARM_3D); çelişen cümleler kaldırılmalı (style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumlu hale getirilmeli). | Orta | Bekliyor |
 | 16 | **Story JSON validation + kelime sayısı** | characterIds, suggestedOutfits, characterExpressions REQUIRED; eksikse validation/retry. Sayfa metni kelime sayısı (getWordCountRange) kontrolü ve gerekirse kısa repair. | Orta | Bekliyor |
-| 17 | **A12 notu (model)** | Master'da input_fidelity: high zaten kullanılıyor. **gpt-image-1'e geçilmez;** pipeline gpt-image-1.5 ile devam eder. | — | Karar verildi |
+| 17 | **A12 notu (model)** | **quality** master/cover/sayfa hep **low**. **input_fidelity** (referans sadakati) **high** kullanılıyor (route.ts). gpt-image-1'e geçilmez; pipeline gpt-image-1.5 ile devam eder. | — | Karar verildi |
 | 18 | **Allow relighting** | Sayfa prompt’una "Use reference for face/hair/outfit only; do NOT copy lighting/background; allow relighting." (veya eşdeğeri) ekle. Magicalchildrensbook tarzı sahneye özel ışık/ton için; geliştirmesi düşük risk. | Düşük | Bekliyor |
 
 **Madde 5 (Allow relighting):** Plana eklendi (Sıra 18). Açıklama: `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md` → “Relighting nedir?”.  
 **Madde 7 (Prompt linter):** Planda yok (gerek yok). Açıklama rehberde referans için duruyor.
+
+---
+
+### 14.1 Test zamanlaması (Sıra 14, 15, 16, 18)
+
+Hangi maddeden sonra test yapılması gerektiği:
+
+| Madde | Ne değişir | Test ne zaman | Ne yapılır |
+|-------|------------|----------------|------------|
+| **14** (Türkçe FOREGROUND) | Sayfa prompt'unda characterAction kaynağı (sceneContext/sceneDescription; page.text fallback kaldırılır veya en son). | **14 tamamlandıktan sonra** | Smoke: 1 kitap veya 2–3 sayfa üret; FOREGROUND'da Türkçe metin gidiyor mu kontrol et. Hata/timeout yok mu bak. |
+| **15** (Çelişkili stil) | style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumu; çelişen cümleler kaldırılır. | **15 tamamlandıktan sonra** | Orta test: 1 tam kitap; görsel stil tutarlı mı, aşırı doygunluk / çelişkili ışık ifadeleri kalmadı mı kontrol et. |
+| **16** (Story JSON validation) | Story API: validation/retry (characterIds, suggestedOutfits, characterExpressions); kelime sayısı kontrolü ve kısa repair. | **16 tamamlandıktan sonra** | Entegre test: 1 tam kitap (story + master + cover + sayfalar); validation tetikleniyor mu, repair çalışıyor mu, görsel pipeline bozulmadı mı kontrol et. |
+| **17** | — (Karar verildi, kod değişikliği yok.) | Test yok | — |
+| **18** (Allow relighting) | Sayfa prompt'una relighting cümlesi eklenir. | **18 tamamlandıktan sonra** | Smoke: 1 kitap veya birkaç sayfa; sahneye özel ışık/ton farkı gözlemlenebilir mi, kimlik bozulmadı mı kontrol et. |
+
+**Özet:** 14 ve 18 sonrası kısa smoke test yeterli; 15 ve 16 sonrası daha kapsamlı (tam kitap / entegre) test önerilir. 17 için test yok.
+
+---
+
+### 14.2 Sıra 14–18 tamamlandıktan sonra: genel eşitleme ve doküman güncellemesi
+
+Tüm Sıra 14–18 maddeleri (ve gerekiyorsa testler) bittikten sonra, **Sıra 13'teki gibi** genel eşitleme ve doküman güncellemesi yapılmalı:
+
+1. **Prompts doküman = kod eşitlemesi (tekrar)**  
+   - `docs/prompts/STORY_PROMPT_TEMPLATE.md` ve `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` içerik/yapı olarak `lib/prompts/` ile eşitlenmeli.  
+   - Kod = tek kaynak; doküman kodu yansıtmalı. 14–18'de yapılan prompt/validation değişiklikleri dokümana yansıtılmalı (version, blok açıklamaları, örnekler).
+
+2. **Bu analiz dokümanının güncellenmesi**  
+   - Bölüm 14 tablosunda ilgili maddelerin **Durum** sütunu "✅ Yapıldı" olarak güncellenmeli.  
+   - Üstteki "Uygulama Durumu" ve "Sıradaki adım" metinleri, 14–18 tamamlandıktan sonraki sıraya göre güncellenmeli.  
+   - Gerekirse 14.1 (test zamanlaması) ve 14.2 (genel eşitleme) notları tamamlanan tarih ve kısa sonuçla güncellenmeli.
+
+3. **Proje yönetimi / diğer dokümanlar**  
+   - `.cursor/rules/project-manager.mdc`: "Prompt optimizasyon planı" altında Sıra 14–18 durumu ve sıradaki işler güncellenmeli.  
+   - `docs/roadmap/ILERLEME_TAKIBI.md` veya `docs/ROADMAP.md` içinde bu aksiyonlara referans varsa ilgili işler tamamlandı olarak işaretlenmeli.  
+   - `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`: 14–18'de eklenen/değişen direktifler (relighting, FOREGROUND kaynağı, stil profili vb.) varsa ilgili bölümler güncellenmeli.
+
+**Sıra:** Önce 14 → 15 → 16 → 18 uygulama ve (yukarıdaki tabloya göre) test; ardından bu genel eşitleme ve doküman güncellemesi yapılır.
