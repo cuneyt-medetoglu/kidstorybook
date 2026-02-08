@@ -75,6 +75,12 @@ export const PROMPT_CONFIG = {
     retryAttempts: 2,
   },
 
+  // [A9] Layout-safe master: karakter frame yüksekliğinin %min–%max’i (testte çok küçük kalırsa büyütmek için artır)
+  masterLayout: {
+    characterScaleMin: 25,
+    characterScaleMax: 30,
+  },
+
   // Cost optimization
   cost: {
     // Use cheaper models for drafts

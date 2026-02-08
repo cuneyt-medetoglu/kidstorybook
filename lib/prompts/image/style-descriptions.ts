@@ -77,6 +77,27 @@ export function get3DAnimationNotes(): string {
 }
 
 /**
+ * GLOBAL_ART_DIRECTION – kitap geneli tek blok (A7, PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md).
+ * Playground'da işe yaran "kısa tekrar + uzun sahne" yapısı; "stylized, NOT live-action photo" ile canlı çekim freni.
+ */
+const GLOBAL_ART_DIRECTION_CORE = [
+  'Deep focus with crisp environment detail, layered depth (foreground/midground/background).',
+  'Soft cinematic lighting, gentle bloom, subtle filmic vignette, rich but controlled color grading.',
+  'No text, no watermark, no UI.',
+  'Avoid: close-up portrait, headshot, centered composition, chibi big-head proportions, flat lighting, neon oversaturation.',
+  'Preserve identity/outfit from the provided reference images; do not redesign the character.',
+].join(' ')
+
+export function getGlobalArtDirection(illustrationStyle: string): string {
+  const normalized = illustrationStyle.toLowerCase().replace(/[-\s]/g, '_')
+  const is3D = normalized === '3d_animation' || normalized === '3d'
+  const styleLead = is3D
+    ? 'Cinematic 3D animated storybook illustration, like a high-quality animated film still (stylized, NOT live-action photo).'
+    : `Cinematic storybook illustration in ${illustrationStyle} style, like a high-quality illustrated film still (stylized, NOT live-action photo).`
+  return `${styleLead} ${GLOBAL_ART_DIRECTION_CORE}`
+}
+
+/**
  * CINEMATIC_PACK – tüm stiller için ortak sinematik kalite (GPT önerisi, 7 Şubat 2026)
  * Stil DNA'sını bozmadan "film tadı" ekler: lighting, color grade, environment depth.
  */

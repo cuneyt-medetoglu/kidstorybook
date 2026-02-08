@@ -17,6 +17,7 @@ import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
 import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
+import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -179,11 +180,14 @@ async function generateMasterCharacterIllustration(
   const outfitPart = storyClothing?.trim()
     ? `Character wearing exactly: ${storyClothing}. `
     : ''
+  // [A9] Layout-safe master: karakter küçük (config: masterLayout.characterScaleMin/Max), bol boşluk; PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.4
+  const layoutSafeDirectives = getLayoutSafeMasterDirectives()
   const masterPrompt = [
     '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]',
     `[STYLE] ${styleDirective} [/STYLE]`,
     '[EXPRESSION] Neutral or gentle facial expression, closed mouth or soft closed-mouth smile, calm and relaxed face. Not a big open-mouthed smile. [/EXPRESSION]',
     `Full body, standing, feet visible, neutral pose. Child from head to toe. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style (NOT photorealistic). Match reference photos for face and body.`,
+    layoutSafeDirectives,
   ].join(' ')
 
   const masterRequestRaw = {
@@ -1253,17 +1257,17 @@ export async function POST(request: NextRequest) {
         const journeyPhrase = locationList
           ? ` Evoke the full journey: ${locationList}. Key story moments and world of the story in one image.`
           : ' Key story moments and world of the story in one image.'
-        const base = customRequests && customRequests.trim()
-          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story: ${customRequests}.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
-          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+        // A2: customRequests only once (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+        const storyBlock = customRequests && customRequests.trim() ? `Story: ${customRequests}. ` : ''
+        const base = `A magical book cover for a children's story titled "${book.title}". ${storyBlock}In a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story.${journeyPhrase} The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
         coverSceneDescription = base
         if (locationList) {
           console.log('[Create Book] 📍 Story-based cover: locations', locationList)
         }
       } else {
-        coverSceneDescription = customRequests && customRequests.trim()
-          ? `A magical book cover for a children's story titled "${book.title}" (${customRequests}) in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story: ${customRequests}. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
-          : `A magical book cover for a children's story titled "${book.title}" in a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
+        // A2: customRequests only once (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+        const storyBlock = customRequests && customRequests.trim() ? `Story: ${customRequests}. ` : ''
+        coverSceneDescription = `A magical book cover for a children's story titled "${book.title}". ${storyBlock}In a ${themeKey} theme. The main character should be integrated into the scene with an inviting, whimsical background that captures the essence of the story. The composition should be eye-catching and suitable for a children's book cover, with space for title text at the top. Vibrant, warm colors with a sense of wonder and adventure.`
       }
 
       // From-example: örnek kapak görselinden sahne öğelerini (top, tavşan vb.) Vision ile alıp prompt'a ekle
@@ -1337,16 +1341,13 @@ export async function POST(request: NextRequest) {
         throw new Error('OPENAI_API_KEY is not configured')
       }
 
-      // NEW: Use all character master illustrations as reference (if available)
-      // Fallback to character photos if master generation failed
+      // A10: Reference image order = [0] character masters, [1..] entity masters (OpenAI: first image preserved best). PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
       const coverMasterUrls = Object.values(masterIllustrations).filter((url): url is string => Boolean(url))
-      
-      // NEW: Add entity masters to cover references (31 Ocak 2026)
       const entityMasterUrls = Object.values(entityMasterIllustrations).filter((url): url is string => Boolean(url))
-      const allCoverMasters = [...coverMasterUrls, ...entityMasterUrls] // Character masters + entity masters
-      
+      const allCoverMasters = [...coverMasterUrls, ...entityMasterUrls]
+
       const referenceImageUrls = allCoverMasters.length > 0
-        ? allCoverMasters  // TÜM karakterlerin + entity'lerin master'larını kullan (cover'da hepsi olmalı)
+        ? allCoverMasters
         : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
       
       let coverImageUrl: string | null = null
@@ -2019,11 +2020,11 @@ export async function POST(request: NextRequest) {
         const pageImageStartTime = Date.now()
         // FIX: pageCharacters already defined above (line 1411) - use existing variable (25 Ocak 2026)
         // Use characterIds directly from story generation (required field) - pageCharacters already defined
+        // A10: Order = [0] character masters, [1..] entity masters (first image preserved best). PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
         const pageMasterUrls = pageCharacters
           .map(charId => masterIllustrations[charId])
           .filter((url): url is string => Boolean(url))
-        
-        // NEW: Add entity masters for this page (31 Ocak 2026)
+
         const pageEntityIds: string[] = []
         if (storyData?.supportingEntities) {
           for (const entity of storyData.supportingEntities) {
@@ -2035,13 +2036,11 @@ export async function POST(request: NextRequest) {
         const pageEntityMasterUrls = pageEntityIds
           .map(entityId => entityMasterIllustrations[entityId])
           .filter((url): url is string => Boolean(url))
-        
-        // Combine character + entity masters
+
         const allPageMasters = [...pageMasterUrls, ...pageEntityMasterUrls]
-        
-        // Fallback to character photos if no master illustrations available for detected characters
+
         const referenceImageUrls = allPageMasters.length > 0
-          ? allPageMasters  // Character master'ları + Entity master'ları
+          ? allPageMasters
           : characters
               .filter(c => pageCharacters.includes(c.id))
               .map(c => c.reference_photo_url)

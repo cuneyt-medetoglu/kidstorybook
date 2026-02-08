@@ -252,6 +252,42 @@ console.log('Negative prompts version:', negativeVersion.version) // v1.1.0
 
 ---
 
+## Sıra 13 Sonrası – GPT Trace Takip Aksiyonları (8 Şubat 2026)
+
+**Kaynak:** Trace `kidstorybook-trace-2026-02-08T13-48-30.json` incelemesi + kod karşılaştırması. Detay ve güncel tablo: `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md` §14.
+
+| Sıra | Aksiyon | Not |
+|------|---------|-----|
+| 14 | Sayfa prompt’unda Türkçe metin (FOREGROUND) | characterAction için İngilizce (sceneContext/sceneDescription); page.text fallback kaldırılmalı veya en son. |
+| 15 | Çelişkili stil ifadeleri | Tek stil profili; "vibrant saturated" / "controlled saturation" ve "soft" / "high contrast dramatic" aynı prompt’ta olmamalı. |
+| 16 | Story JSON validation + kelime sayısı | REQUIRED alanlar (characterIds, suggestedOutfits, characterExpressions) validation/retry; sayfa metni word-count kontrolü. |
+| 17 | A12 (model) | input_fidelity: high zaten kullanılıyor. **gpt-image-1.5 kullanılmaya devam;** gpt-image-1’e geçilmez. |
+
+| 18 | Allow relighting | Prompt'a "reference = identity only; do NOT copy lighting/background; allow relighting." ekle. Magical tarzı sahneye özel ışık için; düşük risk. |
+
+**Madde 5 (Allow relighting):** Plana eklendi (Sıra 18). Açıklama aşağıda “Relighting nedir?”.  
+**Madde 7 (Prompt linter):** Planda yok (gerek yok). Açıklama aşağıda referans için duruyor.
+
+### Relighting nedir? (Madde 5 – Magicalchildrensbook tarzına yardım eder mi?)
+
+**“Allow relighting” ne işe yarar?** Referanstaki (master) ışığı ve havayı kopyalamayıp, **her sayfanın kendi sahnesine göre** ışık/atmosfer uygulanmasına izin vermek. Yani: Referans = sadece kimlik (yüz, saç, kıyafet). Işık ve renk tonu = sayfa prompt’undaki gibi (örn. golden hour, soft cinematic, gün batımı).
+
+**Magicalchildrensbook benzeri görsellerle ilişkisi:** Örnek görsellerde (kamp, orman, göl batımı) gördüğün gibi: sıcak, **kontrollü doygunluk**, yumuşak ışık, filmic ton – her sahnenin kendi ışığı var (gündüz orman, kamp ateşi, göl batımı). Master görsel ise genelde **nötr stüdyo ışığı** ile üretiliyor. “Allow relighting” dersek model, master’daki bu nötr ışığı her sayfaya taşımak zorunda kalmaz; sayfa prompt’undaki “soft cinematic”, “golden hour”, “warm” gibi ifadeler sayfaya özel ışık ve magical tarzı tonu getirebilir. **Yani evet – doğru renk/ışık kelimeleriyle birlikte kullanıldığında magicalchildrensbook benzeri, sahneye özel sıcak/filmic görseller üretmeye yardımcı olur.**
+
+**Tek başına yeterli mi?** Hayır. Renk/ton için ayrıca çelişkilerin temizlenmesi (Madde 15: “vibrant saturated” vs “controlled saturation”) ve istersen tek bir “FILMIC_WARM” stil profili gerekir. Relighting, bu tarzı **sayfa bazında** uygulayabilmemiz için gerekli talimatlardan biri.
+
+**Plana eklendi (Sıra 18):** Prompt’a “Use reference for face/hair/outfit only; do NOT copy lighting/background; allow relighting.” (Sıra 18 – Sıra 13 sonrası yapılacaklar listesinde).
+
+### Prompt linter nedir? (Madde 7 – basit açıklama)
+
+**En kısa hali:** Yazım denetimi gibi, ama **prompt metni** için. Aynı prompt’ta birbirine zıt talimatlar var mı diye bakar.
+
+**Örnek:** Prompt’ta hem “çok canlı, doygun renkler” hem “kontrollü, pastel doygunluk” yazıyorsa model hangisine uyacağını şaşırır; sonuç “ortası” bir şey olur. Linter bu tür çiftleri (örn. “vibrant saturated” + “controlled saturation”, “soft” + “dramatic shadows”) tespit edip “bu ikisi aynı anda olmasın” diye uyarır veya raporlar.
+
+**Pratikte ne yapılır?** İstersen küçük bir script: `generateFullPagePrompt` çıktısında bu kelime çiftlerini arar; çakışma varsa uyarı verir. İstersen sadece release öncesi manuel checklist: “Sayfa prompt’unda çelişen stil cümlesi var mı?” Şu an plana eklenmedi; ileride prompt’ları topluca gözden geçirirken “çelişen kelimeler var mı?” diye bakmak da yeterli olabilir.
+
+---
+
 ## İlgili Dosyalar
 
 - [`lib/prompts/image/v1.0.0/negative.ts`](lib/prompts/image/v1.0.0/negative.ts) - Anatomical + negative prompts

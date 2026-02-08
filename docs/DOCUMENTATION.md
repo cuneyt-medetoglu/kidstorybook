@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 7 Şubat 2026 (Commit öncesi: prompt v2.1.0/v1.2.0, GPT trace aksiyonları, analysis dokümanları.)
+**Son güncelleme:** 8 Şubat 2026 (Commit noktası: A5 öncesi – prompt plan güncel: A6 plandan çıkarıldı, Allow relighting Sıra 18 eklendi; sıradaki A5 shotPlan schema.)
 
 ---
 
@@ -201,7 +201,9 @@ docs/
 6. **analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md** - Create Your Own from Example: akış, characterIds eşleştirmesi, kapak Vision
 7. **analysis/DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md** - Debug kalite butonları (admin, trace export)
 8. **analysis/STORY_PROMPT_ACTION_PLAN.md** - Hikaye + görsel kalite aksiyon planı
-9. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
+9. **analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md** - Prompt uzunluk/tekrar analizi, öncelik tablosu (A1–A9 tamamlandı, A5/A12/Sıra 13 sonrası), kaynak: GPT trace + kod
+10. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+11. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

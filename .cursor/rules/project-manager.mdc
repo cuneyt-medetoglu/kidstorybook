@@ -38,6 +38,12 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Bakış açıları:** Kullanıcı geri bildirimi: şimdilik daha iyi.
 - **Bilinen konu:** Tekrarlayan arka planlar (yol, çiçekler, arkada ev) custom request olmadan da görülebilir; iyileştirme alanı (story/görsel çeşitlilik). Doküman: `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` (Bilinen konular bölümü).
 
+### Prompt optimizasyon planı (analiz – A5 öncesi commit noktası)
+- **Kaynak:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
+- **Durum:** A1–A9 tamamlandı. A6 (Master quality) plandan çıkarıldı. Allow relighting Sıra 18 eklendi. Prompt linter plana alınmadı.
+- **Sıradaki:** A5 – shotPlan schema (LLM’den yapılandırılmış shotPlan objesi almak; büyük mimari değişiklik).
+- **Sonra:** A12 (karar: gpt-image-1.5 ile devam), Sıra 13 (Prompts doküman = kod eşitlemesi), Sıra 14–18 (Trace takip aksiyonları).
+
 ### PDF Generation (50 MB limit, sıkıştırma, timeout)
 - **Storage:** AWS S3 tek bucket, `pdfs/` prefix – dosya başına **50 MB** limit. PDF bu limiti aşarsa yükleme 413 hatası verir.
 - **Görsel sıkıştırma:** `lib/pdf/image-compress.ts` – kapak ve sayfa görselleri PDF öncesi indirilir, **sharp** ile yeniden boyutlandırılır (MAX_WIDTH_PX) ve JPEG (JPEG_QUALITY) olarak sıkıştırılır; data URL ile PDF'e verilir. Hedef boyut ~30–40 MB (ayar: MAX_WIDTH_PX, JPEG_QUALITY).

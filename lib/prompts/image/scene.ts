@@ -1,6 +1,6 @@
 import type { PromptVersion } from '../types'
-import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes, getCinematicPack } from './style-descriptions'
-import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative'
+import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes, getCinematicPack, getGlobalArtDirection } from './style-descriptions'
+import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStrategy } from './negative'
 
 /**
  * Scene Generation Prompts - Version 1.0.0
@@ -16,8 +16,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.11.0',
-  releaseDate: new Date('2026-02-03'),
+  version: '1.16.0',
+  releaseDate: new Date('2026-02-08'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -64,6 +64,11 @@ export const VERSION: PromptVersion = {
     'v1.9.0: SceneInput.expression (per-page from story); Facial expression in prompt when present. Clothing: "same outfit every page" when match_reference. (2 Şubat 2026)',
     'v1.10.0: getCinematicNaturalDirectives() – interior pages: cinematic storybook moment, characters engaged with scene not viewer, do NOT look at camera; natural composition. (2 Şubat 2026)',
     'v1.11.0: SceneInput.characterExpressions (per-character from story) – Replaces single expression field. buildCharacterExpressionsSection(): [CHARACTER_EXPRESSIONS] block with per-character visual descriptions; "Do not copy reference expression; match only face + outfit"; "No generic smile unless joy/laughter". Multi-character scenes: each character can have different expression. (3 Şubat 2026)',
+    'v1.12.0: [A4] Priority ladder at start of generateFullPagePrompt – conflict resolution order: 1) Scene composition & character scale, 2) Environment richness & depth, 3) Character action & expression, 4) Reference identity match. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v1.13.0: [A2] Cover prompt repetition removed – customRequests/scene once only. getEnvironmentDescription(theme, sceneDesc, useFullSceneDesc); generateLayeredComposition(..., midgroundOverride); generateScenePrompt(..., isCover); buildSceneContentSection(..., sceneInput, isCover) pushes COVER SCENE once. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v1.14.0: [A7] GLOBAL_ART_DIRECTION – getGlobalArtDirection(illustrationStyle) in style-descriptions; injected after PRIORITY in generateFullPagePrompt. Single global block (3D Animation / other styles), kısa tekrar + uzun sahne şablonu. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.1, 8 Şubat 2026)',
+    'v1.15.0: [A8] SHOT PLAN – buildShotPlanBlock(sceneInput, isCover, previousScenes): shotType, lens, cameraAngle, placement, characterScale 25-30%, timeOfDay, mood. [A1] Image prompt konsolidasyonu: SHOT PLAN + COMPOSITION RULES short + AVOID short; Composition&Depth, Camera&Perspective, CharacterEnvironmentRatio blokları kaldırıldı (içerik SHOT PLAN + tek satırlara taşındı). (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.2–9.3, 8 Şubat 2026)',
+    'v1.16.0: [A11] Parmak stratejisi – getDefaultHandStrategy() (negative.ts) buildAnatomicalAndSafetySection içinde: hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -106,7 +111,8 @@ export interface SceneDiversityAnalysis {
 export function generateScenePrompt(
   scene: SceneInput,
   characterPrompt: string,
-  illustrationStyle: string
+  illustrationStyle: string,
+  isCover: boolean = false
 ): string {
   const parts: string[] = []
 
@@ -125,8 +131,9 @@ export function generateScenePrompt(
   // 4. CHARACTER ACTION
   parts.push(`${scene.characterAction}`)
 
-  // 5. ENVIRONMENT - Detailed (cinematic level)
-  const environment = getEnvironmentDescription(scene.theme, scene.sceneDescription)
+  // 5. ENVIRONMENT - Detailed (cinematic level). Cover: use short env to avoid repeating long scene (A2).
+  const useFullSceneDesc = !isCover
+  const environment = getEnvironmentDescription(scene.theme, scene.sceneDescription, useFullSceneDesc)
   parts.push(`in ${environment}`)
 
   // 6. LIGHTING - Based on time of day
@@ -191,13 +198,16 @@ const ENVIRONMENT_TEMPLATES: Record<string, string[]> = {
   underwater: ['coral reef, colorful fish, clear water', 'underwater cave, bioluminescent plants'],
 }
 
-function getEnvironmentDescription(theme: string, sceneDesc: string): string {
+/**
+ * @param useFullSceneDesc When false (e.g. cover), do not embed full sceneDesc to avoid repetition; use theme template only. A2 PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
+ */
+function getEnvironmentDescription(theme: string, sceneDesc: string, useFullSceneDesc: boolean = true): string {
   const envParts: string[] = []
   
-  // If scene description provided, use it as base
-  if (sceneDesc && sceneDesc.length > 50) {
+  // If scene description provided and allowed, use it as base
+  if (useFullSceneDesc && sceneDesc && sceneDesc.length > 50) {
     envParts.push(sceneDesc)
-  } else {
+  } else if (!useFullSceneDesc || !sceneDesc || sceneDesc.length <= 50) {
     // Otherwise use simplified template
     const normalizedTheme = theme.toLowerCase().replace(/[-&_\s]/g, '-')
     const templates = ENVIRONMENT_TEMPLATES[normalizedTheme] || ENVIRONMENT_TEMPLATES['adventure']
@@ -805,10 +815,14 @@ export function getCharacterEnvironmentRatio(): string {
  * Generates layered composition instructions (ENHANCED: 25 Ocak 2026)
  * Ensures proper depth and visual hierarchy with depth of field and atmospheric perspective
  */
+/**
+ * @param midgroundOverride When provided (e.g. for cover), use this instead of full sceneDescription to avoid repetition. A2 PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
+ */
 export function generateLayeredComposition(
   sceneInput: SceneInput,
   characterAction: string,
-  environment: string
+  environment: string,
+  midgroundOverride?: string
 ): string {
   const layers: string[] = []
   
@@ -816,9 +830,10 @@ export function generateLayeredComposition(
   layers.push(`FOREGROUND: ${characterAction}, main character in sharp focus with detailed features visible`)
   layers.push('foreground elements may have slight blur (foreground bokeh) for depth')
   
-  // MIDGROUND - Story elements and context
-  if (sceneInput.sceneDescription && sceneInput.sceneDescription.length > 20) {
-    // Extract key elements from scene description
+  // MIDGROUND - Story elements and context. Cover: use short override so full description appears only once (A2).
+  if (midgroundOverride) {
+    layers.push(`MIDGROUND: ${midgroundOverride}, in sharp detail`)
+  } else if (sceneInput.sceneDescription && sceneInput.sceneDescription.length > 20) {
     layers.push(`MIDGROUND: ${sceneInput.sceneDescription}, in sharp detail`)
   } else {
     layers.push(`MIDGROUND: story elements and contextual objects related to the scene, in sharp detail`)
@@ -981,11 +996,12 @@ function buildAnatomicalAndSafetySection(ageGroup: string): string[] {
   const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
   parts.push(anatomicalDirectives)
   
-  // Safe hand poses
+  // [A11] Parmak stratejisi – varsayılan: el vurgulama (hands at sides, no gestures)
+  parts.push(getDefaultHandStrategy())
+  
+  // Safe hand poses (backup: simple wave, behind back)
   const safeHandPoses = getSafeHandPoses()
-  parts.push('[SAFE_POSES]')
   parts.push('Preferred hand poses: ' + safeHandPoses.join(', '))
-  parts.push('[/SAFE_POSES]')
   parts.push('') // Empty line for separation
   
   return parts
@@ -1137,16 +1153,22 @@ function buildPoseVariationSection(pageNumber: number, totalPages: number): stri
  * Build scene content section
  * v1.7.0: Extracted from generateFullPagePrompt for modularity
  * v1.8.0: Pose variation (Faz 2.3) appended
+ * A2: For cover, full scene description appears only here (once); layeredComp/scenePrompt use short text.
  */
 function buildSceneContentSection(
   scenePrompt: string,
   layeredComp: string,
   ageRules: string[],
   pageNumber: number,
-  totalPages: number
+  totalPages: number,
+  sceneInput?: SceneInput,
+  isCover?: boolean
 ): string[] {
   const parts: string[] = []
   
+  if (isCover && sceneInput?.sceneDescription) {
+    parts.push(`COVER SCENE: ${sceneInput.sceneDescription}`)
+  }
   parts.push(layeredComp)
   parts.push(scenePrompt)
   parts.push(...buildPoseVariationSection(pageNumber, totalPages))
@@ -1251,6 +1273,58 @@ function buildFinalDirectives(): string[] {
 }
 
 // ============================================================================
+// [A8] SHOT PLAN – sayfa başına kısa sinematik blok (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.2)
+// ============================================================================
+
+/** Short placement label for SHOT PLAN (left third / right third / lower third / off-center). */
+function getShotPlanPlacementLabel(pageNumber: number, previousScenes?: SceneDiversityAnalysis[]): string {
+  const placements = ['left third', 'right third', 'lower third', 'left with leading lines', 'right balanced', 'off-center']
+  const lastComp = previousScenes?.[previousScenes.length - 1]?.composition
+  const index = lastComp && lastComp !== 'unknown'
+    ? (pageNumber - 1) % Math.max(1, placements.length - 1)
+    : (pageNumber - 1) % placements.length
+  return placements[index] ?? placements[0]
+}
+
+/**
+ * Build SHOT PLAN block: shotType, lens, cameraAngle, characterScale, placement, timeOfDay, mood.
+ * A8: Sinematik dilin deterministik ve kısa kalması; mevcut sceneInput'tan koddan türetilir.
+ */
+function buildShotPlanBlock(
+  sceneInput: SceneInput,
+  isCover: boolean,
+  previousScenes?: SceneDiversityAnalysis[]
+): string {
+  const shotType = isCover
+    ? 'wide establishing'
+    : sceneInput.focusPoint === 'environment'
+      ? 'wide establishing'
+      : 'wide shot'
+  const lens = sceneInput.focusPoint === 'environment' ? '24-28mm' : '35mm'
+  const cameraAngle = getCameraAngleDirectives(sceneInput.pageNumber, previousScenes)
+  const placement = getShotPlanPlacementLabel(sceneInput.pageNumber, previousScenes)
+  const timeOfDay = sceneInput.timeOfDay ?? 'day'
+  const mood = sceneInput.mood || 'wonder'
+  return `SHOT PLAN: ${shotType}. ${lens} lens look. Camera: ${cameraAngle}. Characters are SMALL (25-30% of frame height). Placement: ${placement}. Not centered. Time: ${timeOfDay}. Mood: ${mood}.`
+}
+
+// ============================================================================
+// [A1] COMPOSITION RULES – tek kısa satır (şablon 9.3; tekrarları kaldırır)
+// ============================================================================
+
+function buildCompositionRulesShort(): string {
+  return 'COMPOSITION RULES: Environment dominates (65-75%). Strong leading lines, rule of thirds, no zoom-in.'
+}
+
+// ============================================================================
+// [A1] AVOID – tek satır (buildFinalDirectives + ana negatifler)
+// ============================================================================
+
+function buildAvoidShort(): string {
+  return 'AVOID: character filling the frame, close-up portrait framing, extra limbs, messy anatomy, blurry background, neon saturation, text or watermark.'
+}
+
+// ============================================================================
 // Full Page Image Prompt (ENHANCED: 15 Ocak 2026)
 // ============================================================================
 
@@ -1267,13 +1341,14 @@ export function generateFullPagePrompt(
   characterListForExpressions?: Array<{ id: string; name: string }> // v1.11.0: For [CHARACTER_EXPRESSIONS] labels (char ID → name)
 ): string {
   // Build scene prompt (hybrid: cinematic + descriptive)
-  const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle)
+  const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle, isCover)
 
   // Get environment for layered composition
-  const environment = getEnvironmentDescription(sceneInput.theme, sceneInput.sceneDescription)
+  const environment = getEnvironmentDescription(sceneInput.theme, sceneInput.sceneDescription, !isCover)
 
   // Build layered composition (FOREGROUND/MIDGROUND/BACKGROUND)
-  const layeredComp = generateLayeredComposition(sceneInput, sceneInput.characterAction, environment)
+  const midgroundOverride = isCover ? 'Book cover: key story moments and theme in one image' : undefined
+  const layeredComp = generateLayeredComposition(sceneInput, sceneInput.characterAction, environment, midgroundOverride)
 
   // Add age-appropriate rules
   const ageRules = getAgeAppropriateSceneRules(ageGroup)
@@ -1281,13 +1356,21 @@ export function generateFullPagePrompt(
   // Start building prompt parts - v1.7.0: Section builders; v1.8.0: Scene-First (Faz 2.1)
   const promptParts: string[] = []
 
-  // 0. [NEW v1.8.0] Scene Establishment (Scene-First: sahne önce kurulur)
+  // 0. [A4] Priority ladder – conflict resolution (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)
+  promptParts.push('PRIORITY: If any conflict, follow this order: 1) Scene composition & character scale, 2) Environment richness & depth, 3) Character action & expression, 4) Reference identity match.')
+
+  // 0.4. [A7] GLOBAL_ART_DIRECTION – kitap geneli tek blok (kısa tekrar + uzun sahne şablonu)
+  promptParts.push(getGlobalArtDirection(illustrationStyle))
+
+  // 0.45. [A8] SHOT PLAN – sayfa başına kısa sinematik blok (shotType, lens, camera, placement, time, mood)
+  promptParts.push(buildShotPlanBlock(sceneInput, isCover, previousScenes))
+
+  // 0.5. [NEW v1.8.0] Scene Establishment (Scene-First: sahne önce kurulur)
   if (!isCover) {
     promptParts.push(...buildSceneEstablishmentSection(environment))
   }
 
   // 0.5. [Faz 1] Reference = identity only; pose & expression from story (v1.11.0)
-  // GPT sinematik kalite: Identity match does NOT imply close-up; keep wide framing (7 Şubat 2026)
   const useMatchReference = sceneInput.clothing === 'match_reference'
   if (useMatchReference) {
     promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing. Identity match does NOT imply close-up. Keep the wide framing.')
@@ -1298,38 +1381,35 @@ export function generateFullPagePrompt(
   // 1. Anatomical & Safety Section
   promptParts.push(...buildAnatomicalAndSafetySection(ageGroup))
 
-  // 2. Composition & Depth Section (v1.8.0: enhanced atmospheric depth)
-  promptParts.push(...buildCompositionAndDepthSection(sceneInput.pageNumber, sceneInput.focusPoint))
+  // 2–4. [A1] Composition & Depth, Camera & Perspective, Character-Environment Ratio kaldırıldı (SHOT PLAN + COMPOSITION RULES short)
 
-  // 3. Lighting & Atmosphere Section (v1.8.0: golden hour boost)
+  // 5. Lighting & Atmosphere (LIGHTING & COLOR)
   promptParts.push(...buildLightingAndAtmosphereSection(sceneInput.timeOfDay, sceneInput.mood))
 
-  // 4. Camera & Perspective Section (Faz 3.4: isCover for composition – character NOT centered on interior)
-  promptParts.push(...buildCameraAndPerspectiveSection(sceneInput.pageNumber, sceneInput.focusPoint, previousScenes))
+  // 5.5. [A1] COMPOSITION RULES – tek kısa satır (şablon 9.3)
+  promptParts.push(buildCompositionRulesShort())
 
-  // 5. Character-Environment Ratio Section
-  promptParts.push(...buildCharacterEnvironmentRatioSection())
-
-  // 6. Style Section
+  // 6. Style Section (kısa)
   promptParts.push(...buildStyleSection(illustrationStyle))
 
-  // 6.5. CINEMATIC_PACK – tüm stiller için ortak sinematik kalite (GPT 7 Şubat 2026)
+  // 6.5. CINEMATIC_PACK
   promptParts.push(getCinematicPack())
 
-  // 7. [NEW v1.8.0] Character Integration (karakter sahneye entegre, yapıştırılmış değil)
-  // 7.5. Cinematic & natural (interior only): characters engaged with scene, NOT looking at camera
+  // 7. Character Integration (interior only)
   if (!isCover) {
     promptParts.push(...buildCharacterIntegrationSection())
     promptParts.push(getCinematicNaturalDirectives())
   }
 
-  // 8. Scene Content Section (v1.8.0: pose variation per page)
+  // 8. [A1] SCENE: Scene Content (layeredComp, scenePrompt, pose, ageRules)
   promptParts.push(...buildSceneContentSection(
     scenePrompt,
     layeredComp,
     ageRules,
     sceneInput.pageNumber,
-    totalPages
+    totalPages,
+    sceneInput,
+    isCover
   ))
 
   // 8.5. Per-character expressions from story (v1.9.0 – Feb 2026)
@@ -1358,8 +1438,8 @@ export function generateFullPagePrompt(
   // 12. Clothing Section
   promptParts.push(...buildClothingSection(sceneInput.clothing, sceneInput.theme, isCover, useCoverReference))
 
-  // 13. Final Directives Section
-  promptParts.push(...buildFinalDirectives())
+  // 13. [A1] AVOID – tek satır (final directives + ana negatifler)
+  promptParts.push(buildAvoidShort())
   
   // Combine everything
   const fullPrompt = promptParts.join(', ')

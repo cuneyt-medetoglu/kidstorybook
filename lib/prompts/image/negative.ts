@@ -8,8 +8,8 @@ import type { PromptVersion } from '../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.2.0',
-  releaseDate: new Date('2026-02-07'),
+  version: '1.3.0',
+  releaseDate: new Date('2026-02-08'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -29,6 +29,7 @@ export const VERSION: PromptVersion = {
     'v1.0.5: getSafeHandPoses() eklendi - güvenli el pozisyonları listesi (18 Ocak 2026)',
     'v1.1.0: Prompt optimization - anatomical directives ultra-simplified (500→120 chars), safe poses minimized (150→40 chars), ANATOMICAL_NEGATIVE reduced to 3 items (18 Ocak 2026)',
     'v1.2.0: El/parmak – getAnatomicalCorrectnessDirectives: five distinct fingers, well-formed hands, properly proportioned. ANATOMICAL_NEGATIVE: extra fingers, missing fingers, fused fingers (7 Şubat 2026)',
+    'v1.3.0: [A11] Parmak stratejisi – getDefaultHandStrategy(): hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects. getHandDirectivesWhenVisible(): five fingers + avoid (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -386,6 +387,26 @@ export function getSafeHandPoses(): string[] {
   return ['hands at sides', 'simple wave', 'behind back']
 }
 
+// ============================================================================
+// [A11] Parmak stratejisi (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)
+// ============================================================================
+
+/**
+ * Default hand strategy: de-emphasize hands to reduce finger errors.
+ * "Hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects."
+ */
+export function getDefaultHandStrategy(): string {
+  return 'Hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects.'
+}
+
+/**
+ * When hands must be visible in scene: explicit five-finger + avoid list.
+ * Use only when story/scene requires hands visible (e.g. waving, holding object).
+ */
+export function getHandDirectivesWhenVisible(): string {
+  return 'Exactly five fingers per hand, visible gaps, natural joints, no extra digits, no fused fingers. Avoid: extra fingers, six fingers, malformed hands.'
+}
+
 export function getContentSafetyFilter(): string[] {
   return [
     'violence', 'scary', 'frightening', 'horror',
@@ -409,5 +430,7 @@ export default {
   getContentSafetyFilter,
   getAnatomicalCorrectnessDirectives,
   getSafeHandPoses,
+  getDefaultHandStrategy,
+  getHandDirectivesWhenVisible,
 }
 

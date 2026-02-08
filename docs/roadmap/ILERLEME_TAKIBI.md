@@ -20,9 +20,9 @@
 
 ---
 
-**Son Güncelleme:** 27 Ocak 2026  
+**Son Güncelleme:** 8 Şubat 2026  
 **Güncelleyen:** @project-manager agent  
-**Son Eklenen:** Step 6 Pay Gizleme + Üyesiz Ücretsiz Kapak (Email + IP) - 27 Ocak 2026
+**Son Eklenen:** Prompt plan güncellemesi (A6 çıkarıldı, Allow relighting eklendi) – A5 öncesi commit noktası
 
 **Not:** 
 - Faz 1 ve Faz 2 tamamlandı ✅ (15 Ocak 2026)
@@ -42,6 +42,14 @@
 - 🎉 **FAZ 3 TAMAMLANDI (%96 - MVP için %100):** MVP için gerekli tüm backend ve AI entegrasyonları tamamlandı ✅
 - 🎯 **Sıradaki:** Faz 4 - E-ticaret ve Ödeme (Checkout sayfası, ödeme entegrasyonu)
 - ✅ **Faz 4 İlerleme:** Pricing sayfası, Sepet sistemi ve My Library hardcopy özellikleri tamamlandı (25 Ocak 2026)
+
+**Son Yapılanlar (8 Şubat 2026):**
+- ✅ **Prompt optimizasyon planı güncellendi (A5 öncesi commit noktası):**
+  - **A6 (Master quality low/medium/high)** plandan çıkarıldı; konu prompt ile ilgili değil (API parametresi).
+  - **Allow relighting** Sıra 18 olarak plana eklendi (sayfa prompt’una "reference = identity only; allow relighting" ekleme).
+  - **Prompt linter (Madde 7)** plana alınmadı (gerek yok); açıklama rehberde referans için duruyor.
+  - **Sıradaki iş:** A5 – shotPlan schema (LLM’den yapılandırılmış shotPlan objesi almak).
+  - Kaynak: `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
 
 **Son Yapılanlar (27 Ocak 2026):**
 - ✅ **Step 6: Pay & Create My Book sadece üyeli:**

@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.1.0',
+  version: '2.2.0',
   releaseDate: new Date('2026-02-07'),
   status: 'active',
   changelog: [
@@ -47,6 +47,7 @@ export const VERSION: PromptVersion = {
     'v1.9.0: characterExpressions (per-character per-page) – Replaces single "expression" field. Story output now has characterExpressions object (char ID → visual facial description: eyes, brows, mouth). ILLUSTRATION section: detailed expression guidelines (sad/worried/curious/angry/focused/surprised/happy/calm), visual betimleme (not emotion words), multi-character scene support (each character can have different expression). OUTPUT FORMAT + CRITICAL REMINDERS updated. (3 Şubat 2026)',
     'v2.0.0: STORY_PROMPT_ACTION_PLAN – Cover netliği (cover ayrı, pages = interior only). CHARACTER MAPPING + CHARACTER_ID_MAP (liste + map, gerçek UUID). Yaş/kelime: getWordCountRange (toddler 10-25, preschool 25-45, vb.), getSentenceLength doğal kurallar. DO NOT DESCRIBE iki maddeli: (a) text = görsel yok, (b) imagePrompt = appearance yasak, ışık/kompozisyon serbest. OUTPUT FORMAT suggestedOutfits placeholder düzeltmesi. (7 Şubat 2026)',
     'v2.1.0: GPT trace aksiyonları – VISUAL DIVERSITY: Do NOT repeat same pose/action on consecutive pages; each page distinctly different action/pose. Word count: getWordCountRange artırıldı (toddler 30-45 … pre-teen 130-180), getWordCountMin export; CRITICAL: Each page text at least X words. generate-story: kelime sayımı + kısa sayfa repair pass. (7 Şubat 2026)',
+    'v2.2.0: [A3] VERIFICATION CHECKLIST – Tüm verify/check maddeleri tek blokta. LANGUAGE: "Before returning JSON verify..." kaldırıldı. OUTPUT FORMAT: Tekrarlayan "characterIds/suggestedOutfits/characterExpressions REQUIRED" satırları kısaltıldı, "see # VERIFICATION CHECKLIST" referansı. buildCriticalRemindersSection → buildVerificationChecklistSection. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -179,8 +180,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n- Use the exact character IDs from the mapping above`
     characterDesc += `\n- Example: If page 2 features both ${characterName} and ${characters[1].name || characters[1].type.displayName}, set "characterIds": ["${characters[0].id}", "${characters[1].id}"]`
     characterDesc += `\n- **CRITICAL:** ALL ${characters.length} characters must appear in the story - check each page's characterIds to ensure ALL characters are included across all pages`
-    characterDesc += `\n- **VERIFICATION:** Before returning JSON, verify that ALL character IDs (${characters.map(c => c.id).join(', ')}) appear in at least one page's characterIds array`
-    characterDesc += `\n- **DO NOT** exclude any character - ALL ${characters.length} characters must be used in the story`
+    characterDesc += `\n- **DO NOT** exclude any character - ALL ${characters.length} characters must be used in the story (see # VERIFICATION CHECKLIST for required fields).`
   } else if (characters && characters.length === 1) {
     // Single character - liste + CHARACTER_ID_MAP (aksiyon planı 1.2)
     const c = characters[0]
@@ -205,7 +205,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     buildSafetySection(ageGroup),
     buildIllustrationSection(illustrationStyle, characterName, characters),
     buildOutputFormatSection(ageGroup, pageCount ?? 12, illustrationStyle, theme, themeConfig, characters || [], characterName),
-    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount ?? 12, language),
+    buildVerificationChecklistSection(ageGroup, characterName, themeConfig, pageCount ?? 12, language),
     `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
   ]
   
@@ -664,8 +664,7 @@ function buildLanguageSection(language: string): string {
   const langName = getLanguageName(language)
   return `# LANGUAGE
 - **Page "text" only:** Write the story narrative (the "text" field for each page) in ${langName} only. This is what appears in the book. Do not use words from other languages in "text".
-- **imagePrompt, sceneDescription, sceneContext:** Always in English only. These fields are used for image generation APIs and must be in English.
-Before returning JSON: verify every word in every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.`
+- **imagePrompt, sceneDescription, sceneContext:** Always in English only. These fields are used for image generation APIs and must be in English.`
 }
 
 function buildAgeAppropriateSection(ageGroup: string): string {
@@ -793,21 +792,25 @@ Return a valid JSON object:
   "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"<uuid-from-CHARACTER_ID_MAP>": "one line English outfit"'},
   "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
 }
-Pages array: EXACTLY ${getPageCount(ageGroup, pageCount)} items. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING). suggestedOutfits REQUIRED: object with one key per character ID from CHARACTER MAPPING, value = one line English outfit for that character (used for master illustration).
-characterExpressions REQUIRED per page: object with one key per character ID appearing on that page (from characterIds array). Value = short English visual description of that character's facial expression for THIS page (describe eyes, eyebrows, mouth specifically; e.g. 'eyes wide with surprise, eyebrows raised, mouth open' NOT just 'surprised'). Each character can have a different expression on the same page.`
+Required fields and checks: see # VERIFICATION CHECKLIST below.`
 }
 
-function buildCriticalRemindersSection(
+/** A3: Single verification block – no duplicate verify/check across LANGUAGE, OUTPUT FORMAT, CRITICAL REMINDERS. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md */
+function buildVerificationChecklistSection(
   ageGroup: string,
   characterName: string,
   themeConfig: ReturnType<typeof getThemeConfig>,
   pageCount: number,
   language: string
 ): string {
-  return `# CRITICAL REMINDERS
-- Return EXACTLY ${getPageCount(ageGroup, pageCount)} pages. characterIds REQUIRED per page.
-- ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.
-- Before returning: verify page "text" is in ${getLanguageName(language)}; verify imagePrompt, sceneDescription, sceneContext are in English; verify characterExpressions has one entry per character ID in that page's characterIds array (each value = visual facial description in English); verify suggestedOutfits has one entry per character ID from CHARACTER MAPPING (each value = one line English outfit, used for master).`
+  const n = getPageCount(ageGroup, pageCount)
+  const langName = getLanguageName(language)
+  return `# VERIFICATION CHECKLIST (before returning JSON)
+- Return EXACTLY ${n} pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
+- suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
+- characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
+- Verify every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.
+- ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.`
 }
 
 // ============================================================================
