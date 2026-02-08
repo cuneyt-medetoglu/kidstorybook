@@ -23,8 +23,13 @@
 | **A5** – shotPlan schema (LLM) | ✅ Yapıldı | 8 Şubat 2026 | Story: shotPlan OUTPUT FORMAT + VERIFICATION’da zorunlu. types: ShotPlan, StoryPage.shotPlan. scene.ts: buildShotPlanBlock(sceneInput.shotPlan); API shotPlan geçiriyor; yoksa fallback. |
 | **A12** – input_fidelity | Karar verildi | — | Bkz. Bölüm 14, Madde 17: Master’da zaten high; gpt-image-1’e geçilmez. |
 | **Prompts doküman = kod eşitlemesi** | ✅ Yapıldı | 8 Şubat 2026 | docs/prompts/STORY_PROMPT_TEMPLATE.md (2.3.0, shotPlan zorunlu, VERIFICATION CHECKLIST) ve IMAGE_PROMPT_TEMPLATE.md (1.17.0, PRIORITY/SHOT PLAN yapısı) kodla eşitlendi. |
+| **Sıra 14** – Kapak ortamı hikayeden | ✅ Yapıldı | 8 Şubat 2026 | Plan A: coverSetting (story), route coverEnvironment = storyData.coverSetting; scene.ts getEnvironmentDescription(..., coverEnvironment); extractSceneElements priorityLocationKeywords (glacier, ice, space, ocean vb.). COVER_PATH_FLOWERS_ANALYSIS.md. |
+| **Sıra 15** – Sayfa FOREGROUND İngilizce | ✅ Yapıldı | 8 Şubat 2026 | route.ts: characterActionRaw = sceneContext → sceneDescription → imagePrompt → page.text; FOREGROUND’a Türkçe metin gitmiyor. |
+| **Sıra 16** – Çelişkili stil ifadeleri | ✅ Yapıldı | 8 Şubat 2026 | Tek stil profili (filmic, controlled saturation). style-descriptions + scene.ts: vibrant/high contrast → rich, clear, moderate; dramatic → clear/defined. v1.19.0. |
+| **Sıra 17** – Story JSON validation + kelime sayısı | ✅ Yapıldı | 8 Şubat 2026 | route.ts: suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. getWordCountMin ile kelime sayısı kontrolü; kısa sayfalar için LLM repair pass. |
+| **Sıra 19** – Allow relighting | ✅ Yapıldı | 8 Şubat 2026 | scene.ts: Interior sayfa prompt'una relighting cümlesi (reference face/hair/outfit only; allow relighting). v1.20.0. |
 
-**Sıradaki adım:** Sıra 13 tamamlandı. Sıradaki: Bölüm 14 (Trace takip aksiyonları 14–18).
+**Sıradaki adım:** Sıra 13–19 tamamlandı. Bölüm 14 Trace aksiyonları tamamlandı; sonrasında 14.2 genel eşitleme ve doküman güncellemesi yapılabilir.
 
 ---
 
@@ -394,7 +399,7 @@ Aşağıdakiler mevcut A1–A6’ya ek; öncelik sırası güncel tabloda.
 
 ## 11. Güncel Öncelik ve Sıralama
 
-**Tamamlanan:** A4, A2, A3, A10, A7, A1, A8, A11, A9, A5, **Sıra 13** (8 Şubat 2026). **Sıradaki:** Bölüm 14 (Trace aksiyonları 14–18).
+**Tamamlanan:** A4, A2, A3, A10, A7, A1, A8, A11, A9, A5, **Sıra 13**, **Sıra 14**, **Sıra 15**, **Sıra 16**, **Sıra 17**, **Sıra 19** (8 Şubat 2026). Bölüm 14 Trace aksiyonları tamamlandı.
 
 | Sıra | Aksiyon | Etki | Risk | Durum |
 |------|---------|------|------|--------|
@@ -447,49 +452,54 @@ Trace incelemesi (kidstorybook-trace-2026-02-08T13-48-30.json) ve kod karşıla�
 
 | Sıra | Aksiyon | Etki | Risk | Durum |
 |------|---------|------|------|--------|
-| 14 | **Sayfa prompt’unda Türkçe metin (FOREGROUND)** | characterAction = page.text (Türkçe) → FOREGROUND’a gidiyor; stil/token bozuyor. **Fix:** characterAction için İngilizce kaynak (sceneContext veya sceneDescription); page.text fallback olmamalı veya en son. | Düşük | Bekliyor |
-| 15 | **Çelişkili stil ifadeleri** | Aynı prompt’ta "vibrant saturated" + "controlled saturation", "soft cinematic" + "high contrast dramatic". Tek stil profili (örn. FILMIC_WARM_3D); çelişen cümleler kaldırılmalı (style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumlu hale getirilmeli). | Orta | Bekliyor |
-| 16 | **Story JSON validation + kelime sayısı** | characterIds, suggestedOutfits, characterExpressions REQUIRED; eksikse validation/retry. Sayfa metni kelime sayısı (getWordCountRange) kontrolü ve gerekirse kısa repair. | Orta | Bekliyor |
-| 17 | **A12 notu (model)** | **quality** master/cover/sayfa hep **low**. **input_fidelity** (referans sadakati) **high** kullanılıyor (route.ts). gpt-image-1'e geçilmez; pipeline gpt-image-1.5 ile devam eder. | — | Karar verildi |
-| 18 | **Allow relighting** | Sayfa prompt’una "Use reference for face/hair/outfit only; do NOT copy lighting/background; allow relighting." (veya eşdeğeri) ekle. Magicalchildrensbook tarzı sahneye özel ışık/ton için; geliştirmesi düşük risk. | Düşük | Bekliyor |
+| 14 | **Kapak ortamı hikayeden (Cover environment from story)** | Kapak BACKGROUND şu an tema şablonundan (adventure = forest, wildflowers); hikaye buz/uzay/deniz olsa bile orman+çiçek çıkıyor. **Fix:** Kapak için environment'ı hikayeden türet (coverEnvironment veya sceneDesc özeti); locationKeywords'e glacier/ice/space/ocean ekle; tema şablonu sadece fallback. Detay: `docs/analysis/COVER_PATH_FLOWERS_ANALYSIS.md`. | Yüksek (UX) | ✅ Yapıldı (8 Şubat 2026) |
+| 15 | **Sayfa prompt’unda Türkçe metin (FOREGROUND)** | characterAction = page.text (Türkçe) → FOREGROUND’a gidiyor; stil/token bozuyor. **Fix:** characterAction için İngilizce kaynak (sceneContext veya sceneDescription); page.text fallback olmamalı veya en son. | Düşük | ✅ Yapıldı (8 Şubat 2026) |
+| 16 | **Çelişkili stil ifadeleri** | Aynı prompt’ta "vibrant saturated" + "controlled saturation", "soft cinematic" + "high contrast dramatic". Tek stil profili (örn. FILMIC_WARM_3D); çelişen cümleler kaldırılmalı (style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumlu hale getirilmeli). | Orta | ✅ Yapıldı (8 Şubat 2026) |
+| 17 | **Story JSON validation + kelime sayısı** | characterIds, suggestedOutfits, characterExpressions REQUIRED; eksikse validation/retry. Sayfa metni kelime sayısı (getWordCountRange) kontrolü ve gerekirse kısa repair. | Orta | ✅ Yapıldı (8 Şubat 2026) |
+| 18 | **A12 notu (model)** | **quality** master/cover/sayfa hep **low**. **input_fidelity** (referans sadakati) **high** kullanılıyor (route.ts). gpt-image-1'e geçilmez; pipeline gpt-image-1.5 ile devam eder. | — | Karar verildi |
+| 19 | **Allow relighting** | Sayfa prompt’una "Use reference for face/hair/outfit only; do NOT copy lighting/background; allow relighting." (veya eşdeğeri) ekle. Magicalchildrensbook tarzı sahneye özel ışık/ton için; geliştirmesi düşük risk. | Düşük | ✅ Yapıldı (8 Şubat 2026) |
 
-**Madde 5 (Allow relighting):** Plana eklendi (Sıra 18). Açıklama: `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md` → “Relighting nedir?”.  
+**Madde 5 (Allow relighting):** Plana eklendi (Sıra 19). Açıklama: `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md` → “Relighting nedir?”.  
 **Madde 7 (Prompt linter):** Planda yok (gerek yok). Açıklama rehberde referans için duruyor.
+
+**Kapak tekrarı (orman yolu + çiçekler):** **Sıra 14** olarak planda; Trace aksiyonlarından (15–19) önce yapılacak. Kök neden ve düzeltme → `docs/analysis/COVER_PATH_FLOWERS_ANALYSIS.md`. **Plan A (ek çağrı yok):** Kapak ortamını Story API çıktısında `coverSetting` olarak LLM’e ürettirmek; maddeler A.1–A.8 → aynı doküman, Bölüm 7.
 
 ---
 
-### 14.1 Test zamanlaması (Sıra 14, 15, 16, 18)
+### 14.1 Test zamanlaması (Sıra 14, 15, 16, 17, 19)
 
 Hangi maddeden sonra test yapılması gerektiği:
 
 | Madde | Ne değişir | Test ne zaman | Ne yapılır |
 |-------|------------|----------------|------------|
-| **14** (Türkçe FOREGROUND) | Sayfa prompt'unda characterAction kaynağı (sceneContext/sceneDescription; page.text fallback kaldırılır veya en son). | **14 tamamlandıktan sonra** | Smoke: 1 kitap veya 2–3 sayfa üret; FOREGROUND'da Türkçe metin gidiyor mu kontrol et. Hata/timeout yok mu bak. |
-| **15** (Çelişkili stil) | style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumu; çelişen cümleler kaldırılır. | **15 tamamlandıktan sonra** | Orta test: 1 tam kitap; görsel stil tutarlı mı, aşırı doygunluk / çelişkili ışık ifadeleri kalmadı mı kontrol et. |
-| **16** (Story JSON validation) | Story API: validation/retry (characterIds, suggestedOutfits, characterExpressions); kelime sayısı kontrolü ve kısa repair. | **16 tamamlandıktan sonra** | Entegre test: 1 tam kitap (story + master + cover + sayfalar); validation tetikleniyor mu, repair çalışıyor mu, görsel pipeline bozulmadı mı kontrol et. |
-| **17** | — (Karar verildi, kod değişikliği yok.) | Test yok | — |
-| **18** (Allow relighting) | Sayfa prompt'una relighting cümlesi eklenir. | **18 tamamlandıktan sonra** | Smoke: 1 kitap veya birkaç sayfa; sahneye özel ışık/ton farkı gözlemlenebilir mi, kimlik bozulmadı mı kontrol et. |
+| **14** (Kapak ortamı hikayeden) | Kapak environment hikayeden; locationKeywords genişletme; tema şablonu fallback. | **14 tamamlandıktan sonra** | Smoke: Buz / orman (veya uzay) temalı birer kitap; kapak hikaye ortamına uyuyor mu kontrol et. |
+| **15** (Türkçe FOREGROUND) | Sayfa prompt'unda characterAction kaynağı (sceneContext/sceneDescription; page.text fallback kaldırılır veya en son). | **15 tamamlandıktan sonra** | Smoke: 1 kitap veya 2–3 sayfa üret; FOREGROUND'da Türkçe metin gidiyor mu kontrol et. Hata/timeout yok mu bak. |
+| **16** (Çelişkili stil) | style-descriptions, getCinematicPack, getEnhancedAtmosphericDepth uyumu; çelişen cümleler kaldırılır. | **16 tamamlandıktan sonra** | Orta test: 1 tam kitap; görsel stil tutarlı mı, aşırı doygunluk / çelişkili ışık ifadeleri kalmadı mı kontrol et. |
+| **17** (Story JSON validation) | Story API: validation/retry (characterIds, suggestedOutfits, characterExpressions); kelime sayısı kontrolü ve kısa repair. | **17 tamamlandıktan sonra** | Entegre test: 1 tam kitap (story + master + cover + sayfalar); validation tetikleniyor mu, repair çalışıyor mu, görsel pipeline bozulmadı mı kontrol et. |
+| **18** | — (A12 karar verildi, kod değişikliği yok.) | Test yok | — |
+| **19** (Allow relighting) | Sayfa prompt'una relighting cümlesi eklenir. | **19 tamamlandıktan sonra** | Smoke: 1 kitap veya birkaç sayfa; sahneye özel ışık/ton farkı gözlemlenebilir mi, kimlik bozulmadı mı kontrol et. |
 
-**Özet:** 14 ve 18 sonrası kısa smoke test yeterli; 15 ve 16 sonrası daha kapsamlı (tam kitap / entegre) test önerilir. 17 için test yok.
+**Özet:** 14, 15 ve 19 sonrası kısa smoke test yeterli; 16 ve 17 sonrası daha kapsamlı (tam kitap / entegre) test önerilir. 18 için test yok.
 
 ---
 
-### 14.2 Sıra 14–18 tamamlandıktan sonra: genel eşitleme ve doküman güncellemesi
+### 14.2 Sıra 14–19 tamamlandıktan sonra: genel eşitleme ve doküman güncellemesi
 
-Tüm Sıra 14–18 maddeleri (ve gerekiyorsa testler) bittikten sonra, **Sıra 13'teki gibi** genel eşitleme ve doküman güncellemesi yapılmalı:
+Tüm Sıra 14–19 maddeleri (ve gerekiyorsa testler) bittikten sonra, **Sıra 13'teki gibi** genel eşitleme ve doküman güncellemesi yapılmalı:
 
 1. **Prompts doküman = kod eşitlemesi (tekrar)**  
    - `docs/prompts/STORY_PROMPT_TEMPLATE.md` ve `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` içerik/yapı olarak `lib/prompts/` ile eşitlenmeli.  
-   - Kod = tek kaynak; doküman kodu yansıtmalı. 14–18'de yapılan prompt/validation değişiklikleri dokümana yansıtılmalı (version, blok açıklamaları, örnekler).
+   - Kod = tek kaynak; doküman kodu yansıtmalı. 14–19'da yapılan prompt/validation değişiklikleri dokümana yansıtılmalı (version, blok açıklamaları, örnekler).
 
 2. **Bu analiz dokümanının güncellenmesi**  
    - Bölüm 14 tablosunda ilgili maddelerin **Durum** sütunu "✅ Yapıldı" olarak güncellenmeli.  
-   - Üstteki "Uygulama Durumu" ve "Sıradaki adım" metinleri, 14–18 tamamlandıktan sonraki sıraya göre güncellenmeli.  
+   - Üstteki "Uygulama Durumu" ve "Sıradaki adım" metinleri, 14–19 tamamlandıktan sonraki sıraya göre güncellenmeli.  
    - Gerekirse 14.1 (test zamanlaması) ve 14.2 (genel eşitleme) notları tamamlanan tarih ve kısa sonuçla güncellenmeli.
 
 3. **Proje yönetimi / diğer dokümanlar**  
-   - `.cursor/rules/project-manager.mdc`: "Prompt optimizasyon planı" altında Sıra 14–18 durumu ve sıradaki işler güncellenmeli.  
+   - `.cursor/rules/project-manager.mdc`: "Prompt optimizasyon planı" altında Sıra 14–19 durumu ve sıradaki işler güncellenmeli.  
    - `docs/roadmap/ILERLEME_TAKIBI.md` veya `docs/ROADMAP.md` içinde bu aksiyonlara referans varsa ilgili işler tamamlandı olarak işaretlenmeli.  
-   - `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`: 14–18'de eklenen/değişen direktifler (relighting, FOREGROUND kaynağı, stil profili vb.) varsa ilgili bölümler güncellenmeli.
+   - `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`: 14–19'da eklenen/değişen direktifler (relighting, FOREGROUND kaynağı, stil profili vb.) varsa ilgili bölümler güncellenmeli.
 
-**Sıra:** Önce 14 → 15 → 16 → 18 uygulama ve (yukarıdaki tabloya göre) test; ardından bu genel eşitleme ve doküman güncellemesi yapılır.
+**Sıra:** Önce 14 (Kapak) → 15 → 16 → 17 → 19 uygulama ve (yukarıdaki tabloya göre) test; ardından bu genel eşitleme ve doküman güncellemesi yapılır.  
+**14.2 tamamlandı (8 Şubat 2026):** Prompts doküman (IMAGE 1.20.0, STORY 2.5.0), analiz dokümanı, project-manager.mdc, ILERLEME_TAKIBI, PROMPT_OPTIMIZATION_GUIDE güncellendi.

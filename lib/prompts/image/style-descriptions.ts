@@ -1,14 +1,15 @@
 /**
  * Illustration Style Descriptions
- * 
+ *
  * Provides detailed style descriptions for image generation prompts
  * Based on POC styleDescriptions structure
+ * v1.19.0 [Sıra 16]: 3d_animation/3d + get3DAnimationNotes: vibrant saturated → rich appealing (controlled saturation) for consistency with getCinematicPack/GLOBAL_ART_DIRECTION.
  */
 
 export const STYLE_DESCRIPTIONS: Record<string, string> = {
   // 3D Animation (Pixar Style) - Pixar-style 3D animation like Toy Story, Finding Nemo, Inside Out
-  '3d_animation': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), vibrant saturated colors, rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
-  '3d': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), vibrant saturated colors, rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
+  '3d_animation': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), rich appealing colors (controlled saturation), rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
+  '3d': '3D Animation (Pixar Style) - Pixar-style 3D animation (like Toy Story, Finding Nemo, Inside Out), cartoonish and stylized (NOT photorealistic), rich appealing colors (controlled saturation), rounded shapes, exaggerated features, soft shadows, realistic textures, children\'s animated movie aesthetic, Pixar animation quality',
   
   // Geometric - Flat design, minimalist, angular shapes, vector art style
   'geometric': 'Geometric - Flat design style, minimalist geometric shapes (circles, squares, triangles, polygons), angular sharp edges, flat colors with NO gradients, NO shadows, NO depth, vector art aesthetic, clean lines, modern stylized, grid-based alignment, geometric abstraction, low-poly style elements, illustration',
@@ -73,7 +74,7 @@ export function is3DAnimationStyle(styleKey: string): boolean {
  * Get 3D Animation special notes (if applicable)
  */
 export function get3DAnimationNotes(): string {
-  return 'CRITICAL FOR 3D ANIMATION (PIXAR STYLE): The illustration must be cartoonish and stylized like Pixar animated movies (Toy Story, Finding Nemo, Inside Out) - NOT photorealistic, NOT realistic photography. Use rounded shapes, exaggerated features, bright saturated colors, soft shadows, realistic textures, and a playful animated movie aesthetic. The character should look like a 3D animated cartoon character from a Pixar children\'s movie, not a real photograph or realistic 3D render. Pixar animation quality and visual style.'
+  return 'CRITICAL FOR 3D ANIMATION (PIXAR STYLE): The illustration must be cartoonish and stylized like Pixar animated movies (Toy Story, Finding Nemo, Inside Out) - NOT photorealistic, NOT realistic photography. Use rounded shapes, exaggerated features, rich appealing colors (controlled saturation), soft shadows, realistic textures, and a playful animated movie aesthetic. The character should look like a 3D animated cartoon character from a Pixar children\'s movie, not a real photograph or realistic 3D render. Pixar animation quality and visual style.'
 }
 
 /**

@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 8 Şubat 2026 (Commit noktası: A5 öncesi – prompt plan güncel: A6 plandan çıkarıldı, Allow relighting Sıra 18 eklendi; sıradaki A5 shotPlan schema.)
+**Son güncelleme:** 8 Şubat 2026 (Commit öncesi: Create Book E2E test 2 kitap başarılı; word count repair çalıştı. Detay: `docs/implementation/FAZ3_IMPLEMENTATION.md` → Son Create Book E2E Test.)
 
 ---
 

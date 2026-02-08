@@ -1,7 +1,8 @@
 # Image Generation Prompt Template
 
 **Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts`, `master.ts` (tek kaynak; doküman bu kodla eşleşir)  
-**Versiyon (scene):** 1.17.0 | **Versiyon (negative):** 1.3.0 (8 Şubat 2026 – el/parmak stratejisi, anatomik direktifler)
+**Versiyon (scene):** 1.20.0 | **Versiyon (negative):** 1.3.0 (8 Şubat 2026 – el/parmak stratejisi, anatomik direktifler)  
+**v1.18.0:** Kapak ortamı hikayeden (coverEnvironment). **v1.19.0:** Çelişkili stil ifadeleri – tek profil (filmic, controlled saturation). **v1.20.0:** Allow relighting – interior sayfa prompt'una "Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene."
 
 ---
 
@@ -70,19 +71,20 @@ Sayfa görseli prompt'u `lib/prompts/image/scene.ts` → `generateFullPagePrompt
 2. **GLOBAL_ART_DIRECTION** – Stil bazlı tek blok (getGlobalArtDirection; 3D Animation / diğer stiller). (A7)
 3. **SHOT PLAN** – buildShotPlanBlock: shotType, lens, cameraAngle, placement, characterScale 25–30%, timeOfDay, mood. Story'den gelen shotPlan kullanılır; yoksa kod fallback (bkz. PROMPT_OPTIMIZATION_GUIDE.md “shotPlan yoksa fallback”). (A8, A5)
 4. **CRITICAL** – Referans = sadece kimlik / veya “Character MUST wear EXACTLY: [clothing]”.
-5. **Anatomical & Safety** – buildAnatomicalAndSafetySection (el stratejisi, parmak, anatomi). (A11)
-6. **Lighting & Atmosphere** – buildLightingAndAtmosphereSection.
-7. **COMPOSITION RULES** – Tek kısa satır (environment 65–75%, rule of thirds, no zoom-in). (A1)
-8. **Style** – buildStyleSection.
-9. **CINEMATIC_PACK** – getCinematicPack().
-10. **Character Integration** + **Cinematic Natural** (interior only).
-11. **SCENE** – buildSceneContentSection (layered composition, scene prompt, pose, age rules).
-12. **CHARACTER_EXPRESSIONS** – buildCharacterExpressionsSection (story'den characterExpressions).
-13. **Special Page Directives** – buildSpecialPageDirectives.
-14. **Character Consistency** – buildCharacterConsistencySection.
-15. **Scene Diversity** – buildSceneDiversitySection.
-16. **Clothing** – buildClothingSection.
-17. **AVOID** – buildAvoidShort (tek satır negatifler). (A1)
+5. **Allow relighting** (interior only) – "Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene." (Sıra 19, v1.20.0)
+6. **Anatomical & Safety** – buildAnatomicalAndSafetySection (el stratejisi, parmak, anatomi). (A11)
+7. **Lighting & Atmosphere** – buildLightingAndAtmosphereSection.
+8. **COMPOSITION RULES** – Tek kısa satır (environment 65–75%, rule of thirds, no zoom-in). (A1)
+9. **Style** – buildStyleSection.
+10. **CINEMATIC_PACK** – getCinematicPack().
+11. **Character Integration** + **Cinematic Natural** (interior only).
+12. **SCENE** – buildSceneContentSection (layered composition, scene prompt, pose, age rules).
+13. **CHARACTER_EXPRESSIONS** – buildCharacterExpressionsSection (story'den characterExpressions).
+14. **Special Page Directives** – buildSpecialPageDirectives.
+15. **Character Consistency** – buildCharacterConsistencySection.
+16. **Scene Diversity** – buildSceneDiversitySection.
+17. **Clothing** – buildClothingSection.
+18. **AVOID** – buildAvoidShort (tek satır negatifler). (A1)
 
 Master, kapak ve entity prompt'ları aynı modülde veya `character.ts` / `master.ts` içinde üretilir. Karakter tutarlılığı (hair, eyes, skin, facial features), çoklu karakter referans eşlemesi, cover talimatları (NO TEXT), interior sayfa talimatları için ilgili builder fonksiyonlarına bakın.
 

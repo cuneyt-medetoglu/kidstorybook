@@ -265,7 +265,7 @@ console.log('Negative prompts version:', negativeVersion.version) // v1.1.0
 
 | 18 | Allow relighting | Prompt'a "reference = identity only; do NOT copy lighting/background; allow relighting." ekle. Magical tarzı sahneye özel ışık için; düşük risk. |
 
-**Madde 5 (Allow relighting):** Plana eklendi (Sıra 18). Açıklama aşağıda “Relighting nedir?”.  
+**Madde 5 (Allow relighting):** Plana eklendi (Sıra 19). Kodda interior sayfa prompt’una eklendi (scene.ts v1.20.0). Açıklama aşağıda “Relighting nedir?”.  
 **Madde 7 (Prompt linter):** Planda yok (gerek yok). Açıklama aşağıda referans için duruyor.
 
 ### Relighting nedir? (Madde 5 – Magicalchildrensbook tarzına yardım eder mi?)

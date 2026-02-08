@@ -12,7 +12,7 @@ import { appConfig } from '@/lib/config'
 import { getCharacterById } from '@/lib/db/characters'
 import { getUserRole } from '@/lib/db/users'
 import { createBook, getUserBooks, updateBook, getBookById, deleteBook } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
@@ -37,6 +37,48 @@ function normalizeThemeKey(theme: string): string {
   if (!t) return t
   if (t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities') return 'sports'
   return t
+}
+
+/**
+ * Sıra 14 (COVER_PATH_FLOWERS_ANALYSIS.md): Kapak BACKGROUND'u hikayeden türet.
+ * customRequests + sayfa sceneDescription/sceneContext/text içinden ortam anahtar kelimelerine göre
+ * kısa bir environment cümlesi döner. Boş dönerse getEnvironmentDescription tema şablonuna düşer.
+ */
+function deriveCoverEnvironmentFromStory(
+  customRequests: string | undefined,
+  pages: Array<{ sceneDescription?: string; sceneContext?: string; text?: string; imagePrompt?: string }>
+): string {
+  const parts: string[] = [customRequests || '']
+  for (const p of pages) {
+    parts.push(p.sceneDescription || '', p.sceneContext || '', p.text || '', p.imagePrompt || '')
+  }
+  const combined = parts.join(' ').toLowerCase()
+  // Öncelik: güçlü ortam (buz, uzay, deniz) önce; sonra orman, dağ, mağara
+  if (/\b(glacier|ice|buz|frozen|snow|kar|snowy|karlı|buzul)\b/.test(combined)) {
+    return 'glacier, ice cave, frozen landscape, soft snow and crystals'
+  }
+  if (/\b(space|uzay|stars|yıldız|planet|gezegen|cosmic|orbit)\b/.test(combined)) {
+    return 'space, stars and planets, cosmic horizon'
+  }
+  if (/\b(ocean|deniz|sea|underwater|sualtı|coral|reef|aquatic)\b/.test(combined)) {
+    return 'ocean, clear water, coral reef or underwater world'
+  }
+  if (/\b(cave|mağara|ice cave|buz mağara)\b/.test(combined)) {
+    return 'cave, rocky interior, mysterious atmosphere'
+  }
+  if (/\b(forest|orman|clearing|açıklık|wildflowers|mushroom)\b/.test(combined)) {
+    return 'lush forest, dappled sunlight, wildflowers'
+  }
+  if (/\b(mountain|dağ|path|yol|trail|patika|peak|zirve)\b/.test(combined)) {
+    return 'mountain path, distant peaks, natural landscape'
+  }
+  if (/\b(beach|sahil|plaj|sand)\b/.test(combined)) {
+    return 'sandy beach, ocean horizon, soft waves'
+  }
+  if (/\b(garden|bahçe|flower|çiçek)\b/.test(combined)) {
+    return 'colorful garden, flowers and greenery'
+  }
+  return ''
 }
 
 /** From-example: örnek kapak görselinden sahne betimi (top, tavşan, kulübe vb.) alır; kapak prompt'unu zenginleştirmek için. */
@@ -850,6 +892,32 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          // Sıra 17: suggestedOutfits REQUIRED – one key per character ID (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+          const suggestedOutfits = generatedStoryData.suggestedOutfits
+          if (!suggestedOutfits || typeof suggestedOutfits !== 'object') {
+            throw new Error('Story is missing required "suggestedOutfits" object')
+          }
+          for (const char of characters) {
+            const outfit = suggestedOutfits[char.id]
+            if (typeof outfit !== 'string' || !outfit.trim()) {
+              throw new Error(`suggestedOutfits is missing or empty for character ${char.id} (${char.name})`)
+            }
+          }
+
+          // Sıra 17: characterExpressions REQUIRED per page – one key per character in that page (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+          for (const page of generatedStoryData.pages) {
+            const exp = page.characterExpressions
+            if (!exp || typeof exp !== 'object') {
+              throw new Error(`Page ${page.pageNumber} is missing required "characterExpressions" object`)
+            }
+            for (const charId of page.characterIds || []) {
+              const desc = exp[charId]
+              if (typeof desc !== 'string' || !desc.trim()) {
+                throw new Error(`Page ${page.pageNumber} characterExpressions is missing or empty for character ${charId}`)
+              }
+            }
+          }
+
           // Debug trace: full raw story request/response (before trim so you see what API actually returned)
           if (debugTrace) {
             debugTrace.push({
@@ -934,6 +1002,53 @@ export async function POST(request: NextRequest) {
 
       // Assign to outer variable for downstream steps (cover + page image generation)
       storyData = generatedStoryData
+
+      // Sıra 17: Kelime sayısı kontrolü ve gerekirse kısa repair (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+      const ageGroupForWordCount = storyData?.metadata?.ageGroup || 'preschool'
+      const wordMin = getWordCountMin(ageGroupForWordCount)
+      const wordCounts = storyData.pages.map((page: any, index: number) => {
+        const text = page.text || ''
+        const count = text.trim() ? text.split(/\s+/).length : 0
+        return { pageNumber: page.pageNumber ?? index + 1, count, pageIndex: index }
+      })
+      const shortPages = wordCounts.filter((p: { count: number }) => p.count < wordMin)
+      console.log(`[Create Book] 📊 Word count (min ${wordMin}):`, wordCounts.map((p: { pageNumber: number; count: number }) => `p${p.pageNumber}=${p.count}`).join(', '))
+      if (shortPages.length > 0) {
+        console.warn(`[Create Book] ⚠️ Short pages (below ${wordMin} words):`, shortPages.map((p: { pageNumber: number; count: number }) => `page ${p.pageNumber} (${p.count})`).join(', '))
+        try {
+          const repairPrompt = `The following story has some pages with too few words. Return ONLY a valid JSON object with key "pages": an array of objects. Each object has "pageNumber" (number) and "text" (string). Include ONLY the pages that need expansion (page numbers: ${shortPages.map((p: { pageNumber: number }) => p.pageNumber).join(', ')}). For each of these pages, rewrite the "text" to be at least ${wordMin} words while keeping the same story event and tone. Use the same language as the original. Do not change other pages.
+
+Original story title: ${storyData.title}
+Current short page texts:
+${shortPages.map((p: { pageNumber: number; pageIndex: number }) => `Page ${p.pageNumber}: "${(storyData.pages[p.pageIndex].text || '').slice(0, 200)}..."`).join('\n')}
+
+Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
+
+          const repairCompletion = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [{ role: 'user', content: repairPrompt }],
+            response_format: { type: 'json_object' },
+            temperature: 0.4,
+            max_tokens: 2000,
+          })
+          const repairContent = repairCompletion.choices[0]?.message?.content
+          if (repairContent) {
+            const repairData = JSON.parse(repairContent)
+            if (Array.isArray(repairData.pages)) {
+              for (const item of repairData.pages) {
+                const idx = storyData.pages.findIndex((p: any, i: number) => (p.pageNumber ?? i + 1) === item.pageNumber)
+                if (idx >= 0 && item.text) {
+                  storyData.pages[idx].text = item.text
+                  const newCount = item.text.split(/\s+/).length
+                  console.log(`[Create Book] 📝 Repair: expanded page ${item.pageNumber} to ${newCount} words`)
+                }
+              }
+            }
+          }
+        } catch (repairErr: any) {
+          console.warn('[Create Book] Word count repair failed (non-fatal):', repairErr?.message || repairErr)
+        }
+      }
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
 
@@ -1308,6 +1423,15 @@ export async function POST(request: NextRequest) {
       // Determine age group (default for cover only mode)
       const ageGroup = isCoverOnlyMode ? 'preschool' : (storyData?.metadata?.ageGroup || 'preschool')
       
+      // Plan A: Önce story LLM çıktısındaki coverSetting; yoksa keyword fallback (deriveCoverEnvironmentFromStory). COVER_PATH_FLOWERS_ANALYSIS.md §7
+      const coverEnvironment =
+        (typeof storyData?.coverSetting === 'string' && storyData.coverSetting.trim())
+          ? storyData.coverSetting.trim()
+          : (storyData?.pages?.length ? deriveCoverEnvironmentFromStory(customRequests, storyData.pages) : '')
+      if (coverEnvironment) {
+        console.log('[Create Book] 🌍 Cover environment from story:', coverEnvironment)
+      }
+
       // Kapak/sayfa: Master referans varsa kıyafeti referanstan al (mavi/kırmızı zorlaması yok)
       const useMasterForClothing = Object.keys(masterIllustrations).length > 0
       const coverClothing = useMasterForClothing ? 'match_reference' : undefined // v1.6.0: no clothing from story
@@ -1319,6 +1443,7 @@ export async function POST(request: NextRequest) {
         characterAction: characters.length > 1 ? `characters integrated into environment as guides into the world; sense of wonder and adventure` : `character integrated into environment as guide into the world; sense of wonder and adventure`,
         focusPoint: 'balanced' as const,
         ...(coverClothing && { clothing: coverClothing }),
+        ...(coverEnvironment && { coverEnvironment }),
       }
       
       // Generate full page prompt using generateFullPagePrompt (POC style - enhanced)
@@ -1918,8 +2043,10 @@ export async function POST(request: NextRequest) {
         // NEW (v1.6.0): Story no longer generates clothing; master system handles it
         const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
         // Note: stripClothingFromSceneText REMOVED (v1.6.0) - story doesn't produce clothing text anymore
-        
-        const characterActionRaw = page.text || sceneDescription || ''
+
+        // Sıra 15: characterAction = İngilizce kaynak (FOREGROUND'a gider); page.text (Türkçe) sadece fallback. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
+        const pageWithContext = page as { sceneContext?: string; sceneDescription?: string; imagePrompt?: string; text?: string }
+        const characterActionRaw = pageWithContext.sceneContext?.trim() || pageWithContext.sceneDescription?.trim() || pageWithContext.imagePrompt?.trim() || page.text?.trim() || ''
         const riskAnalysis = detectRiskySceneElements(sceneDescription ?? '', characterActionRaw)
         let characterAction = riskAnalysis.hasRisk ? getSafeSceneAlternative(characterActionRaw) : characterActionRaw
         const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'

@@ -70,6 +70,9 @@ export const VERSION: PromptVersion = {
     'v1.15.0: [A8] SHOT PLAN – buildShotPlanBlock(sceneInput, isCover, previousScenes): shotType, lens, cameraAngle, placement, characterScale 25-30%, timeOfDay, mood. [A1] Image prompt konsolidasyonu: SHOT PLAN + COMPOSITION RULES short + AVOID short; Composition&Depth, Camera&Perspective, CharacterEnvironmentRatio blokları kaldırıldı (içerik SHOT PLAN + tek satırlara taşındı). (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md §9.2–9.3, 8 Şubat 2026)',
     'v1.16.0: [A11] Parmak stratejisi – getDefaultHandStrategy() (negative.ts) buildAnatomicalAndSafetySection içinde: hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
     'v1.17.0: [A5] shotPlan schema – SceneInput.shotPlan (optional). buildShotPlanBlock uses LLM shotPlan when present (shotType, lens, cameraAngle, placement, timeOfDay, mood) with code fallbacks. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v1.18.0: [Sıra 14] Kapak ortamı hikayeden – SceneInput.coverEnvironment; getEnvironmentDescription(..., coverEnvironment) kapakta tema şablonu yerine hikaye ortamı; extractSceneElements öncelikli locationKeywords (glacier, ice, space, ocean vb.). COVER_PATH_FLOWERS_ANALYSIS.md (8 Şubat 2026)',
+    'v1.19.0: [Sıra 16] Çelişkili stil ifadeleri – Tek stil profili (filmic, controlled saturation). getEnhancedAtmosphericDepth: vibrant saturated/high contrast → rich textures, clear detail, moderate saturation; getLightingDescription/getCinematicElements: dramatic → clear/defined; getStyleSpecificDirectives 3d: vibrant → rich appealing. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md (8 Şubat 2026)',
+    'v1.20.0: [Sıra 19] Allow relighting – Interior sayfa prompt\'una "Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene." eklendi. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md (8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -93,6 +96,8 @@ export interface SceneInput {
   characterExpressions?: Record<string, string>
   /** A5: Optional shot plan from LLM; when set, SHOT PLAN block uses these (with code fallbacks for missing fields). */
   shotPlan?: ShotPlan
+  /** Sıra 14: Kapak için hikayeden türetilmiş ortam (glacier, forest, space vb.). Varsa BACKGROUND bu olur; yoksa tema şablonu. COVER_PATH_FLOWERS_ANALYSIS.md */
+  coverEnvironment?: string
 }
 
 // NEW: Scene Diversity Analysis (16 Ocak 2026)
@@ -202,31 +207,35 @@ const ENVIRONMENT_TEMPLATES: Record<string, string[]> = {
 }
 
 /**
- * @param useFullSceneDesc When false (e.g. cover), do not embed full sceneDesc to avoid repetition; use theme template only. A2 PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
+ * @param useFullSceneDesc When false (e.g. cover), do not embed full sceneDesc to avoid repetition; use theme template or coverEnvironment. A2 PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
+ * @param coverEnvironment Sıra 14: Kapak için hikayeden türetilmiş ortam (glacier, forest, space vb.). Varsa tema şablonu atlanır; BACKGROUND hikayeye uyar. COVER_PATH_FLOWERS_ANALYSIS.md
  */
-function getEnvironmentDescription(theme: string, sceneDesc: string, useFullSceneDesc: boolean = true): string {
+function getEnvironmentDescription(theme: string, sceneDesc: string, useFullSceneDesc: boolean = true, coverEnvironment?: string): string {
   const envParts: string[] = []
-  
-  // If scene description provided and allowed, use it as base
-  if (useFullSceneDesc && sceneDesc && sceneDesc.length > 50) {
+
+  // Sıra 14: Kapak için hikayeden gelen ortam varsa onu kullan (tema şablonu yok)
+  if (coverEnvironment && coverEnvironment.trim().length > 0) {
+    envParts.push(coverEnvironment.trim())
+  } else if (useFullSceneDesc && sceneDesc && sceneDesc.length > 50) {
+    // If scene description provided and allowed, use it as base
     envParts.push(sceneDesc)
   } else if (!useFullSceneDesc || !sceneDesc || sceneDesc.length <= 50) {
-    // Otherwise use simplified template
+    // Otherwise use simplified template (fallback)
     const normalizedTheme = theme.toLowerCase().replace(/[-&_\s]/g, '-')
     const templates = ENVIRONMENT_TEMPLATES[normalizedTheme] || ENVIRONMENT_TEMPLATES['adventure']
     envParts.push(templates[0])
   }
-  
+
   // Enhanced background details
   envParts.push('expansive sky visible')
   envParts.push('dramatic clouds or clear sky')
   envParts.push('distant mountains or horizon line')
   envParts.push('atmospheric perspective in background')
-  
+
   // Atmospheric elements
   envParts.push('atmospheric haze in distance')
   envParts.push('background elements fade into soft mist')
-  
+
   return envParts.join(', ')
 }
 
@@ -253,7 +262,7 @@ function getLightingDescription(timeOfDay: string, mood: string): string {
   } else if (timeOfDay === 'night') {
     lightingParts.push('moonlight')
     lightingParts.push('cool ambient light')
-    lightingParts.push('dramatic contrast between light and shadow')
+    lightingParts.push('clear contrast between moonlight and shadow')
   } else {
     lightingParts.push('bright daylight')
   }
@@ -267,7 +276,7 @@ function getLightingDescription(timeOfDay: string, mood: string): string {
   
   // Light quality
   if (mood === 'exciting') {
-    lightingParts.push('dramatic hard light with strong shadows')
+    lightingParts.push('defined key light with clear shadows')
   } else if (mood === 'calm') {
     lightingParts.push('soft diffused light, gentle shadows')
   }
@@ -339,11 +348,11 @@ export function getCinematicElements(
   } else if (timeOfDay === 'night') {
     elements.push('moonlight')
     elements.push('cool ambient light')
-    elements.push('dramatic contrast between light and shadow')
+    elements.push('clear contrast between moonlight and shadow')
   } else {
     // Afternoon or default
     if (mood === 'exciting') {
-      elements.push('dynamic lighting with dramatic shadows')
+      elements.push('dynamic lighting with defined shadows')
     } else if (mood === 'calm') {
       elements.push('soft ambient light, even diffusion')
     } else {
@@ -585,7 +594,7 @@ export function getDepthOfFieldDirectives(pageNumber: number, focusPoint: string
   
   // Page-specific variations
   if (pageNumber === 1) {
-    directives.push('hero shot with dramatic depth separation')
+    directives.push('hero shot with clear depth separation')
   } else {
     directives.push('varied depth of field for visual interest')
   }
@@ -627,7 +636,7 @@ export function getAtmosphericPerspectiveDirectives(): string {
  */
 export function getEnhancedAtmosphericDepth(): string {
   return [
-    'foreground: sharp focus, vibrant saturated colors, rich textures, high contrast',
+    'foreground: sharp focus, rich textures, clear detail, moderate saturation',
     'midground: detailed and clear, moderate saturation, visible textures',
     'background: soft atmospheric haze, colors 30-40% less saturated',
     'distant elements fade into warm golden mist or soft blue haze',
@@ -864,7 +873,7 @@ export function getStyleSpecificDirectives(illustrationStyle: string): string {
   const normalizedStyle = illustrationStyle.toLowerCase().replace(/[-\s]/g, '_')
   
   const directives: Record<string, string> = {
-    '3d_animation': 'Pixar-style 3D, rounded shapes, vibrant colors, soft shadows',
+    '3d_animation': 'Pixar-style 3D, rounded shapes, rich appealing colors, soft shadows',
     'geometric': 'Flat geometric shapes, no gradients, vector art, clean lines',
     'watercolor': 'Transparent watercolor, soft brushstrokes, paper texture visible',
     'block_world': 'Pixelated blocky aesthetic, Minecraft-like, limited palette',
@@ -1355,8 +1364,13 @@ export function generateFullPagePrompt(
   // Build scene prompt (hybrid: cinematic + descriptive)
   const scenePrompt = generateScenePrompt(sceneInput, characterPrompt, illustrationStyle, isCover)
 
-  // Get environment for layered composition
-  const environment = getEnvironmentDescription(sceneInput.theme, sceneInput.sceneDescription, !isCover)
+  // Get environment for layered composition (Sıra 14: kapakta coverEnvironment varsa hikayeden gelen ortam kullanılır)
+  const environment = getEnvironmentDescription(
+    sceneInput.theme,
+    sceneInput.sceneDescription,
+    !isCover,
+    isCover ? sceneInput.coverEnvironment : undefined
+  )
 
   // Build layered composition (FOREGROUND/MIDGROUND/BACKGROUND)
   const midgroundOverride = isCover ? 'Book cover: key story moments and theme in one image' : undefined
@@ -1388,6 +1402,11 @@ export function generateFullPagePrompt(
     promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing. Identity match does NOT imply close-up. Keep the wide framing.')
   } else if (sceneInput.clothing?.trim()) {
     promptParts.push(`CRITICAL: Character MUST wear EXACTLY: ${sceneInput.clothing.trim()}. This outfit is LOCKED for the entire book.`)
+  }
+
+  // 0.55. [Sıra 19] Allow relighting – sayfa için referans sadece yüz/saç/kıyafet; ışık/arka plan sahneye özel (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+  if (!isCover) {
+    promptParts.push('Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene.')
   }
 
   // 1. Anatomical & Safety Section
@@ -1490,19 +1509,32 @@ export function extractSceneElements(
     timeOfDay = 'night'
   }
   
-  // Extract location keywords
+  // Extract location keywords (Sıra 14: önce güçlü ortam kelimeleri, sonra genel – COVER_PATH_FLOWERS_ANALYSIS.md)
   let location: string | undefined
-  const locationKeywords = [
-    'home', 'ev', 'house', 'forest', 'orman', 'park', 'mountain', 'dağ', 
-    'beach', 'sahil', 'plaj', 'cave', 'mağara', 'river', 'nehir', 'lake', 
-    'göl', 'garden', 'bahçe', 'school', 'okul', 'playground', 'oyun alanı',
-    'clearing', 'açıklık', 'path', 'yol', 'trail', 'patika', 'summit', 'zirve'
+  const priorityLocationKeywords = [
+    'glacier', 'buzul', 'ice', 'buz', 'frozen', 'snow', 'kar', 'snowy', 'karlı',
+    'space', 'uzay', 'stars', 'yıldız', 'planet', 'gezegen',
+    'ocean', 'deniz', 'sea', 'underwater', 'sualtı', 'coral', 'reef',
+    'cave', 'mağara', 'ice cave', 'buz mağara'
   ]
-  
-  for (const keyword of locationKeywords) {
+  const generalLocationKeywords = [
+    'forest', 'orman', 'clearing', 'açıklık', 'path', 'yol', 'trail', 'patika',
+    'home', 'ev', 'house', 'park', 'mountain', 'dağ', 'beach', 'sahil', 'plaj',
+    'river', 'nehir', 'lake', 'göl', 'garden', 'bahçe', 'school', 'okul',
+    'playground', 'oyun alanı', 'summit', 'zirve'
+  ]
+  for (const keyword of priorityLocationKeywords) {
     if (combined.includes(keyword)) {
       location = keyword
       break
+    }
+  }
+  if (!location) {
+    for (const keyword of generalLocationKeywords) {
+      if (combined.includes(keyword)) {
+        location = keyword
+        break
+      }
     }
   }
   

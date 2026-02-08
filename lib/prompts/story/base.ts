@@ -12,7 +12,7 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.3.0',
+  version: '2.4.0',
   releaseDate: new Date('2026-02-08'),
   status: 'active',
   changelog: [
@@ -49,6 +49,7 @@ export const VERSION: PromptVersion = {
     'v2.1.0: GPT trace aksiyonları – VISUAL DIVERSITY: Do NOT repeat same pose/action on consecutive pages; each page distinctly different action/pose. Word count: getWordCountRange artırıldı (toddler 30-45 … pre-teen 130-180), getWordCountMin export; CRITICAL: Each page text at least X words. generate-story: kelime sayımı + kısa sayfa repair pass. (7 Şubat 2026)',
     'v2.2.0: [A3] VERIFICATION CHECKLIST – Tüm verify/check maddeleri tek blokta. LANGUAGE: "Before returning JSON verify..." kaldırıldı. OUTPUT FORMAT: Tekrarlayan "characterIds/suggestedOutfits/characterExpressions REQUIRED" satırları kısaltıldı, "see # VERIFICATION CHECKLIST" referansı. buildCriticalRemindersSection → buildVerificationChecklistSection. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
     'v2.3.0: [A5] shotPlan (optional) – OUTPUT FORMAT: per-page optional shotPlan (shotType, lens, cameraAngle, placement, timeOfDay, mood). English only; used for image composition when provided. Omit if not needed. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v2.4.0: [Plan A] coverSetting REQUIRED – Story JSON top-level field: one sentence English, setting/background only for book cover (no characters). LLM generates it from story; used for cover image BACKGROUND. COVER_PATH_FLOWERS_ANALYSIS.md §7 (8 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -775,6 +776,7 @@ function buildOutputFormatSection(
 Return a valid JSON object:
 {
   "title": "Story title",
+  "coverSetting": "English, one sentence: setting/background only for the book cover image (no characters). Cinematic. Examples: 'glacier and ice cave, frozen landscape' or 'birthday party room with balloons and cake' or 'lush forest clearing with wildflowers'",
   "pages": [
     {
       "pageNumber": 1,
@@ -794,6 +796,7 @@ Return a valid JSON object:
   "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"<uuid-from-CHARACTER_ID_MAP>": "one line English outfit"'},
   "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
 }
+coverSetting REQUIRED: one sentence in English describing only the setting/background for the book cover (e.g. glacier and ice cave, birthday party room with balloons, lush forest). No character description. Used for cover image generation.
 shotPlan REQUIRED per page (shotType, lens, cameraAngle, placement, timeOfDay, mood) — English only; used for image composition. Vary per page for visual diversity.
 Required fields and checks: see # VERIFICATION CHECKLIST below.`
 }
@@ -810,6 +813,7 @@ function buildVerificationChecklistSection(
   const langName = getLanguageName(language)
   return `# VERIFICATION CHECKLIST (before returning JSON)
 - Return EXACTLY ${n} pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
+- coverSetting REQUIRED: one sentence, English, setting/background only for the book cover image (e.g. glacier and ice cave, birthday party room with balloons). No character description.
 - suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
 - Verify every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.

@@ -44,11 +44,9 @@
 - ✅ **Faz 4 İlerleme:** Pricing sayfası, Sepet sistemi ve My Library hardcopy özellikleri tamamlandı (25 Ocak 2026)
 
 **Son Yapılanlar (8 Şubat 2026):**
-- ✅ **Prompt optimizasyon planı güncellendi (A5 öncesi commit noktası):**
-  - **A6 (Master quality low/medium/high)** plandan çıkarıldı; konu prompt ile ilgili değil (API parametresi).
-  - **Allow relighting** Sıra 18 olarak plana eklendi (sayfa prompt’una "reference = identity only; allow relighting" ekleme).
-  - **Prompt linter (Madde 7)** plana alınmadı (gerek yok); açıklama rehberde referans için duruyor.
-  - **Sıradaki iş:** A5 – shotPlan schema (LLM’den yapılandırılmış shotPlan objesi almak).
+- ✅ **Bölüm 14 Trace aksiyonları (Sıra 14–19) ve 14.2 genel eşitleme tamamlandı:**
+  - **Sıra 14** Kapak ortamı hikayeden (coverSetting, coverEnvironment). **Sıra 15** Sayfa FOREGROUND İngilizce (characterActionRaw = sceneContext → sceneDescription → imagePrompt). **Sıra 16** Çelişkili stil ifadeleri (tek profil: filmic, controlled saturation). **Sıra 17** Story JSON validation (suggestedOutfits, characterExpressions REQUIRED; kelime sayısı + repair). **Sıra 19** Allow relighting (sayfa prompt’una relighting cümlesi).
+  - **14.2 genel eşitleme:** STORY_PROMPT_TEMPLATE (v2.5.0), IMAGE_PROMPT_TEMPLATE (v1.20.0), PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, project-manager.mdc, ILERLEME_TAKIBI, PROMPT_OPTIMIZATION_GUIDE güncellendi.
   - Kaynak: `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
 
 **Son Yapılanlar (27 Ocak 2026):**

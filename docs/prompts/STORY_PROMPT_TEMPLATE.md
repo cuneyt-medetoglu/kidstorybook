@@ -1,11 +1,13 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
-**Versiyon (kod):** 2.3.0  
+**Versiyon (kod):** 2.4.0  
 Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse doküman da güncellenmelidir; **base.ts = gerçek kaynak**.
 
 **v2.2.0 (8 Şubat 2026):** Tüm doğrulama maddeleri tek blokta: `# VERIFICATION CHECKLIST`. LANGUAGE'dan "Before returning..." kaldırıldı; OUTPUT FORMAT kuyruğu "see # VERIFICATION CHECKLIST below" ile kısaltıldı.  
 **v2.3.0 (8 Şubat 2026):** shotPlan sayfa başına **zorunlu**; OUTPUT FORMAT ve VERIFICATION CHECKLIST güncellendi.  
+**v2.4.0 (8 Şubat 2026):** **coverSetting** üst seviye alan eklendi (REQUIRED): kapak görseli için tek cümle İngilizce ortam tarifi (karakter yok). Plan A – COVER_PATH_FLOWERS_ANALYSIS.md §7.  
+**v2.5.0 (8 Şubat 2026):** **Story JSON validation (Sıra 17):** route.ts story cevabında suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. Kelime sayısı kontrolü ve kısa sayfa repair pass.  
 (v2.1.0: Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.)
 
 ---
@@ -246,6 +248,7 @@ For each page, describe EACH character's facial expression separately in the cha
 Return a valid JSON object:
 {
   "title": "Story title",
+  "coverSetting": "English, one sentence: setting/background only for the book cover image (no characters). Cinematic. Examples: 'glacier and ice cave, frozen landscape' or 'birthday party room with balloons and cake' or 'lush forest clearing with wildflowers'",
   "pages": [
     {
       "pageNumber": 1,
@@ -265,11 +268,12 @@ Return a valid JSON object:
   "suggestedOutfits": { "[characterId1]": "one line English outfit", "[characterId2]": "one line English outfit" },
   "metadata": { "ageGroup": "[ageGroup]", "theme": "[theme]", "educationalThemes": [], "safetyChecked": true }
 }
+coverSetting REQUIRED: one sentence in English describing only the setting/background for the book cover (e.g. glacier and ice cave, birthday party room with balloons, lush forest). No character description. Used for cover image generation.
 shotPlan REQUIRED per page (shotType, lens, cameraAngle, placement, timeOfDay, mood) — English only; used for image composition. Vary per page for visual diversity.
 Required fields and checks: see # VERIFICATION CHECKLIST below.
 ```
 
-**Not:** Sayfa çıktısında **clothing** alanı yok. **shotPlan** (shotType, lens, cameraAngle, placement, timeOfDay, mood) sayfa başına **zorunlu**; görsel pipeline'da SHOT PLAN bloğunda kullanılır (yoksa kod fallback üretir; bkz. PROMPT_OPTIMIZATION_GUIDE.md "shotPlan yoksa fallback"). **characterExpressions** (sayfa bazlı, karakter bazlı görsel ifade tarifi) story’den gelir; image pipeline’da [CHARACTER_EXPRESSIONS] bloğunda kullanılır. Master sadece kimlik referansıdır; poz, ifade ve sahne story çıktısından gelir. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. 
+**Not:** Sayfa çıktısında **clothing** alanı yok. **coverSetting** (v2.4.0, Plan A): üst seviye, **zorunlu**; kapak görseli için tek cümle İngilizce ortam tarifi (sadece mekân, karakter yok). Örn. glacier and ice cave, birthday party room with balloons. Kapak BACKGROUND'unda kullanılır; yoksa route'ta keyword fallback. **shotPlan** (shotType, lens, cameraAngle, placement, timeOfDay, mood) sayfa başına **zorunlu**; görsel pipeline'da SHOT PLAN bloğunda kullanılır (yoksa kod fallback üretir; bkz. PROMPT_OPTIMIZATION_GUIDE.md "shotPlan yoksa fallback"). **characterExpressions** (sayfa bazlı, karakter bazlı görsel ifade tarifi) story’den gelir; image pipeline’da [CHARACTER_EXPRESSIONS] bloğunda kullanılır. Master sadece kimlik referansıdır; poz, ifade ve sahne story çıktısından gelir. **suggestedOutfits** (object: karakter ID → tek satır İngilizce kıyafet) story’den gelir; her karakterin master’ında "Character wearing exactly" olarak kullanılır. 
 ---
 
 ### 13. VERIFICATION CHECKLIST
@@ -281,6 +285,7 @@ Tüm doğrulama maddeleri tek blokta (A3); LANGUAGE veya OUTPUT FORMAT içinde t
 ```
 # VERIFICATION CHECKLIST (before returning JSON)
 - Return EXACTLY [n] pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
+- coverSetting REQUIRED: one sentence, English, setting/background only for the book cover image (e.g. glacier and ice cave, birthday party room with balloons). No character description.
 - suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
 - Verify every page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext are in English.
@@ -322,6 +327,7 @@ Generate the story now in valid JSON format with EXACTLY [getPageCount(ageGroup,
 ## Beklenen JSON çıktısı
 
 - **title:** string  
+- **coverSetting:** string (v2.4.0, REQUIRED). Kapak görseli için tek cümle İngilizce ortam tarifi; sadece mekân (karakter yok). Örn. "glacier and ice cave, frozen landscape", "birthday party room with balloons and cake". Kapak BACKGROUND’unda kullanılır.  
 - **pages[]:** pageNumber, text, imagePrompt, sceneDescription, **characterIds**, **sceneContext**, **characterExpressions** (clothing yok; characterExpressions = sayfa bazlı, karakter bazlı görsel ifade: char ID → eyes/eyebrows/mouth, İngilizce)  
 - **supportingEntities[]:** id, type (animal|object), name, description, appearsOnPages  
 - **suggestedOutfits:** object (karakter ID → kıyafet). Her CHARACTER MAPPING’teki karakter için bir anahtar: değer = tek satır İngilizce kıyafet. Master’lar oluşturulmadan önce her karakterin ne giyeceği belli olur.  

@@ -1,7 +1,7 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 7 Şubat 2026  
+**Son Güncelleme:** 8 Şubat 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
@@ -393,6 +393,16 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 ---
 
+## 🧪 Son Create Book E2E Test (8 Şubat 2026)
+
+- **Akış:** Karakter oluşturma → Story (gpt-4o-mini) → Master illüstrasyon → (Entity master: supporting entities varsa) → Kapak (edits API, referans görsel) → Sayfa görselleri (paralel batch, edits API, master ref) → S3 upload → `completed`.
+- **Sonuç:** 2 kitap tam akışla başarılı (3 sayfa, adventure, toddler). Tüm API 200, edits API b64_json döndü, S3 upload OK.
+- **Word count repair:** İkinci kitapta AI sayfa metinleri 26, 28, 25 kelime döndü; min 30 hedefi için repair devreye girdi, sayfalar 53, 59, 58 kelimeye genişletildi.
+- **Supporting entity:** İkinci kitapta "Shimmering Fox" için entity master üretildi; kapakta 2 referans görsel (master + entity) kullanıldı.
+- **Trace:** `kidstorybook-trace-2026-02-08T22-07-24.json` (debug export; .gitignore ile `*.json` hariç tutulabilir).
+
+---
+
 ## 📝 Önemli Notlar
 
 ### Organization Verification
@@ -416,6 +426,6 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 
 ---
 
-**Son Güncelleme:** 11 Ocak 2026  
+**Son Güncelleme:** 8 Şubat 2026  
 **Güncelleyen:** @project-manager agent  
-**Durum:** Faz 3.5 ve 3.6 tamamlandı ✅ MVP hazır 🎉 **Kitap oluşturma ve görüntüleme tamamen çalışıyor** ✅
+**Durum:** Faz 3.5 ve 3.6 tamamlandı ✅ MVP hazır 🎉 **Kitap oluşturma ve görüntüleme tamamen çalışıyor** ✅. Son E2E test: 8 Şubat 2026 (2 kitap full flow başarılı, word count repair çalıştı).

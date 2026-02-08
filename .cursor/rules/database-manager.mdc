@@ -51,102 +51,14 @@ Sen KidStoryBook projesinin Database Manager agent'ısın. Görevin:
 - Data type seçimleri
 - Enums vs VARCHAR kararları
 
-## 📁 Database Dosya Yapısı
+**Dosya yapısı:** `supabase/migrations/`, `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`, `docs/strategies/`.
 
-```
-supabase/
-├── migrations/
-│   ├── 00001_initial_schema.sql       # Initial schema (mevcut)
-│   ├── 001_create_characters_table.sql
-│   ├── 002_update_books_table.sql
-│   ├── 003_create_books_table.sql
-│   ├── 004_create_storage_buckets.sql
-│   └── README.md
-│
-docs/
-├── database/
-│   └── SCHEMA.md                      # Database schema dokümantasyonu
-├── guides/
-│   └── SUPABASE_MIGRATION_GUIDE.md   # Migration rehberi
-└── strategies/
-    └── CHARACTER_CONSISTENCY_STRATEGY.md  # Database-related strategies
-```
+## 🎯 Mevcut DB Yapısı (özet – agent bilmeli)
 
-## 🎯 Mevcut Database Yapısı
-
-### Tables Overview
-```
-┌─────────────┐         ┌─────────────┐         ┌─────────────┐
-│   users     │         │ characters  │         │   books     │
-│ (PostgreSQL)│◄───────│             │◄────────│             │
-└─────────────┘         └─────────────┘         └─────────────┘
-                                │
-                                │
-                        ┌───────▼──────┐
-                        │  orders      │
-                        │  payments    │
-                        └──────────────┘
-```
-
-### Tables
-1. **characters** - Master character descriptions (multi-book consistency)
-   - Primary key: `id` (UUID)
-   - Foreign key: `user_id` → `auth.users(id)`
-   - JSONB: `description` (detailed character features)
-   - Array: `used_in_books` (book IDs)
-   - Version control: `version`, `previous_versions`
-
-2. **books** - User-generated story books
-   - Primary key: `id` (UUID)
-   - Foreign key: `user_id` → `auth.users(id)`, `character_id` → `characters(id)`
-   - JSONB: `story_data`, `images_data`, `generation_metadata`
-   - Status: `draft`, `generating`, `completed`, `failed`, `archived`
-
-3. **orders** - Book orders
-   - Primary key: `id` (UUID)
-   - Foreign key: `user_id`, `book_id`
-   - Order type: `ebook`, `printed`
-   - Status: `pending`, `paid`, `processing`, `shipped`, `completed`, `cancelled`
-
-4. **payments** - Payment transactions
-   - Primary key: `id` (UUID)
-   - Foreign key: `order_id`, `user_id`
-   - Provider: `stripe`, `iyzico`
-   - Status: `pending`, `succeeded`, `failed`, `refunded`
-
-### Indexes Strategy
-- **User lookup:** `idx_*_user_id` (all user-owned tables)
-- **Character lookup:** `idx_books_character_id`
-- **Status filtering:** `idx_books_status`, `idx_orders_status`
-- **Recent items:** `idx_*_created_at DESC`
-- **Favorites:** `idx_books_favorites` (conditional, WHERE is_favorite = TRUE)
-- **Default character:** `idx_characters_default` (conditional, WHERE is_default = TRUE)
-
-### RLS Policies
-- **Principle:** Users can only access their own data
-- **Implementation:** All policies use `auth.uid() = user_id`
-- **Tables with RLS:**
-  - `characters` - 4 policies (SELECT, INSERT, UPDATE, DELETE)
-  - `books` - 4 policies (SELECT, INSERT, UPDATE, DELETE)
-  - Storage buckets - policies per bucket
-
-### Triggers
-- **Auto-update timestamps:** `trigger_update_*_timestamp` (updated_at)
-- **Single default character:** `trigger_ensure_single_default`
-- **Book count sync:** `trigger_update_total_books`, `trigger_update_character_books`
-- **Status completion:** `trigger_set_books_completed_at`
-
-### Helper Functions
-- **Characters:**
-  - `get_default_character(p_user_id)` - Get user's default character
-  - `get_character_stats(p_character_id)` - Character usage statistics
-- **Books:**
-  - `get_user_book_stats(p_user_id)` - User's book statistics
-  - `get_book_with_character(p_book_id)` - Book with character details
-  - `increment_book_views(p_book_id)` - Increment view count
-  - `get_books_by_character(p_character_id)` - Books by character
-- **Storage:**
-  - `cleanup_orphaned_book_images()` - Clean orphaned images
+- **Tablolar:** `characters` (user_id, description, used_in_books; RLS), `books` (user_id, character_id, story_data, images_data, generation_metadata, status; RLS), `orders`, `payments`
+- **İlişkiler:** users → characters, users → books, character → books; storage bucket’lar (photos, books, pdfs, covers)
+- **RLS:** Tüm user verisi `auth.uid() = user_id` ile kısıtlı
+- **Migration’lar:** `supabase/migrations/` (PostgreSQL), sıra numaralı; detay ve sıra: `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
 
 ## 🔧 Yapabileceklerin
 
@@ -197,76 +109,13 @@ Schema değişikliği yapıldığında:
 - API dokümantasyonunu kontrol et
 - Breaking changes'i not et
 
-## 📊 Mevcut Mimari ve Stratejiler
-
-### Database Platform
-- **Provider:** PostgreSQL (EC2); migration’lar `supabase/migrations/` klasöründe
-- **Location:** AWS EC2 (eu-central-1)
-- **Backup:** EC2/manuel veya AWS RDS snapshot (tercihe göre)
-- **Replication:** Tek instance (scale gerekirse ayrı plan)
-
-### Schema Evolution Strategy
-- **Approach:** Incremental migrations
-- **Versioning:** Sequential numbering (001, 002, 003, ...)
-- **Compatibility:** Backward compatible whenever possible
-- **Rollback:** Manual rollback scripts (if needed)
-
-### Data Storage Strategy
-- **Relational Data:** PostgreSQL tables (users, characters, books, orders, payments)
-- **JSON Data:** JSONB columns (story_data, images_data, description, metadata)
-- **Large Files:** AWS S3 tek bucket, prefix’ler (photos, books, pdfs, covers)
-- **Binary Data:** AWS S3 (images, PDFs)
-
-### Character Consistency System
-- **Master Character:** Single character description per user
-- **Multi-Book:** Same character used across multiple books
-- **Version Control:** Character versioning for updates
-- **Tracking:** `used_in_books` array, `total_books` count
-
-### Performance Strategy
-- **Indexes:** Strategic indexes for common queries
-- **JSONB Indexes:** GIN indexes for JSONB queries (future)
-- **Connection Pooling:** Uygulama tarafında (pg pool veya connection string)
-- **Query Optimization:** EXPLAIN ANALYZE for slow queries
+**Mevcut mimari (platform, schema evolution, storage, character consistency, performance):** Detay `docs/database/SCHEMA.md`, `docs/ARCHITECTURE.md`.
 
 ## 🔄 Migration Best Practices
 
-### 1. Migration Dosya İsimlendirme
-```
-supabase/migrations/
-├── 00001_initial_schema.sql           # Initial schema
-├── 001_descriptive_name.sql           # Feature-based naming
-├── 002_add_feature_name.sql           # Sequential numbering
-└── README.md                          # Migration guide
-```
+**Migration dosya isimlendirme:** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
 
-### 2. Migration Yapısı
-```sql
--- ============================================================================
--- Migration Name
--- ============================================================================
--- Description: What this migration does
--- Created: YYYY-MM-DD
--- Version: X.Y.Z
-
--- Check if table/column exists before creating
-DO $$ 
-BEGIN
-  IF NOT EXISTS (...) THEN
-    ALTER TABLE ... ADD COLUMN ...;
-  END IF;
-END $$;
-
--- Use IF NOT EXISTS for indexes
-CREATE INDEX IF NOT EXISTS idx_name ON table(column);
-
--- Drop existing policies/triggers before recreating
-DROP POLICY IF EXISTS "policy_name" ON table;
-DROP TRIGGER IF EXISTS trigger_name ON table;
-
--- Create with IF NOT EXISTS or CREATE OR REPLACE
-CREATE OR REPLACE FUNCTION function_name() ...;
-```
+**Migration yapısı (SQL şablonu, IF NOT EXISTS, idempotent):** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
 
 ### 3. Backward Compatibility
 - ✅ **Add columns:** Always with DEFAULT values
@@ -304,80 +153,11 @@ CREATE OR REPLACE FUNCTION function_name() ...;
 
 ## 🚨 Önemli Notlar
 
-### Migration Sırası (KRİTİK!)
-1. ✅ **Migration 001:** Characters table (enhance existing)
-2. ⚠️ **Migration 002:** Update books table (requires books table)
-3. ✅ **Migration 003:** Books table (enhance existing)
-4. ✅ **Migration 004:** Storage buckets
-
-**⚠️ DİKKAT:** Migration 002, books table'a `character_id` ekler. Eğer books table yoksa, önce 003'ü çalıştır!
-
-### Existing Schema Conflicts
-- **Initial Schema:** `00001_initial_schema.sql` - basic tables
-- **Enhancement Migrations:** 001, 002, 003 - add columns, indexes, functions
-- **Strategy:** Enhance, don't recreate (preserve data)
-
-### Column Naming Conventions
-- **Timestamps:** `created_at`, `updated_at`, `deleted_at`, `completed_at`
-- **Status:** `status` (VARCHAR with CHECK constraint)
-- **Foreign Keys:** `{table}_id` (e.g., `character_id`, `user_id`)
-- **Arrays:** `{plural}_ids` or `used_in_{plural}` (e.g., `used_in_books`)
-- **JSONB:** `{name}_data` or `{name}_metadata` (e.g., `story_data`, `generation_metadata`)
-
-### Multi-Character Storage Strategy (25 Ocak 2026)
-
-**Karar:** Metadata JSON yaklaşımı seçildi (Junction table yerine)
-
-**Neden:**
-- Hızlı implementasyon (migration gerektirmez)
-- Mevcut `books.character_id` ana karakter için kullanılıyor
-- Ek karakterler `books.generation_metadata` içinde saklanıyor
-- Backward compatible (eski kitaplar etkilenmedi)
-
-**Yapı:**
-```json
-{
-  "generation_metadata": {
-    "characterIds": ["uuid-1", "uuid-2", "uuid-3"],
-    "additionalCharacters": [
-      { "group": "Pets", "value": "Dog", "displayName": "Dog" },
-      { "group": "Family Members", "value": "Grandma", "displayName": "Grandma" }
-    ],
-    // ... diğer metadata
-  }
-}
-```
-
-**Gelecek İyileştirmeler:**
-- Junction table (`book_characters`) eklenebilir (query optimization için)
-- Character type field (`characters.character_type` JSONB) eklenebilir
-- Migration: Mevcut `generation_metadata` → junction table
-
-**Not:** Şu anki yapı MVP için yeterli. İleride junction table'a geçilebilir.
-
-### Index Naming Conventions
-- **Format:** `idx_{table}_{column(s)}`
-- **Conditional:** `idx_{table}_{condition}` (e.g., `idx_books_favorites`)
-- **Unique:** `idx_{table}_{column}_unique` (if unique constraint)
+**Migration sırası, schema çakışmaları, naming conventions, multi-character stratejisi:** Detay `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`, `docs/archive/2026-02/aws-plans/` (migration sırası).
 
 ## 💡 Best Practices
 
-### 1. Always Check Before Creating
-```sql
--- Check if column exists
-IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-               WHERE table_schema = 'public' 
-               AND table_name = 'table_name' 
-               AND column_name = 'column_name') THEN
-  ALTER TABLE ... ADD COLUMN ...;
-END IF;
-
--- Check if index exists
-CREATE INDEX IF NOT EXISTS idx_name ON table(column);
-
--- Check if function exists
-CREATE OR REPLACE FUNCTION function_name() ...;
-```
+**Check-before-create, idempotent migrations:** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
 
 ### 2. Idempotent Migrations
 - Her migration birden fazla kez çalıştırılabilir olmalı
