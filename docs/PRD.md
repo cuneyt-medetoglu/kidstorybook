@@ -3,8 +3,8 @@
 
 **Versiyon:** 1.5  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 4 Şubat 2026  
-**Durum:** TASLAK – FAZ 3 (MVP hazır; Multi-character, TTS, Currency, Cart, Image Edit, 8 dil, PDF, Debug/Feature Flags)
+**Son Güncelleme:** 7 Şubat 2026  
+**Durum:** TASLAK – FAZ 3 (MVP hazır; Multi-character, TTS, Currency, Cart, Image Edit, 8 dil, PDF, Debug/Feature Flags; hikaye/görsel kalite iyileştirmeleri: kelime hedefleri, sayfa çeşitliliği, el anatomisi prompt)
 
 > **Kısa PRD:** Teknik detaylar → [PRD Teknik Gereksinimler](technical/PRD_TECHNICAL_DETAILS.md). Tamamlanan özellikler → [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md).
 

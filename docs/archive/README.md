@@ -5,6 +5,7 @@ Tamamlanmış işlere ait veya tek seferlik analiz dokümanları; referans için
 ## Yapı
 
 - **Kök (docs/archive/)** – Önceki arşiv: FAZ1 test/checklist/raporlar, sahne/kıyafet/görsel analizleri, UNIFIED_ANALYSIS, vb.
+- **2026-02/analysis/** – 7 Şubat 2026: docs/analysis/’ten taşınan 7 dosya (GPT trace, clothing, ChatGPT prompt, vb.).
 - **2026-q1/** – Şubat 2026 FAZ 6 temizliğiyle taşınan 17 dosya:
   - **implementation/** – FAZ1, FAZ2, FAZ2.4 karakter gruplama, FAZ3 PDF plan
   - **guides/** – Pricing analizi, Image/Story API refactor, Book viewer, test prompt'ları, Wizard test, Kapak/boş karakter analizi

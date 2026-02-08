@@ -76,3 +76,22 @@ export function get3DAnimationNotes(): string {
   return 'CRITICAL FOR 3D ANIMATION (PIXAR STYLE): The illustration must be cartoonish and stylized like Pixar animated movies (Toy Story, Finding Nemo, Inside Out) - NOT photorealistic, NOT realistic photography. Use rounded shapes, exaggerated features, bright saturated colors, soft shadows, realistic textures, and a playful animated movie aesthetic. The character should look like a 3D animated cartoon character from a Pixar children\'s movie, not a real photograph or realistic 3D render. Pixar animation quality and visual style.'
 }
 
+/**
+ * CINEMATIC_PACK – tüm stiller için ortak sinematik kalite (GPT önerisi, 7 Şubat 2026)
+ * Stil DNA'sını bozmadan "film tadı" ekler: lighting, color grade, environment depth.
+ */
+export function getCinematicPack(): string {
+  return [
+    'cinematic key light with soft fill and rim light',
+    'volumetric sun rays where appropriate',
+    'atmospheric perspective',
+    'warm cinematic color grading',
+    'rich contrast',
+    'gentle bloom',
+    'controlled saturation',
+    'high-detail set dressing',
+    'layered depth (foreground, midground, background)',
+    'natural scale cues',
+  ].join(', ')
+}
+

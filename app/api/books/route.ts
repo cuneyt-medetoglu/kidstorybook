@@ -11,11 +11,12 @@ import { uploadFile, getPublicUrl, getObjectBuffer } from '@/lib/storage/s3'
 import { appConfig } from '@/lib/config'
 import { getCharacterById } from '@/lib/db/characters'
 import { getUserRole } from '@/lib/db/users'
-import { createBook, getUserBooks, updateBook, getBookById } from '@/lib/db/books'
+import { createBook, getUserBooks, updateBook, getBookById, deleteBook } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
+import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -163,7 +164,9 @@ async function generateMasterCharacterIllustration(
   userId: string,
   includeAge: boolean = true,
   characterGender?: 'boy' | 'girl' | 'other',
-  storyClothing?: string // Hikayeden gelen kıyafet – master bu kıyafetle çizilir (referans sadece yüz/vücut)
+  storyClothing?: string, // Hikayeden gelen kıyafet – master bu kıyafetle çizilir (referans sadece yüz/vücut)
+  debugTracePush?: (entry: DebugTraceEntry) => void,
+  debugStep?: string
 ): Promise<string> {
   const fixedDescription = {
     ...characterDescription,
@@ -260,14 +263,21 @@ async function generateMasterCharacterIllustration(
 
   console.log('[Create Book] 📥 MASTER RESPONSE received (image data present)')
   stopAfter('master_response')
-  
+
   // Upload to S3 with character ID in filename
   const masterImageBuffer = Buffer.from(b64Image, 'base64')
   const timestamp = Date.now()
   const filename = `${userId}/masters/master_${characterId}_${timestamp}.png`
-  
   const s3Key = await uploadFile('books', filename, masterImageBuffer, 'image/png')
   const masterUrl = getPublicUrl(s3Key)
+
+  if (debugTracePush) {
+    debugTracePush({
+      step: debugStep || `master_character_${characterId}`,
+      request: { model: 'gpt-image-1.5', prompt: masterPrompt, size: '1024x1536', quality: 'low', characterId },
+      response: { url: masterUrl, b64Length: (b64Image as string).length, rawResponse: result },
+    })
+  }
   return masterUrl
 }
 
@@ -283,17 +293,17 @@ async function generateSupportingEntityMaster(
   entityName: string,
   entityDescription: string,
   illustrationStyle: string,
-  userId: string
+  userId: string,
+  debugTracePush?: (entry: DebugTraceEntry) => void,
+  debugStep?: string
 ): Promise<string> {
   // Build prompt for entity master (text-only, no reference photo)
-  const styleDirective = illustrationStyle === '3d_animation' 
-    ? 'Pixar-style 3D animation' 
-    : illustrationStyle === 'watercolor' 
-    ? 'Watercolor illustration' 
-    : illustrationStyle
-  
+  // GPT sinematik kalite: aynı STYLE_CORE + CINEMATIC_PACK ile kitap bütünlüğü (7 Şubat 2026)
+  const styleDirective = getStyleDescription(illustrationStyle)
+  const cinematicPack = getCinematicPack()
   const entityPrompt = [
     `[STYLE] ${styleDirective} [/STYLE]`,
+    `[CINEMATIC] ${cinematicPack}. Consistent lighting and material with the book style. [/CINEMATIC]`,
     `Neutral front-facing view. ${entityDescription}.`,
     `Plain neutral background. Illustration style (NOT photorealistic).`,
     entityType === 'animal' ? 'Friendly and appealing animal character.' : 'Clear and recognizable object.',
@@ -330,7 +340,15 @@ async function generateSupportingEntityMaster(
   const timestamp = Date.now()
   const filename = `${userId}/entity-masters/entity_master_${entityId}_${timestamp}.png`
   const s3Key = await uploadFile('books', filename, imageBuffer, 'image/png')
-  return getPublicUrl(s3Key)
+  const entityUrl = getPublicUrl(s3Key)
+  if (debugTracePush) {
+    debugTracePush({
+      step: debugStep || `entity_master_${entityName}`,
+      request: { model: 'gpt-image-1.5', prompt: entityPrompt, size: '1024x1536', entityId, entityType, entityName },
+      response: { url: entityUrl, b64Length: (b64Image as string).length, rawResponse: result },
+    })
+  }
+  return entityUrl
 }
 
 /**
@@ -419,8 +437,15 @@ export interface CreateBookRequest {
   fromExampleId?: string
   /** When true, mark created book as public example (admin only; see step6 "Create example book"). */
   isExample?: boolean
+  /** Debug: run pipeline up to this step then return result without keeping book (admin + showDebugQualityButtons). */
+  debugRunUpTo?: 'masters' | 'cover'
+  /** Debug: collect full raw request/response for every step (story, masters, cover, pages); admin + showDebugQualityButtons. */
+  debugTrace?: boolean
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
+
+/** One entry per step when debugTrace is true (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §10) */
+export type DebugTraceEntry = { step: string; request: unknown; response: unknown }
 
 export interface CreateBookResponse {
   id: string
@@ -462,6 +487,8 @@ export async function POST(request: NextRequest) {
       skipPayment,
       fromExampleId, // Create from example: same story/scenes, only character swap via edits
       isExample, // Mark as public example (admin only; step6 "Create example book")
+      debugRunUpTo, // Debug: run up to step then return (admin + showDebugQualityButtons)
+      debugTrace: debugTraceRequested, // Debug: full raw request/response per step (admin + flag)
     } = body
 
     // Skip-payment: only when DEBUG or admin + flag (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
@@ -474,6 +501,30 @@ export async function POST(request: NextRequest) {
       if (!canSkip) {
         return CommonErrors.forbidden('Skip payment is not allowed for this user')
       }
+    }
+
+    // Debug run-up-to: admin + showDebugQualityButtons only (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §9)
+    const isDebugCoverMode = debugRunUpTo === 'cover'
+    const isDebugMastersMode = debugRunUpTo === 'masters'
+    if (debugRunUpTo) {
+      if (debugRunUpTo !== 'cover' && debugRunUpTo !== 'masters') {
+        return CommonErrors.badRequest('debugRunUpTo only supports "masters" or "cover"')
+      }
+      const role = await getUserRole(user.id)
+      const isAdmin = role === 'admin'
+      const flagOn = appConfig.features.dev.showDebugQualityButtons
+      if (!isAdmin || !flagOn) {
+        return CommonErrors.forbidden('Debug run-up-to is only allowed for admin with showDebugQualityButtons')
+      }
+    }
+
+    // Debug trace: collect full raw request/response for every step (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §10)
+    let debugTrace: DebugTraceEntry[] | null = null
+    if (debugTraceRequested === true) {
+      const role = await getUserRole(user.id)
+      const isAdmin = role === 'admin'
+      const flagOn = appConfig.features.dev.showDebugQualityButtons
+      if (isAdmin && flagOn) debugTrace = []
     }
 
     // Image generation defaults (hardcoded - no override)
@@ -530,12 +581,15 @@ export async function POST(request: NextRequest) {
     const character = characters[0]
 
     // ====================================================================
-    // DETERMINE MODE: Cover Only, From Example, or Full Book
+    // DETERMINE MODE: Cover Only, From Example, Full Book, or Debug (run up to masters/cover)
     // ====================================================================
-    const isCoverOnlyMode = !fromExampleId && (!pageCount || pageCount === 0)
-    const isFromExampleMode = !!fromExampleId
+    const isDebugRunUpTo = isDebugCoverMode || isDebugMastersMode
+    const isCoverOnlyMode = !isDebugRunUpTo && !fromExampleId && (!pageCount || pageCount === 0)
+    const isFromExampleMode = !isDebugRunUpTo && !!fromExampleId
+    // Debug: force full book path (story → masters [→ cover]) then return without keeping book
+    const effectivePageCount = isDebugRunUpTo ? (pageCount || 5) : pageCount
 
-    console.log(`[Create Book] 📋 Mode: ${isCoverOnlyMode ? 'Cover Only' : isFromExampleMode ? 'From Example' : 'Full Book'} (pageCount: ${pageCount || 'undefined'}, fromExampleId: ${fromExampleId || 'none'})`)
+    console.log(`[Create Book] 📋 Mode: ${isDebugMastersMode ? 'Debug (run up to masters)' : isDebugCoverMode ? 'Debug (run up to cover)' : isCoverOnlyMode ? 'Cover Only' : isFromExampleMode ? 'From Example' : 'Full Book'} (pageCount: ${effectivePageCount ?? 'undefined'}, fromExampleId: ${fromExampleId || 'none'})`)
     console.log(`[Create Book] 🎯 Theme: ${themeKey}`)
 
     let storyData: any = null
@@ -706,7 +760,7 @@ export async function POST(request: NextRequest) {
         theme: themeKey,
         illustrationStyle,
         customRequests,
-        pageCount: pageCount, // Debug: Optional page count override
+        pageCount: effectivePageCount, // Debug: Optional page count override; debug cover mode uses 5 if not set
         referencePhotoAnalysis: {
           detectedFeatures: character.description.physicalFeatures || {},
           finalDescription: character.description,
@@ -792,11 +846,32 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          // Debug trace: full raw story request/response (before trim so you see what API actually returned)
+          if (debugTrace) {
+            debugTrace.push({
+              step: 'story',
+              request: {
+                model: storyModel,
+                effectivePageCount,
+                systemMessage: storyRequestBody.messages[0].content,
+                userPromptLength: storyPrompt.length,
+                userPrompt: storyPrompt,
+                fullRequestBody: storyRequestBody,
+              },
+              response: {
+                rawContent: storyContent,
+                parsed: generatedStoryData,
+                pagesCount: generatedStoryData.pages?.length,
+                usage: completion?.usage,
+              },
+            })
+          }
+
           // v1.6.0: "clothing" field REMOVED from story schema – visual details from master system only; no validation for clothing
 
           // Enforce requested pageCount strictly
-          if (pageCount !== undefined && pageCount !== null) {
-            const requestedPages = Number(pageCount)
+          if (effectivePageCount !== undefined && effectivePageCount !== null) {
+            const requestedPages = Number(effectivePageCount)
             const returnedPages = generatedStoryData.pages.length
 
             console.log(`[Create Book] 📏 Requested pages: ${requestedPages}, AI returned: ${returnedPages} (attempt ${attempt}/${MAX_RETRIES})`)
@@ -927,7 +1002,9 @@ export async function POST(request: NextRequest) {
             user.id,
             true,
             char.gender,
-            themeClothing
+            themeClothing,
+            debugTrace ? (e) => debugTrace!.push(e) : undefined,
+            `master_character_${char.name || char.id}`
           )
           masterIllustrations[char.id] = masterUrl
           console.log(`[Create Book] ✅ From-example master for character ${char.id} (${char.name}): ${masterUrl}`)
@@ -1040,7 +1117,9 @@ export async function POST(request: NextRequest) {
           user.id,
           includeAge,
           char.gender,
-          charOutfit
+          charOutfit,
+          debugTrace ? (e) => debugTrace!.push(e) : undefined,
+          `master_character_${char.name || char.id}`
         )
         masterIllustrations[char.id] = masterUrl
         console.log(`[Create Book] ✅ Master illustration created for character ${char.id} (${char.name}): ${masterUrl}`)
@@ -1092,7 +1171,9 @@ export async function POST(request: NextRequest) {
             entity.name,
             entity.description,
             illustrationStyle,
-            user.id
+            user.id,
+            debugTrace ? (e) => debugTrace!.push(e) : undefined,
+            `entity_master_${entity.name}`
           )
           entityMasterIllustrations[entity.id] = entityMasterUrl
           console.log(`[Create Book] ✅ Entity master created for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
@@ -1119,6 +1200,30 @@ export async function POST(request: NextRequest) {
     }
 
     } // end if (!isFromExampleMode) — cover/page below run for both normal and from-example
+
+    // Debug: run up to masters – return result and remove book (kalite/prompt iyileştirme için)
+    if (isDebugMastersMode) {
+      const { error: delErr } = await deleteBook(book.id)
+      if (delErr) console.error('[Create Book] Debug: deleteBook failed', delErr)
+      return NextResponse.json({
+        success: true,
+        debug: true,
+        debugRunUpTo: 'masters',
+        data: {
+          storyData,
+          masterIllustrations,
+          entityMasterIllustrations: entityMasterIllustrations || {},
+        },
+        request: {
+          characterIds: characterIds ?? (characterId ? [characterId] : []),
+          theme: themeKey,
+          illustrationStyle,
+          language,
+          customRequests,
+          pageCount: effectivePageCount,
+        },
+      })
+    }
 
     console.log(`[Create Book] 🎨 Starting cover generation...`)
 
@@ -1671,6 +1776,14 @@ export async function POST(request: NextRequest) {
         console.log('[Create Book] 📸 Cover image URL length:', generatedCoverImageUrl.length, 'chars')
       }
 
+      if (debugTrace) {
+        debugTrace.push({
+          step: 'cover',
+          request: { prompt: textPrompt, sceneDescription: coverSceneDescription, coverSceneInput, themeKey, illustrationStyle },
+          response: { url: storageCoverUrl },
+        })
+      }
+
       // Update book with cover image URL
       // Update book with cover image URL
       // Status: Always 'generating' after cover (will be 'completed' only after page images in full-book mode)
@@ -1688,8 +1801,40 @@ export async function POST(request: NextRequest) {
         console.log('[Create Book] ✅ Book updated with cover image URL, status: generating (waiting for page images)')
       }
 
+      // Debug: run up to cover – return result and remove book (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §9)
+      if (isDebugCoverMode) {
+        const { error: delErr } = await deleteBook(book.id)
+        if (delErr) console.error('[Create Book] Debug: deleteBook failed', delErr)
+        return NextResponse.json({
+          success: true,
+          debug: true,
+          debugRunUpTo: 'cover',
+          data: {
+            coverUrl: storageCoverUrl,
+            storyData,
+            masterIllustrations,
+            entityMasterIllustrations: entityMasterIllustrations || {},
+          },
+          request: {
+            characterIds: characterIds ?? (characterId ? [characterId] : []),
+            theme: themeKey,
+            illustrationStyle,
+            language,
+            customRequests,
+            pageCount: effectivePageCount,
+          },
+        })
+      }
     } catch (coverError) {
       console.error('[Create Book] Cover generation failed:', coverError)
+      if (isDebugCoverMode) {
+        const { error: delErr } = await deleteBook(book.id)
+        if (delErr) console.error('[Create Book] Debug: deleteBook failed', delErr)
+        return NextResponse.json(
+          { success: false, debug: true, debugRunUpTo: 'cover', error: (coverError as Error).message },
+          { status: 500 }
+        )
+      }
       // Update status to 'failed' but don't throw - book can still be used without cover
       await updateBook(book.id, { status: 'failed' })
       // Continue to response - story is still generated
@@ -1720,7 +1865,7 @@ export async function POST(request: NextRequest) {
             })
           }
         })
-        console.log(`[Create Book] 🚀 Using PARALLEL batch processing (4 images per 90 seconds)`)
+        console.log(`[Create Book] 🚀 Using PARALLEL batch processing (15 images per batch, 90s window)`)
         console.log(`[Create Book] 📊 Model: ${imageModel} | Size: ${imageSize} | Quality: ${imageQuality}`)
         console.log(`[Create Book] ⏱️  Page images generation started at: ${new Date().toISOString()}`)
 
@@ -1749,8 +1894,8 @@ export async function POST(request: NextRequest) {
           console.log(`[Create Book] 📝 All additional characters:`, allAdditionalCharacters.map(c => c.type.displayName).join(', '))
         }
 
-        // Process pages in batches of 4 (Tier 1: 4 IPM = 4 images per 90 seconds)
-        const BATCH_SIZE = 4
+        // Process pages in batches of 15 (capacity: 15 concurrent image requests per window)
+        const BATCH_SIZE = 15
         const RATE_LIMIT_WINDOW_MS = 90000 // 90 seconds
 
         for (let batchStart = 0; batchStart < totalPages; batchStart += BATCH_SIZE) {
@@ -2232,6 +2377,14 @@ export async function POST(request: NextRequest) {
         console.log(`[Create Book] ✅ Page ${pageNumber} - Image uploaded:`, storageImageUrl)
         console.log(`[Create Book] 📊 Page ${pageNumber} - Storage URL length:`, storageImageUrl?.length || 0, 'chars')
 
+        if (debugTrace) {
+          debugTrace.push({
+            step: `page_${pageNumber}`,
+            request: { prompt: fullPrompt, sceneDescription, pageNumber },
+            response: { url: storageImageUrl },
+          })
+        }
+
             // Update page with image URL
             const pageIndex = pages.findIndex((p: { pageNumber?: number }) => (p.pageNumber || pages.indexOf(p) + 1) === pageNumber)
             if (pageIndex !== -1) {
@@ -2337,7 +2490,7 @@ export async function POST(request: NextRequest) {
     console.log(`[Create Book] 🖼️  Cover image: ${finalBook.cover_image_url ? 'Yes ✅' : 'No ❌'}`)
     console.log(`[Create Book] 📄 Total pages: ${finalBook.total_pages}`)
 
-    const response: CreateBookResponse = {
+    const response: CreateBookResponse & { debugTrace?: DebugTraceEntry[] } = {
       id: finalBook.id,
       title: finalBook.title,
       status: finalBook.status,
@@ -2351,6 +2504,7 @@ export async function POST(request: NextRequest) {
       generationTime,
       tokensUsed,
       story_data: storyData, // Include story content in response for debug/preview (null in cover only mode)
+      ...(debugTrace && debugTrace.length > 0 && { debugTrace }),
     }
 
     return successResponse(

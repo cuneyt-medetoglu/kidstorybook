@@ -8,8 +8,8 @@ import type { PromptVersion } from '../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.1.0',
-  releaseDate: new Date('2026-01-18'),
+  version: '1.2.0',
+  releaseDate: new Date('2026-02-07'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -28,6 +28,7 @@ export const VERSION: PromptVersion = {
     'v1.0.5: ANATOMICAL_NEGATIVE daha da sadeleştirildi - tekrarlar kaldırıldı (18 Ocak 2026)',
     'v1.0.5: getSafeHandPoses() eklendi - güvenli el pozisyonları listesi (18 Ocak 2026)',
     'v1.1.0: Prompt optimization - anatomical directives ultra-simplified (500→120 chars), safe poses minimized (150→40 chars), ANATOMICAL_NEGATIVE reduced to 3 items (18 Ocak 2026)',
+    'v1.2.0: El/parmak – getAnatomicalCorrectnessDirectives: five distinct fingers, well-formed hands, properly proportioned. ANATOMICAL_NEGATIVE: extra fingers, missing fingers, fused fingers (7 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -122,6 +123,23 @@ export const AGE_SPECIFIC_NEGATIVE: Record<string, string[]> = {
     'childish', 'too simple',
   ],
 }
+
+// ============================================================================
+// Composition Negative Prompts (GPT sinematik kalite – "kocaman karakter" kırma)
+// 7 Şubat 2026: close-up/centered/filling frame ile karakterin frame'i doldurması azaltılır
+// ============================================================================
+
+export const COMPOSITION_NEGATIVE = [
+  'close-up portrait',
+  'centered subject',
+  'character filling frame',
+  'big head',
+  'cropped feet',
+  'selfie angle',
+  'poster composition',
+  'no zoom-in',
+  'no tight framing',
+]
 
 // ============================================================================
 // Style-Specific Negative Prompts (UPDATED: Illustration Style İyileştirmesi)
@@ -283,6 +301,7 @@ export const THEME_NEGATIVE: Record<string, string[]> = {
  */
 export const ANATOMICAL_NEGATIVE = [
   'deformed', 'extra limbs', 'holding hands',
+  'extra fingers', 'missing fingers', 'fused fingers',
 ]
 
 // ============================================================================
@@ -339,6 +358,9 @@ export function getNegativePrompt(
   // Add character negatives
   negatives.push(...CHARACTER_NEGATIVE)
   
+  // Add composition negatives (sinematik kalite – avoid "kocaman karakter")
+  negatives.push(...COMPOSITION_NEGATIVE)
+  
   // Remove duplicates and join
   const uniqueNegatives = [...new Set(negatives)]
   
@@ -353,7 +375,7 @@ export function getNegativePrompt(
  * Simplified to avoid token attention issues
  */
 export function getAnatomicalCorrectnessDirectives(): string {
-  return '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]'
+  return '[ANATOMY] Each hand has exactly five distinct fingers, clearly separated; well-formed hands, properly proportioned fingers. Arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth). [/ANATOMY]'
 }
 
 /**
@@ -378,6 +400,7 @@ export default {
   VERSION,
   UNIVERSAL_NEGATIVE,
   AGE_SPECIFIC_NEGATIVE,
+  COMPOSITION_NEGATIVE,
   STYLE_NEGATIVE,
   THEME_NEGATIVE,
   CHARACTER_NEGATIVE,

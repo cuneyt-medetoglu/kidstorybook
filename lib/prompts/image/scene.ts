@@ -1,5 +1,5 @@
 import type { PromptVersion } from '../types'
-import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes } from './style-descriptions'
+import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes, getCinematicPack } from './style-descriptions'
 import { getAnatomicalCorrectnessDirectives, getSafeHandPoses } from './negative'
 
 /**
@@ -1287,9 +1287,10 @@ export function generateFullPagePrompt(
   }
 
   // 0.5. [Faz 1] Reference = identity only; pose & expression from story (v1.11.0)
+  // GPT sinematik kalite: Identity match does NOT imply close-up; keep wide framing (7 Şubat 2026)
   const useMatchReference = sceneInput.clothing === 'match_reference'
   if (useMatchReference) {
-    promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing.')
+    promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing. Identity match does NOT imply close-up. Keep the wide framing.')
   } else if (sceneInput.clothing?.trim()) {
     promptParts.push(`CRITICAL: Character MUST wear EXACTLY: ${sceneInput.clothing.trim()}. This outfit is LOCKED for the entire book.`)
   }
@@ -1311,6 +1312,9 @@ export function generateFullPagePrompt(
 
   // 6. Style Section
   promptParts.push(...buildStyleSection(illustrationStyle))
+
+  // 6.5. CINEMATIC_PACK – tüm stiller için ortak sinematik kalite (GPT 7 Şubat 2026)
+  promptParts.push(getCinematicPack())
 
   // 7. [NEW v1.8.0] Character Integration (karakter sahneye entegre, yapıştırılmış değil)
   // 7.5. Cinematic & natural (interior only): characters engaged with scene, NOT looking at camera

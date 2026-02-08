@@ -74,6 +74,8 @@ export const appConfig = {
       skipPaymentForCreateBook: isDevelopment || process.env.DEBUG_SKIP_PAYMENT === 'true',
       /** Server: allow showing admin dashboard. Do not set in production except for admins. */
       showAdminDashboard: isDevelopment || process.env.SHOW_ADMIN_DASHBOARD === 'true',
+      /** Server: show debug quality buttons (Step 6) for admins to test story/masters/cover/page individually. */
+      showDebugQualityButtons: isDevelopment || process.env.SHOW_DEBUG_QUALITY_BUTTONS === 'true',
     },
     // Production features
     production: {

@@ -43,6 +43,7 @@
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@uiw/react-json-view": "^2.0.0-alpha.41",
     "autoprefixer": "^10.4.23",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

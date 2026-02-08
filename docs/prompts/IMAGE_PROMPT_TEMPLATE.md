@@ -1,7 +1,7 @@
 # Image Generation Prompt Template
 
 **Kod referansları:** `lib/prompts/image/scene.ts`, `character.ts`, `negative.ts`, `style-descriptions.ts` (tek kaynak; doküman bu kodla eşleşir)  
-**Versiyon (scene):** 1.11.0
+**Versiyon (scene):** 1.11.0 | **Versiyon (negative/anatomi):** 1.2.0 (7 Şubat 2026 – el/parmak pozitif ve negatif direktifler)
 
 ---
 

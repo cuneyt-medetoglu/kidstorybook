@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.9.0',
-  releaseDate: new Date('2026-02-03'),
+  version: '2.1.0',
+  releaseDate: new Date('2026-02-07'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -45,6 +45,8 @@ export const VERSION: PromptVersion = {
     'v1.7.0: PROMPT SLIM – Request length reduced. System: one-line language rule. User: removed duplicate opening line; removed PERSONALITY block; removed Theme-Specific Examples; LANGUAGE section one line + verification; STORY STRUCTURE = short cover/interior/different-scenes; THEME + DO NOT DESCRIBE shortened; VISUAL DIVERSITY, WRITING STYLE, ILLUSTRATION, CRITICAL REMINDERS, OUTPUT FORMAT, SUPPORTING ENTITIES shortened. (30 Ocak 2026)',
     'v1.8.0: Per-page expression field – Story output adds expression (one word or short phrase, English) per page; derived from page text; no fixed list. ILLUSTRATION + OUTPUT FORMAT + CRITICAL REMINDERS updated. Used by image pipeline for facial expression. (2 Şubat 2026)',
     'v1.9.0: characterExpressions (per-character per-page) – Replaces single "expression" field. Story output now has characterExpressions object (char ID → visual facial description: eyes, brows, mouth). ILLUSTRATION section: detailed expression guidelines (sad/worried/curious/angry/focused/surprised/happy/calm), visual betimleme (not emotion words), multi-character scene support (each character can have different expression). OUTPUT FORMAT + CRITICAL REMINDERS updated. (3 Şubat 2026)',
+    'v2.0.0: STORY_PROMPT_ACTION_PLAN – Cover netliği (cover ayrı, pages = interior only). CHARACTER MAPPING + CHARACTER_ID_MAP (liste + map, gerçek UUID). Yaş/kelime: getWordCountRange (toddler 10-25, preschool 25-45, vb.), getSentenceLength doğal kurallar. DO NOT DESCRIBE iki maddeli: (a) text = görsel yok, (b) imagePrompt = appearance yasak, ışık/kompozisyon serbest. OUTPUT FORMAT suggestedOutfits placeholder düzeltmesi. (7 Şubat 2026)',
+    'v2.1.0: GPT trace aksiyonları – VISUAL DIVERSITY: Do NOT repeat same pose/action on consecutive pages; each page distinctly different action/pose. Word count: getWordCountRange artırıldı (toddler 30-45 … pre-teen 130-180), getWordCountMin export; CRITICAL: Each page text at least X words. generate-story: kelime sayımı + kısa sayfa repair pass. (7 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -165,13 +167,14 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     }
     characterDesc += `\n- Distribute characters evenly - do not favor some characters over others`
     
-    // CHARACTER MAPPING for JSON response
+    // CHARACTER MAPPING for JSON response (aksiyon planı 1.2: liste + CHARACTER_ID_MAP)
     characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
     characters.forEach((char, index) => {
-      characterDesc += `- Character ${index + 1}: ID="${char.id}", Name="${char.name || char.type.displayName}"\n`
+      const name = char.name || char.type.displayName
+      characterDesc += `- Character ${index + 1}: id: ${char.id} | name: ${name}\n`
     })
-    
-    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include a "characterIds" array indicating which characters appear on that page using their IDs from the mapping above.`
+    characterDesc += `\nCHARACTER_ID_MAP (use these exact IDs in characterIds and suggestedOutfits):\n${JSON.stringify(Object.fromEntries(characters.map(c => [c.id, c.name || c.type.displayName])))}\n`
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include a "characterIds" array indicating which characters appear on that page using their IDs from the mapping above (exact UUIDs from CHARACTER_ID_MAP).`
     characterDesc += `\n- "characterIds" is a REQUIRED field - do NOT omit it`
     characterDesc += `\n- Use the exact character IDs from the mapping above`
     characterDesc += `\n- Example: If page 2 features both ${characterName} and ${characters[1].name || characters[1].type.displayName}, set "characterIds": ["${characters[0].id}", "${characters[1].id}"]`
@@ -179,27 +182,30 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n- **VERIFICATION:** Before returning JSON, verify that ALL character IDs (${characters.map(c => c.id).join(', ')}) appear in at least one page's characterIds array`
     characterDesc += `\n- **DO NOT** exclude any character - ALL ${characters.length} characters must be used in the story`
   } else if (characters && characters.length === 1) {
-    // Single character - still include characterIds for consistency
+    // Single character - liste + CHARACTER_ID_MAP (aksiyon planı 1.2)
+    const c = characters[0]
+    const name = c.name || c.type.displayName
     characterDesc += `\n\nCHARACTER MAPPING (CRITICAL - for JSON response):\n`
-    characterDesc += `- Character 1: ID="${characters[0].id}", Name="${characters[0].name || characters[0].type.displayName}"\n`
-    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${characters[0].id}"]`
+    characterDesc += `- Character 1: id: ${c.id} | name: ${name}\n`
+    characterDesc += `\nCHARACTER_ID_MAP (use this exact ID in characterIds and suggestedOutfits):\n${JSON.stringify({ [c.id]: name })}\n`
+    characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${c.id}"]`
   }
 
   // Faz 2: Prompt bölümlerini oluştur (açılış system'de; tekrar yok)
   const sections = [
     buildCharacterSection(characterDesc, characters),
-    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 10, language, illustrationStyle, customRequests),
+    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 12, language, illustrationStyle, customRequests),
     buildSupportingEntitiesSection(theme), // NEW: Supporting entities for master generation
     buildLanguageSection(language),
     buildAgeAppropriateSection(ageGroup),
-    buildStoryStructureSection(characterName, ageGroup, pageCount ?? 10, characters),
+    buildStoryStructureSection(characterName, ageGroup, pageCount ?? 12, characters),
     buildThemeSpecificSection(themeConfig, ageGroup, theme),
     buildVisualDiversitySection(),
     buildWritingStyleSection(ageGroup, language, characterName, characters),
     buildSafetySection(ageGroup),
     buildIllustrationSection(illustrationStyle, characterName, characters),
-    buildOutputFormatSection(ageGroup, pageCount ?? 10, illustrationStyle, theme, themeConfig, characters || [], characterName),
-    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount ?? 10, language),
+    buildOutputFormatSection(ageGroup, pageCount ?? 12, illustrationStyle, theme, themeConfig, characters || [], characterName),
+    buildCriticalRemindersSection(ageGroup, characterName, themeConfig, pageCount ?? 12, language),
     `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
   ]
   
@@ -224,8 +230,8 @@ function getPageCount(ageGroup: string, override?: number): number {
     return override
   }
   
-  // Fixed to 10 pages for all age groups (user request: 10 Ocak 2026)
-  return 10
+  // Varsayılan: 12 sayfa (isteğe göre 2–20 override ile değiştirilebilir)
+  return 12
   
   // Previous logic (commented out for reference):
   // const counts: Record<string, number> = {
@@ -250,12 +256,13 @@ function getVocabularyLevel(ageGroup: string): string {
 }
 
 function getSentenceLength(ageGroup: string): string {
+  // Aksiyon planı 1.3: mikro "3-5 words" kaldırıldı; doğal kurallar
   const lengths: Record<string, string> = {
-    toddler: 'very short (3-5 words)',
-    preschool: 'short (5-8 words)',
-    'early-elementary': 'short to medium (8-12 words)',
-    elementary: 'medium (10-15 words)',
-    'pre-teen': 'medium to long (12-20 words)',
+    toddler: 'very short sentences, simple verbs, lots of repetition',
+    preschool: 'short sentences, simple structure',
+    'early-elementary': 'short to medium sentences',
+    elementary: 'medium sentences, clear cause-effect',
+    'pre-teen': 'medium to long sentences',
   }
   return lengths[ageGroup] || 'age-appropriate'
 }
@@ -271,17 +278,32 @@ function getComplexityLevel(ageGroup: string): string {
   return levels[ageGroup] || 'age-appropriate'
 }
 
-function getWordCount(ageGroup: string): string {
-  // Updated word counts (25 Ocak 2026): All values are AVERAGES, doubled from previous version
-  // User request: Increase word counts by 2x for richer story content
-  const counts: Record<string, string> = {
-    toddler: '70-90',           // avg 80 words (doubled from 35-45)
-    preschool: '100-140',        // avg 120 words (doubled from 50-70)
-    'early-elementary': '160-200', // avg 180 words (doubled from 80-100)
-    elementary: '220-260',       // avg 240 words (doubled from 110-130)
-    'pre-teen': '220-260',       // avg 240 words (doubled from 110-130)
+/** Yaş bandına göre hedef kelime sayısı (basılı kitap için artırılmış hedefler – 7 Şubat 2026) */
+function getWordCountRange(ageGroup: string): string {
+  const ranges: Record<string, string> = {
+    toddler: '30-45',
+    preschool: '45-65',
+    'early-elementary': '70-95',
+    elementary: '95-125',
+    'pre-teen': '130-180',
   }
-  return counts[ageGroup] || '160-200'
+  return ranges[ageGroup] || '70-95'
+}
+
+/** Yaş bandına göre sayfa başı minimum kelime (CRITICAL talimat ve post-process için) */
+export function getWordCountMin(ageGroup: string): number {
+  const mins: Record<string, number> = {
+    toddler: 30,
+    preschool: 45,
+    'early-elementary': 70,
+    elementary: 95,
+    'pre-teen': 130,
+  }
+  return mins[ageGroup] ?? 70
+}
+
+function getWordCount(ageGroup: string): string {
+  return getWordCountRange(ageGroup)
 }
 
 function getReadingTime(ageGroup: string): number {
@@ -613,10 +635,15 @@ function buildStoryRequirementsSection(
   illustrationStyle: string,
   customRequests?: string
 ): string {
+  const n = getPageCount(ageGroup, pageCount)
+  const wordTarget = getWordCountRange(ageGroup)
+  const wordMin = getWordCountMin(ageGroup)
   return `# STORY REQUIREMENTS
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
 - Target Age: ${characterAge} years old (${ageGroup} age group)
-- Story Length: EXACTLY ${getPageCount(ageGroup, pageCount)} pages (CRITICAL: You MUST return exactly ${getPageCount(ageGroup, pageCount)} pages, no more, no less)
+- Story Length: EXACTLY ${n} pages (CRITICAL: You MUST return exactly ${n} interior pages, no more, no less. Cover is generated separately.)
+- Target words per page: ${wordTarget} (short sentences, simple verbs, repetition where appropriate).
+- CRITICAL: Each page's "text" must be at least ${wordMin} words for this age group. Do not leave pages with only a few words.
 - Language: ${getLanguageName(language)}
 - Illustration Style: ${illustrationStyle}
 - Special Requests: ${customRequests || 'None'}`
@@ -655,8 +682,10 @@ function buildStoryStructureSection(
   pageCount: number,
   characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
 ): string {
+  const n = getPageCount(ageGroup, pageCount)
   return `# STORY STRUCTURE
-- **Cover:** One page for the book cover (main character + theme). Professional, striking.
+- **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
+- **pages[]:** EXACTLY ${n} items (interior pages only). No cover in this array.
 - **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
 - **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
 - Vary locations and time of day across pages so the story feels like a progression.`
@@ -670,13 +699,16 @@ function buildThemeSpecificSection(
   return `# THEME
 Use a setting, mood, and educational focus that fit the theme "${themeConfig.name}" and target age. Do not list fixed examples; derive them from the story you create.
 
-# DO NOT DESCRIBE VISUAL DETAILS
-Story = narrative only. Visual details (appearance, clothing, object colors) = master illustration system. Do not describe character looks or clothing in text/imagePrompt/sceneContext. Focus on actions, emotions, location, time of day, plot. sceneContext = short location/time/action only, in English (e.g. "forest clearing, morning, character approaching").`
+# DO NOT DESCRIBE VISUAL DETAILS (two rules)
+(a) **pages[].text (story narrative):** No visual details (no appearance, clothing, object colors). Focus on actions, emotions, location, time of day, plot. Narrative only.
+(b) **imagePrompt / sceneDescription:** Do NOT describe character appearance or clothing (master provides that). DO include: lighting, color, composition, atmosphere, camera angle, environment detail. sceneContext = short location/time/action only, in English (e.g. "forest clearing, morning, character approaching").`
 }
 
 function buildVisualDiversitySection(): string {
   return `# VISUAL DIVERSITY
-Each page = different scene. Vary location, time of day, perspective, composition, action. Scene description and imagePrompt: detailed (150+ and 200+ chars).`
+Each page = different scene. Vary location, time of day, perspective, composition, and character action/pose.
+- Do NOT repeat the same pose or action on consecutive pages. Each page must have a distinctly different character action or pose (e.g. one page running, next page sitting or looking around; one page jumping, next page crouching or pointing).
+- Scene description and imagePrompt: detailed (150+ and 200+ chars).`
 }
 
 function buildWritingStyleSection(
@@ -758,7 +790,7 @@ Return a valid JSON object:
     }
   ],
   "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
-  "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"character-id-from-MAPPING": "one line English outfit"'},
+  "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"<uuid-from-CHARACTER_ID_MAP>": "one line English outfit"'},
   "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
 }
 Pages array: EXACTLY ${getPageCount(ageGroup, pageCount)} items. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING). suggestedOutfits REQUIRED: object with one key per character ID from CHARACTER MAPPING, value = one line English outfit for that character (used for master illustration).

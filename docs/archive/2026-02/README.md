@@ -1,6 +1,18 @@
 # Arşiv – Şubat 2026
 
-Bu klasör, AWS geçişi sonrası gerekli olmayan dokümanları içerir. Production ortamı AWS (EC2 PostgreSQL + S3); sıfırdan kurulum için tek referans: **docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md**.
+Bu klasör, AWS geçişi sonrası gerekli olmayan dokümanları ve işi bitmiş analiz dokümanlarını içerir. Production ortamı AWS (EC2 PostgreSQL + S3); sıfırdan kurulum için tek referans: **docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md**.
+
+## analysis/
+
+İşi bitmiş veya tek seferlik analiz dokümanları (7 Şubat 2026’da docs/analysis/’ten taşındı):
+
+- **CHATGPT_STORY_REQUEST_REVIEW_PROMPT.md** – ChatGPT’ye yapıştırma prompt’u (story request inceleme)
+- **CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS.md** – Kıyafet tutarlılığı kök neden analizi
+- **SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md** – Kıyafet sistemi tasarımı (v1.6.0)
+- **GPT_FOLLOWUP_AND_PLAN.md** – GPT konuşma özeti + aksiyon planı bağlantısı
+- **GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE.md** – GPT’ye illustrationStyle + sinematik mesaj şablonu
+- **GPT_TRACE_CEVAPLARI_AKSIYON.md** – GPT trace cevapları, aksiyon planı ve uygulama durumu
+- **GPT_TRACE_QUESTIONS_2026-02-07.md** – GPT’ye trace ile sorulacak sorular ve kapsam cevabı
 
 ## supabase-legacy/
 

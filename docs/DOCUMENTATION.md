@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 7 Şubat 2026 (Commit öncesi: migration/temp dokümanlar archive'a taşındı; docs sadeleştirildi.)
+**Son güncelleme:** 7 Şubat 2026 (Commit öncesi: prompt v2.1.0/v1.2.0, GPT trace aksiyonları, analysis dokümanları.)
 
 ---
 
@@ -44,8 +44,9 @@ docs/
 │   ├── README.md               # Arşiv yapısı (FAZ 6)
 │   ├── 2026-q1/                # FAZ 6 ile taşınan 17 dosya (implementation, guides, reports, strategies, ai)
 │   │   └── README.md           # 2026-q1 özeti
-│   ├── 2026-02/                # AWS geçişi sonrası (Supabase legacy rehberler, AWS analiz/detay planları)
+│   ├── 2026-02/                # AWS geçişi sonrası + işi bitmiş analizler
 │   │   ├── README.md           # 2026-02 özeti
+│   │   ├── analysis/           # Taşınan analiz dokümanları (7 dosya: GPT trace, clothing, vb.)
 │   │   ├── supabase-legacy/    # SUPABASE_TEST_GUIDE, SUPABASE_MIGRATION_GUIDE, SUPABASE_PDFS_BUCKET_SETUP
 │   │   └── aws-plans/         # SUPABASE_TO_AWS_ANALYSIS, AWS_S3_SINGLE_BUCKET_PLAN, AWS_MIGRATIONS_ORDER
 │   ├── FAZ1_2_CHECKLIST.md     # Faz 1.2 kontrol listesi (arşiv)
@@ -197,8 +198,10 @@ docs/
 3. (AI_TOOLS_COMPARISON → archive/2026-q1/ai/)
 4. **prompts/** - Tüm prompt template'leri
 5. **analysis/STORY_AND_IMAGE_AI_FLOW.md** - Story ve Image için AI’a ne gönderildiği / ne döndüğü (request-response akışı, inceleme için)
-6. **analysis/SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md** - Kıyafet tutarlılığı sistem tasarımı (v1.6.0 single source of truth)
-7. **analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md** - Create Your Own from Example: akış, characterIds eşleştirmesi, kapak Vision
+6. **analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md** - Create Your Own from Example: akış, characterIds eşleştirmesi, kapak Vision
+7. **analysis/DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md** - Debug kalite butonları (admin, trace export)
+8. **analysis/STORY_PROMPT_ACTION_PLAN.md** - Hikaye + görsel kalite aksiyon planı
+9. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

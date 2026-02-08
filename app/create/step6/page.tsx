@@ -29,6 +29,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import type { CurrencyConfig } from "@/lib/currency"
 import { useCurrency } from "@/contexts/CurrencyContext"
+import { DebugQualityPanel } from "@/components/debug/DebugQualityPanel"
+import { TraceViewerModal, type DebugTraceEntry } from "@/components/debug/TraceViewerModal"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // Timeline step configuration
 const timelineSteps = [
@@ -81,6 +84,14 @@ export default function Step6Page() {
   // Debug / skip payment: only from API (admin role in DB or DEBUG_SKIP_PAYMENT server env)
   const [canSkipPayment, setCanSkipPayment] = useState(false)
 
+  // Debug quality buttons: only for admin + feature flag
+  const [canShowDebugQuality, setCanShowDebugQuality] = useState(false)
+
+  // Debug trace: collect full request/response for every step when creating book
+  const [debugTraceRequested, setDebugTraceRequested] = useState(false)
+  const [traceModalOpen, setTraceModalOpen] = useState(false)
+  const [traceData, setTraceData] = useState<DebugTraceEntry[] | null>(null)
+
   // Currency from context (tek seferlik fetch)
   const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
@@ -124,6 +135,24 @@ export default function Step6Page() {
         setCanSkipPayment(!!data.canSkipPayment)
       } catch {
         setCanSkipPayment(false)
+      }
+    }
+    check()
+  }, [user])
+
+  // Can show debug quality buttons (admin + feature flag)
+  useEffect(() => {
+    if (!user) {
+      setCanShowDebugQuality(false)
+      return
+    }
+    const check = async () => {
+      try {
+        const res = await fetch("/api/debug/quality/can-show")
+        const data = await res.json()
+        setCanShowDebugQuality(!!data.canShow)
+      } catch {
+        setCanShowDebugQuality(false)
       }
     }
     check()
@@ -368,6 +397,7 @@ export default function Step6Page() {
       pageCount: formData.pageCount,
       language,
       skipPayment: true,
+      ...(canShowDebugQuality && debugTraceRequested && { debugTrace: true }),
     }
     if (!(payload as { characterIds?: string[]; characterId?: string | null }).characterIds?.length && !(payload as any).characterId) {
       toast({
@@ -389,11 +419,20 @@ export default function Step6Page() {
         throw new Error(result.error || result.message || "Create book failed")
       }
       const bookId = result.data?.id ?? result.id
-      toast({
-        title: "Book creation started",
-        description: "Your book is being generated.",
-      })
-      router.push("/dashboard")
+      if (result.data?.debugTrace?.length) {
+        setTraceData(result.data.debugTrace)
+        setTraceModalOpen(true)
+        toast({
+          title: "Kitap oluşturuldu",
+          description: "Tüm adımların request/response'ı aşağıda. İnceleyip kapatabilirsiniz.",
+        })
+      } else {
+        toast({
+          title: "Book creation started",
+          description: "Your book is being generated.",
+        })
+        router.push("/dashboard")
+      }
     } catch (error) {
       console.error("Create without payment error:", error)
       toast({
@@ -1140,8 +1179,17 @@ export default function Step6Page() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.35, duration: 0.4 }}
-                  className="w-full"
+                  className="w-full space-y-2"
                 >
+                  {canShowDebugQuality && (
+                    <label className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-200 cursor-pointer">
+                      <Checkbox
+                        checked={debugTraceRequested}
+                        onCheckedChange={(v) => setDebugTraceRequested(!!v)}
+                      />
+                      <span>Tüm adımların request/response'ını topla (debug trace)</span>
+                    </label>
+                  )}
                   <Button
                     type="button"
                     variant="outline"
@@ -1197,6 +1245,22 @@ export default function Step6Page() {
                 </motion.div>
               )}
 
+              {/* Debug Quality Panel (Admin only) */}
+              {canShowDebugQuality && wizardData && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.45, duration: 0.4 }}
+                  className="w-full"
+                >
+                  <DebugQualityPanel
+                    wizardData={wizardData}
+                    characterIds={getCharacterIdsForApi(getCharactersData())}
+                    canShow={canShowDebugQuality}
+                  />
+                </motion.div>
+              )}
+
               {/* Back Button */}
               <motion.div
                 initial={{ opacity: 0 }}
@@ -1231,6 +1295,17 @@ export default function Step6Page() {
         </motion.div>
       </div>
 
+      {/* Trace viewer modal (after create with debugTrace) */}
+      {traceData && (
+        <TraceViewerModal
+          open={traceModalOpen}
+          onOpenChange={(open) => {
+            setTraceModalOpen(open)
+            if (!open) router.push("/dashboard")
+          }}
+          trace={traceData}
+        />
+      )}
     </div>
   )
 }

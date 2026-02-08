@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getBookById } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import OpenAI from 'openai'
 
@@ -24,6 +24,10 @@ export interface StoryGenerationRequest {
   illustrationStyle: string
   customRequests?: string
   language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
+  /** Sayfa sayısı (2–20). Verilmezse prompt varsayılanı kullanılır (şu an 10). */
+  pageCount?: number
+  /** Debug: return apiRequest, characterResolved, aiRequest in response metadata.debug */
+  debug?: boolean
 }
 
 export interface StoryGenerationResponse {
@@ -69,6 +73,8 @@ export async function POST(request: NextRequest) {
       illustrationStyle,
       customRequests,
       language = 'en',
+      pageCount: pageCountOverride,
+      debug: debugMode = false,
     } = body
 
     if (!characterId || !theme || !illustrationStyle) {
@@ -104,6 +110,15 @@ export async function POST(request: NextRequest) {
         ? `${character.description.clothingStyle} in ${character.description.clothingColors.join(' and ')}`
         : undefined)
 
+    // CHARACTER MAPPING için gerçek UUID: tek karakterde bile characters dizisi veriyoruz (aksiyon planı 1.2)
+    const charactersForPrompt = [
+      {
+        id: character.id,
+        name: character.name,
+        type: { displayName: character.name, group: 'Child', value: 'Child' },
+      },
+    ]
+
     const storyPrompt = generateStoryPrompt({
       characterName: character.name,
       characterAge: character.age,
@@ -111,6 +126,7 @@ export async function POST(request: NextRequest) {
       theme,
       illustrationStyle,
       customRequests,
+      pageCount: pageCountOverride,
       referencePhotoAnalysis: {
         detectedFeatures: {
           age: character.description.age,
@@ -126,6 +142,7 @@ export async function POST(request: NextRequest) {
       },
       language,
       defaultClothing,
+      characters: charactersForPrompt,
     })
 
     console.log('Story generation started for character:', character.name)
@@ -145,21 +162,16 @@ export async function POST(request: NextRequest) {
       'ru': 'Russian',
     }
     const languageName = languageNames[language] || 'English'
+    const systemMessage =
+      `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts.
+
+LANGUAGE: Only the "text" field of each page (the story narrative) must be in ${languageName}. The fields imagePrompt, sceneDescription, sceneContext, and characterExpressions must be in English (used for image generation APIs).`
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        {
-          role: 'system',
-          content:
-            `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts.
-
-CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageName} ONLY. DO NOT use any English words, phrases, or sentences. Every single word in the story text must be in ${languageName}. If you use any English words, the story will be rejected.`,
-        },
-        {
-          role: 'user',
-          content: storyPrompt,
-        },
+        { role: 'system', content: systemMessage },
+        { role: 'user', content: storyPrompt },
       ],
       response_format: { type: 'json_object' },
       temperature: 0.8, // Creative but not too random
@@ -182,29 +194,110 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
     }
 
     // ====================================================================
-    // 6.1. LOG: Word Count Analysis (NEW: 15 Ocak 2026 - Quality Check)
+    // 6.0. Validator + repair pass: supportingEntities, suggestedOutfits (aksiyon planı 2.1)
     // ====================================================================
-    console.log('[Story Generation] 📊 WORD COUNT ANALYSIS:')
-    const ageGroup = storyData.metadata?.ageGroup || 'preschool'
-    const expectedWordCount = ageGroup === 'toddler' ? '35-45' : 
-                             ageGroup === 'preschool' ? '50-70' :
-                             ageGroup === 'early-elementary' ? '80-100' : '110-130'
-    
-    storyData.pages.forEach((page: any, index: number) => {
-      const wordCount = page.text ? page.text.split(/\s+/).length : 0
-      const pageNum = page.pageNumber || index + 1
-      const isTooShort = (ageGroup === 'toddler' && wordCount < 35) ||
-                        (ageGroup === 'preschool' && wordCount < 50) ||
-                        (ageGroup === 'early-elementary' && wordCount < 80) ||
-                        (ageGroup === 'elementary' && wordCount < 110)
-      
-      console.log(`  Page ${pageNum}: ${wordCount} words (target: ${expectedWordCount} avg)${isTooShort ? ' ⚠️ TOO SHORT!' : ' ✓'}`)
+    const needsSupportingEntities = !Array.isArray(storyData.supportingEntities) || storyData.supportingEntities.length === 0
+    const characterIdsFromPages = new Set<string>()
+    storyData.pages?.forEach((p: { characterIds?: string[] }) => {
+      (p.characterIds || []).forEach((id: string) => characterIdsFromPages.add(id))
     })
-    
-    const avgWordCount = storyData.pages.reduce((sum: number, page: any) => {
-      return sum + (page.text ? page.text.split(/\s+/).length : 0)
-    }, 0) / storyData.pages.length
-    console.log(`  Average: ${avgWordCount.toFixed(1)} words per page (target: ${expectedWordCount})`)
+    const needsSuggestedOutfits =
+      !storyData.suggestedOutfits ||
+      typeof storyData.suggestedOutfits !== 'object' ||
+      [...characterIdsFromPages].some((id) => !storyData.suggestedOutfits[id])
+
+    if (needsSupportingEntities || needsSuggestedOutfits) {
+      try {
+        const repairPrompt = `The following story JSON is missing required fields. Return ONLY a valid JSON object containing the missing field(s). Do not repeat or change the story content.
+
+Missing: ${needsSupportingEntities ? 'supportingEntities (array of { id, type: "animal"|"object", name, description, appearsOnPages: number[] }) - list ALL animals and important objects in the story.' : ''}${needsSuggestedOutfits ? (needsSupportingEntities ? ' ' : '') + 'suggestedOutfits (object: character UUID -> one line English outfit per character). Character IDs to include: ' + [...characterIdsFromPages].join(', ') + '.' : ''}
+
+Story title: ${storyData.title}
+Pages count: ${storyData.pages?.length || 0}
+Theme: ${theme}
+
+Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', needsSuggestedOutfits && 'suggestedOutfits'].filter(Boolean).join(', ')}.`
+
+        const repairCompletion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: repairPrompt }],
+          response_format: { type: 'json_object' },
+          temperature: 0.3,
+          max_tokens: 1500,
+        })
+        const repairContent = repairCompletion.choices[0]?.message?.content
+        if (repairContent) {
+          const repairData = JSON.parse(repairContent)
+          if (Array.isArray(repairData.supportingEntities)) {
+            storyData.supportingEntities = repairData.supportingEntities
+            console.log('[Story Generation] Repair: added supportingEntities', storyData.supportingEntities.length)
+          }
+          if (repairData.suggestedOutfits && typeof repairData.suggestedOutfits === 'object') {
+            storyData.suggestedOutfits = { ...storyData.suggestedOutfits, ...repairData.suggestedOutfits }
+            console.log('[Story Generation] Repair: added/updated suggestedOutfits')
+          }
+        }
+      } catch (repairErr) {
+        console.warn('[Story Generation] Repair pass failed (non-fatal):', repairErr)
+      }
+    }
+
+    // ====================================================================
+    // 6.1. Word Count Analysis + Short-Page Repair (7 Şubat 2026)
+    // ====================================================================
+    const ageGroup = storyData.metadata?.ageGroup || 'preschool'
+    const wordMin = getWordCountMin(ageGroup)
+    const wordCounts = storyData.pages.map((page: any, index: number) => {
+      const text = page.text || ''
+      const count = text.trim() ? text.split(/\s+/).length : 0
+      return { pageNumber: page.pageNumber || index + 1, count, pageIndex: index }
+    })
+    type WordCountItem = { pageNumber: number; count: number; pageIndex: number }
+    const shortPages = wordCounts.filter((p: WordCountItem) => p.count < wordMin)
+
+    console.log('[Story Generation] 📊 WORD COUNT ANALYSIS:')
+    wordCounts.forEach((p: WordCountItem) => {
+      console.log(`  Page ${p.pageNumber}: ${p.count} words (min: ${wordMin})${p.count < wordMin ? ' ⚠️ TOO SHORT!' : ' ✓'}`)
+    })
+    const avgWordCount = wordCounts.reduce((sum: number, p: WordCountItem) => sum + p.count, 0) / wordCounts.length
+    console.log(`  Average: ${avgWordCount.toFixed(1)} words per page (min per page: ${wordMin})`)
+
+    // Repair: expand short pages (one LLM pass for all short pages)
+    if (shortPages.length > 0) {
+      try {
+        const repairPrompt = `The following story has some pages with too few words. Return ONLY a valid JSON object with key "pages": an array of objects. Each object has "pageNumber" (number) and "text" (string). Include ONLY the pages that need expansion (page numbers: ${shortPages.map((p: WordCountItem) => p.pageNumber).join(', ')}). For each of these pages, rewrite the "text" to be at least ${wordMin} words while keeping the same story event and tone. Use the same language as the original. Do not change other pages.
+
+Original story title: ${storyData.title}
+Theme: ${theme}
+Current short page texts:
+${shortPages.map((p: WordCountItem) => `Page ${p.pageNumber}: "${(storyData.pages[p.pageIndex].text || '').slice(0, 200)}..."`).join('\n')}
+
+Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
+
+        const repairCompletion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: repairPrompt }],
+          response_format: { type: 'json_object' },
+          temperature: 0.4,
+          max_tokens: 2000,
+        })
+        const repairContent = repairCompletion.choices[0]?.message?.content
+        if (repairContent) {
+          const repairData = JSON.parse(repairContent)
+          if (Array.isArray(repairData.pages)) {
+            repairData.pages.forEach((item: { pageNumber: number; text: string }) => {
+              const idx = storyData.pages.findIndex((p: any, i: number) => (p.pageNumber || i + 1) === item.pageNumber)
+              if (idx >= 0 && item.text) {
+                storyData.pages[idx].text = item.text
+                console.log(`[Story Generation] Repair: expanded page ${item.pageNumber} to ${item.text.split(/\s+/).length} words`)
+              }
+            })
+          }
+        }
+      } catch (repairErr) {
+        console.warn('[Story Generation] Word count repair pass failed (non-fatal):', repairErr)
+      }
+    }
     
     // ====================================================================
     // 6.2. LOG: Theme & Clothing Style (NEW: 15 Ocak 2026 - Quality Check)
@@ -278,14 +371,35 @@ CRITICAL LANGUAGE REQUIREMENT: The story MUST be written entirely in ${languageN
       tokensUsed,
     }
 
-    return successResponse(
-      response,
-      'Story generated successfully',
-      {
-        cost: `~$${((tokensUsed / 1000) * 0.005).toFixed(4)}`, // Rough estimate
-        characterUsage: character.total_books + 1,
+    const metadata: Record<string, unknown> = {
+      cost: `~$${((tokensUsed / 1000) * 0.005).toFixed(4)}`,
+      characterUsage: character.total_books + 1,
+    }
+    if (debugMode) {
+      metadata.debug = {
+        apiRequest: {
+          characterId,
+          theme,
+          illustrationStyle,
+          customRequests: customRequests ?? '',
+          language,
+          pageCount: pageCountOverride,
+        },
+        characterResolved: {
+          id: character.id,
+          name: character.name,
+          age: character.age,
+          gender: character.gender,
+        },
+        aiRequest: {
+          model: 'gpt-4o-mini',
+          systemMessage,
+          userMessage: storyPrompt,
+        },
       }
-    )
+    }
+
+    return successResponse(response, 'Story generated successfully', metadata)
   } catch (error) {
     console.error('Story generation error:', error)
     return handleAPIError(error)

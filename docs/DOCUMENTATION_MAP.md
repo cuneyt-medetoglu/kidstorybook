@@ -67,8 +67,10 @@
 | Dosya | Kategori | Son Güncelleme | Özet |
 |-------|----------|----------------|------|
 | STORY_AND_IMAGE_AI_FLOW.md | ✅ AKTİF | 1 Şubat 2026 | Story ve Image AI request/response akışı. |
-| SYSTEM_REDESIGN_CLOTHING_CONSISTENCY.md | ✅ AKTİF | 1 Şubat 2026 | Kıyafet tutarlılığı sistem tasarımı (v1.6.0). |
-| CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS.md | ✅ AKTİF | 1 Şubat 2026 | Kök neden analizi. |
+| CREATE_YOUR_OWN_FROM_EXAMPLE.md | ✅ AKTİF | - | Create Your Own from Example: akış, characterIds, kapak Vision. |
+| DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md | ✅ AKTİF | 7 Şubat 2026 | Debug kalite butonları (admin, trace export). |
+| STORY_PROMPT_ACTION_PLAN.md | ✅ AKTİF | 7 Şubat 2026 | Hikaye + görsel kalite aksiyon planı. |
+| (7 dosya) | → archive/2026-02/analysis/ | 7 Şubat 2026 | CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07. |
 
 ---
 
@@ -87,6 +89,7 @@
 | Not | İçerik |
 |-----|--------|
 | README.md | Arşiv yapısı (FAZ 6). |
+| 2026-02/analysis/ | 7 Şubat 2026: analysis’ten taşınan 7 dosya (GPT trace, clothing, ChatGPT prompt, vb.). |
 | 2026-q1/ | FAZ 6 ile taşınan 17 dosya: implementation (4), guides (7), reports (3), strategies (2), ai (1). |
 | (kök) | 13 dosya: FAZ1 test/checklist/raporlar, sahne/kıyafet analizleri, UNIFIED_ANALYSIS, vb. |
 

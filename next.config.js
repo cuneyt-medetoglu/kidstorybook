@@ -4,6 +4,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       // S3 / custom storage (use your bucket domain if needed)
+      {
+        protocol: 'https',
+        hostname: 'kidstorybook.s3.eu-central-1.amazonaws.com',
+      },
       // DALL-E 3 images
       {
         protocol: 'https',

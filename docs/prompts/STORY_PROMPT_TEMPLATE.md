@@ -1,8 +1,10 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
-**Versiyon (kod):** 1.9.0  
+**Versiyon (kod):** 2.1.0  
 Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse doküman da güncellenmelidir; **base.ts = gerçek kaynak**.
+
+**v2.1.0 (7 Şubat 2026):** Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.
 
 ---
 

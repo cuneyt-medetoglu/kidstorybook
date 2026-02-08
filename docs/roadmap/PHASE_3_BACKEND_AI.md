@@ -331,6 +331,9 @@
   - **Sonuç:** Her karakter, her sahne farklı ifade (üzgün/meraklı/kızgın); hikaye anlatıyor, sinematik ve doğal his
   - **Dokümantasyon:** `docs/TEMP_CREATE_BOOK_TEST_ANALYSIS.md` (analiz + plan + test senaryoları)
   - **Version:** Story v1.8.0 → v1.9.0; Scene v1.10.0 → v1.11.0
+- [ ] **3.5.29** customRequests boşken varsayılan öneri (yaş + tema) (7 Şubat 2026) - **DO**, Bekliyor
+  - Kullanıcı özel istek girmediğinde hikaye kalitesi düşüyor. Yaş grubu ve temaya göre varsayılan "Special Request" metinleri (tablo veya DB) ile prompt'a otomatik enjekte.
+  - Kaynak: `docs/archive/2026-02/analysis/GPT_TRACE_CEVAPLARI_AKSIYON.md` (C1, C2)
 - [x] **3.5.16** Image Edit Feature - ChatGPT-style mask-based editing ✅ **TAMAMLANDI** (17 Ocak 2026)
   - [x] Database migration (`011_add_image_edit_feature.sql`)
     - [x] `books` table: `edit_quota_used`, `edit_quota_limit` columns

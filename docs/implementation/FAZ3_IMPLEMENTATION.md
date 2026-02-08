@@ -1,7 +1,7 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 25 Ocak 2026  
+**Son Güncelleme:** 7 Şubat 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
@@ -122,6 +122,14 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
     - `getLanguageName()` helper fonksiyonu eklendi
   - ✅ **System Message Güçlendirildi:** API route'larda system message'a dil talimatı eklendi
   - ✅ **Prompt Version Changelog Güncellendi:** v1.0.0 changelog'una dil desteği ve dil karışıklığı çözümü eklendi
+
+#### GPT Trace Aksiyonları (7 Şubat 2026) ✅
+- **Kaynak:** `docs/archive/2026-02/analysis/GPT_TRACE_CEVAPLARI_AKSIYON.md`
+- **Yapılanlar:**
+  - **El/parmak:** `lib/prompts/image/negative.ts` v1.2.0 – getAnatomicalCorrectnessDirectives (five distinct fingers, well-formed hands); ANATOMICAL_NEGATIVE (extra fingers, missing fingers, fused fingers).
+  - **Story çeşitlilik:** `lib/prompts/story/base.ts` – buildVisualDiversitySection: ardışık sayfada aynı poz/eylem tekrarlanmasın; her sayfada farklı eylem/poz.
+  - **Kelime hedefleri:** getWordCountRange artırıldı (toddler 30–45 … pre-teen 130–180), getWordCountMin export; prompt’ta CRITICAL min kelime; `app/api/ai/generate-story/route.ts` kelime sayımı + kısa sayfa repair pass.
+  - **customRequests:** Roadmap’e 3.5.29 eklendi (DO, Bekliyor) – yaş+tema varsayılan öneri.
 
 #### 3.5.3 - Image Generation Prompts v1.0.0 ✅
 - **Tarih:** 10 Ocak 2026
