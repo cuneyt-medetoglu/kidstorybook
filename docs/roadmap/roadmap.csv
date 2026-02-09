@@ -4,15 +4,16 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	1.1.3,1,1.1,"shadcn/ui kur ve tema ayarla",Tamamlandı,Kritik,Altyapı,,"",,#1.1
 	1.1.4,1,1.1,"ESLint + Prettier ayarla",Tamamlandı,Kritik,Altyapı,,"",,#1.1
 	1.1.5,1,1.1,"Git repo ve branch stratejisi belirle",Tamamlandı,Kritik,Altyapı,,"",,#1.1
-	1.2.1,1,1.2,"Supabase projesi oluştur",Tamamlandı,Kritik,Altyapı,,"",,#1.2
+	1.2.1,1,1.2,"~~Supabase projesi oluştur~~ → AWS EC2 + PostgreSQL + S3 kuruldu ✅",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.2.2,1,1.2,"Veritabanı şeması tasarla ve oluştur",Tamamlandı,Kritik,Altyapı,,"",,#1.2
-	1.2.3,1,1.2,"Supabase Auth entegrasyonu (email/password + OAuth)",Tamamlandı,Kritik,Altyapı,,"Client setup tamamlandı",,#1.2
-	1.2.4,1,1.2,"Storage bucket'ları oluştur (photos, books, pdfs, covers)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
+	1.2.3,1,1.2,"Auth entegrasyonu (email/password + OAuth)",Tamamlandı,Kritik,Altyapı,,"Supabase Auth client kullanılıyor; Faz 5'te alternatif planlanıyor",,#1.2
+	1.2.4,1,1.2,"Storage: AWS S3 tek bucket + prefix'ler (photos, books, pdfs, covers) ✅",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.2.5,1,1.2,"Row Level Security (RLS) kuralları",Tamamlandı,Kritik,Altyapı,,"Migration'da hazır",,#1.2
-	1.2.6,1,1.2,"Supabase vs AWS Değerlendirmesi (23 Ocak 2026)",Bekliyor,Kritik,Altyapı,,"",,#1.2
-	1.2.7,1,1.2,"Database Backup Sistemi (23 Ocak 2026)",Bekliyor,Kritik,Altyapı,,"",,#1.2
+	1.2.6,1,1.2,"~~Supabase vs AWS Değerlendirmesi~~ → AWS'ye geçiş kararı verildi ve uygulandı ✅ (Şubat 2026)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
+	1.2.7,1,1.2,"Database Backup Sistemi",Bekliyor,Kritik,Altyapı,PLAN,"",,#1.2
+	1.2.8,1,1.2,"~~Supabase'ı AWS'de açılacak bir makineye migrate etme~~ → AWS altyapı Faz 1–4 tamamlandı ✅ (Şubat 2026)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.3.1,1,1.3,"`.env.local` dosyası oluştur",Tamamlandı,Kritik,Altyapı,,"✅ Kontrol edildi ve optimize edildi",,#1.3
-	1.3.2,1,1.3,"Tüm API key'leri ekle (OpenAI, Groq, Supabase)",Tamamlandı,Kritik,Altyapı,,"✅ `.env.example` template hazır",,#1.3
+	1.3.2,1,1.3,"Tüm API key'leri ekle (OpenAI, Groq, AWS/DB)",Tamamlandı,Kritik,Altyapı,,"✅ `.env.example` template hazır",,#1.3
 	1.3.3,1,1.3,"Vercel environment variables ayarla",Tamamlandı,Kritik,Altyapı,,"✅ Dokümante edildi (`docs/guides/ENVIRONMENT_SETUP.md`)",,#1.3
 	1.3.4,1,1.3,"Development/Production config ayrımı",Tamamlandı,Kritik,Altyapı,,"✅ `lib/config.ts` oluşturuldu",,#1.3
 	1.3.5,1,1.3,"Log Yapısı (23 Ocak 2026)",Bekliyor,Kritik,Altyapı,,"",,#1.3
@@ -64,7 +65,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.4.10,2,2.4,"""Ücretsiz Kapak Oluştur"" butonu (hakkı varsa)",Tamamlandı,Kritik,Frontend - Wizard,,"✅ UI tamamlandı (Step 6'da, Faz 3'te API entegrasyonu)",,#2.4
 	2.4.12,2,2.4,"Kitap oluşturma sonrası animasyon ve loading (23 Ocak 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
 	2.4.13,2,2.4,"API tekrarlı çağrılar: GET /api/currency 2x ve sayfa gezerken log (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
-	2.4.14,2,2.4,"Next.js Image ve layout konsol uyarıları (Şubat 2026)",Bekliyor,Kritik,Frontend - Wizard,DO,"",,#2.4
+	2.4.14,2,2.4,"Next.js Image ve layout konsol uyarıları (Şubat 2026) | ✅ Çözüldü (4 Şubat 2026)",Tamamlandı,Kritik,Frontend - Wizard,,"",,#2.4
 	2.5.1.1,2,2.5,"react-pageflip veya alternatif library araştırması ve seçimi",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Framer Motion ile custom implementation seçildi",,#2.5
 	2.5.1.2,2,2.5,"Flipbook animasyonu (sayfa çevirme efekti)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ v0.app'den alındı ve entegre edildi (Flip, Slide, Fade animasyonları)",,#2.5
 	2.5.1.3,2,2.5,"Sayfa navigasyonu (ileri, geri, sayfa atlama)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Buttons, keyboard, swipe, mouse click desteği",,#2.5
@@ -83,15 +84,15 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.5.2.5,2,2.5,"Screen orientation detection ve otomatik layout değişimi",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ window.innerWidth/innerHeight ile otomatik detection",,#2.5
 	2.5.2.6,2,2.5,"PWA optimizasyonu (offline okuma, vb.)",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Faz 6'da yapılacak",,#2.5
 	2.5.3.1,2,2.5,"Text-to-Speech entegrasyonu (Gemini Pro TTS)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Backend API ve frontend hook oluşturuldu, WaveNet/Standard sesler kaldırıldı (15 Ocak 2026)",,#2.5
-	2.5.3.2,2,2.5,"Ses seçeneği (Achernar",Tamamlandı,Kritik,Frontend - E-book Viewer,,"Gemini Pro TTS) - ✅ Settings dropdown'da Achernar sesi mevcut, eski sesler kaldırıldı (15 Ocak 2026)",,#2.5
-	2.5.3.3,2,2.5,"Ses hızı kontrolü (0.5x",Tamamlandı,Kritik,Frontend - E-book Viewer,,"2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x)",,#2.5
-	2.5.3.4,2,2.5,"Volume kontrolü",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Hook'ta mevcut, UI'da henüz yok",,#2.5
+	2.5.3.2,2,2.5,"Ses seçeneği (Achernar",Tamamlandı,Kritik,Frontend - E-book Viewer,,"Gemini Pro TTS) - ✅ Admin global config (tts_settings); Settings dropdown'da sadece admin TTS düzenleme (15 Ocak / 9 Şubat 2026)",,#2.5
+	2.5.3.3,2,2.5,"Ses hızı kontrolü (0.5x",Tamamlandı,Kritik,Frontend - E-book Viewer,,"2x arası) - ✅ Parent Settings'te (Yavaş/Normal/Hızlı); kullanıcı tercihi localStorage (9 Şubat 2026)",,#2.5
+	2.5.3.4,2,2.5,"Volume kontrolü",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Parent Settings'te ses seviyesi (slider); okuyucuda mute butonu; kullanıcı tercihi localStorage (9 Şubat 2026)",,#2.5
 	2.5.3.5,2,2.5,"Play/Pause/Stop butonları",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok",,#2.5
 	2.5.3.6,2,2.5,"Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence)",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli",,#2.5
 	2.5.3.7,2,2.5,"Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ TTS bittiğinde otomatik sayfa ilerleme",,#2.5
-	2.5.3.8,2,2.5,"TTS Cache mekanizması",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026",,#2.5
+	2.5.3.8,2,2.5,"TTS Cache mekanizması",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ S3'te cache (signed URL); kitap tamamlanınca TTS prewarm; aynı metin tekrar okutulduğunda cache hit (15 Ocak 2026, S3 + prewarm 9 Şubat 2026)",,#2.5
 	2.5.3.9,2,2.5,"TTS Cache temizleme (hikaye değişikliğinde)",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur",,#2.5
-	2.5.3.10,2,2.5,"Sesli Hikaye Özelliği Pazarlama Vurgusu (26 Ocak 2026)",Bekliyor,Kritik,Frontend - E-book Viewer,,"",,#2.5
+	2.5.3.10,2,2.5,"Sesli Hikaye Özelliği Pazarlama Vurgusu (26 Ocak 2026)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Kısmen tamamlandı (9 Şubat 2026)",,#2.5
 	2.5.4.1,2,2.5,"Autoplay butonu ve kontrolü",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi",,#2.5
 	2.5.4.2,2,2.5,"Autoplay hızı ayarı (sayfa başına kaç saniye)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ 5s, 10s, 15s, 20s seçenekleri Settings'te",,#2.5
 	2.5.4.3,2,2.5,"Sesli okuma ile senkronize otomatik ilerleme",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ TTS Synced mode: TTS bittiğinde otomatik sayfa geçişi + otomatik okumaya devam (onEnded callback ile)",,#2.5
@@ -103,12 +104,13 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.5.5.5,2,2.5,"Print options",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Post-MVP",,#2.5
 	2.5.5.6,2,2.5,"Keyboard shortcuts (desktop: arrow keys, space, esc, vb.)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ 11 farklı klavye kısayolu eklendi",,#2.5
 	2.5.5.7,2,2.5,"Accessibility features (font size, high contrast, screen reader support)",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Post-MVP",,#2.5
-	2.5.5.8,2,2.5,"Settings UI iyileştirmesi",Bekliyor,Kritik,Frontend - E-book Viewer,,"⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım)",,#2.5
+	2.5.5.8,2,2.5,"Settings UI iyileştirmesi",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Ses/hız Parent Settings'e taşındı; okuyucu sadeleştirildi (sadece admin için TTS varsayılanları dropdown'da). Çocuk odaklı sade tasarım (9 Şubat 2026)",,#2.5
 	2.5.6.1,2,2.5,"Sayfa çevirme animasyonu (flip effect, slide, fade, vb.)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ 6 farklı animasyon tipi: Flip (3D), Slide, Fade, Page Curl, Zoom, None (Instant)",,#2.5
 	2.5.6.2,2,2.5,"Animasyon hızı/stili seçenekleri",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Settings'te 3 hız seçeneği: Slow, Normal, Fast (configurable)",,#2.5
 	2.5.6.3,2,2.5,"Smooth transitions",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Spring ve tween animasyonları, easeInOut/easeOut transitions",,#2.5
 	2.5.6.4,2,2.5,"Page curl effect (sayfa kıvrılma efekti)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ 3D rotateX/rotateY ile page curl animasyonu",,#2.5
 	2.5.6.5,2,2.5,"Shadow ve depth effects (3D görünüm)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Shadow-2xl, drop-shadow, depth effects (z-index)",,#2.5
+	2.5.5.9,2,2.5,"Çocuk UX (footer) (9 Şubat 2026)",Tamamlandı,Kritik,Frontend - E-book Viewer,,"✅ Okuyucu footer'da min 44px dokunmatik alan, basınca scale animasyonu (active:scale-95), ikon boyutları md'de büyütüldü. Ref: TTS_GOOGLE_GEMINI_ANALYSIS.md §3.5",,#2.5
 	2.5.8,2,2.5,"Çocuk Modu (Kids Mode) (23 Ocak 2026)",Bekliyor,Kritik,Frontend - E-book Viewer,,"",,#2.5
 	2.5.7.1,2,2.5,"Notes/annotations (sayfaya not alma)",Bekliyor,Kritik,Frontend - E-book Viewer,,"",,#2.5
 	2.5.7.2,2,2.5,"Search in book (kitap içinde arama)",Bekliyor,Kritik,Frontend - E-book Viewer,,"",,#2.5
@@ -131,6 +133,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.7.6,2,2.7,"Kullanım Şartları",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.7,2,2.7,"KVKK Aydınlatma Metni",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.8,2,2.7,"Examples sayfası (tüm örnek kitaplar, ""View Example"" butonları)",Tamamlandı,Kritik,Frontend - Statik Sayfalar,,"✅ **TAMAMLANDI (25 Ocak 2026)**",,#2.7
+	2.7.8.1,2,2.7,"Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026)",Bekliyor,Kritik,Frontend - Statik Sayfalar,DO,"",,#2.7
 	2.7.9,2,2.7,"Ideas sayfası (hikaye fikirleri ve şablonları)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.10,2,2.7,"Tema kartları görsel gösterimi (her tema için thumbnail)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.11,2,2.7,"""Used Photos"" gösterimi (örneklerde hangi fotoğraflar kullanılmış)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"✅ Examples sayfasına entegre edildi (2.7.8)",,#2.7
@@ -199,6 +202,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	3.5.25,3,3.5,"Story API Refactor",Tamamlandı,Kritik,AI - Entegrasyon,,"Modülerleştirme (24 Ocak 2026) - ✅ **TAMAMLANDI**",,#3.5
 	3.5.27,3,3.5,"Create Book Test İyileştirmeleri (2 Şubat 2026)",Tamamlandı,Kritik,AI - Entegrasyon,,"✅ **TAMAMLANDI**",,#3.5
 	3.5.28,3,3.5,"İfade Çeşitliliği ve Sinematik Hikaye Anlatımı (3 Şubat 2026)",Tamamlandı,Kritik,AI - Entegrasyon,,"✅ **TAMAMLANDI**",,#3.5
+	3.5.29,3,3.5,"customRequests boşken varsayılan öneri (yaş + tema) (7 Şubat 2026)",Bekliyor,Kritik,AI - Entegrasyon,,"**DO**, Bekliyor",,#3.5
 	3.5.17,3,3.5,"Görsel Revize UX İyileştirmesi (23 Ocak 2026)",Bekliyor,Kritik,AI - Entegrasyon,,"",,#3.5
 	3.7.1,3,3.7,"Stripe webhook handler",Bekliyor,Kritik,Backend - Webhook,,"",,#3.7
 	3.7.2,3,3.7,"İyzico webhook handler",Bekliyor,Kritik,Backend - Webhook,,"",,#3.7
@@ -251,25 +255,29 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	5.8.6,5,5.8,"Kitap Yönetimi (Admin)",Bekliyor,Önemli,Admin Panel,,"🆕 **25 Ocak 2026**",,#5.8
 	5.8.7,5,5.8,"Dashboard İstatistikleri",Bekliyor,Önemli,Admin Panel,,"🆕 **25 Ocak 2026**",,#5.8
 	5.8.8,5,5.8,"Sistem Yönetimi",Bekliyor,Önemli,Admin Panel,,"🆕 **25 Ocak 2026**",,#5.8
-	5.3.1,5,5.3,"HTTPS sertifikası (Vercel otomatik)",Bekliyor,Önemli,Güvenlik,,"",,#5.3
+	5.3.1,5,5.3,"HTTPS sertifikası (Nginx + Let's Encrypt; bkz. 5.5.3)",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.2,5,5.3,"Rate limiting",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.3,5,5.3,"Input validasyonu",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.4,5,5.3,"CSRF protection",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.5,5,5.3,"GDPR/KVKK uyumluluk kontrolü",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.6,5,5.3,"GDPR/KVKK Veri Silme ve Hesap Silme (23 Ocak 2026)",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.7,5,5.3,"IP Bazlı Attack Detection (23 Ocak 2026)",Bekliyor,Önemli,Güvenlik,,"",,#5.3
-	5.3.8,5,5.3,"Supabase Güvenlik ve Dosya Erişim Kontrolü (23 Ocak 2026)",Bekliyor,Önemli,Güvenlik,,"",,#5.3
+	5.3.8,5,5.3,"AWS / S3 Güvenlik ve Dosya Erişim Kontrolü",Bekliyor,Önemli,Güvenlik,,"",,#5.3
 	5.3.9,5,5.3,"API Key Güvenliği (23 Ocak 2026)",Bekliyor,Önemli,Güvenlik,,"🔴 **KRİTİK**",,#5.3
 	5.4.1,5,5.4,"Manuel test (tüm akışlar)",Bekliyor,Önemli,Test,,"",,#5.4
 	5.4.2,5,5.4,"Mobil test",Bekliyor,Önemli,Test,,"",,#5.4
 	5.4.3,5,5.4,"Cross-browser test",Bekliyor,Önemli,Test,,"",,#5.4
 	5.4.4,5,5.4,"Ödeme testleri (sandbox)",Bekliyor,Önemli,Test,,"",,#5.4
-	5.5.1,5,5.5,"Vercel production deployment",Bekliyor,Önemli,Deployment,,"",,#5.5
-	5.5.2,5,5.5,"Domain bağlantısı",Bekliyor,Önemli,Deployment,,"",,#5.5
-	5.5.3,5,5.5,"SSL sertifikası (Vercel otomatik, kontrol edilmeli)",Bekliyor,Önemli,Deployment,,"",,#5.5
+	5.4.5.1,5,5.4,"Production'da kullanıcı dostu hata yönetimi (Şubat 2026)",Bekliyor,Önemli,Test,,"",,#5.4
+	5.5.7,5,5.5,"AWS'de production makine kurulumu ✅ (Şubat 2026)",Tamamlandı,Önemli,Deployment,,"",,#5.5
+	5.5.1,5,5.5,"EC2'de Next.js uygulaması deploy",Bekliyor,Önemli,Deployment,DO,"",,#5.5
+	5.5.2,5,5.5,"Domain bağlantısı",Bekliyor,Önemli,Deployment,DO,"",,#5.5
+	5.5.3,5,5.5,"SSL sertifikası (Let's Encrypt + Nginx)",Bekliyor,Önemli,Deployment,DO,"",,#5.5
 	5.5.4,5,5.5,"Monitoring kurulumu",Bekliyor,Önemli,Deployment,,"",,#5.5
 	5.5.5,5,5.5,"Error tracking (Sentry)",Bekliyor,Önemli,Deployment,,"",,#5.5
-	5.5.6,5,5.5,"Production Environment Variables Kontrolü (25 Ocak 2026)",Bekliyor,Önemli,Deployment,,"",,#5.5
+	5.5.6,5,5.5,"Production Environment Variables Kontrolü",Bekliyor,Önemli,Deployment,,"",,#5.5
+	5.5.8,5,5.5,"CI/CD Pipeline (Otomatik Deployment)",Bekliyor,Önemli,Deployment,PLAN,"",,#5.5
+	5.5.9,5,5.5,"Docker ile Deployment (Opsiyonel)",Bekliyor,Önemli,Deployment,PLAN,"",,#5.5
 	5.7.1,5,5.7,"Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)",Tamamlandı,Önemli,PDF Tasarım,,"",,#5.7
 	5.7.1.1,5,5.7,"PDF Layout İyileştirmeleri ✅ (25 Ocak 2026)",Tamamlandı,Önemli,PDF Tasarım,,"",,#5.7
 	5.7.2,5,5.7,"PDF preview özelliği (indirmeden önce önizleme)",Bekliyor,Önemli,PDF Tasarım,,"",,#5.7

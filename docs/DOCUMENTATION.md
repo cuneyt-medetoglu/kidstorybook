@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 8 Şubat 2026 (Commit öncesi: Create Book E2E test 2 kitap başarılı; word count repair çalıştı. Detay: `docs/implementation/FAZ3_IMPLEMENTATION.md` → Son Create Book E2E Test.)
+**Son güncelleme:** 9 Şubat 2026 (TTS ve e-book viewer: signed URL, admin config, prewarm, Parent Settings sesli okuma, Audio badge, mute, çocuk UX. Detay: `docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md`, `docs/implementation/FAZ3_IMPLEMENTATION.md`.)
 
 ---
 

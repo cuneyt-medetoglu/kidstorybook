@@ -93,7 +93,7 @@ EOF
 **3.4.1** Migration dosyalarını EC2’ye kopyala (laptop’tan):
 
 ```bash
-scp -i KEY_PEM -r supabase/migrations ubuntu@EC2_IP:~/migrations
+scp -i KEY_PEM -r migrations ubuntu@EC2_IP:~/migrations
 ```
 
 **3.4.2** EC2’de sırayla (şifreyi `DB_SIFRE` ile değiştir):
@@ -125,6 +125,7 @@ psql -h localhost -U kidstorybook -d kidstorybook -f 013_add_free_cover_to_users
 psql -h localhost -U kidstorybook -d kidstorybook -f 014_guest_free_cover_used.sql
 psql -h localhost -U kidstorybook -d kidstorybook -f 015_add_user_role.sql
 psql -h localhost -U kidstorybook -d kidstorybook -f 016_add_is_example_to_books.sql
+psql -h localhost -U kidstorybook -d kidstorybook -f 017_tts_settings.sql
 ```
 
 **Atlanan migration’lar:** 004, 005, 006, 008_add_pdf_mime_type, 008_create_tts_cache_bucket, 010 (Supabase storage/auth’a özel).

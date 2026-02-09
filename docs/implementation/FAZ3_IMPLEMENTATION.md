@@ -1,9 +1,11 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 8 Şubat 2026  
+**Son Güncelleme:** 9 Şubat 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
+
+**9 Şubat 2026 – TTS ve E-book Viewer:** TTS S3 signed URL ile düzeltildi; admin TTS config (tts_settings), kitap tamamlanınca TTS prewarm; Parent Settings sesli okuma (hız, volume, localStorage); BookViewer mute, prefs, Audio badge (dashboard), çocuk UX (44px dokunmatik, active:scale-95). Ref: docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md
 
 ---
 

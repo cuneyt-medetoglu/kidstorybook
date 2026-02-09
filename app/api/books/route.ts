@@ -18,6 +18,7 @@ import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharac
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
 import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
+import { generateTts } from '@/lib/tts/generate'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -2598,6 +2599,26 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       console.log(`[Create Book]   - Images generated:`, generatedImages.length)
       console.log(`[Create Book]   - Images in story_data.pages:`, pages.filter((p: any) => p.imageUrl).length)
       console.log(`[Create Book]   - Images in images_data:`, generatedImages.length)
+
+      // TTS prewarm: generate audio for each page so first read is instant (TTS_GOOGLE_GEMINI_ANALYSIS.md §2)
+      if (allImagesGenerated && pages?.length) {
+        const bookLanguage = language || 'tr'
+        console.log(`[Create Book] 🔊 TTS prewarm: generating audio for ${pages.length} pages...`)
+        for (let i = 0; i < pages.length; i++) {
+          const p = pages[i]
+          const text = p?.text?.trim()
+          if (!text) continue
+          try {
+            await generateTts(text, { language: bookLanguage })
+            if (process.env.DEBUG_LOGGING === 'true') {
+              console.log(`[Create Book] TTS prewarm: page ${i + 1}/${pages.length} ok`)
+            }
+          } catch (ttsErr) {
+            console.warn(`[Create Book] TTS prewarm: page ${i + 1} failed:`, (ttsErr as Error).message)
+          }
+        }
+        console.log(`[Create Book] 🔊 TTS prewarm done`)
+      }
 
       } catch (imagesError) {
         console.error('[Create Book] Page images generation failed:', imagesError)

@@ -20,6 +20,8 @@ import {
   RotateCcw,
   Square,
   BookOpen,
+  Volume2,
+  VolumeX,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -30,11 +32,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 import { BookPage } from "./book-page"
 import { PageThumbnails } from "./page-thumbnails"
 import { useSwipeGesture } from "@/hooks/use-swipe-gesture"
 import { useTTS } from "@/hooks/useTTS"
+import { getTtsPrefs } from "@/lib/tts-prefs"
 
 // Mock data - Faz 3'te API'den gelecek
 const mockBook = {
@@ -120,17 +132,26 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
   const [direction, setDirection] = useState(0)
   const [selectedVoice, setSelectedVoice] = useState("Achernar")
   const [ttsSpeed, setTtsSpeed] = useState(1.0)
+  const [ttsVolume, setTtsVolume] = useState(1)
+  const [isMuted, setIsMuted] = useState(false)
   const [autoplayMode, setAutoplayMode] = useState<"off" | "tts" | "timed">("off")
   const [autoplaySpeed, setAutoplaySpeed] = useState(10) // seconds per page
   const [autoplayCountdown, setAutoplayCountdown] = useState(0)
   const [mobileLayoutMode, setMobileLayoutMode] = useState<MobileLayoutMode>("stacked")
   const [showTextOnMobile, setShowTextOnMobile] = useState(false)
+  const [ttsSettings, setTtsSettings] = useState<{ voiceName: string; prompt: string; languageCode: string } | null>(null)
+  const [canEditTts, setCanEditTts] = useState(false)
+  const [ttsAdminPrompt, setTtsAdminPrompt] = useState("")
+  const [ttsAdminVoice, setTtsAdminVoice] = useState("Achernar")
+  const [ttsAdminLanguage, setTtsAdminLanguage] = useState("tr")
+  const [ttsAdminSaving, setTtsAdminSaving] = useState(false)
+  const [showTtsAdminDialog, setShowTtsAdminDialog] = useState(false)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // TTS hook (must be called unconditionally)
-  const { isPlaying, isPaused, isLoading, play, pause, resume, stop, onEnded } = useTTS()
+  const { isPlaying, isPaused, isLoading, play, pause, resume, stop, setVolume, onEnded } = useTTS()
 
   const totalPages = book?.pages?.length ?? 0
   const isBookmarked = bookmarkedPages.has(currentPage)
@@ -302,6 +323,37 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
     setShowTextOnMobile(false)
   }, [currentPage])
 
+  // Load user TTS prefs (global for this user) from localStorage
+  useEffect(() => {
+    const prefs = getTtsPrefs()
+    setTtsSpeed(prefs.ttsSpeed)
+    setTtsVolume(prefs.volume)
+  }, [])
+
+  // Apply mute state to audio volume
+  useEffect(() => {
+    setVolume(isMuted ? 0 : ttsVolume)
+  }, [isMuted, ttsVolume, setVolume])
+
+  // Fetch global TTS settings (read-only display) and whether current user can edit (admin)
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([
+      fetch("/api/tts/settings").then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/tts/settings/can-edit").then((r) => (r.ok ? r.json() : { canEdit: false })),
+    ]).then(([settings, canEditRes]) => {
+      if (cancelled) return
+      if (settings) {
+        setTtsSettings({ voiceName: settings.voiceName, prompt: settings.prompt, languageCode: settings.languageCode })
+        setTtsAdminVoice(settings.voiceName)
+        setTtsAdminPrompt(settings.prompt)
+        setTtsAdminLanguage(settings.languageCode)
+      }
+      setCanEditTts(!!canEditRes?.canEdit)
+    })
+    return () => { cancelled = true }
+  }, [])
+
   // Fullscreen handling
   const toggleFullscreen = useCallback(async () => {
     if (!document.fullscreenElement) {
@@ -363,8 +415,8 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
               const nextPageText = book.pages[nextPage]?.text
               if (nextPageText) {
                 play(nextPageText, {
-                  voiceId: selectedVoice,
                   speed: ttsSpeed,
+                  volume: isMuted ? 0 : ttsVolume,
                   language: book?.language || "en",
                 })
               }
@@ -377,7 +429,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
         })
       }, 1000)
     }
-  }, [autoplayMode, totalPages, book?.pages, play, selectedVoice, ttsSpeed])
+  }, [autoplayMode, totalPages, book?.pages, play, selectedVoice, ttsSpeed, ttsVolume, isMuted])
 
   // Set up TTS ended callback
   useEffect(() => {
@@ -420,13 +472,13 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
       const currentPageText = book?.pages?.[currentPage]?.text
       if (currentPageText) {
         await play(currentPageText, {
-          voiceId: selectedVoice,
           speed: ttsSpeed,
+          volume: isMuted ? 0 : ttsVolume,
           language: book?.language || "en",
         })
       }
     }
-  }, [isPlaying, isPaused, currentPage, book?.pages, play, pause, resume, selectedVoice, ttsSpeed])
+  }, [isPlaying, isPaused, currentPage, book?.pages, play, pause, resume, selectedVoice, ttsSpeed, ttsVolume, isMuted])
 
   // Toggle autoplay mode
   const handleAutoplayToggle = useCallback(() => {
@@ -437,8 +489,8 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
         stop()
         setTimeout(() => {
           play(currentPageText, {
-            voiceId: selectedVoice,
             speed: ttsSpeed,
+            volume: isMuted ? 0 : ttsVolume,
             language: book?.language || "en",
           })
         }, 100)
@@ -447,7 +499,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
       setAutoplayMode("off")
       stop()
     }
-  }, [autoplayMode, currentPage, book?.pages, play, stop, selectedVoice, ttsSpeed])
+  }, [autoplayMode, currentPage, book?.pages, play, stop, selectedVoice, ttsSpeed, ttsVolume, isMuted])
 
   // Toggle bookmark for current page
   const toggleBookmark = useCallback(() => {
@@ -586,15 +638,15 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
         const currentPageText = book.pages[currentPage]?.text
         if (currentPageText) {
           play(currentPageText, {
-            voiceId: selectedVoice,
             speed: ttsSpeed,
+            volume: isMuted ? 0 : ttsVolume,
             language: book?.language || "en",
           })
         }
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [currentPage, stop, autoplayMode, book?.pages, play, selectedVoice, ttsSpeed])
+  }, [currentPage, stop, autoplayMode, book?.pages, play, selectedVoice, ttsSpeed, ttsVolume, isMuted])
 
   // Show loading state
   if (isLoadingBook) {
@@ -886,28 +938,84 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
               <DropdownMenuItem onClick={() => setAnimationSpeed("fast")}>
                 <span className={cn(animationSpeed === "fast" && "font-semibold")}>Fast</span>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Voice</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setSelectedVoice("Achernar")}>
-                <span className={cn(selectedVoice === "Achernar" && "font-semibold")}>
-                  Achernar (Gemini Pro TTS)
-                </span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Speed</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setTtsSpeed(0.75)}>
-                <span className={cn(ttsSpeed === 0.75 && "font-semibold")}>Slow (0.75x)</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTtsSpeed(1.0)}>
-                <span className={cn(ttsSpeed === 1.0 && "font-semibold")}>Normal (1x)</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTtsSpeed(1.25)}>
-                <span className={cn(ttsSpeed === 1.25 && "font-semibold")}>Fast (1.25x)</span>
-              </DropdownMenuItem>
+              {canEditTts && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>TTS varsayılanları (Admin)</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setShowTtsAdminDialog(true)} className="cursor-pointer">
+                    Ses / ton / dil düzenle (global)
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Dialog open={showTtsAdminDialog} onOpenChange={setShowTtsAdminDialog}>
+            <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+              <DialogHeader>
+                <DialogTitle>TTS varsayılanları (herkese uygulanır)</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="tts-admin-voice">Ses adı</Label>
+                  <Input
+                    id="tts-admin-voice"
+                    value={ttsAdminVoice}
+                    onChange={(e) => setTtsAdminVoice(e.target.value)}
+                    placeholder="Achernar"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="tts-admin-prompt">Okuma tonu (prompt)</Label>
+                  <Textarea
+                    id="tts-admin-prompt"
+                    value={ttsAdminPrompt}
+                    onChange={(e) => setTtsAdminPrompt(e.target.value)}
+                    placeholder="Heyecanlı çocuk hikayesi tonunda..."
+                    rows={3}
+                    className="resize-none"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="tts-admin-lang">Dil kodu (PRD)</Label>
+                  <Input
+                    id="tts-admin-lang"
+                    value={ttsAdminLanguage}
+                    onChange={(e) => setTtsAdminLanguage(e.target.value)}
+                    placeholder="tr, en, de, fr, es, pt, ru, zh"
+                  />
+                </div>
+                <Button
+                  disabled={ttsAdminSaving}
+                  onClick={async () => {
+                    setTtsAdminSaving(true)
+                    try {
+                      const res = await fetch("/api/tts/settings", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          voiceName: ttsAdminVoice.trim() || "Achernar",
+                          prompt: ttsAdminPrompt.trim() || "Çocuk hikayesi anlatır gibi enerjik, heyecanlı ve sıcak bir tonda konuş.",
+                          languageCode: ttsAdminLanguage.trim() || "tr",
+                        }),
+                      })
+                      if (!res.ok) throw new Error("Kaydetme başarısız")
+                      const data = await res.json()
+                      setTtsSettings({ voiceName: data.voiceName, prompt: data.prompt, languageCode: data.languageCode })
+                      setShowTtsAdminDialog(false)
+                    } catch (e) {
+                      console.error(e)
+                    } finally {
+                      setTtsAdminSaving(false)
+                    }
+                  }}
+                >
+                  {ttsAdminSaving ? "Kaydediliyor…" : "Kaydet (global)"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Button variant="ghost" size="icon" onClick={onClose} className="h-9 w-9" aria-label="Close book">
             <X className="h-4 w-4" />
@@ -1006,24 +1114,24 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
         </AnimatePresence>
       </main>
 
-      {/* Footer Controls */}
-      <footer className="sticky bottom-0 z-40 flex h-[72px] items-center justify-center gap-2 border-t border-border/50 bg-white/80 px-4 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm md:h-20 md:gap-4 md:px-6 dark:bg-slate-800/80">
+      {/* Footer Controls – 3.5: 44px+ touch targets on mobile, press feedback */}
+      <footer className="sticky bottom-0 z-40 flex min-h-[72px] items-center justify-center gap-2 border-t border-border/50 bg-white/80 px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] backdrop-blur-sm md:h-20 md:gap-4 md:px-6 dark:bg-slate-800/80">
         <Button
           variant="outline"
           size="icon"
           onClick={goToPrevPage}
           disabled={currentPage === 0}
-          className="h-10 w-10 bg-transparent md:h-12 md:w-12"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] bg-transparent transition-transform active:scale-95 md:h-12 md:w-12"
           aria-label="Previous page"
         >
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
 
         {/* Autoplay Button */}
         <Button
           onClick={handleAutoplayToggle}
           className={cn(
-            "h-10 w-10 text-white md:h-12 md:w-12",
+            "h-11 w-11 min-h-[44px] min-w-[44px] text-white transition-transform active:scale-95 md:h-12 md:w-12",
             autoplayMode !== "off"
               ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
               : "bg-slate-400 hover:bg-slate-500"
@@ -1032,9 +1140,9 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           aria-label={autoplayMode !== "off" ? "Stop autoplay" : "Start autoplay"}
         >
           {autoplayMode !== "off" ? (
-            <Square className="h-5 w-5" />
+            <Square className="h-5 w-5 md:h-6 md:w-6" />
           ) : (
-            <RotateCcw className="h-5 w-5" />
+            <RotateCcw className="h-5 w-5 md:h-6 md:w-6" />
           )}
         </Button>
 
@@ -1043,7 +1151,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           <Button
             onClick={handlePlayPause}
             disabled={isLoading}
-            className="h-10 w-10 bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 md:h-12 md:w-12 disabled:opacity-50"
+            className="h-11 w-11 min-h-[44px] min-w-[44px] bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 transition-transform active:scale-95 md:h-12 md:w-12 disabled:opacity-50 disabled:active:scale-100"
             size="icon"
             aria-label={isLoading ? "Loading..." : isPlaying ? "Pause reading" : "Play reading"}
           >
@@ -1051,25 +1159,39 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
+                className="h-5 w-5 border-2 border-white border-t-transparent rounded-full md:h-6 md:w-6"
               />
             ) : isPlaying ? (
-              <Pause className="h-5 w-5" />
+              <Pause className="h-5 w-5 md:h-6 md:w-6" />
             ) : (
-              <Play className="h-5 w-5" />
+              <Play className="h-5 w-5 md:h-6 md:w-6" />
             )}
           </Button>
         )}
+
+        {/* Mute */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setIsMuted((m) => !m)}
+          className={cn(
+            "h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12",
+            isMuted && "bg-muted text-muted-foreground"
+          )}
+          aria-label={isMuted ? "Unmute" : "Mute"}
+        >
+          {isMuted ? <VolumeX className="h-5 w-5 md:h-6 md:w-6" /> : <Volume2 className="h-5 w-5 md:h-6 md:w-6" />}
+        </Button>
 
         <Button
           variant="outline"
           size="icon"
           onClick={goToNextPage}
           disabled={currentPage === totalPages - 1}
-          className="h-10 w-10 bg-transparent md:h-12 md:w-12"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] bg-transparent transition-transform active:scale-95 md:h-12 md:w-12"
           aria-label="Next page"
         >
-          <ArrowRight className="h-5 w-5" />
+          <ArrowRight className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
 
         <div className="mx-2 h-8 w-px bg-border md:mx-4" />
@@ -1078,30 +1200,30 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
           variant="ghost"
           size="icon"
           onClick={() => setShowThumbnails(true)}
-          className="h-10 w-10 md:h-12 md:w-12"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12"
           aria-label="View all pages"
         >
-          <Grid3X3 className="h-5 w-5" />
+          <Grid3X3 className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleBookmark}
-          className={cn("h-10 w-10 md:h-12 md:w-12", isBookmarked && "text-pink-500")}
+          className={cn("h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12", isBookmarked && "text-pink-500")}
           aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
         >
-          {isBookmarked ? <BookmarkCheck className="h-5 w-5 fill-pink-500" /> : <Bookmark className="h-5 w-5" />}
+          {isBookmarked ? <BookmarkCheck className="h-5 w-5 md:h-6 md:w-6 fill-pink-500" /> : <Bookmark className="h-5 w-5 md:h-6 md:w-6" />}
         </Button>
 
         <Button
           variant="ghost"
           size="icon"
           onClick={handleShare}
-          className="h-10 w-10 md:h-12 md:w-12"
+          className="h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12"
           aria-label="Share book"
         >
-          <Share2 className="h-5 w-5" />
+          <Share2 className="h-5 w-5 md:h-6 md:w-6" />
         </Button>
 
         {/* Parent Settings - Subtle link for parents */}

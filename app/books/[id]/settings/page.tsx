@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { ImageEditModal } from "@/components/book-viewer/ImageEditModal"
 import { EditHistoryPanel } from "@/components/book-viewer/EditHistoryPanel"
+import { getTtsPrefs, setTtsPrefs } from "@/lib/tts-prefs"
 
 interface Book {
   id: string
@@ -42,6 +43,15 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingPage, setEditingPage] = useState<number | null>(null)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
+  const [ttsSpeed, setTtsSpeed] = useState(1)
+  const [ttsVolume, setTtsVolume] = useState(1)
+
+  // Load TTS prefs from localStorage (user-level global)
+  useEffect(() => {
+    const prefs = getTtsPrefs()
+    setTtsSpeed(prefs.ttsSpeed)
+    setTtsVolume(prefs.volume)
+  }, [])
 
   // Fetch book data
   useEffect(() => {
@@ -291,6 +301,59 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
               <div>
                 <p className="text-sm text-muted-foreground">Total Pages</p>
                 <p className="font-medium">{book.story_data?.pages?.length || 0}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sesli okuma (kullanıcı bazlı global tercihler) */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>🔊 Sesli Okuma</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Tüm kitaplar için geçerli ayarlar. Okuyucuda sadece oynat/durdur ve ses aç/kapa görünür.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <p className="text-sm font-medium mb-2">Okuma hızı</p>
+              <div className="flex gap-2">
+                {[
+                  { value: 0.75, label: "Yavaş" },
+                  { value: 1, label: "Normal" },
+                  { value: 1.25, label: "Hızlı" },
+                ].map((opt) => (
+                  <Button
+                    key={opt.value}
+                    variant={ttsSpeed === opt.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setTtsSpeed(opt.value)
+                      setTtsPrefs({ ttsSpeed: opt.value })
+                      toast({ title: "Kaydedildi", description: `Okuma hızı: ${opt.label}` })
+                    }}
+                  >
+                    {opt.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2">Ses seviyesi</p>
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={Math.round(ttsVolume * 100)}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) / 100
+                    setTtsVolume(v)
+                    setTtsPrefs({ volume: v })
+                  }}
+                  className="w-32 md:w-48 h-2 rounded-full appearance-none bg-muted accent-primary"
+                />
+                <span className="text-sm text-muted-foreground w-10">{Math.round(ttsVolume * 100)}%</span>
               </div>
             </div>
           </CardContent>

@@ -126,7 +126,7 @@
 | PDF indirme | 🔴 P0 | ✅ | Tamamlandı kitaplar için |
 | Animasyonlu öğeler | ⚪ P3 | ✅ | Görsel ve animasyonlar |
 
-**MVP Kararı:** react-pageflip, TTS, otomatik oynatma, PDF – tamamlandı.
+**MVP Kararı:** react-pageflip, TTS, otomatik oynatma, PDF – tamamlandı. TTS: signed URL, admin config, prewarm, Parent Settings (hız/volume), Audio badge, mute, çocuk UX footer (Şubat 2026).
 
 ---
 

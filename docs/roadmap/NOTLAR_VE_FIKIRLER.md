@@ -1,10 +1,10 @@
 ## 📝 Notlar ve Fikirler
 
-### 🔴 TTS Play butonu çalışmıyor (8 Şubat 2026) | 🔴 DO
+### ✅ TTS Play butonu çalışmıyor (8 Şubat 2026) – ÇÖZÜLDÜ (9 Şubat 2026)
 - **Kategori:** Bug / E-book viewer
-- **Öncelik:** 🔴 Önemli – DO (hemen bakılacak)
-- **Tarih:** 8 Şubat 2026
-- **Durum:** ⏳ Açık
+- **Öncelik:** 🔴 DO (yapıldı)
+- **Tarih:** 8 Şubat 2026 | **Çözüm:** 9 Şubat 2026
+- **Durum:** ✅ Çözüldü
 - **Açıklama:** Kitap görüntüleyicide Play’e basıldığında ses çalmıyor. API 200 dönüyor (TTS cache hit), ancak tarayıcıda oynatma başarısız.
 - **Yapılan kolay deneme:** `hooks/useTTS.ts` – audioUrl kontrolü, load() sonrası canplaythrough/error bekleniyor, net hata mesajı (CORS / zaman aşımı). Bu değişiklik yükleme hatasını görünür kılar.
 - **Olası nedenler:** S3’ten dönen ses URL’i cross-origin; tarayıcı CORS nedeniyle sesi yükleyemiyor olabilir. Alternatif: sesi API üzerinden proxy ile sunmak (same-origin).

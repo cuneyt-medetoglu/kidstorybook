@@ -278,7 +278,7 @@ Kullanıcı şunları diyebilir:
   - `docs/ROADMAP_CSV_README.md` - CSV kullanım rehberi
   - Prompt version sync ve takip (`lib/prompts/` ve `docs/prompts/` arasındaki senkronizasyon)
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
-- **@database-manager:** `docs/database/SCHEMA.md`, `supabase/migrations/`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` (migration detay: `docs/archive/2026-02/aws-plans/`)
+- **@database-manager:** `docs/database/SCHEMA.md`, `migrations/`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` (migration detay: `docs/archive/2026-02/aws-plans/`)
 - **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
   - **Sorumluluk:** Prompt'ların sürekli geliştirilmesi, kalite iyileştirmeleri, feedback'lerin prompt'lara yansıtılması
   - Prompt'lar sürekli gelişen dokümanlardır ve @prompt-manager bu gelişimin sorumlusudur

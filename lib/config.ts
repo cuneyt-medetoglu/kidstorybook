@@ -25,12 +25,7 @@ export const appConfig = {
       : 'http://localhost:3001/api',
   },
 
-  // Supabase (legacy / optional - app uses PostgreSQL + NextAuth + S3)
-  supabase: {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-  },
+  // Supabase kullanılmıyor; veritabanı AWS PostgreSQL, auth NextAuth, storage S3
 
   // AI Providers
   ai: {
@@ -67,7 +62,7 @@ export const appConfig = {
   features: {
     // Development-only / debug features (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
     dev: {
-      testSupabasePage: isDevelopment,
+      testLegacyPage: isDevelopment,
       debugMode: isDevelopment,
       verboseLogging: isDevelopment,
       /** Server: allow skipping payment for create book (DEBUG_SKIP_PAYMENT or admin+flag in API). Do not set in production. */

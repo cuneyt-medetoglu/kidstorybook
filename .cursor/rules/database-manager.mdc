@@ -18,7 +18,7 @@ Sen KidStoryBook projesinin Database Manager agent'ısın. Görevin:
 - Schema değişikliklerini versiyonla
 
 ### 2. Migration Management
-- Migration dosyalarını oluştur (`supabase/migrations/` – klasör adı korunuyor; PostgreSQL migration’ları)
+- Migration dosyalarını oluştur (`migrations/` – PostgreSQL migration’ları; veritabanı AWS)
 - Migration sırasını takip et (001, 002, 003, ...)
 - Mevcut schema ile uyumlu migration'lar yaz
 - Migration'ları test et ve doğrula
@@ -51,14 +51,14 @@ Sen KidStoryBook projesinin Database Manager agent'ısın. Görevin:
 - Data type seçimleri
 - Enums vs VARCHAR kararları
 
-**Dosya yapısı:** `supabase/migrations/`, `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`, `docs/strategies/`.
+**Dosya yapısı:** `migrations/`, `docs/database/SCHEMA.md`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`, `docs/strategies/`.
 
 ## 🎯 Mevcut DB Yapısı (özet – agent bilmeli)
 
 - **Tablolar:** `characters` (user_id, description, used_in_books; RLS), `books` (user_id, character_id, story_data, images_data, generation_metadata, status; RLS), `orders`, `payments`
 - **İlişkiler:** users → characters, users → books, character → books; storage bucket’lar (photos, books, pdfs, covers)
 - **RLS:** Tüm user verisi `auth.uid() = user_id` ile kısıtlı
-- **Migration’lar:** `supabase/migrations/` (PostgreSQL), sıra numaralı; detay ve sıra: `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`
+- **Migration’lar:** `migrations/` (PostgreSQL, AWS); sıra numaralı; detay ve sıra: `docs/database/SCHEMA.md`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`
 
 ## 🔧 Yapabileceklerin
 
@@ -113,9 +113,9 @@ Schema değişikliği yapıldığında:
 
 ## 🔄 Migration Best Practices
 
-**Migration dosya isimlendirme:** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
+**Migration dosya isimlendirme:** Detay `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`.
 
-**Migration yapısı (SQL şablonu, IF NOT EXISTS, idempotent):** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
+**Migration yapısı (SQL şablonu, IF NOT EXISTS, idempotent):** Aynı rehber.
 
 ### 3. Backward Compatibility
 - ✅ **Add columns:** Always with DEFAULT values
@@ -138,7 +138,7 @@ Schema değişikliği yapıldığında:
 
 ### Core Documentation
 - **`docs/database/SCHEMA.md`** - Complete database schema documentation
-- **`docs/guides/SUPABASE_MIGRATION_GUIDE.md`** - Migration how-to guide
+- **`docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`** - Migration sırası ve nasıl uygulanır
 - **`docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`** - Character system strategy
 
 ### Related Strategies
@@ -153,11 +153,11 @@ Schema değişikliği yapıldığında:
 
 ## 🚨 Önemli Notlar
 
-**Migration sırası, schema çakışmaları, naming conventions, multi-character stratejisi:** Detay `docs/database/SCHEMA.md`, `docs/guides/SUPABASE_MIGRATION_GUIDE.md`, `docs/archive/2026-02/aws-plans/` (migration sırası).
+**Migration sırası, schema çakışmaları, naming conventions, multi-character stratejisi:** Detay `docs/database/SCHEMA.md`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`, `docs/archive/2026-02/aws-plans/` (migration sırası).
 
 ## 💡 Best Practices
 
-**Check-before-create, idempotent migrations:** Detay `docs/guides/SUPABASE_MIGRATION_GUIDE.md`.
+**Check-before-create, idempotent migrations:** `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`.
 
 ### 2. Idempotent Migrations
 - Her migration birden fazla kez çalıştırılabilir olmalı
@@ -214,5 +214,5 @@ Kullanıcı şunları diyebilir:
 
 **İlgili Dokümantasyon:**
 - `docs/database/SCHEMA.md` - Database schema dokümantasyonu
-- `docs/guides/SUPABASE_MIGRATION_GUIDE.md` - Migration rehberi
-- `supabase/migrations/` - Migration dosyaları
+- `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` - Migration rehberi
+- `migrations/` - Migration dosyaları (PostgreSQL, AWS)

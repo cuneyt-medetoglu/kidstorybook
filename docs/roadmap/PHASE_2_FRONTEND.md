@@ -1,7 +1,7 @@
 ## 🎨 FAZ 2: Frontend Geliştirme
 **Öncelik:** 🔴 Kritik  
 **Durum:** 🟡 Devam Ediyor (4 Ocak 2026)  
-**İlerleme:** 32/61 iş tamamlandı (52%)
+**İlerleme:** 36/62 iş tamamlandı (58%) — TTS/viewer iyileştirmeleri (9 Şubat 2026) dahil
 
 ### 2.1 Layout ve Navigasyon
 - [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
@@ -216,9 +216,10 @@
 **Özet:**
 - ✅ Temel görüntüleme ve navigasyon (6 animasyon tipi, fullscreen, thumbnails)
 - ✅ Mobil ve responsive (portrait/landscape, swipe gestures)
-- ✅ Text-to-Speech entegrasyonu (Gemini Pro TTS, Achernar ses)
+- ✅ Text-to-Speech entegrasyonu (Gemini Pro TTS, Achernar ses; S3 signed URL, admin TTS config, prewarm)
 - ✅ Otomatik oynatma (TTS Synced, Timed modes)
-- ✅ TTS Cache mekanizması (15 Ocak 2026)
+- ✅ TTS Cache mekanizması (S3, prewarm, 15 Ocak / 9 Şubat 2026)
+- ✅ Parent Settings sesli okuma (hız, volume); okuyucuda mute; dashboard "Audio" badge; çocuk UX footer (9 Şubat 2026)
 - ✅ 8 dil desteği (TR, EN, DE, FR, ES, PT, RU, ZH)
 - ✅ UX iyileştirmeleri (Bookmark, Reading Progress, Keyboard Shortcuts, Share)
 - ✅ Görsel ve animasyonlar (6 animasyon tipi, 3 hız seçeneği, shadow/depth effects)
@@ -263,19 +264,19 @@
 
 #### 2.5.3 Sesli Okuma (Text-to-Speech)
 - [x] **2.5.3.1** Text-to-Speech entegrasyonu (Gemini Pro TTS) - ✅ Backend API ve frontend hook oluşturuldu, WaveNet/Standard sesler kaldırıldı (15 Ocak 2026)
-- [x] **2.5.3.2** Ses seçeneği (Achernar - Gemini Pro TTS) - ✅ Settings dropdown'da Achernar sesi mevcut, eski sesler kaldırıldı (15 Ocak 2026)
-- [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Settings dropdown'da (0.75x, 1.0x, 1.25x)
-- [ ] **2.5.3.4** Volume kontrolü - ⏳ Hook'ta mevcut, UI'da henüz yok
+- [x] **2.5.3.2** Ses seçeneği (Achernar - Gemini Pro TTS) - ✅ Admin global config (tts_settings); Settings dropdown'da sadece admin TTS düzenleme (15 Ocak / 9 Şubat 2026)
+- [x] **2.5.3.3** Ses hızı kontrolü (0.5x - 2x arası) - ✅ Parent Settings'te (Yavaş/Normal/Hızlı); kullanıcı tercihi localStorage (9 Şubat 2026)
+- [x] **2.5.3.4** Volume kontrolü - ✅ Parent Settings'te ses seviyesi (slider); okuyucuda mute butonu; kullanıcı tercihi localStorage (9 Şubat 2026)
 - [x] **2.5.3.5** Play/Pause/Stop butonları - ✅ Play/Pause mevcut, Stop hook'ta mevcut ama UI'da yok
 - [ ] **2.5.3.6** Sesli okuma sırasında sayfa vurgulama (highlight current word/sentence) - ⏳ Basit implementasyon mevcut, gelişmiş versiyon için Web Speech API word timing gerekli
 - [x] **2.5.3.7** Otomatik sayfa ilerleme (ses bittiğinde sonraki sayfaya geç) - ✅ TTS bittiğinde otomatik sayfa ilerleme
-- [x] **2.5.3.8** TTS Cache mekanizması - ✅ Supabase Storage'da ses dosyalarını cache'leme (aynı metin tekrar okutulduğunda ücretsiz) - 15 Ocak 2026
+- [x] **2.5.3.8** TTS Cache mekanizması - ✅ S3'te cache (signed URL); kitap tamamlanınca TTS prewarm; aynı metin tekrar okutulduğunda cache hit (15 Ocak 2026, S3 + prewarm 9 Şubat 2026)
 - [ ] **2.5.3.9** TTS Cache temizleme (hikaye değişikliğinde) - ⏳ Hikaye metni değiştiğinde eski cache dosyasını sil, yeni ses oluştur
-- [ ] **2.5.3.10** Sesli Hikaye Özelliği Pazarlama Vurgusu (26 Ocak 2026)
-  - Ebook viewer'da sesli hikaye özelliği daha görünür hale getirilmeli
-  - İlk açılışta veya onboarding'de sesli okuma özelliği tanıtılmalı
-  - "Listen to your story" veya "Audio narration available" gibi prominent call-to-action'lar eklenmeli
-  - Sesli okuma özelliğinin faydaları (okuma öğrenme, telaffuz, bağımsız okuma) kullanıcıya gösterilmeli
+- [x] **2.5.3.10** Sesli Hikaye Özelliği Pazarlama Vurgusu (26 Ocak 2026) - ✅ Kısmen tamamlandı (9 Şubat 2026)
+  - [x] Dashboard'da completed kitaplar için "Audio" badge (Volume2 ikonu) - ✅
+  - [ ] İlk açılışta veya onboarding'de sesli okuma tanıtımı - ⏳ İsteğe bağlı
+  - [ ] Viewer'da prominent "Listen to your story" CTA - ⏳ İsteğe bağlı (sade tasarım tercih edildi)
+  - Ref: docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md
 
 #### 2.5.4 Otomatik Oynatma (Autoplay)
 - [x] **2.5.4.1** Autoplay butonu ve kontrolü - ✅ Autoplay toggle butonu (RotateCcw icon), visual indicator ve Settings'te mod seçimi
@@ -292,7 +293,7 @@
 - [ ] **2.5.5.5** Print options - ⏳ Post-MVP
 - [x] **2.5.5.6** Keyboard shortcuts (desktop: arrow keys, space, esc, vb.) - ✅ 11 farklı klavye kısayolu eklendi
 - [ ] **2.5.5.7** Accessibility features (font size, high contrast, screen reader support) - ⏳ Post-MVP
-- [ ] **2.5.5.8** Settings UI iyileştirmesi - ⏳ Şu an sağ üstte Settings dropdown debug için mevcut. Daha sonra daha güzel bir yere taşınacak ve daha sade/anlaşılır hale getirilecek (kullanıcı dostu tasarım)
+- [x] **2.5.5.8** Settings UI iyileştirmesi - ✅ Ses/hız Parent Settings'e taşındı; okuyucu sadeleştirildi (sadece admin için TTS varsayılanları dropdown'da). Çocuk odaklı sade tasarım (9 Şubat 2026)
 
 #### 2.5.6 Görsel ve Animasyonlar
 - [x] **2.5.6.1** Sayfa çevirme animasyonu (flip effect, slide, fade, vb.) - ✅ 6 farklı animasyon tipi: Flip (3D), Slide, Fade, Page Curl, Zoom, None (Instant)
@@ -302,10 +303,11 @@
 - [x] **2.5.6.5** Shadow ve depth effects (3D görünüm) - ✅ Shadow-2xl, drop-shadow, depth effects (z-index)
 
 #### 2.5.7 Gelecek Özellikler (Post-MVP)
+- [x] **2.5.5.9** Çocuk UX (footer) (9 Şubat 2026) - ✅ Okuyucu footer'da min 44px dokunmatik alan, basınca scale animasyonu (active:scale-95), ikon boyutları md'de büyütüldü. Ref: TTS_GOOGLE_GEMINI_ANALYSIS.md §3.5
 - [ ] **2.5.8** Çocuk Modu (Kids Mode) (23 Ocak 2026)
   - Tablet veya telefondan hikayeleri okuyup/dinlerken ayrı bir çocuk modu olabilir
   - Bu moda nasıl girilip çıkılır? Düşünülecek
-  - Basitleştirilmiş UI, büyük butonlar, otomatik oynatma
+  - Basitleştirilmiş UI, büyük butonlar, otomatik oynatma - ✅ Kısmen: footer büyük butonlar ve animasyon yapıldı (2.5.5.9)
   - Erişim kontrolü (ebeveyn kilidi gibi)
 - [ ] **2.5.7.1** Notes/annotations (sayfaya not alma)
 - [ ] **2.5.7.2** Search in book (kitap içinde arama)

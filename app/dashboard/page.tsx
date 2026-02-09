@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2, ShoppingCart, CheckSquare, Square } from "lucide-react"
+import { Search, Grid3x3, List, BookOpen, Plus, Download, Share2, Trash2, Edit, Loader2, ShoppingCart, CheckSquare, Square, Volume2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -692,11 +692,17 @@ export default function LibraryPage() {
                       <h3 className="font-semibold text-lg line-clamp-2 text-foreground">{book.title}</h3>
                       <div className="flex items-center justify-between flex-wrap gap-2">
                         <p className="text-xs text-muted-foreground">Created {book.createdDate}</p>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           {book.status === "completed" && (
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800">
-                              E-Book
-                            </Badge>
+                            <>
+                              <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                                E-Book
+                              </Badge>
+                              <Badge variant="outline" className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border-amber-200 dark:border-amber-800 gap-1" title="Audio">
+                                <Volume2 className="h-3 w-3" />
+                                Audio
+                              </Badge>
+                            </>
                           )}
                           <Badge variant="secondary" className={statusConfig[book.status].color}>
                             {statusConfig[book.status].label}

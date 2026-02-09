@@ -23,7 +23,7 @@ KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI dest
 
 - Node.js 18+
 - npm veya yarn
-- API anahtarları: OpenAI, Supabase, (opsiyonel) Groq, Google Cloud TTS, Stripe/İyzico
+- API anahtarları: OpenAI, (opsiyonel) Groq, Google Cloud TTS, Stripe/İyzico
 
 ### Kurulum
 
@@ -69,8 +69,8 @@ Tarayıcıda **http://localhost:3001** adresini açın.
 | Katman | Teknoloji |
 |--------|-----------|
 | **Frontend** | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
-| **Backend** | Next.js API Routes, Supabase (Auth, DB, Storage) |
-| **Veritabanı** | PostgreSQL (Supabase) |
+| **Backend** | Next.js API Routes, PostgreSQL (AWS), S3, NextAuth |
+| **Veritabanı** | PostgreSQL (AWS) |
 | **AI – Metin** | OpenAI GPT-4o, (opsiyonel) Groq, Claude, Gemini |
 | **AI – Görsel** | OpenAI GPT-image / DALL-E, (opsiyonel) Imagen, Stable Diffusion |
 | **TTS** | Google Cloud Text-to-Speech |
@@ -83,13 +83,13 @@ Tarayıcıda **http://localhost:3001** adresini açın.
 kidstorybook/
 ├── app/                 # Next.js App Router (sayfalar, API routes)
 ├── components/          # React bileşenleri (ui, layout, sections)
-├── lib/                 # Yardımcılar, Supabase, DB, prompt’lar, PDF, TTS
+├── lib/                 # Yardımcılar, DB, prompt'lar, PDF, TTS
 ├── hooks/               # React hooks
 ├── contexts/            # React context (örn. Cart)
 ├── public/              # Statik dosyalar (görseller, test-images)
 ├── scripts/             # Yardımcı script’ler (roadmap CSV, hero transformation)
 ├── docs/                # Dokümantasyon (ROADMAP, PRD, guides, roadmap/, technical/)
-├── supabase/            # Migration’lar ve schema
+├── migrations/          # PostgreSQL migration'ları (AWS)
 └── .cursor/             # Cursor AI kuralları
 ```
 

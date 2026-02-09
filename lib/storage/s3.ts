@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl as getS3SignedUrl } from '@aws-sdk/s3-request-presigner'
 
 const bucket = process.env.AWS_S3_BUCKET
 const region = process.env.AWS_REGION || 'eu-central-1'
@@ -55,6 +56,21 @@ export async function uploadFile(
  */
 export function getPublicUrl(key: string): string {
   return `https://${bucket}.s3.${region}.amazonaws.com/${key}`
+}
+
+/**
+ * Get a time-limited signed URL for S3 object
+ * @param key - S3 key (full path)
+ * @param expiresInSeconds - Expiration time in seconds (default: 1 hour)
+ * @returns Signed URL
+ */
+export async function getSignedObjectUrl(key: string, expiresInSeconds: number = 3600): Promise<string> {
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  })
+
+  return getS3SignedUrl(s3Client, command, { expiresIn: expiresInSeconds })
 }
 
 /**

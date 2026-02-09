@@ -1,0 +1,182 @@
+/**
+ * Server-side TTS generation: cache check + Google TTS + S3 cache.
+ * Used by POST /api/tts/generate and by book creation prewarm.
+ */
+
+import { TextToSpeechClient } from "@google-cloud/text-to-speech"
+import crypto from "crypto"
+import { getLanguageCode, getPromptForLanguage } from "@/lib/prompts/tts/v1.0.0"
+import { uploadFile, getSignedObjectUrl, fileExists } from "@/lib/storage/s3"
+import { getTtsSettings } from "@/lib/db/tts-settings"
+
+const TTS_CACHE_PREFIX = "tts-cache"
+
+let ttsClient: TextToSpeechClient | null = null
+
+function getTTSClient(): TextToSpeechClient {
+  if (ttsClient) return ttsClient
+  try {
+    if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
+      ttsClient = new TextToSpeechClient({ projectId: credentials.project_id, credentials })
+      return ttsClient
+    }
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      ttsClient = new TextToSpeechClient({
+        projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+      })
+      return ttsClient
+    }
+    ttsClient = new TextToSpeechClient({ projectId: process.env.GOOGLE_CLOUD_PROJECT_ID })
+  } catch (error) {
+    console.error("Failed to initialize Google Cloud TTS client:", error)
+    throw new Error("Google Cloud TTS client initialization failed")
+  }
+  return ttsClient!
+}
+
+function generateCacheHash(text: string, voiceId: string, speed: number, prompt: string): string {
+  const content = `${text}|${voiceId}|${speed}|${prompt}`
+  return crypto.createHash("sha256").update(content).digest("hex")
+}
+
+async function getCachedAudio(hash: string): Promise<string | null> {
+  try {
+    const key = `${TTS_CACHE_PREFIX}/${hash}.mp3`
+    const exists = await fileExists(key)
+    if (!exists) return null
+    return getSignedObjectUrl(key)
+  } catch (error) {
+    console.error("[TTS Cache] Error checking cache:", error)
+    return null
+  }
+}
+
+async function saveCachedAudio(hash: string, audioBuffer: Buffer): Promise<string | null> {
+  try {
+    const fileName = `${hash}.mp3`
+    const key = await uploadFile(TTS_CACHE_PREFIX, fileName, audioBuffer, "audio/mpeg")
+    return getSignedObjectUrl(key)
+  } catch (error) {
+    console.error("[TTS Cache] Error saving to cache:", error)
+    return null
+  }
+}
+
+export interface GenerateTtsOptions {
+  language?: string
+  voiceId?: string
+  speed?: number
+  prompt?: string
+}
+
+export interface GenerateTtsResult {
+  audioUrl: string
+  cached: boolean
+  voiceId: string
+  speed: number
+  languageCode: string
+  textLength: number
+}
+
+/**
+ * Generate TTS for the given text using global defaults (or overrides).
+ * Checks cache first; on miss, calls Google TTS and saves to S3.
+ */
+export async function generateTts(
+  text: string,
+  options: GenerateTtsOptions = {}
+): Promise<GenerateTtsResult> {
+  if (!text || typeof text !== "string" || text.trim().length === 0) {
+    throw new Error("Text is required")
+  }
+  if (text.length > 5000) {
+    throw new Error("Text too long. Maximum 5000 characters.")
+  }
+
+  let ttsDefaults: Awaited<ReturnType<typeof getTtsSettings>> = null
+  try {
+    ttsDefaults = await getTtsSettings()
+  } catch (_) {}
+
+  const voiceId =
+    (typeof options.voiceId === "string" && options.voiceId.trim() ? options.voiceId.trim() : null) ??
+    ttsDefaults?.voice_name ??
+    "Achernar"
+  const language =
+    (typeof options.language === "string" && options.language.trim() ? options.language.trim() : null) ??
+    ttsDefaults?.language_code ??
+    "en"
+  const rawSpeed =
+    typeof options.speed === "number" ? options.speed : (ttsDefaults?.speaking_rate ?? 1.0)
+  const prompt =
+    (typeof options.prompt === "string" && options.prompt.trim() ? options.prompt.trim() : null) ??
+    ttsDefaults?.prompt ??
+    getPromptForLanguage(language)
+  const modelName = ttsDefaults?.model_name ?? "gemini-2.5-pro-tts"
+
+  const languageCode = getLanguageCode(language)
+  const validSpeed = Math.max(0.25, Math.min(4.0, Number(rawSpeed)))
+  const cacheHash = generateCacheHash(text, voiceId, validSpeed, prompt)
+
+  const cachedUrl = await getCachedAudio(cacheHash)
+  if (cachedUrl) {
+    if (process.env.DEBUG_LOGGING === "true") {
+      console.log("[TTS] Cache hit:", cacheHash.substring(0, 8))
+    }
+    return {
+      audioUrl: cachedUrl,
+      cached: true,
+      voiceId,
+      speed: validSpeed,
+      languageCode,
+      textLength: text.length,
+    }
+  }
+
+  if (process.env.DEBUG_LOGGING === "true") {
+    console.log("[TTS] Cache miss, generating audio:", cacheHash.substring(0, 8))
+  }
+
+  const client = getTTSClient()
+  const [response] = await client.synthesizeSpeech({
+    input: { text, ...(prompt ? { prompt } : {}) },
+    voice: { languageCode, name: voiceId, modelName },
+    audioConfig: {
+      audioEncoding: "MP3",
+      speakingRate: validSpeed,
+      pitch: 0,
+      volumeGainDb: 0,
+    },
+  })
+
+  if (!response.audioContent) {
+    throw new Error("Failed to generate audio")
+  }
+
+  const audioBuffer = Buffer.from(response.audioContent)
+  const savedUrl = await saveCachedAudio(cacheHash, audioBuffer)
+
+  if (savedUrl) {
+    return {
+      audioUrl: savedUrl,
+      cached: false,
+      voiceId,
+      speed: validSpeed,
+      languageCode,
+      textLength: text.length,
+    }
+  }
+
+  const audioBase64 = audioBuffer.toString("base64")
+  const dataUrl = `data:audio/mp3;base64,${audioBase64}`
+  return {
+    audioUrl: dataUrl,
+    cached: false,
+    voiceId,
+    speed: validSpeed,
+    languageCode,
+    textLength: text.length,
+  }
+}

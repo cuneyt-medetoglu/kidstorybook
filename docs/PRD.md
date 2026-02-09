@@ -1,10 +1,10 @@
 # 📄 Product Requirements Document (PRD)
 # KidStoryBook Platform
 
-**Versiyon:** 1.5  
+**Versiyon:** 1.6  
 **Tarih:** 21 Aralık 2025  
-**Son Güncelleme:** 7 Şubat 2026  
-**Durum:** TASLAK – FAZ 3 (MVP hazır; Multi-character, TTS, Currency, Cart, Image Edit, 8 dil, PDF, Debug/Feature Flags; hikaye/görsel kalite iyileştirmeleri: kelime hedefleri, sayfa çeşitliliği, el anatomisi prompt)
+**Son Güncelleme:** 9 Şubat 2026  
+**Durum:** TASLAK – FAZ 3 (MVP hazır; Multi-character, TTS, Currency, Cart, Image Edit, 8 dil, PDF, Debug/Feature Flags; TTS/viewer: signed URL, admin config, prewarm, Parent Settings read-aloud, Audio badge, mute, child UX footer)
 
 > **Kısa PRD:** Teknik detaylar → [PRD Teknik Gereksinimler](technical/PRD_TECHNICAL_DETAILS.md). Tamamlanan özellikler → [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md).
 
@@ -119,15 +119,16 @@ Mobil uygulama, video hikayeler, kullanıcı yorumları (başlangıç), affiliat
 
 ## 9. Versiyon Özeti (Son Değişiklikler)
 
-1. **29 Ocak 2026:** Debug/Feature Flags (PRD 3.5)
-2. **25 Ocak 2026:** Multi-character, Pet/Toys, Currency, Sepet, Pricing sayfası, TTS, Rate limiting
-3. **24 Ocak 2026:** 8 dil, dil talimatları
-4. **17 Ocak 2026:** Image Edit (mask-based), version history/revert
-5. **15 Ocak 2026:** Prompt versioning, kalite iyileştirme, log/monitoring
+1. **9 Şubat 2026:** TTS ve e-book viewer iyileştirmeleri: signed URL (S3 erişim), admin TTS config (ses/ton/dil), kitap tamamlanınca TTS prewarm, Parent Settings’te sesli okuma ayarları (hız, volume), dashboard’da “Audio” badge, okuyucuda mute, çocuk UX (44px dokunmatik, basınca animasyon). Ref: `docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md`
+2. **29 Ocak 2026:** Debug/Feature Flags (PRD 3.5)
+3. **25 Ocak 2026:** Multi-character, Pet/Toys, Currency, Sepet, Pricing sayfası, TTS, Rate limiting
+4. **24 Ocak 2026:** 8 dil, dil talimatları
+5. **17 Ocak 2026:** Image Edit (mask-based), version history/revert
+6. **15 Ocak 2026:** Prompt versioning, kalite iyileştirme, log/monitoring
 
 **Tüm tamamlanan özellikler:** [COMPLETED_FEATURES.md](COMPLETED_FEATURES.md)
 
 ---
 
 **Doküman Sahibi:** Proje Ekibi  
-**Son Güncelleme:** 4 Şubat 2026
+**Son Güncelleme:** 9 Şubat 2026

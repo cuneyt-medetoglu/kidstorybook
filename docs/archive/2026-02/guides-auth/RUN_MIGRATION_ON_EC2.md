@@ -1,6 +1,6 @@
 # EC2'de Migration Çalıştırma Rehberi
 
-Bu rehber, `supabase/migrations/20260204_add_nextauth_support.sql` dosyasını EC2 (veya PostgreSQL'in çalıştığı sunucu) üzerinde nasıl çalıştıracağınızı anlatır.
+Bu rehber, `migrations/20260204_add_nextauth_support.sql` dosyasını EC2 (veya PostgreSQL'in çalıştığı sunucu) üzerinde nasıl çalıştıracağınızı anlatır.
 
 ---
 
@@ -16,10 +16,10 @@ Bu rehber, `supabase/migrations/20260204_add_nextauth_support.sql` dosyasını E
 ```bash
 ssh -i kidstorybook-key.pem ubuntu@<EC2_IP>
 # Migration dosyası proje dizinindeyse:
-psql "$DATABASE_URL" -f supabase/migrations/20260204_add_nextauth_support.sql
+psql "$DATABASE_URL" -f migrations/20260204_add_nextauth_support.sql
 ```
 
-SCP ile dosya kopyalama: `scp -i key.pem supabase/migrations/20260204_add_nextauth_support.sql ubuntu@<IP>:~/`
+SCP ile dosya kopyalama: `scp -i key.pem migrations/20260204_add_nextauth_support.sql ubuntu@<IP>:~/`
 
 ---
 
