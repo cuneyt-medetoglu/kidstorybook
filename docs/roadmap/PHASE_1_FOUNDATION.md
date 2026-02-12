@@ -60,10 +60,10 @@
 - [x] **1.2.6** ~~Supabase vs AWS Değerlendirmesi~~ → AWS'ye geçiş kararı verildi ve uygulandı ✅ (Şubat 2026)
   - Analiz: `docs/archive/2026-02/aws-plans/SUPABASE_TO_AWS_ANALYSIS.md`
   - Karar: Tek EC2 (t3.medium) + PostgreSQL + S3; aylık ~35–45 USD
-- [ ] **1.2.7** Database Backup Sistemi | 🟡 PLAN
-  - EC2 PostgreSQL için `pg_dump` cron veya AWS Backup
-  - Backup stratejisi ve retention policy
-  - S3'e backup dosyaları yükleme
+- [x] **1.2.7** Database Backup Sistemi ✅ (Şubat 2026)
+  - EC2 PostgreSQL için `scripts/db-backup.sh` (pg_dump → S3, retention 14 gün)
+  - Runbook: `docs/guides/DB_BACKUP_RUNBOOK.md` (cron, restore)
+  - S3 prefix: `backups/db`
 - [x] **1.2.8** ~~Supabase'ı AWS'de açılacak bir makineye migrate etme~~ → AWS altyapı Faz 1–4 tamamlandı ✅ (Şubat 2026)
   - EC2 Ubuntu 24.04, PostgreSQL 16, S3, IAM role, migration'lar uygulandı
   - Rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`

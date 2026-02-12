@@ -2,7 +2,7 @@
 
 **Tarih:** 10 Şubat 2026  
 **Son Güncelleme:** 12 Şubat 2026  
-**Durum:** 🟢 5.5.1 tamamlandı; 5.5.6 checklist hazır (eksikler sonra); sırada 1.2.7  
+**Durum:** 🟢 5.5.1 + 1.2.7 tamamlandı; sırada 5.5.10 veya 5.5.2 (domain)  
 **Kaynak:** `docs/roadmap/PHASE_5_LAUNCH.md` (5.5), `docs/analysis/DEPLOYMENT_SERVER_ANALYSIS.md`
 
 ---
@@ -13,7 +13,7 @@
 |------|-----|--------|--------|
 | 1 | 5.5.1 | EC2'de Next.js uygulaması deploy | ✅ Tamamlandı (12 Şubat 2026) |
 | 2 | 5.5.6 | Production Environment Variables kontrolü | 🟡 Checklist hazır (eksikler sonra) |
-| 3 | 1.2.7 | Database backup sistemi | ⬜ Sırada |
+| 3 | 1.2.7 | Database backup sistemi | ✅ Tamamlandı (script + runbook) |
 | 4 | 5.5.10 | Production veritabanı migration akışı | ⬜ Bekliyor |
 | 5 | 5.5.4 / 5.5.5 | Monitoring + Sentry | ⬜ Bekliyor |
 | 6 | 5.5.8 | CI/CD pipeline (opsiyonel) | ⬜ Bekliyor |
@@ -27,6 +27,7 @@
 - **10 Şubat 2026:** Faz 5.5 implementasyon dokümanı oluşturuldu. Öncelik sırası netleştirildi (domain/SSL sonraya). 5.5.1 ilk adım olarak belirlendi.
 - **10 Şubat 2026:** 5.5.7 (AWS production makine kurulumu) önceden tamamlanmış; rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`.
 - **12 Şubat 2026:** 5.5.1 tamamlandı. EC2’de Node 20, git clone, `npm run deploy:build`, `npm run start`/start:prod; uygulama http://EC2_IP:3000 üzerinden erişilebilir. Port 3000 güvenlik grubunda açıldı; NEXTAUTH_URL/NEXT_PUBLIC_APP_URL production IP ile ayarlandı. **Not:** IP ile erişimde Auth.js “UntrustedHost” log’u çıkıyor; giriş/session domain alındıktan sonra tam çalışacak. Bu haliyle IP ile test ve kullanım mümkün.
+- **12 Şubat 2026:** 1.2.7 Database backup sistemi tamamlandı. `scripts/db-backup.sh` (pg_dump → S3, retention 14 gün), `docs/guides/DB_BACKUP_RUNBOOK.md` (kurulum, cron, restore). S3 prefix: backups/db.
 
 ---
 
@@ -58,12 +59,23 @@ Checklist’i doldurup gerekli düzeltmeleri yaptıktan sonra bu maddeyi tamamla
 
 ---
 
+## 3d. Adım 3: 1.2.7 – Database backup sistemi ✅ Tamamlandı
+
+- **Script:** `scripts/db-backup.sh` — pg_dump (custom format), S3’e yükleme, yerel dosyayı silme, S3’te retention (varsayılan 14 gün).
+- **Runbook:** `docs/guides/DB_BACKUP_RUNBOOK.md` — kurulum, manuel/cron yedek, S3 listeleme/indirme, restore adımları.
+- **S3:** `s3://BUCKET/backups/db/` (backups prefix public değil).
+- **Cron:** Runbook’ta örnek (günlük 03:00); `.pgpass` veya `PGPASSWORD` gerekli.
+
+EC2’de ilk kez: `chmod +x scripts/db-backup.sh`, `.pgpass` veya `PGPASSWORD` ayarla, bir kez `./scripts/db-backup.sh` dene, sonra crontab ekle.
+
+---
+
 ## 3b. Sıradaki adım ve kısa özet
 
 | Ne | Açıklama |
 |----|----------|
-| **Sıradaki adım** | **1.2.7** – Database backup sistemi (production PostgreSQL için yedekleme stratejisi ve araçları). |
-| **Sonra** | 5.5.10 migration akışı → 5.5.4/5.5.5 monitoring/Sentry → 5.5.8 CI/CD (opsiyonel). 5.5.6 eksik env’ler sonra tamamlanacak. |
+| **Sıradaki adım** | **5.5.10** – Production veritabanı migration akışı (migration öncesi backup, rollback planı). Veya **5.5.2** (domain). |
+| **Sonra** | 5.5.4/5.5.5 monitoring/Sentry → 5.5.8 CI/CD (opsiyonel). 5.5.6 eksik env’ler sonra tamamlanacak. |
 | **Domain sonrası** | 5.5.2 Domain → 5.5.3 SSL (Nginx + Let’s Encrypt); NEXTAUTH_URL ve NEXT_PUBLIC_APP_URL’i https://domain.com yap. |
 
 ---
@@ -77,6 +89,7 @@ Aşağıdakiler ihtiyaç halinde açılacak; kalıcı olanlar burada listelenir,
 | **DEPLOYMENT_SERVER_ANALYSIS.md** | Deployment kapsamı, roadmap eşlemesi, önerilen sıra | `docs/analysis/` |
 | **EC2 build/hata analizi** | Build veya runtime hatalarının kök neden incelemesi | Gerekirse `docs/analysis/` veya geçici not |
 | **PRODUCTION_ENV_5_5_6.md** | 5.5.6 için env değişkenleri checklist | `docs/checklists/` |
+| **DB_BACKUP_RUNBOOK.md** | 1.2.7 DB yedekleme ve restore | `docs/guides/` |
 | **Migration runbook** | 5.5.10 için production migration adımları | Gerekirse `docs/guides/` veya `docs/plans/` |
 
 ---

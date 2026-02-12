@@ -160,7 +160,7 @@ Local'de uygulama veya DBeaver ile prod DB'ye bağlanmak için **SSH tüneli** k
 
 ## 4.2 Prefix’ler (klasörler)
 
-- Bucket’a gir → **Create folder** (veya Upload → Create folder): `photos`, `books`, `pdfs`, `covers`.
+- Bucket’a gir → **Create folder** (veya Upload → Create folder): `photos`, `books`, `pdfs`, `covers`, `backups` (DB yedekleri için; 1.2.7 — `docs/guides/DB_BACKUP_RUNBOOK.md`).
 
 ## 4.3 Public read (sadece books, pdfs, covers)
 
@@ -314,7 +314,29 @@ npm run build
 npm run start
 ```
 
-`.env` olmadan build/start hata verebilir; önce 8. bölümdeki gibi production `.env` oluştur. Process manager (PM2) için sonraki adım: `docs/implementation/FAZ5_5_IMPLEMENTATION.md` → 3.4.
+`.env` olmadan build/start hata verebilir; önce 8. bölümdeki gibi production `.env` oluştur. PM2 kurulumu ve kullanımı aşağıda 6.4a ve 6.5'te.
+
+## 6.4a PM2 kurulumu (EC2'de)
+
+PM2 varsayılan olarak kurulu değildir; sunucuda bir kez kurarsın.
+
+```bash
+sudo npm install -g pm2
+pm2 -v
+```
+
+**Uygulamayı PM2 ile ilk kez başlatma (proje dizininde ~/kidstorybook):**
+
+```bash
+cd ~/kidstorybook
+pm2 start npm --name kidstorybook -- run start:prod
+pm2 save
+pm2 startup   # çıkan sudo env PATH=... komutunu kopyalayıp çalıştır
+```
+
+`pm2 startup` ekranda bir `sudo env PATH=...` satırı verir; onu kopyalayıp çalıştır. Sonra `pm2 save`. Böylece sunucu yeniden açılsa da PM2 otomatik başlar.
+
+**Yararlı:** `pm2 list`, `pm2 logs kidstorybook`, `pm2 reload kidstorybook` (sıfır kesinti yeniden yükle).
 
 ## 6.5 Deploy ve sıfır kesinti (npm script’ler + PM2)
 
