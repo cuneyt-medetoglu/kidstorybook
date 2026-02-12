@@ -19,10 +19,10 @@ export const appConfig = {
 
   // App URLs
   urls: {
-    appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001',
+    appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
     apiUrl: process.env.NEXT_PUBLIC_APP_URL 
       ? `${process.env.NEXT_PUBLIC_APP_URL}/api`
-      : 'http://localhost:3001/api',
+      : 'http://localhost:3000/api',
   },
 
   // Supabase kullanılmıyor; veritabanı AWS PostgreSQL, auth NextAuth, storage S3
@@ -85,9 +85,9 @@ export const appConfig = {
 export function validateConfig() {
   const errors: string[] = []
 
-  // Required in production (Supabase no longer required - using PostgreSQL + NextAuth + S3)
+  // Production build'de localhost kullanılmamalı (gerçek production URL olmalı)
   if (isProduction) {
-    if (appConfig.urls.appUrl === 'http://localhost:3001') {
+    if (appConfig.urls.appUrl.includes('localhost')) {
       errors.push('NEXT_PUBLIC_APP_URL must be set to production URL')
     }
   }
