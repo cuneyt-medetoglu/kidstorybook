@@ -101,7 +101,11 @@ export function TraceViewerModal({
                     <div className="text-xs font-semibold text-slate-600 mb-1">Request</div>
                     <div className="border rounded p-3 bg-white text-sm overflow-auto max-h-96">
                       <JsonView
-                        value={entry.request}
+                        value={
+                          entry.request !== null && typeof entry.request === "object"
+                            ? entry.request
+                            : undefined
+                        }
                         collapsed={2}
                         displayDataTypes={false}
                         style={{ backgroundColor: "transparent", fontSize: "12px" }}
@@ -112,7 +116,11 @@ export function TraceViewerModal({
                     <div className="text-xs font-semibold text-slate-600 mb-1">Response</div>
                     <div className="border rounded p-3 bg-white text-sm overflow-auto max-h-96">
                       <JsonView
-                        value={entry.response}
+                        value={
+                          entry.response !== null && typeof entry.response === "object"
+                            ? entry.response
+                            : undefined
+                        }
                         collapsed={2}
                         displayDataTypes={false}
                         style={{ backgroundColor: "transparent", fontSize: "12px" }}
