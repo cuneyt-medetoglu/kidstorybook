@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 9 Şubat 2026 (TTS ve e-book viewer: signed URL, admin config, prewarm, Parent Settings sesli okuma, Audio badge, mute, çocuk UX. Detay: `docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md`, `docs/implementation/FAZ3_IMPLEMENTATION.md`.)
+**Son güncelleme:** 10 Şubat 2026 (Faz 5.5 Deployment: FAZ5_5_IMPLEMENTATION, DEPLOYMENT_SERVER_ANALYSIS, DOCUMENTATION/PRD referansları. Detay: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`, `docs/analysis/DEPLOYMENT_SERVER_ANALYSIS.md`.)
 
 ---
 
@@ -34,6 +34,7 @@ docs/
 │   ├── README.md               # Klasör açıklaması (FAZ 6)
 │   ├── FAZ3_IMPLEMENTATION.md   # Faz 3 implementasyon takibi
 │   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
+│   ├── FAZ5_5_IMPLEMENTATION.md   # Faz 5.5 Deployment (EC2 Next.js, env, backup, migration) ilerleme
 │   ├── IMAGE_QUALITY_IMPROVEMENT_PLAN.md # Görsel + sahne kalitesi tek plan
 │   └── (FAZ1, FAZ2, FAZ2.4, FAZ3 PDF plan → archive/2026-q1/implementation/)
 │
@@ -191,6 +192,11 @@ docs/
 ### Teknik Kararlar
 1. **technical/TECHNICAL_DECISIONS.md** - Next.js 14, Supabase seçimleri
 2. **technical/TECHNICAL_RESEARCH.md** - Detaylı teknik araştırma
+
+### Deployment (Faz 5.5)
+1. **analysis/DEPLOYMENT_SERVER_ANALYSIS.md** - Deployment kapsamı, roadmap eşlemesi, önerilen sıra (domain/SSL sonraya)
+2. **implementation/FAZ5_5_IMPLEMENTATION.md** - Adım adım ilerleme, 5.5.1 alt adımları, olası analiz/geçici dosya listesi
+3. **plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md** - EC2 + PostgreSQL + S3 sıfırdan kurulum
 
 ### AI ve Prompt'lar
 1. **ai/AI_STRATEGY.md** - AI stratejisi ve prompt engineering

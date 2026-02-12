@@ -36,6 +36,7 @@ Kurulumda aşağıdakileri kendi değerlerinle değiştir:
   - SSH (22) — Kaynak: My IP (veya 0.0.0.0/0 geçici).
   - HTTP (80) — 0.0.0.0/0.
   - HTTPS (443) — 0.0.0.0/0.
+  - **Custom TCP (3000)** — 0.0.0.0/0 *(Next.js uygulaması IP ile test için; domain + Nginx sonra 80/443 kullanacak)*.
 - **Create security group**.
 
 ## 2.2 Instance’ı başlat
@@ -251,7 +252,96 @@ aws s3 ls s3://BUCKET_ADI/
 
 ---
 
-# 6. Özet Checklist
+# 6. Node.js ve Proje (5.5.1 – EC2’de uygulama deploy)
+
+EC2’ye SSH ile bağlıyken aşağıdaki sırayla ilerle. **Önce Node.js, sonra projeyi çek.**
+
+## 6.1 Node.js 20 LTS kurulumu (Ubuntu)
+
+```bash
+# NodeSource repo ile Node 20 LTS
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Kontrol
+node -v   # v20.x.x
+npm -v
+```
+
+## 6.2 Git kurulumu (yoksa)
+
+```bash
+sudo apt install -y git
+git --version
+```
+
+## 6.3 Projeyi GitHub’dan EC2’ye çekme
+
+**Seçenek A – Public repo:** Doğrudan clone.
+
+```bash
+cd ~
+git clone https://github.com/KULLANICI_OR_ORG/kidstorybook.git
+cd kidstorybook
+```
+
+**Seçenek B – Private repo:** SSH key veya token gerekir.
+
+- GitHub’da **Settings → SSH and GPG keys** ile EC2’de oluşturduğun public key’i ekle; sonra:
+  ```bash
+  cd ~
+  ssh-keygen -t ed25519 -C "ec2-kidstorybook" -f ~/.ssh/id_ed25519 -N ""
+  cat ~/.ssh/id_ed25519.pub   # Bunu GitHub’a ekle
+  git clone git@github.com:KULLANICI_OR_ORG/kidstorybook.git
+  cd kidstorybook
+  ```
+- Veya **Personal Access Token** ile HTTPS:
+  ```bash
+  git clone https://TOKEN@github.com/KULLANICI_OR_ORG/kidstorybook.git
+  cd kidstorybook
+  ```
+
+**KULLANICI_OR_ORG** ve repo adını kendi GitHub kullanıcı/org ve repo adınla değiştir.
+
+## 6.4 Build ve çalıştırma (kısa)
+
+Proje dizininde (`~/kidstorybook`):
+
+```bash
+npm ci
+# .env dosyasını oluştur (8. bölümdeki örnek + diğer key'ler)
+npm run build
+npm run start
+```
+
+`.env` olmadan build/start hata verebilir; önce 8. bölümdeki gibi production `.env` oluştur. Process manager (PM2) için sonraki adım: `docs/implementation/FAZ5_5_IMPLEMENTATION.md` → 3.4.
+
+## 6.5 Deploy ve sıfır kesinti (npm script’ler + PM2)
+
+Projede hazır komutlar:
+
+| Komut | Açıklama |
+|--------|----------|
+| `npm run clean` | Sadece `.next` (build çıktısı) siler |
+| `npm run clean:all` | `node_modules` + `.next` siler |
+| `npm run deploy:build` | Temiz kurulum: `clean:all` → `npm ci` → `build` (önerilen deploy öncesi) |
+| `npm run deploy:build:fast` | Sadece `npm ci` + `build` (node_modules silinmez, daha hızlı) |
+| `npm run start:prod` | `next start -p 3000` (PM2 ile kullanılacak komut) |
+
+**Sıfır kesinti deploy akışı (EC2’de):**
+
+1. Kodu çek: `git pull` (veya `git fetch && git checkout main`).
+2. Temiz build: `npm run deploy:build` (node_modules + .next silinir, ci + build).
+3. PM2 ile yeniden yükle (çalışan process’i yeniden başlatır, kesinti minimum):  
+   `pm2 reload all` veya `pm2 reload kidstorybook`.
+
+PM2 ilk kurulumda: `pm2 start npm --name kidstorybook -- run start:prod`. Sonraki deploy’larda sadece `git pull` → `npm run deploy:build` → `pm2 reload all`.
+
+**Docker:** Docker ile deploy roadmap’te **5.5.9 (opsiyonel)** olarak sonraya alındı. Önce 5.5.1 (Node + PM2) tamamlanacak; istersen Docker’ı sonra ekleyebilirsin.
+
+---
+
+# 7. Özet Checklist (5.5.7 + 5.5.1 başlangıç)
 
 - [ ] Bölge eu-central-1.
 - [ ] EC2: Ubuntu 24.04, t3.medium, güvenlik grubu (22, 80, 443), key pair indirildi.
@@ -259,10 +349,11 @@ aws s3 ls s3://BUCKET_ADI/
 - [ ] Migration’lar sırayla uygulandı (00001, 001, 002, 003, 007, 009, 011 → auth stub → 012–016); 012 için gerekirse GRANT REFERENCES.
 - [ ] S3: Tek bucket, prefix’ler (photos, books, pdfs, covers), bucket policy (public read books/pdfs/covers), IAM policy + EC2 role atandı.
 - [ ] EC2’de AWS CLI kuruldu; `aws s3 ls s3://BUCKET_ADI/` başarılı.
+- [ ] (5.5.1) Node.js 20 LTS kuruldu; proje `git clone` ile alındı; `npm ci && npm run build` çalıştı.
 
 ---
 
-# 7. Uygulama .env Örnekleri
+# 8. Uygulama .env Örnekleri
 
 Ortam kurulduktan sonra uygulama tarafında kullanılacak değişkenler (örnek):
 

@@ -82,6 +82,7 @@ AI ile kullanıcı dostu arayüzden dakikalar içinde kişiselleştirilmiş, pro
 - **Performans:** Hikaye &lt; 3 dk, görsel 30–60 sn, sayfa &lt; 3 sn hedefleniyor.
 - **Güvenlik:** GDPR/KVKK, çocuk fotoğrafı şifreleme, veri silme hakkı hedefleniyor.
 - **Debug/Feature Flags:** `lib/config.ts` + `DEBUG_SKIP_PAYMENT`; admin rolü ile test ortamında ödemesiz kitap.
+- **Deployment:** Production AWS EC2 (Faz 5.5); ilerleme: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`, kapsam: `docs/analysis/DEPLOYMENT_SERVER_ANALYSIS.md`.
 
 **Detay:** [PRD Teknik Gereksinimler](technical/PRD_TECHNICAL_DETAILS.md)
 

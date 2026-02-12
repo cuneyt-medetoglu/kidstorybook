@@ -165,6 +165,12 @@
   - OpenAI API key production kontrolü
   - Google Cloud TTS key production kontrolü
   - Tüm secret'ların güvenli şekilde saklandığından emin ol
+- [ ] **5.5.10** Production Veritabanı Migration Akışı
+  - Production PostgreSQL için migration çalıştırma sürecini netleştir
+  - Migration öncesi otomatik/manuel backup alma adımını belirle
+  - Gerekirse maintenance mode / sadece okuma moduna alma stratejisi
+  - Hata durumunda rollback planı (önceki schema'ya geri dönüş veya backup'tan restore)
+  - Migration script'lerinin önce staging/deneme ortamında test edilmesi
 - [ ] **5.5.8** CI/CD Pipeline (Otomatik Deployment) | 🟡 PLAN
   - GitHub Actions ile otomatik build + deploy
   - `main` branch'e push → EC2'ye SSH ile deploy (veya rsync)
