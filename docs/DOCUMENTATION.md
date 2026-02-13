@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 10 Şubat 2026 (Faz 5.5 Deployment: FAZ5_5_IMPLEMENTATION, DEPLOYMENT_SERVER_ANALYSIS, DOCUMENTATION/PRD referansları. Detay: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`, `docs/analysis/DEPLOYMENT_SERVER_ANALYSIS.md`.)
+**Son güncelleme:** 13 Şubat 2026 (Faz 5.5 Deployment tamamlandı: 5.5.1, 1.2.7, 5.5.10. Yeni rehberler: DB_BACKUP_RUNBOOK, PRODUCTION_MIGRATION_RUNBOOK. Kalan maddeler 5.5.4/5.5.5/5.5.8/5.5.2/5.5.3 daha sonra. Detay: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`.)
 
 ---
 
@@ -39,6 +39,7 @@ docs/
 │   └── (FAZ1, FAZ2, FAZ2.4, FAZ3 PDF plan → archive/2026-q1/implementation/)
 │
 ├── checklists/                 # Kontrol listeleri (aktif)
+│   ├── PRODUCTION_ENV_5_5_6.md # Production env kontrol listesi (5.5.6)
 │   └── ...
 │
 ├── archive/                    # Arşivlenmiş dosyalar (referans için)
@@ -79,6 +80,8 @@ docs/
 │   ├── STEP6_PAY_AND_GUEST_FREE_COVER_SPEC.md # Step 6 Pay gizleme + Üyesiz ücretsiz kapak (email + IP) spec
 │   ├── HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md # "Your Child, The Hero" real photo + story character görselleri (config, format, rehber)
 │   ├── HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md # HeroBookTransformation kartlarında köşe beyazlığı/iz analizi ve denenen çözümler
+│   ├── DB_BACKUP_RUNBOOK.md # DB yedekleme (1.2.7): script, cron, S3, restore
+│   ├── PRODUCTION_MIGRATION_RUNBOOK.md # Production şema migration (5.5.10): backup öncesi, psql -f, rollback
 │   └── ...
 │
 ├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (roadmap.csv ve viewer docs/roadmap/ içinde)

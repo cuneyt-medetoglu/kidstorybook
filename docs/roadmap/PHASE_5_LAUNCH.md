@@ -165,9 +165,9 @@
   - OpenAI API key production kontrolü
   - Google Cloud TTS key production kontrolü
   - Tüm secret'ların güvenli şekilde saklandığından emin ol
-- [ ] **5.5.10** Production Veritabanı Migration Akışı
-  - Production PostgreSQL için migration çalıştırma sürecini netleştir
-  - Migration öncesi otomatik/manuel backup alma adımını belirle
+- [x] **5.5.10** Production Veritabanı Migration Akışı ✅ (Şubat 2026)
+  - Runbook: `docs/guides/PRODUCTION_MIGRATION_RUNBOOK.md` (migration öncesi backup, psql -f, rollback/restore)
+  - Migration öncesi backup: `./scripts/db-backup.sh` (1.2.7)
   - Gerekirse maintenance mode / sadece okuma moduna alma stratejisi
   - Hata durumunda rollback planı (önceki schema'ya geri dönüş veya backup'tan restore)
   - Migration script'lerinin önce staging/deneme ortamında test edilmesi

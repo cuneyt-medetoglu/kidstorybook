@@ -36,6 +36,13 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Prompt optimizasyon / analiz:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
 - **PDF (limit, sıkıştırma, timeout):** `docs/guides/PDF_GENERATION_GUIDE.md`
 
+### Kritik operasyon (deployment, backup, migration)
+Agent bu bilgileri bilmeli; kullanıcı sorduğunda doğru dokümana yönlendir.
+- **Faz 5.5 durumu:** Şimdilik tamamlandı (5.5.1, 1.2.7, 5.5.10). Kalan maddeler (5.5.4, 5.5.5, 5.5.6, 5.5.8, 5.5.2, 5.5.3) daha sonra; ilerleme: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`.
+- **DB backup (1.2.7):** `scripts/db-backup.sh` — pg_dump → S3 (`s3://BUCKET/backups/db/`), retention 14 gün. Cron: günlük 03:00 (EC2). **Runbook:** `docs/guides/DB_BACKUP_RUNBOOK.md` (kurulum, .pgpass, manuel/cron, restore).
+- **Production migration (5.5.10):** Yeni şema migration’ı prod’da çalıştırma. **Önce backup**, sonra `psql -f migrations/XXX.sql`. **Runbook:** `docs/guides/PRODUCTION_MIGRATION_RUNBOOK.md`.
+- **Deployment (5.5.1):** EC2’de Next.js, PM2, port 3000. Rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`.
+
 ### Diğer Önemli Dosyalar
 - `docs/ai/` - AI stratejisi ve dokümanları
 - `docs/technical/` - Teknik araştırma ve kararlar
