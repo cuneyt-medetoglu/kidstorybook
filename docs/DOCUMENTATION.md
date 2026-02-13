@@ -82,6 +82,7 @@ docs/
 │   ├── HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md # HeroBookTransformation kartlarında köşe beyazlığı/iz analizi ve denenen çözümler
 │   ├── DB_BACKUP_RUNBOOK.md # DB yedekleme (1.2.7): script, cron, S3, restore
 │   ├── PRODUCTION_MIGRATION_RUNBOOK.md # Production şema migration (5.5.10): backup öncesi, psql -f, rollback
+│   ├── LOCAL_DB_TUNNEL.md # Local'de prod AWS DB'ye bağlanma: ssh:tunnel vs ssh:server, iki terminal, ECONNREFUSED çözümü
 │   └── ...
 │
 ├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (roadmap.csv ve viewer docs/roadmap/ içinde)

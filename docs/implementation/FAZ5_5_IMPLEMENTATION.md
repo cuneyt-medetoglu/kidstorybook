@@ -31,6 +31,7 @@
 - **13 Şubat 2026:** 1.2.7 cron kuruldu (EC2’de günlük 03:00); manuel backup ve S3 yükleme başarılı.
 - **13 Şubat 2026:** 5.5.10 Production migration runbook eklendi. `docs/guides/PRODUCTION_MIGRATION_RUNBOOK.md` — migration öncesi backup, prod’da psql -f, rollback/restore.
 - **13 Şubat 2026:** Faz 5.5 şimdilik tamamlandı kabul edildi. Kalan maddeler (5.5.4, 5.5.5, 5.5.6 eksikler, 5.5.8, 5.5.2, 5.5.3) daha sonra bakılacak.
+- **13 Şubat 2026:** Local'de prod AWS DB'ye bağlanma netleştirildi. `npm run ssh:tunnel` (tünel) ile `npm run ssh:server` (sadece shell) ayrımı README'ye yazıldı; `package.json`'a `ssh:tunnel` script'i eklendi. Tünel açılmadan local'de DB istekleri ECONNREFUSED (localhost:5432) veriyordu; iki terminalde sırayla tünel + dev kullanımı dokümante edildi.
 
 ---
 

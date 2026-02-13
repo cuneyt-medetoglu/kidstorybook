@@ -44,7 +44,7 @@ Tarayıcıda **http://localhost:3001** adresini açın.
 
 - **Local (kendi bilgisayarında prod DB’ye bağlanmak):**  
   Önce SSH tüneli aç (bir terminalde açık kalsın):  
-  `ssh -i kidstorybook-key.pem -L 5432:localhost:5432 ubuntu@EC2_IP`  
+  `npm run ssh:tunnel` (tünel; bir terminalde açık kalsın). Manuel: `ssh -i kidstorybook-key.pem -L 5432:localhost:5432 -N ubuntu@EC2_IP`. Detay: [docs/guides/LOCAL_DB_TUNNEL.md](docs/guides/LOCAL_DB_TUNNEL.md)  
   .env’de: `DATABASE_URL=postgresql://kidstorybook:SIFRE@localhost:5432/kidstorybook`  
   Sonra `npm run dev`. DBeaver’da da aynı tüneli kullanıp Host: localhost, Port: 5432 yapabilirsin.
 
