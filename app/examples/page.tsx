@@ -8,7 +8,7 @@ import { useState, useCallback, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { Eye, Plus, ChevronLeft, ChevronRight, BookOpen, Search, ArrowRight, X } from "lucide-react"
+import { Eye, Plus, ChevronLeft, ChevronRight, BookOpen, Search, ArrowRight, X, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -500,7 +500,7 @@ function ExamplesPageContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50/50 to-background py-16 md:py-24 lg:py-28">
+      <section className="relative overflow-hidden bg-gradient-to-br from-amber-50 via-orange-50/50 to-background py-16 md:py-20 lg:py-24">
         {/* Decorative floating shapes */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-12 left-[10%] w-20 h-20 md:w-32 md:h-32 rounded-full bg-amber-200/30 blur-2xl" />
@@ -516,57 +516,136 @@ function ExamplesPageContent() {
         }} />
         
         <div className="container relative px-4 md:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="max-w-4xl mx-auto text-center"
-          >
-            {/* Animated icon badge */}
+          <div className="max-w-6xl mx-auto">
+            {/* Text content - centered */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="inline-flex items-center justify-center mb-6 md:mb-8"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-center mb-12 md:mb-16"
             >
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-400 rounded-3xl blur-xl opacity-40" />
-                <div className="relative flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-gradient-to-br from-amber-400 via-orange-400 to-rose-400 shadow-lg">
-                  <BookOpen className="w-10 h-10 md:w-12 md:h-12 text-white" strokeWidth={2} />
-                </div>
-              </div>
+              {/* Main heading with text gradient */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-5 text-balance"
+              >
+                <span className="bg-gradient-to-br from-amber-700 via-orange-600 to-rose-600 bg-clip-text text-transparent">
+                  Example Books
+                </span>
+              </motion.h1>
+
+              {/* Subheading */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-2xl mx-auto text-pretty leading-relaxed"
+              >
+                Discover how we create magical stories from your child's photos
+              </motion.p>
             </motion.div>
 
-            {/* Main heading with text gradient */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-5 md:mb-6 text-balance"
-            >
-              <span className="bg-gradient-to-br from-amber-700 via-orange-600 to-rose-600 bg-clip-text text-transparent">
-                Example Books
-              </span>
-            </motion.h1>
-
-            {/* Subheading */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-2xl mx-auto text-pretty leading-relaxed"
-            >
-              Discover how we create magical stories from your child's photos
-            </motion.p>
-
-            {/* Decorative underline accent */}
+            {/* Transformation visual - Before and After */}
             <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-              className="mt-6 md:mt-8 mx-auto w-20 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 rounded-full"
-            />
-          </motion.div>
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-12 max-w-5xl mx-auto"
+            >
+              {/* Before: Child Photo */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.5 }}
+                className="relative group"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-br from-amber-400/50 to-orange-400/50 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
+                <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden">
+                  <div className="absolute top-3 left-3 z-10">
+                    <div className="bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-sm">
+                      <span className="text-xs md:text-sm font-semibold text-amber-700">Your Photo</span>
+                    </div>
+                  </div>
+                  <div className="relative w-56 h-64 md:w-64 md:h-80 lg:w-72 lg:h-96">
+                    <Image
+                      src="https://picsum.photos/seed/child1/400/600"
+                      alt="Child photo example"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Arrow with sparkles animation */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.7 }}
+                className="flex flex-col md:flex-row items-center gap-2 shrink-0"
+              >
+                <motion.div
+                  animate={{ 
+                    rotate: [0, 5, 0, -5, 0],
+                    scale: [1, 1.1, 1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full blur-md opacity-50" />
+                  <div className="relative bg-gradient-to-br from-amber-400 via-orange-400 to-rose-400 rounded-full p-3 md:p-4 shadow-lg">
+                    <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white" strokeWidth={2.5} />
+                  </div>
+                </motion.div>
+                <ArrowRight className="w-8 h-8 md:w-10 md:h-10 text-amber-600/70 rotate-90 md:rotate-0" strokeWidth={2} />
+              </motion.div>
+
+              {/* After: Storybook */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.7, delay: 0.5 }}
+                className="relative group"
+              >
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.02, 1],
+                    rotate: [0, 1, 0, -1, 0]
+                  }}
+                  transition={{ 
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute -inset-1 bg-gradient-to-br from-orange-400/60 to-rose-400/60 rounded-2xl blur-xl opacity-70 group-hover:opacity-90 transition-opacity"
+                />
+                <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+                  <div className="absolute top-3 right-3 z-10">
+                    <div className="bg-gradient-to-br from-amber-500 to-orange-500 px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                      <span className="text-xs md:text-sm font-semibold text-white">Magical Story</span>
+                    </div>
+                  </div>
+                  <div className="relative w-56 h-64 md:w-64 md:h-80 lg:w-72 lg:h-96">
+                    <Image
+                      src="https://picsum.photos/seed/storybook1/400/600"
+                      alt="Personalized storybook example"
+                      fill
+                      className="object-cover"
+                    />
+                    {/* Illustrated overlay effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-rose-500/10 mix-blend-multiply" />
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
