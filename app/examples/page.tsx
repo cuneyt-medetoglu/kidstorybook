@@ -522,7 +522,7 @@ function ExamplesPageContent() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="text-center mb-12 md:mb-16"
+              className="text-center mb-10 md:mb-14"
             >
               {/* Main heading with text gradient */}
               <motion.h1
@@ -541,10 +541,24 @@ function ExamplesPageContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-2xl mx-auto text-pretty leading-relaxed"
+                className="text-base md:text-lg lg:text-xl text-foreground/70 max-w-2xl mx-auto text-pretty leading-relaxed mb-3"
               >
                 Discover how we create magical stories from your child's photos
               </motion.p>
+
+              {/* Tagline / Value prop */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex items-center justify-center gap-2"
+              >
+                <div className="h-px w-8 bg-gradient-to-r from-transparent to-amber-400/50" />
+                <p className="text-sm md:text-base text-amber-700/80 font-medium">
+                  Real books made from real photos
+                </p>
+                <div className="h-px w-8 bg-gradient-to-l from-transparent to-amber-400/50" />
+              </motion.div>
             </motion.div>
 
             {/* Transformation visual - Before and After */}
@@ -629,7 +643,7 @@ function ExamplesPageContent() {
                   <div className="absolute top-3 right-3 z-10">
                     <div className="bg-gradient-to-br from-amber-500 to-orange-500 px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5">
                       <BookOpen className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-                      <span className="text-xs md:text-sm font-semibold text-white">Magical Story</span>
+                      <span className="text-xs md:text-sm font-semibold text-white">Your Story</span>
                     </div>
                   </div>
                   <div className="relative w-56 h-64 md:w-64 md:h-80 lg:w-72 lg:h-96">
@@ -643,6 +657,38 @@ function ExamplesPageContent() {
                     <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-rose-500/10 mix-blend-multiply" />
                   </div>
                 </div>
+              </motion.div>
+            </motion.div>
+
+            {/* Examples teaser - guides user to scroll */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.9 }}
+              className="mt-10 md:mt-12 flex flex-col items-center gap-3"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md border border-amber-200/50">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                </span>
+                <span className="text-sm md:text-base font-medium text-foreground/80">
+                  Browse real examples below
+                </span>
+              </div>
+              <motion.div
+                animate={{ y: [0, 6, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <svg 
+                  className="w-5 h-5 text-amber-600/60" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
               </motion.div>
             </motion.div>
           </div>
