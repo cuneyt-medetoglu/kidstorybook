@@ -499,34 +499,23 @@ function ExamplesPageContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-background py-12 md:py-20">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(236,72,153,0.1),transparent_50%)]" />
-        
-        <div className="container relative px-4 md:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mb-6">
-              <BookOpen className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 text-balance">
+      {/* Minimal title strip – then filters */}
+      <section className="border-b bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5">
+        <div className="container px-4 md:px-6 lg:px-8 py-5 md:py-6">
+          <div className="max-w-2xl">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
               Example Books
             </h1>
-            <p className="text-lg text-muted-foreground text-pretty">
+            <p className="text-sm md:text-base text-muted-foreground">
               Discover how we create magical stories from your child's photos
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Filter chips */}
       <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
-        <div className="container px-4 md:px-6 lg:px-8 py-3 md:py-4">
+        <div className="container px-4 md:px-6 lg:px-8 py-2 md:py-3">
           <div className="relative flex gap-1.5 md:gap-2 overflow-x-auto pb-2 -mb-2 scrollbar-hide flex-nowrap">
             {ageFilters.map((filter) => (
               <button

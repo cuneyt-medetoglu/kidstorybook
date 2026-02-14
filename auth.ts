@@ -17,6 +17,7 @@ import { getUserByEmail, createUser } from '@/lib/db/users'
 import bcrypt from 'bcryptjs'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true, // IP veya domain ile erişimde UntrustedHost hatasını önler (EC2, proxy)
   providers: [
     CredentialsProvider({
       name: 'credentials',

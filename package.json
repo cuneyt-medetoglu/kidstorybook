@@ -17,10 +17,10 @@
     "roadmap": "node scripts/generate-roadmap-csv.js",
     "ssh:server": "ssh -i kidstorybook-key.pem ubuntu@18.184.150.1",
     "ssh:tunnel": "ssh -i kidstorybook-key.pem -L 5432:localhost:5432 -N ubuntu@18.184.150.1",
-    "clean": "rimraf .next",
-    "clean:all": "rimraf node_modules .next",
-    "deploy:build": "npm run clean:all && npm ci && npm run build",
-    "deploy:build:fast": "npm ci && npm run build"
+    "clean": "npx rimraf .next",
+    "clean:all": "npx rimraf node_modules .next",
+    "deploy:build": "npm run clean:all && npm install && npm run build",
+    "deploy:build:fast": "npm install && npm run build"
   },
   "repository": {
     "type": "git",

@@ -18,6 +18,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: '**.openai.com',
       },
+      // Placeholder/dummy images (e.g. Examples hero from v0)
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
     ],
     // Image optimization settings
     formats: ['image/avif', 'image/webp'],

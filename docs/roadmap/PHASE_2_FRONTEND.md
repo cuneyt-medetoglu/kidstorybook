@@ -390,11 +390,10 @@
   - **Analiz:** `docs/analysis/CREATE_YOUR_OWN_FROM_EXAMPLE.md`
   - **Strategy (Madde 2):** `docs/strategies/EXAMPLES_REAL_BOOKS_AND_CREATE_YOUR_OWN.md`
   - **v0.app Prompt:** Hazır, v0.app'e yapıştırılabilir
-  - [ ] **2.7.8.1** Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026) | 🔴 DO
-    - "Example Books" hero/başlık alanı: daha çekici gradient, ikon ve tipografi
-    - Yaş grubu filtreleri: daha belirgin, çocuk dostu stil
-    - Empty state: büyüteç + mesaj alanı daha görsel ve davetkar
-    - **Not:** Yapılacak; sonra bakılacak.
+  - [x] **2.7.8.1** Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026) | 🔴 DO ✅ (13 Şubat 2026)
+    - **Uygulanan:** Minimal tasarım tercih edildi. Büyük hero (kartlar, "Your Photo/Story", "Browse below") kaldırıldı.
+    - "Example Books" başlık alanı: kısa başlık şeridi (H1 + alt metin), az padding, mor-pembe gradient arka plan; hemen altında yaş filtreleri.
+    - v0 denemeleri sonrası sade metin + filtreler ile devam kararı; detay ve prompt’lar `docs/analysis/EXAMPLE_BOOKS_HERO_V0_ANALYSIS.md`.
 - [ ] **2.7.9** Ideas sayfası (hikaye fikirleri ve şablonları)
 - [ ] **2.7.10** Tema kartları görsel gösterimi (her tema için thumbnail)
 - [ ] **2.7.11** "Used Photos" gösterimi (örneklerde hangi fotoğraflar kullanılmış) - ✅ Examples sayfasına entegre edildi (2.7.8)

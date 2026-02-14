@@ -10,7 +10,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	1.2.4,1,1.2,"Storage: AWS S3 tek bucket + prefix'ler (photos, books, pdfs, covers) ✅",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.2.5,1,1.2,"Row Level Security (RLS) kuralları",Tamamlandı,Kritik,Altyapı,,"Migration'da hazır",,#1.2
 	1.2.6,1,1.2,"~~Supabase vs AWS Değerlendirmesi~~ → AWS'ye geçiş kararı verildi ve uygulandı ✅ (Şubat 2026)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
-	1.2.7,1,1.2,"Database Backup Sistemi",Bekliyor,Kritik,Altyapı,PLAN,"",,#1.2
+	1.2.7,1,1.2,"Database Backup Sistemi ✅ (Şubat 2026)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.2.8,1,1.2,"~~Supabase'ı AWS'de açılacak bir makineye migrate etme~~ → AWS altyapı Faz 1–4 tamamlandı ✅ (Şubat 2026)",Tamamlandı,Kritik,Altyapı,,"",,#1.2
 	1.3.1,1,1.3,"`.env.local` dosyası oluştur",Tamamlandı,Kritik,Altyapı,,"✅ Kontrol edildi ve optimize edildi",,#1.3
 	1.3.2,1,1.3,"Tüm API key'leri ekle (OpenAI, Groq, AWS/DB)",Tamamlandı,Kritik,Altyapı,,"✅ `.env.example` template hazır",,#1.3
@@ -132,7 +132,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	2.7.6,2,2.7,"Kullanım Şartları",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.7,2,2.7,"KVKK Aydınlatma Metni",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.8,2,2.7,"Examples sayfası (tüm örnek kitaplar, ""View Example"" butonları)",Tamamlandı,Kritik,Frontend - Statik Sayfalar,,"✅ **TAMAMLANDI (25 Ocak 2026)**",,#2.7
-	2.7.8.1,2,2.7,"Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026)",Bekliyor,Kritik,Frontend - Statik Sayfalar,DO,"",,#2.7
+	2.7.8.1,2,2.7,"Example Books bölümü görsel tasarım iyileştirmesi (Şubat 2026)",Tamamlandı,Kritik,Frontend - Statik Sayfalar,DO,"",,#2.7
 	2.7.9,2,2.7,"Ideas sayfası (hikaye fikirleri ve şablonları)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.10,2,2.7,"Tema kartları görsel gösterimi (her tema için thumbnail)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"",,#2.7
 	2.7.11,2,2.7,"""Used Photos"" gösterimi (örneklerde hangi fotoğraflar kullanılmış)",Bekliyor,Kritik,Frontend - Statik Sayfalar,,"✅ Examples sayfasına entegre edildi (2.7.8)",,#2.7
@@ -275,6 +275,7 @@ ID,Faz,Alt Faz,Başlık,Durum,Öncelik,Kategori,Priority,Notlar,Tarih,Link
 	5.5.4,5,5.5,"Monitoring kurulumu",Bekliyor,Önemli,Deployment,,"",,#5.5
 	5.5.5,5,5.5,"Error tracking (Sentry)",Bekliyor,Önemli,Deployment,,"",,#5.5
 	5.5.6,5,5.5,"Production Environment Variables Kontrolü",Bekliyor,Önemli,Deployment,,"",,#5.5
+	5.5.10,5,5.5,"Production Veritabanı Migration Akışı ✅ (Şubat 2026)",Tamamlandı,Önemli,Deployment,,"",,#5.5
 	5.5.8,5,5.5,"CI/CD Pipeline (Otomatik Deployment)",Bekliyor,Önemli,Deployment,PLAN,"",,#5.5
 	5.5.9,5,5.5,"Docker ile Deployment (Opsiyonel)",Bekliyor,Önemli,Deployment,PLAN,"",,#5.5
 	5.7.1,5,5.7,"Profesyonel PDF template tasarımı ✅ (17 Ocak 2026)",Tamamlandı,Önemli,PDF Tasarım,,"",,#5.7
