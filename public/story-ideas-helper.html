@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Story Ideas – Prompt Helper</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; }
+    h1 { font-size: 1.25rem; margin-bottom: 8px; }
+    p { color: #444; font-size: 0.9rem; margin-bottom: 16px; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem; }
+    select, input { padding: 8px 10px; margin-bottom: 12px; width: 100%; max-width: 280px; }
+    .row { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .row input { flex: 1; max-width: none; }
+    .char-block { background: #f5f5f5; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    .out { background: #1a1a1a; color: #e0e0e0; padding: 12px; border-radius: 8px; font-family: ui-monospace, monospace; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; margin-top: 8px; }
+    .out-label { font-weight: 600; margin-top: 16px; margin-bottom: 4px; font-size: 0.9rem; }
+    button { padding: 10px 16px; cursor: pointer; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; margin-right: 8px; margin-top: 8px; }
+    button:hover { background: #1d4ed8; }
+    button.secondary { background: #64748b; }
+    button.secondary:hover { background: #475569; }
+    .hint { font-size: 0.8rem; color: #666; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Story Ideas – Prompt Helper</h1>
+  <p>Önce ChatGPT veya Gemini'de <strong>“Step 1”</strong> kutusundaki metni yapıştır. Sonra her hikaye için <strong>“Step 2”</strong> kutusundaki metni oluşturup kopyala ve AI’a gönder.</p>
+
+  <label>Kategori</label>
+  <select id="category">
+    <option value="adventure">adventure</option>
+    <option value="fairy_tale">fairy_tale</option>
+    <option value="educational">educational</option>
+    <option value="nature">nature</option>
+    <option value="space">space</option>
+    <option value="sports">sports</option>
+  </select>
+
+  <label>Yaş grubu</label>
+  <select id="age">
+    <option value="0-2">0-2</option>
+    <option value="3-5">3-5</option>
+    <option value="6-9">6-9</option>
+  </select>
+
+  <label>Karakter sayısı</label>
+  <select id="numChars">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3" selected>3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select>
+
+  <div class="out-label">Karakterler (isim + rol)</div>
+  <div id="charList"></div>
+  <p class="hint">Örnek: Mia / child, Mom / mother, Sparky / dog</p>
+
+  <button type="button" id="btnGen">Step 2 metnini oluştur</button>
+  <button type="button" id="btnCopy" class="secondary">Step 2’yi kopyala</button>
+
+  <div class="out-label">Step 2 – AI’a göndereceğin mesaj (kopyala)</div>
+  <div id="output" class="out">adventure 0-2. Characters: Mia (child), Mom (mother), Sparky (dog).</div>
+
+  <div class="out-label" style="margin-top: 24px;">Step 1 – Önce bunu ChatGPT/Gemini’ye bir kez yapıştır</div>
+  <div id="systemPrompt" class="out"></div>
+  <button type="button" id="btnCopySystem" class="secondary">Step 1’i kopyala</button>
+
+  <script>
+    const SYSTEM_PROMPT = `You are a children's book idea writer. I will send you: (1) category and age group, and (2) how many characters and who they are (e.g. "3 characters: Mia (child), Mom (mother), Sparky (dog)"). You reply with only two things in English:
+
+1) TITLE: One short, catchy English title for the book.
+
+2) EXAMPLE STORY: One compelling narrative paragraph (or two short paragraphs) about those exact characters. The story must feature the names and roles I gave you; the child (or main child) is the hero. Maximum 450 characters (strict).
+
+STYLE (like a polished picture-book summary; apply to every story; do not copy one fixed example):
+- Flowing prose: sentences that connect and build one clear scene. Confident, vivid tone—not "baby talk" or talking down.
+- One clear premise: e.g. a child in a forest meeting a guide; friends in a race who help each other. Dense, vivid prose in 3–5 sentences.
+- Dialogue: natural and story-moving (e.g. a welcome, a challenge, a discovery). Not exclamation-only lines like "Got you!" or "Up!" unless they clearly fit.
+- Sensory details: woven in (e.g. "towering green canopy", "glowing mushrooms", "rustling leaves"). No overload.
+- Invent a fresh situation each time from the category and characters. Vary settings, moods, and hooks.
+
+AVOID:
+- Choppy, list-like sentences ("Little Bear wakes up. The sun is yellow. Stomp, stomp!").
+- Frequent onomatopoeia (tap-tap, boing boing, shh-shh). At most one sound word, woven in naturally.
+- Baby talk or broken grammar to sound cute. Age-appropriate = simpler words and clear sentences, not exclamation-heavy or sound-effect-heavy.
+
+Age-appropriate: 0-2 = simpler words but still flowing; 3-5 = clear sentences; 6-9 = slightly richer. Match the category (adventure, fairy_tale, educational, nature, space, sports). This text will be used as a "custom request" to generate a full 12-page book—rich enough to inspire the story, not a page-by-page script.
+
+Valid categories: adventure, fairy_tale, educational, nature, space, sports.
+Valid age groups: 0-2, 3-5, 6-9.`;
+
+    const placeholders = [
+      ['Mia', 'child'],
+      ['Mom', 'mother'],
+      ['Sparky', 'dog']
+    ];
+
+    const categoryEl = document.getElementById('category');
+    const ageEl = document.getElementById('age');
+    const numCharsEl = document.getElementById('numChars');
+    const charListEl = document.getElementById('charList');
+    const outputEl = document.getElementById('output');
+    const systemPromptEl = document.getElementById('systemPrompt');
+
+    systemPromptEl.textContent = SYSTEM_PROMPT;
+
+    function renderChars() {
+      const n = parseInt(numCharsEl.value, 10);
+      charListEl.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const p = placeholders[i] || ['', ''];
+        const div = document.createElement('div');
+        div.className = 'char-block';
+        div.innerHTML = `
+          <label>Karakter ${i + 1}</label>
+          <div class="row">
+            <input type="text" placeholder="İsim" data-name="${i}" value="${p[0]}" />
+            <input type="text" placeholder="Rol (child, mother, dog, friend…)" data-role="${i}" value="${p[1]}" />
+          </div>
+        `;
+        charListEl.appendChild(div);
+      }
+    }
+
+    function buildMessage() {
+      const cat = categoryEl.value;
+      const age = ageEl.value;
+      const parts = [`${cat} ${age}.`];
+      const charParts = [];
+      charListEl.querySelectorAll('.char-block').forEach(block => {
+        const name = block.querySelector('[data-name]').value.trim();
+        const role = block.querySelector('[data-role]').value.trim();
+        if (name || role) charParts.push(`${name || '?'} (${role || 'character'})`);
+      });
+      if (charParts.length) parts.push(' Characters: ' + charParts.join(', ') + '.');
+      return parts.join('');
+    }
+
+    numCharsEl.addEventListener('change', renderChars);
+    document.getElementById('btnGen').addEventListener('click', () => {
+      outputEl.textContent = buildMessage();
+    });
+    document.getElementById('btnCopy').addEventListener('click', () => {
+      outputEl.textContent = buildMessage();
+      navigator.clipboard.writeText(outputEl.textContent);
+      document.getElementById('btnCopy').textContent = 'Kopyalandı';
+      setTimeout(() => { document.getElementById('btnCopy').textContent = "Step 2'yi kopyala"; }, 1500);
+    });
+    document.getElementById('btnCopySystem').addEventListener('click', () => {
+      navigator.clipboard.writeText(SYSTEM_PROMPT);
+      document.getElementById('btnCopySystem').textContent = 'Kopyalandı';
+      setTimeout(() => { document.getElementById('btnCopySystem').textContent = "Step 1'i kopyala"; }, 1500);
+    });
+
+    renderChars();
+    outputEl.textContent = buildMessage();
+  </script>
+</body>
+</html>

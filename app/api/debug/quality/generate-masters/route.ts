@@ -1,8 +1,8 @@
 /**
  * POST /api/debug/quality/generate-masters
  * Debug endpoint: Generate only master character and entity illustrations
- * Admin only + feature flag (showDebugQualityButtons)
- * 
+ * Admin only (visible in prod and dev, no NODE_ENV/flag check).
+ *
  * Body: { characterIds: string[], theme: string, illustrationStyle: string }
  * Returns: { success, data: { characterMasters, entityMasters }, metadata }
  */
@@ -10,7 +10,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/lib/auth/api-auth'
 import { getUserRole } from '@/lib/db/users'
-import { appConfig } from '@/lib/config'
 import { getCharacterById } from '@/lib/db/characters'
 
 // Import master generation functions from books route
@@ -22,14 +21,13 @@ export async function POST(request: NextRequest) {
 
   try {
     // ====================================================================
-    // 1. Auth check: admin + feature flag
+    // 1. Auth check: admin only
     // ====================================================================
     const user = await requireUser()
     const role = await getUserRole(user.id)
     const isAdmin = role === 'admin'
-    const flagOn = appConfig.features.dev.showDebugQualityButtons
 
-    if (!isAdmin || !flagOn) {
+    if (!isAdmin) {
       return NextResponse.json(
         { success: false, error: 'Forbidden: Admin access required' },
         { status: 403 }

@@ -1,5 +1,12 @@
 ## 📝 Notlar ve Fikirler
 
+### Örnek Hikaye Fikirleri Havuzu (14 Şubat 2026)
+- **Kategori:** İş mantığı / İçerik
+- **Öncelik:** 🟡 Planlandı
+- **Açıklama:** Magical Children's Book Ideas benzeri örnek kitap fikirleri; GPT ile üretim, kategoriler, 12 sayfa senaryo, yaş aralığı, prompt saklama. Custom Request’te veya “aynı örnekten” akışında kullanılacak. Dil şimdilik TR.
+- **Analiz:** `docs/analysis/STORY_IDEAS_GENERATION_ANALYSIS.md`
+- **Roadmap:** Faz 2 – 2.4.5.4
+
 ### ✅ TTS Play butonu çalışmıyor (8 Şubat 2026) – ÇÖZÜLDÜ (9 Şubat 2026)
 - **Kategori:** Bug / E-book viewer
 - **Öncelik:** 🔴 DO (yapıldı)

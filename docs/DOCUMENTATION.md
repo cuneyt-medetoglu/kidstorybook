@@ -212,8 +212,10 @@ docs/
 7. **analysis/DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md** - Debug kalite butonları (admin, trace export)
 8. **analysis/STORY_PROMPT_ACTION_PLAN.md** - Hikaye + görsel kalite aksiyon planı
 9. **analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md** - Prompt uzunluk/tekrar analizi, öncelik tablosu (A1–A9 tamamlandı, A5/A12/Sıra 13 sonrası), kaynak: GPT trace + kod
-10. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
-11. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
+10. **analysis/STORY_IDEAS_GENERATION_ANALYSIS.md** - Örnek hikaye fikirleri üretimi (GPT prompt, kategoriler, 12 sayfa senaryo, yaş aralığı, TR; prompt saklama; Custom Request / aynı örnekten kitap)
+11. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
+12. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+13. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

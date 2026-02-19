@@ -538,19 +538,18 @@ export async function POST(request: NextRequest) {
       debugTrace: debugTraceRequested, // Debug: full raw request/response per step (admin + flag)
     } = body
 
-    // Skip-payment: only when DEBUG or admin + flag (see docs/strategies/DEBUG_AND_FEATURE_FLAGS_ANALYSIS.md)
+    // Skip-payment: only when DEBUG_SKIP_PAYMENT env or admin (admin sees in prod and dev)
     if (skipPayment === true) {
       const debugSkip = process.env.DEBUG_SKIP_PAYMENT === 'true'
       const role = await getUserRole(user.id)
       const isAdmin = role === 'admin'
-      const flagOn = appConfig.features.dev.skipPaymentForCreateBook
-      const canSkip = debugSkip || (isAdmin && flagOn)
+      const canSkip = debugSkip || isAdmin
       if (!canSkip) {
         return CommonErrors.forbidden('Skip payment is not allowed for this user')
       }
     }
 
-    // Debug run-up-to: admin + showDebugQualityButtons only (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §9)
+    // Debug run-up-to: admin only (visible in prod and dev)
     const isDebugCoverMode = debugRunUpTo === 'cover'
     const isDebugMastersMode = debugRunUpTo === 'masters'
     if (debugRunUpTo) {
@@ -559,19 +558,17 @@ export async function POST(request: NextRequest) {
       }
       const role = await getUserRole(user.id)
       const isAdmin = role === 'admin'
-      const flagOn = appConfig.features.dev.showDebugQualityButtons
-      if (!isAdmin || !flagOn) {
-        return CommonErrors.forbidden('Debug run-up-to is only allowed for admin with showDebugQualityButtons')
+      if (!isAdmin) {
+        return CommonErrors.forbidden('Debug run-up-to is only allowed for admin')
       }
     }
 
-    // Debug trace: collect full raw request/response for every step (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §10)
+    // Debug trace: admin only (visible in prod and dev)
     let debugTrace: DebugTraceEntry[] | null = null
     if (debugTraceRequested === true) {
       const role = await getUserRole(user.id)
       const isAdmin = role === 'admin'
-      const flagOn = appConfig.features.dev.showDebugQualityButtons
-      if (isAdmin && flagOn) debugTrace = []
+      if (isAdmin) debugTrace = []
     }
 
     // Image generation defaults (hardcoded - no override)

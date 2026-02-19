@@ -32,8 +32,10 @@
 ### 3. Birleşik kural (ne zaman “debug” özellik açık?)
 
 - **Create book’u ödeme yapmadan açmak:**
-  - `(DEBUG mod AÇIK) VEYA (kullanıcı admin VE skipPaymentForCreateBook flag açık)`  
-  - Böylece: Lokal/Vercel preview’da env ile test; production’da sadece admin hesabı (flag açıksa) test edebilir.
+  - `(DEBUG_SKIP_PAYMENT env AÇIK) VEYA (kullanıcı admin)`  
+  - Admin ise NODE_ENV/flag fark etmez; hem development hem production’da “Create without payment” ve ilgili debug özellikleri görür ve kullanır.
+- **Debug quality butonları (Step 6) ve debug trace / run-up-to:**
+  - Sadece **admin** (role=admin). NODE_ENV veya config flag’e bakılmaz; admin her ortamda erişir.
 - **Admin dashboard’u göstermek:**
   - `(kullanıcı admin) VE (showAdminDashboard flag açık veya DEBUG)`  
   - Normal kullanıcı hiçbir zaman görmemeli.
@@ -54,7 +56,8 @@
 ## Sonuç
 
 - **Tek yer:** Tüm “özel / test / admin” davranışları **config + role** ile yönetilir.
-- **Test:** DEBUG veya admin hesabı ile ödeme yapmadan create book test edilir.
+- **Admin her ortamda:** Skip payment, debug quality paneli ve debug trace/run-up-to özellikleri admin için NODE_ENV veya feature flag’e bağlı değildir; production’da da aynı admin hesabıyla görünür ve kullanılır.
+- **Test:** DEBUG_SKIP_PAYMENT env veya admin hesabı ile ödeme yapmadan create book test edilir.
 - **İleride:** Admin dashboard ve benzeri özellikler aynı yapıya (flag + admin role) eklenir; kısa ve tutarlı kalır.
 
 Detaylı implementasyon adımları iş açıldığında ROADMAP / implementation dokümanına taşınabilir.
