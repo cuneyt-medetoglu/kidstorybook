@@ -285,7 +285,7 @@ export async function POST(request: NextRequest) {
 
       console.log(`[Image Generation] ✅ Cover generated successfully`)
       
-      // Upload cover to Supabase Storage
+      // Upload cover to AWS S3
       const coverImageBuffer = await fetch(coverTempUrl).then((res) => res.arrayBuffer())
       const coverFileName = `${user.id}/books/${bookId}/cover_${Date.now()}.png`
 

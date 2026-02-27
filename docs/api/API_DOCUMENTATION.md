@@ -293,7 +293,7 @@ All API endpoints require authentication via Supabase.
 
 **Endpoint:** `POST /api/books`
 
-**Description:** Creates a new book and generates the story using AI. This endpoint combines story generation and book creation.
+**Description:** Creates a new book and generates the story using AI. This endpoint combines story generation and book creation. When **`story_data`** is provided (e.g. from Debug "Sadece Hikaye" flow), story generation is skipped and the given story is used for masters, cover, and page images.
 
 **Request Body:**
 ```json
@@ -302,9 +302,13 @@ All API endpoints require authentication via Supabase.
   "theme": "adventure",
   "illustrationStyle": "watercolor",
   "customRequests": "Make it exciting",
-  "language": "en"
+  "language": "en",
+  "story_data": null
 }
 ```
+
+**Optional request fields:**
+- **`story_data`** (object, optional): Pre-generated story from Debug "Sadece Hikaye". Must include `pages` array. When provided, story generation is skipped; this data is used for the rest of the pipeline (masters, cover, page images). Used by the "Bu hikayeden kitap oluştur" button in the Debug Quality Panel.
 
 **Success Response (200):**
 ```json

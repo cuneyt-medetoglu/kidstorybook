@@ -67,6 +67,8 @@ Bu değişikliklerle tekrar test edebilirsiniz; story cevabında `clothing` olma
 **Prompt’un bölümleri (özet):**
 
 - v1.7.0 Prompt Slim: CHARACTER (PERSONALITY yok), STORY REQUIREMENTS, SUPPORTING ENTITIES (kısa), LANGUAGE (tek satır), STORY STRUCTURE (kısa), THEME + DO NOT DESCRIBE, VISUAL DIVERSITY, WRITING STYLE, SAFETY, ILLUSTRATION, OUTPUT FORMAT (JSON), CRITICAL REMINDERS. Tam request: logda `📤 STORY REQUEST (raw):` sonrası ham JSON.
+- **Anlatı yayı:** STORY STRUCTURE bölümünde hikayenin tek bir anlatı yayı izlemesi zorunludur: giriş (ilk 1–2 sayfa), gelişme (orta sayfalar), net kapanış (son 1–2 sayfa). Detay: `docs/prompts/STORY_PROMPT_TEMPLATE.md` §6.
+- **Opsiyonel önceden üretilmiş hikaye (Debug):** `POST /api/books` body'de **`story_data`** (geçerli `pages[]` içeren nesne) gönderilirse hikaye üretimi atlanır; bu veri doğrudan kullanılır (masters → kapak → sayfa görselleri aynı akışla). Debug panelinde "Sadece Hikaye" sonrası "Bu hikayeden kitap oluştur" bu yöntemi kullanır.
 
 **İnceleme için:**  
 Konsolda “[Create Book]” log’larına bakabilirsiniz. Tam prompt metnini görmek için `route.ts` içinde geçici olarak `console.log('[Create Book] STORY PROMPT (first 2000 chars):', storyPrompt.slice(0, 2000))` ekleyebilirsiniz.

@@ -25,7 +25,7 @@ export const appConfig = {
       : 'http://localhost:3000/api',
   },
 
-  // Supabase kullanılmıyor; veritabanı AWS PostgreSQL, auth NextAuth, storage S3
+  // Veritabanı: AWS PostgreSQL, Auth: NextAuth, Storage: AWS S3
 
   // AI Providers
   ai: {

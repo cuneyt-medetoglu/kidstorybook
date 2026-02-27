@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
     console.log("[v0] Forgot password form submitted:", data)
     setEmailSent(true)
     setIsLoading(false)
-    // Handle password reset logic here (Faz 3'te Supabase Auth entegrasyonu yapılacak)
+    // TODO: implement password reset via NextAuth / custom email flow
   }
 
   // Floating animations for decorative elements

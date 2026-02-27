@@ -26,7 +26,7 @@
 | **Sıra 14** – Kapak ortamı hikayeden | ✅ Yapıldı | 8 Şubat 2026 | Plan A: coverSetting (story), route coverEnvironment = storyData.coverSetting; scene.ts getEnvironmentDescription(..., coverEnvironment); extractSceneElements priorityLocationKeywords (glacier, ice, space, ocean vb.). COVER_PATH_FLOWERS_ANALYSIS.md. |
 | **Sıra 15** – Sayfa FOREGROUND İngilizce | ✅ Yapıldı | 8 Şubat 2026 | route.ts: characterActionRaw = sceneContext → sceneDescription → imagePrompt → page.text; FOREGROUND’a Türkçe metin gitmiyor. |
 | **Sıra 16** – Çelişkili stil ifadeleri | ✅ Yapıldı | 8 Şubat 2026 | Tek stil profili (filmic, controlled saturation). style-descriptions + scene.ts: vibrant/high contrast → rich, clear, moderate; dramatic → clear/defined. v1.19.0. |
-| **Sıra 17** – Story JSON validation + kelime sayısı | ✅ Yapıldı | 8 Şubat 2026 | route.ts: suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. getWordCountMin ile kelime sayısı kontrolü; kısa sayfalar için LLM repair pass. |
+| **Sıra 17** – Story JSON validation + kelime sayısı | ✅ Güncellendi Şubat 2026 | route.ts: suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. Kelime sayısı sadece log; **repair kaldırıldı** (ilk istekte doğru gelmesi VERIFICATION CHECKLIST + STORY REQUIREMENTS ile hedefleniyor). Bkz. WORD_COUNT_REPAIR_ANALYSIS.md. |
 | **Sıra 19** – Allow relighting | ✅ Yapıldı | 8 Şubat 2026 | scene.ts: Interior sayfa prompt'una relighting cümlesi (reference face/hair/outfit only; allow relighting). v1.20.0. |
 
 **Sıradaki adım:** Sıra 13–19 tamamlandı. Bölüm 14 Trace aksiyonları tamamlandı; sonrasında 14.2 genel eşitleme ve doküman güncellemesi yapılabilir.

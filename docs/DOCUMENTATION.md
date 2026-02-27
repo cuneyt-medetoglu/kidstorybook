@@ -213,9 +213,12 @@ docs/
 8. **analysis/STORY_PROMPT_ACTION_PLAN.md** - Hikaye + görsel kalite aksiyon planı
 9. **analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md** - Prompt uzunluk/tekrar analizi, öncelik tablosu (A1–A9 tamamlandı, A5/A12/Sıra 13 sonrası), kaynak: GPT trace + kod
 10. **analysis/STORY_IDEAS_GENERATION_ANALYSIS.md** - Örnek hikaye fikirleri üretimi (GPT prompt, kategoriler, 12 sayfa senaryo, yaş aralığı, TR; prompt saklama; Custom Request / aynı örnekten kitap)
-11. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
-12. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
-13. **archive/2026-02/analysis/** - Arşivlenen analizler (işi bitmiş/tek seferlik): CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07
+11. **analysis/STORY_FLOW_AND_EXAMPLES_ANALYSIS.md** - Hikaye akışı (başlangıç–gelişme–sonuç) ve Examples için Debug akışı; custom request formatı; sadece analiz
+12. **analysis/CREATE_BOOK_TIMING_ANALYSIS.md** - Create Book timing özeti; entity master paralel ve TTS pipeline örtüştürme (Şubat 2026)
+13. **analysis/PARALLEL_PROCESSING_ANALYSIS.md** - Kitap oluşturma paralel işleme (sayfa batch, TTS batch ve pipeline örtüştürme)
+14. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
+15. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+16. **archive/2026-02/analysis/** - Arşivlenen analizler
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
@@ -307,7 +310,7 @@ Dokümantasyon sürekli güncellenir. Son güncellemeler:
   - Character Consistency System
     - Master Character konsepti tasarlandı
     - Multi-book consistency stratejisi oluşturuldu
-    - Database migrations oluşturuldu (`supabase/migrations/`)
+    - Database migrations oluşturuldu (`migrations/`)
     - Characters table ve triggers eklendi
     - Database helper functions (`lib/db/characters.ts`)
     - `docs/database/SCHEMA.md` oluşturuldu

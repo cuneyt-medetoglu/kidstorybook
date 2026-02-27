@@ -488,6 +488,8 @@ export interface CreateBookRequest {
   debugRunUpTo?: 'masters' | 'cover'
   /** Debug: collect full raw request/response for every step (story, masters, cover, pages); admin + showDebugQualityButtons. */
   debugTrace?: boolean
+  /** Pre-generated story from debug "Sadece Hikaye" flow; when provided, story generation is skipped and this story is used for masters + cover + page images. */
+  story_data?: any
   // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
 }
 
@@ -517,6 +519,15 @@ export interface CreateBookResponse {
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
 
+  // Step timing (ms) — set throughout the handler, logged in final summary
+  let storyMs = 0
+  let masterMs = 0
+  let coverMs = 0
+  let pageImagesMs = 0
+  let ttsMs = 0
+  let ttsPrewarmPromise: Promise<void> | null = null
+  let ttsPrewarmStartTime = 0
+
   try {
     const user = await requireUser()
 
@@ -536,6 +547,7 @@ export async function POST(request: NextRequest) {
       isExample, // Mark as public example (admin only; step6 "Create example book")
       debugRunUpTo, // Debug: run up to step then return (admin + showDebugQualityButtons)
       debugTrace: debugTraceRequested, // Debug: full raw request/response per step (admin + flag)
+      story_data: preGeneratedStoryData, // Debug: use story from "Sadece Hikaye" and skip story generation
     } = body
 
     // Skip-payment: only when DEBUG_SKIP_PAYMENT env or admin (admin sees in prod and dev)
@@ -791,9 +803,20 @@ export async function POST(request: NextRequest) {
       console.log(`[Create Book] ✅ Book created: ${book.id} (cover only)`)
     }
     // ====================================================================
-    // FULL BOOK MODE: Generate story
+    // FULL BOOK MODE: Generate story (or use pre-generated story_data)
     // ====================================================================
     else {
+      const usePreGeneratedStory =
+        preGeneratedStoryData &&
+        Array.isArray(preGeneratedStoryData.pages) &&
+        preGeneratedStoryData.pages.length > 0
+
+      if (usePreGeneratedStory) {
+        storyData = JSON.parse(JSON.stringify(preGeneratedStoryData))
+        console.log('[Create Book] 📖 Using pre-generated story (no story generation):', storyData.pages.length, 'pages')
+      }
+
+      if (!storyData) {
       console.log('[Create Book] 📖 Starting story generation...')
 
       // Generate Story Prompt (NEW: Multiple characters support)
@@ -867,6 +890,7 @@ export async function POST(request: NextRequest) {
 
           completion = await openai.chat.completions.create(storyRequestBody)
           const storyReqMs = Date.now() - storyReqStart
+          storyMs = storyReqMs
           console.log(`[Create Book] ⏱️  Story response time (attempt ${attempt}/${MAX_RETRIES}):`, storyReqMs, 'ms')
 
           const storyContent = completion.choices[0].message.content
@@ -1001,7 +1025,9 @@ export async function POST(request: NextRequest) {
       // Assign to outer variable for downstream steps (cover + page image generation)
       storyData = generatedStoryData
 
-      // Sıra 17: Kelime sayısı kontrolü ve gerekirse kısa repair (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
+      } // end if (!storyData) — story generation
+
+      // Sıra 17: Kelime sayısı kontrolü – sadece log (repair kaldırıldı; ilk istekte doğru gelmesi prompt ile hedefleniyor, WORD_COUNT_REPAIR_ANALYSIS.md)
       const ageGroupForWordCount = storyData?.metadata?.ageGroup || 'preschool'
       const wordMin = getWordCountMin(ageGroupForWordCount)
       const wordCounts = storyData.pages.map((page: any, index: number) => {
@@ -1009,46 +1035,46 @@ export async function POST(request: NextRequest) {
         const count = text.trim() ? text.split(/\s+/).length : 0
         return { pageNumber: page.pageNumber ?? index + 1, count, pageIndex: index }
       })
-      const shortPages = wordCounts.filter((p: { count: number }) => p.count < wordMin)
       console.log(`[Create Book] 📊 Word count (min ${wordMin}):`, wordCounts.map((p: { pageNumber: number; count: number }) => `p${p.pageNumber}=${p.count}`).join(', '))
-      if (shortPages.length > 0) {
-        console.warn(`[Create Book] ⚠️ Short pages (below ${wordMin} words):`, shortPages.map((p: { pageNumber: number; count: number }) => `page ${p.pageNumber} (${p.count})`).join(', '))
-        try {
-          const repairPrompt = `The following story has some pages with too few words. Return ONLY a valid JSON object with key "pages": an array of objects. Each object has "pageNumber" (number) and "text" (string). Include ONLY the pages that need expansion (page numbers: ${shortPages.map((p: { pageNumber: number }) => p.pageNumber).join(', ')}). For each of these pages, rewrite the "text" to be at least ${wordMin} words while keeping the same story event and tone. Use the same language as the original. Do not change other pages.
-
-Original story title: ${storyData.title}
-Current short page texts:
-${shortPages.map((p: { pageNumber: number; pageIndex: number }) => `Page ${p.pageNumber}: "${(storyData.pages[p.pageIndex].text || '').slice(0, 200)}..."`).join('\n')}
-
-Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
-
-          const repairCompletion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
-            messages: [{ role: 'user', content: repairPrompt }],
-            response_format: { type: 'json_object' },
-            temperature: 0.4,
-            max_tokens: 2000,
-          })
-          const repairContent = repairCompletion.choices[0]?.message?.content
-          if (repairContent) {
-            const repairData = JSON.parse(repairContent)
-            if (Array.isArray(repairData.pages)) {
-              for (const item of repairData.pages) {
-                const idx = storyData.pages.findIndex((p: any, i: number) => (p.pageNumber ?? i + 1) === item.pageNumber)
-                if (idx >= 0 && item.text) {
-                  storyData.pages[idx].text = item.text
-                  const newCount = item.text.split(/\s+/).length
-                  console.log(`[Create Book] 📝 Repair: expanded page ${item.pageNumber} to ${newCount} words`)
-                }
-              }
-            }
-          }
-        } catch (repairErr: any) {
-          console.warn('[Create Book] Word count repair failed (non-fatal):', repairErr?.message || repairErr)
-        }
-      }
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
+
+      // TTS prewarm başlat (masters/cover/page images ile paralel çalışsın; CREATE_BOOK_TIMING_ANALYSIS.md)
+      ttsPrewarmStartTime = Date.now()
+      const pagesForTts = storyData.pages.filter((p: any) => p?.text?.trim())
+      if (pagesForTts.length) {
+        const bookLanguageForTts = language || 'tr'
+        const TTS_BATCH_SIZE = 5
+        ttsPrewarmPromise = (async () => {
+          const ttsBatchCount = Math.ceil(pagesForTts.length / TTS_BATCH_SIZE)
+          console.log(`[Create Book] 🔊 TTS prewarm (background): ${pagesForTts.length} pages, ${ttsBatchCount} batch(es) of ${TTS_BATCH_SIZE} (parallel)`)
+          let ttsSuccess = 0
+          let ttsFail = 0
+          const startTts = Date.now()
+          for (let batchStart = 0; batchStart < pagesForTts.length; batchStart += TTS_BATCH_SIZE) {
+            const ttsBatch = pagesForTts.slice(batchStart, batchStart + TTS_BATCH_SIZE)
+            const batchNum = Math.floor(batchStart / TTS_BATCH_SIZE) + 1
+            const batchT = Date.now()
+            const batchResults = await Promise.allSettled(
+              ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguageForTts }))
+            )
+            const batchMs = Date.now() - batchT
+            const ok = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'fulfilled').length
+            const fail = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'rejected').length
+            ttsSuccess += ok
+            ttsFail += fail
+            batchResults.forEach((result: PromiseSettledResult<any>, idx: number) => {
+              if (result.status === 'rejected') {
+                console.warn(`[Create Book] TTS prewarm: batch ${batchNum} page ${batchStart + idx + 1} failed:`, (result.reason as Error).message)
+              }
+            })
+            console.log(`[Create Book] 🔊 TTS batch ${batchNum}/${ttsBatchCount}: ${ok}/${ttsBatch.length} ok — ${batchMs}ms`)
+          }
+          const ttsTotalMs = Date.now() - startTts
+          console.log(`[Create Book] ✅ TTS prewarm done: ${ttsSuccess}/${pagesForTts.length} pages (${ttsFail} failed) — ${ttsTotalMs}ms (${(ttsTotalMs / 1000).toFixed(1)}s)`)
+          console.log(`[Create Book] 📊 TTS avg per page: ${Math.round(ttsTotalMs / Math.max(pagesForTts.length, 1))}ms`)
+        })()
+      }
 
       // Create Book in Database
       const { data: createdBook, error: bookError } = await createBook(user.id, {
@@ -1183,6 +1209,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
     // Master kıyafeti: tema ile uyumlu (adventure → outdoor gear; story clothing yok artık)
     // ====================================================================
     if (!isFromExampleMode) {
+    const masterStartTime = Date.now()
     console.log(`[Create Book] 🎨 Starting master character illustration generation...`)
     
     const themeClothingForMaster: Record<string, string> = {
@@ -1280,25 +1307,29 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
     if (storyData?.supportingEntities && storyData.supportingEntities.length > 0) {
       console.log(`[Create Book] 🐾 Generating ${storyData.supportingEntities.length} supporting entity masters...`)
       
-      for (const entity of storyData.supportingEntities) {
-        try {
-          const entityMasterUrl = await generateSupportingEntityMaster(
+      const entityResults = await Promise.allSettled(
+        storyData.supportingEntities.map((entity: any) =>
+          generateSupportingEntityMaster(
             entity.id,
             entity.type,
             entity.name,
             entity.description,
             illustrationStyle,
             user.id,
-            debugTrace ? (e) => debugTrace!.push(e) : undefined,
+            debugTrace ? (e: any) => debugTrace!.push(e) : undefined,
             `entity_master_${entity.name}`
           )
-          entityMasterIllustrations[entity.id] = entityMasterUrl
-          console.log(`[Create Book] ✅ Entity master created for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
-        } catch (error) {
-          console.error(`[Create Book] ❌ Entity master generation failed for ${entity.name}:`, error)
-          // Continue with other entities
+        )
+      )
+      entityResults.forEach((result, idx) => {
+        const entity = storyData.supportingEntities[idx]
+        if (result.status === 'fulfilled') {
+          entityMasterIllustrations[entity.id] = result.value
+          console.log(`[Create Book] ✅ Entity master created for ${entity.name} (${entity.type}): ${result.value}`)
+        } else {
+          console.error(`[Create Book] ❌ Entity master generation failed for ${entity.name}:`, (result.reason as Error)?.message)
         }
-      }
+      })
       
       // Update generation_metadata with entity master illustrations
       if (Object.keys(entityMasterIllustrations).length > 0) {
@@ -1316,6 +1347,8 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       console.log('[Create Book] ℹ️  No supporting entities in story - skipping entity master generation')
     }
 
+    masterMs = Date.now() - masterStartTime
+    console.log(`[Create Book] ⏱️  Master illustrations total: ${masterMs}ms (${(masterMs/1000).toFixed(1)}s)`)
     } // end if (!isFromExampleMode) — cover/page below run for both normal and from-example
 
     // Debug: run up to masters – return result and remove book (kalite/prompt iyileştirme için)
@@ -1342,6 +1375,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       })
     }
 
+    const coverStartTime = Date.now()
     console.log(`[Create Book] 🎨 Starting cover generation...`)
 
     // ====================================================================
@@ -1862,7 +1896,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
         console.log('[Create Book] ℹ️  INFO: No reference image provided - used text-only generation')
       }
 
-      // Download and upload to Supabase Storage
+      // Download and upload to AWS S3
       let uploadBytes: ArrayBuffer | Buffer
       let contentType = 'image/png'
       const ext = (coverImageOutputFormat || 'png').toLowerCase()
@@ -1963,6 +1997,9 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       await updateBook(book.id, { status: 'failed' })
       // Continue to response - story is still generated
     }
+
+    coverMs = Date.now() - coverStartTime
+    console.log(`[Create Book] ⏱️  Cover generation total: ${coverMs}ms (${(coverMs/1000).toFixed(1)}s)`)
 
     // ====================================================================
     // STEP 3: GENERATE PAGE IMAGES (Skip in cover only mode)
@@ -2465,7 +2502,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
         console.log(`[Create Book] ✅ Page ${pageNumber} - Image generated successfully (${totalImageGenTime}ms)`)
         console.log(`[Create Book] 🖼️  Page ${pageNumber} - Image field:`, pageImageUrl ? 'url ✅' : 'b64_json ✅')
 
-        // Download and upload to Supabase Storage
+        // Download and upload to AWS S3
         let imageBuffer: ArrayBuffer | Buffer
         let contentType = 'image/png'
         const ext = (pageImageOutputFormat || 'png').toLowerCase()
@@ -2556,6 +2593,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
         }
 
       const totalPageImagesTime = Date.now() - pageImagesStartTime
+      pageImagesMs = totalPageImagesTime
       const totalPageImagesTimeSeconds = Math.round(totalPageImagesTime / 1000)
       const totalPageImagesTimeMinutes = Math.floor(totalPageImagesTimeSeconds / 60)
       const remainingSeconds = totalPageImagesTimeSeconds % 60
@@ -2597,24 +2635,43 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       console.log(`[Create Book]   - Images in story_data.pages:`, pages.filter((p: any) => p.imageUrl).length)
       console.log(`[Create Book]   - Images in images_data:`, generatedImages.length)
 
-      // TTS prewarm: generate audio for each page so first read is instant (TTS_GOOGLE_GEMINI_ANALYSIS.md §2)
-      if (allImagesGenerated && pages?.length) {
+      // TTS prewarm: story sonrası arka planda başlatıldı; burada bitene kadar bekle (CREATE_BOOK_TIMING_ANALYSIS.md)
+      if (ttsPrewarmPromise) {
+        await ttsPrewarmPromise
+        ttsMs = Date.now() - ttsPrewarmStartTime
+      } else if (allImagesGenerated && pages?.length) {
+        // From-example vb. path: TTS arka planda başlatılmadığı için burada çalıştır
         const bookLanguage = language || 'tr'
-        console.log(`[Create Book] 🔊 TTS prewarm: generating audio for ${pages.length} pages...`)
-        for (let i = 0; i < pages.length; i++) {
-          const p = pages[i]
-          const text = p?.text?.trim()
-          if (!text) continue
-          try {
-            await generateTts(text, { language: bookLanguage })
-            if (process.env.DEBUG_LOGGING === 'true') {
-              console.log(`[Create Book] TTS prewarm: page ${i + 1}/${pages.length} ok`)
+        const TTS_BATCH_SIZE = 5
+        const ttsStartTime = Date.now()
+        const ttsPages = pages.filter((p: any) => p?.text?.trim())
+        const ttsBatchCount = Math.ceil(ttsPages.length / TTS_BATCH_SIZE)
+        console.log(`[Create Book] 🔊 TTS prewarm: ${ttsPages.length} pages, ${ttsBatchCount} batch(es) of ${TTS_BATCH_SIZE} (parallel)`)
+        let ttsSuccess = 0
+        let ttsFail = 0
+        for (let batchStart = 0; batchStart < ttsPages.length; batchStart += TTS_BATCH_SIZE) {
+          const ttsBatch = ttsPages.slice(batchStart, batchStart + TTS_BATCH_SIZE)
+          const batchNum = Math.floor(batchStart / TTS_BATCH_SIZE) + 1
+          const batchT = Date.now()
+          const batchResults = await Promise.allSettled(
+            ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguage }))
+          )
+          const batchMs = Date.now() - batchT
+          const ok = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'fulfilled').length
+          const fail = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'rejected').length
+          ttsSuccess += ok
+          ttsFail += fail
+          batchResults.forEach((result: PromiseSettledResult<any>, idx: number) => {
+            if (result.status === 'rejected') {
+              console.warn(`[Create Book] TTS prewarm: batch ${batchNum} page ${batchStart + idx + 1} failed:`, (result.reason as Error).message)
             }
-          } catch (ttsErr) {
-            console.warn(`[Create Book] TTS prewarm: page ${i + 1} failed:`, (ttsErr as Error).message)
-          }
+          })
+          console.log(`[Create Book] 🔊 TTS batch ${batchNum}/${ttsBatchCount}: ${ok}/${ttsBatch.length} ok — ${batchMs}ms`)
         }
-        console.log(`[Create Book] 🔊 TTS prewarm done`)
+        const ttsTotalMs = Date.now() - ttsStartTime
+        ttsMs = ttsTotalMs
+        console.log(`[Create Book] ✅ TTS prewarm done: ${ttsSuccess}/${ttsPages.length} pages (${ttsFail} failed) — ${ttsTotalMs}ms (${(ttsTotalMs / 1000).toFixed(1)}s)`)
+        console.log(`[Create Book] 📊 TTS avg per page: ${Math.round(ttsTotalMs / Math.max(ttsPages.length, 1))}ms`)
       }
 
       } catch (imagesError) {
@@ -2638,6 +2695,20 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
     console.log(`[Create Book] 📊 Final book status: ${finalBook.status}`)
     console.log(`[Create Book] 🖼️  Cover image: ${finalBook.cover_image_url ? 'Yes ✅' : 'No ❌'}`)
     console.log(`[Create Book] 📄 Total pages: ${finalBook.total_pages}`)
+
+    // ── TIMING SUMMARY ─────────────────────────────────────────────────────
+    const fmt = (ms: number) => ms > 0 ? `${(ms/1000).toFixed(1)}s` : '—'
+    const otherMs = generationTime - storyMs - masterMs - coverMs - pageImagesMs - ttsMs
+    console.log(`[Create Book] ━━━━━━ ⏱️  TIMING SUMMARY ━━━━━━`)
+    console.log(`[Create Book]   📖 Story generation : ${fmt(storyMs).padStart(7)}  (${storyMs}ms)`)
+    console.log(`[Create Book]   🎨 Master illust.   : ${fmt(masterMs).padStart(7)}  (${masterMs}ms)`)
+    console.log(`[Create Book]   🖼️  Cover image      : ${fmt(coverMs).padStart(7)}  (${coverMs}ms)`)
+    console.log(`[Create Book]   🗂️  Page images      : ${fmt(pageImagesMs).padStart(7)}  (${pageImagesMs}ms) [parallel batch]`)
+    console.log(`[Create Book]   🔊 TTS audio        : ${fmt(ttsMs).padStart(7)}  (${ttsMs}ms) [parallel batch]`)
+    console.log(`[Create Book]   ⚙️  Other/overhead   : ${fmt(otherMs).padStart(7)}  (${otherMs}ms)`)
+    console.log(`[Create Book]   ──────────────────────────────`)
+    console.log(`[Create Book]   🏁 TOTAL            : ${fmt(generationTime).padStart(7)}  (${generationTime}ms)`)
+    console.log(`[Create Book] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
 
     const response: CreateBookResponse & { debugTrace?: DebugTraceEntry[] } = {
       id: finalBook.id,

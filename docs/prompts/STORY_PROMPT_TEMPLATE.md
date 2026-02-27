@@ -8,6 +8,7 @@ Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse
 **v2.3.0 (8 Şubat 2026):** shotPlan sayfa başına **zorunlu**; OUTPUT FORMAT ve VERIFICATION CHECKLIST güncellendi.  
 **v2.4.0 (8 Şubat 2026):** **coverSetting** üst seviye alan eklendi (REQUIRED): kapak görseli için tek cümle İngilizce ortam tarifi (karakter yok). Plan A – COVER_PATH_FLOWERS_ANALYSIS.md §7.  
 **v2.5.0 (8 Şubat 2026):** **Story JSON validation (Sıra 17):** route.ts story cevabında suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. Kelime sayısı kontrolü ve kısa sayfa repair pass.  
+**v2.6.0 (Şubat 2026):** **Anlatı yayı (narrative arc):** STORY STRUCTURE bölümüne zorunlu kural eklendi: hikaye tek bir anlatı yayı izlemeli; ilk 1–2 sayfa giriş, orta sayfalar gelişme, son 1–2 sayfa net kapanış. Son sayfa rastgele durmamalı.  
 (v2.1.0: Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.)
 
 ---
@@ -155,6 +156,7 @@ Identify ALL animals and important objects that appear in the story; each gets a
 - **pages[]:** EXACTLY [getPageCount] items (interior pages only). No cover in this array.
 - **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
 - **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
+- **Narrative arc (CRITICAL):** The story must have a clear beginning, middle, and end. Use the first 1–2 pages to set up the situation and characters; use the middle pages for development (events, choices, small challenges); use the final 1–2 pages to bring the story to a clear resolution or conclusion (e.g. goal reached, problem solved, day ending, return home). The last page must feel like a proper ending, not a random stop.
 - Vary locations and time of day across pages so the story feels like a progression.
 ```
 

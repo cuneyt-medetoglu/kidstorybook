@@ -39,6 +39,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQu
   const [storyData, setStoryData] = useState<any>(null)
   const [pageCount, setPageCount] = useState<number>(0)
   const [selectedPage, setSelectedPage] = useState<number>(1)
+  const [loadingCreateFromStory, setLoadingCreateFromStory] = useState(false)
 
   if (!canShow) return null
 
@@ -117,6 +118,61 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQu
       })
     } finally {
       setLoadingStory(false)
+    }
+  }
+
+  const handleCreateBookFromStory = async () => {
+    if (!storyData?.pages?.length) return
+    setLoadingCreateFromStory(true)
+    try {
+      const themeKey =
+        wizardData?.step3?.theme?.id ||
+        (typeof wizardData?.step3?.theme === "string" ? wizardData.step3.theme : "") ||
+        "adventure"
+      const styleKey =
+        wizardData?.step4?.illustrationStyle?.id ||
+        (typeof wizardData?.step4?.illustrationStyle === "string"
+          ? wizardData.step4.illustrationStyle
+          : "") ||
+        "watercolor"
+      const language = (wizardData?.step3?.language?.id || "en") as string
+      const singleId = characterIds.length === 1 ? characterIds[0] : null
+      const fallbackId = localStorage.getItem("kidstorybook_character_id")
+      const requestBody = {
+        characterId: singleId || fallbackId || characterIds[0],
+        characterIds: characterIds.length > 0 ? characterIds : [singleId || fallbackId || characterIds[0]].filter(Boolean),
+        theme: themeKey,
+        illustrationStyle: styleKey,
+        customRequests: wizardData?.step5?.customRequests || "",
+        language,
+        pageCount: wizardData?.step5?.pageCount || storyData.pages.length,
+        story_data: storyData,
+        skipPayment: true,
+      }
+      const response = await fetch("/api/books", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      })
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || result.message || "Kitap oluşturulamadı")
+      }
+      toast({
+        title: "Kitap oluşturuldu",
+        description: result.data?.id ? `Kitap ID: ${result.data.id}` : "Hikayeden kitap oluşturuldu.",
+      })
+      if (result.data?.id) {
+        window.open(`/books/${result.data.id}`, "_blank")
+      }
+    } catch (error: any) {
+      toast({
+        title: "Hata",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoadingCreateFromStory(false)
     }
   }
 
@@ -292,20 +348,39 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQu
                     </p>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleStoryOnly}
-                  disabled={loadingStory}
-                >
-                  {loadingStory ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                      Üretiliyor...
-                    </>
-                  ) : (
-                    "Test Et"
+                <div className="flex items-center gap-2">
+                  {storyData && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={handleCreateBookFromStory}
+                      disabled={loadingCreateFromStory}
+                    >
+                      {loadingCreateFromStory ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          Oluşturuluyor...
+                        </>
+                      ) : (
+                        "Bu hikayeden kitap oluştur"
+                      )}
+                    </Button>
                   )}
-                </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleStoryOnly}
+                    disabled={loadingStory}
+                  >
+                    {loadingStory ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        Üretiliyor...
+                      </>
+                    ) : (
+                      "Test Et"
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
 

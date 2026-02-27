@@ -1,9 +1,11 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 9 Şubat 2026  
+**Son Güncelleme:** 14 Şubat 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
+
+**14 Şubat 2026 – Create Book timing:** Entity master’lar paralel üretiliyor (`Promise.allSettled`); TTS prewarm story biter bitmez arka planda başlatılıp masters/cover/page images ile örtüştürülüyor, response öncesi await. Ref: docs/analysis/CREATE_BOOK_TIMING_ANALYSIS.md
 
 **9 Şubat 2026 – TTS ve E-book Viewer:** TTS S3 signed URL ile düzeltildi; admin TTS config (tts_settings), kitap tamamlanınca TTS prewarm; Parent Settings sesli okuma (hız, volume, localStorage); BookViewer mute, prefs, Audio badge (dashboard), çocuk UX (44px dokunmatik, active:scale-95). Ref: docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md
 

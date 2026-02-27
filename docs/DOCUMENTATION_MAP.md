@@ -66,7 +66,8 @@
 
 | Dosya | Kategori | Son Güncelleme | Özet |
 |-------|----------|----------------|------|
-| STORY_AND_IMAGE_AI_FLOW.md | ✅ AKTİF | 1 Şubat 2026 | Story ve Image AI request/response akışı. |
+| STORY_AND_IMAGE_AI_FLOW.md | ✅ AKTİF | 1 Şubat 2026 | Story ve Image AI request/response; önceden üretilmiş story_data (Debug) notu. |
+| STORY_FLOW_AND_EXAMPLES_ANALYSIS.md | ✅ AKTİF | Hikaye akışı, custom request rolü, Debug akışı. §6: yapılanlar (narrative arc, story_data, “Bu hikayeden kitap oluştur”). |
 | CREATE_YOUR_OWN_FROM_EXAMPLE.md | ✅ AKTİF | - | Create Your Own from Example: akış, characterIds, kapak Vision. |
 | DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md | ✅ AKTİF | 7 Şubat 2026 | Debug kalite butonları (admin, trace export). |
 | STORY_PROMPT_ACTION_PLAN.md | ✅ AKTİF | 7 Şubat 2026 | Hikaye + görsel kalite aksiyon planı. |
@@ -129,6 +130,7 @@
 | EXAMPLES_PAGE_V0_PROMPT.md | ✅ AKTİF | 25 Ocak 2026 | Examples sayfası v0 prompt. |
 | SALES_AND_CART_TESTING_GUIDE.md | ✅ AKTİF | 26 Ocak 2026 | Sepet ve satış test planı. |
 | HERO_YOUR_CHILD_THE_HERO_IMAGES_ANALYSIS.md | ✅ AKTİF | 27 Ocak 2026 | Hero "Your Child The Hero" görselleri. |
+| EXAMPLE_BOOK_CHILD_IMAGES.md | ✅ AKTİF | 22 Şubat 2026 | Örnek kitap sayfası için çocuk görselleri: ücretsiz indirme siteleri, lisans, klasör. |
 | HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md | ✅ AKTİF | 27 Ocak 2026 | Hero köşe artefakt analizi. |
 | PROMPT_OPTIMIZATION_GUIDE.md | ✅ AKTİF | 18 Ocak 2026 | Prompt iyileştirme rehberi. |
 | ANATOMICAL_PROMPT_IMPROVEMENTS_GUIDE.md | ✅ AKTİF | 18 Ocak 2026 | Anatomik prompt iyileştirmeleri. |
@@ -167,7 +169,7 @@
 
 | Dosya | Kategori | Özet |
 |-------|----------|------|
-| STORY_PROMPT_TEMPLATE.md | ✅ AKTİF | Hikaye prompt şablonu (kod ile senkron). |
+| STORY_PROMPT_TEMPLATE.md | ✅ AKTİF | Hikaye prompt şablonu (kod ile senkron). v2.6.0: anlatı yayı (narrative arc) STORY STRUCTURE’da. |
 | IMAGE_PROMPT_TEMPLATE.md | ✅ AKTİF | Görsel prompt şablonu (kod ile senkron). |
 | HERO_TRANSFORMATION_PROMPTS.md | ✅ AKTİF | Hero "Your Child, The Hero" sahne prompt örnekleri (FAZ 9; eskiden scripts/hero-transformation-prompts.txt). |
 
@@ -233,8 +235,7 @@
 | README.md (root) | 📝 GÜNCELLENECEK | Proje ana README – FAZ 10'da güncellenecek. |
 | CLEANUP_PLAN.md (root) | ✅ AKTİF | Temizlik planı – iş bitince silinecek/archive'a taşınacak. |
 | scripts/README.md | ✅ AKTİF | Script'ler rehberi. |
-| supabase/README.md | ✅ AKTİF | Supabase kurulum. |
-| supabase/migrations/README.md | ✅ AKTİF | Migration rehberi. |
+| migrations/README yok | — | migrations/ klasöründe SQL dosyaları; Supabase kaldırıldı. |
 | public/pdf-backgrounds/README.md | ✅ AKTİF | PDF arka planları. |
 | tests/api/README.md | ✅ AKTİF | API test senaryoları. |
 

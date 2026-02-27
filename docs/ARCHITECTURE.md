@@ -81,7 +81,7 @@ Docker desteği şu an yok, ama planlanıyor:
 
 1. **Local Development**
    - PostgreSQL (local veya EC2)
-   - Database migrations (supabase/migrations/)
+   - Database migrations (migrations/)
    - Consistent development environment
 
 2. **CI/CD Pipeline**
@@ -193,10 +193,9 @@ kidstorybook/
 │   ├── pdf/                    # generator, image-compress (50 MB limit), templates (PDF üretimi)
 │   ├── prompts/                # Prompt Management (config, story, image, tts v1.0.0 dil dosyaları)
 │   ├── queue/                  # image-generation-queue
-│   ├── supabase/               # client, server, server-auth (legacy/auth – Faz 5’te alternatif)
-│   ├── utils.ts                # cn, helpers
+│   ├── │   ├── utils.ts                # cn, helpers
 │   └── wizard-state.ts         # Wizard state
-├── supabase/migrations/        # PostgreSQL migrations (isimlendirme korunuyor)
+├── migrations/                 # PostgreSQL migrations (AWS)
 ├── middleware.ts                # Next.js middleware (auth)
 ├── docs/                       # Dokümantasyon (roadmap, PRD, guides, database, api, vb.)
 └── public/                     # Static files
@@ -244,10 +243,8 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 | **UI Framework** | Tailwind CSS | 3.4.19 | Utility-first CSS |
 | **UI Components** | shadcn/ui (Radix) | - | button, card, dialog, select, tabs, vb. |
 | **Backend** | Next.js API Routes | Built-in | 29 endpoint, serverless |
-| **Database** | PostgreSQL (EC2) | - | DB (migrations: supabase/migrations/) |
+| **Database** | PostgreSQL (EC2) | - | DB (migrations: migrations/) |
 | **Storage** | AWS S3 | - | Tek bucket, prefix'ler: photos, books, pdfs, covers |
-| **Supabase Client** | @supabase/ssr | 0.8.0 | Auth (legacy – Faz 5’te alternatif planlanıyor) |
-| **Supabase JS** | @supabase/supabase-js | 2.89.0 | Core client (auth) |
 | **TypeScript** | TypeScript | 5.9.3 | Type safety |
 | **React** | React | 18.3.1 | UI library |
 | **AI** | OpenAI (GPT-4o, GPT-image) | openai ^6.16.0 | Hikaye, görsel, kapak, edit |
@@ -283,10 +280,10 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 3. ✅ Faz 1.2: Auth/DB kurulumu tamamlandı; **Şubat 2026: AWS altyapı (Faz 1–4) tamamlandı**
    - Database: PostgreSQL EC2 üzerinde, migration'lar uygulandı
    - Storage: AWS S3 tek bucket (photos, books, pdfs, covers)
-   - Supabase client (auth) hâlâ kullanılıyor; Faz 5’te auth alternatifi planlanıyor
-   - RLS/constraints schema’da mevcut
+   - Auth: NextAuth.js (Google, Facebook, email); Supabase kaldırıldı
+   - DB-level RLS kaldırıldı; auth uygulama katmanında (NextAuth)
 4. ✅ Environment variables oluşturuldu (`.env.local` / `.env`)
-5. ✅ Test infrastructure (`/test-supabase` – legacy; production AWS)
+5. ✅ Test infrastructure (AWS production)
 
 ### Tamamlananlar (Faz 1.3)
 
@@ -331,7 +328,7 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 
 **Neden Supabase’ten geçildi?**
 - Supabase Storage free tier limiti; maliyet ve ölçeklenebilirlik için AWS S3 seçildi.
-- Database de EC2’de PostgreSQL olarak taşındı; auth alternatifi Faz 5’te planlanıyor.
+- Database EC2’de PostgreSQL olarak taşındı; auth NextAuth.js ile tamamlandı (Supabase tamamen kaldırıldı).
 
 ---
 
@@ -446,7 +443,7 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 ### Mevcut Test Araçları
 
 **Faz 1.2'de oluşturuldu (legacy):**
-- ✅ `/test-supabase` - Eski Supabase connection test sayfası (production artık AWS)
+
 - ✅ `app/api/test/storage` - Storage API test endpoint (production: S3)
 
 **Kullanım:**
@@ -457,15 +454,14 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 
 ## 📜 Mimari Değişiklik Geçmişi
 
-### 4 Ocak 2026 - Faz 1.2 Tamamlandı (Supabase)
+### 4 Ocak 2026 - Faz 1.2 Tamamlandı (başlangıç altyapı)
 **Ne değişti:**
-- Supabase kurulumu tamamlandı (Auth, DB, Storage)
-- Database schema oluşturuldu; Supabase client setup; test infrastructure eklendi.
+- Database schema oluşturuldu; test infrastructure eklendi.
 
 **Şubat 2026 – Production AWS’e taşındı (Faz 1–4):**
-- Database: EC2 üzerinde PostgreSQL; migration’lar aynı (supabase/migrations/).
+- Database: EC2 üzerinde PostgreSQL; migrations/ klasöründe.
 - Storage: AWS S3 tek bucket (photos, books, pdfs, covers).
-- Auth: Supabase client hâlâ kullanılıyor; Faz 5’te alternatif planlanıyor.
+- Auth: NextAuth.js (tamamlandı). Supabase tamamen kaldırıldı.
 - Rehber: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`
 
 ### 4 Ocak 2026 - Dark/Light Mode Kararı ✅

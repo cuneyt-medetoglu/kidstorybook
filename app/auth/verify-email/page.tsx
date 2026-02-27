@@ -15,11 +15,6 @@ function VerifyEmailContent() {
   const [email, setEmail] = useState<string>("")
 
   useEffect(() => {
-    // Faz 3'te Supabase Auth email verification handling yapılacak
-    // const token = searchParams.get("token")
-    // const type = searchParams.get("type") // "signup" or "email_change"
-
-    // Simulate email verification processing
     const token = searchParams.get("token")
     const type = searchParams.get("type")
     const emailParam = searchParams.get("email")
@@ -30,28 +25,19 @@ function VerifyEmailContent() {
 
     if (token) {
       setStatus("loading")
-      // Simulate API call
       const timer = setTimeout(() => {
-        // Faz 3'te: Verify token with Supabase Auth
-        // const supabase = createClient()
-        // const { data, error } = await supabase.auth.verifyOtp({
-        //   token_hash: token,
-        //   type: type || "signup",
-        // })
-
-        // For now, simulate success
+        // TODO: implement token verification via NextAuth / custom email flow
         setStatus("success")
       }, 2000)
 
       return () => clearTimeout(timer)
     } else {
-      // No token, show pending state
       setStatus("pending")
     }
   }, [searchParams, router])
 
   const handleResendEmail = async () => {
-    // ROADMAP: 2.3 Auth - Supabase auth.resend({ type: 'signup', email })
+    // TODO: implement resend email via NextAuth / custom email flow
   }
 
   return (

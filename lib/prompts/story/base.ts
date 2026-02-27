@@ -689,6 +689,7 @@ function buildStoryStructureSection(
 - **pages[]:** EXACTLY ${n} items (interior pages only). No cover in this array.
 - **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
 - **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
+- **Narrative arc (CRITICAL):** The story must have a clear beginning, middle, and end. Use the first 1–2 pages to set up the situation and characters; use the middle pages for development (events, choices, small challenges); use the final 1–2 pages to bring the story to a clear resolution or conclusion (e.g. goal reached, problem solved, day ending, return home). The last page must feel like a proper ending, not a random stop.
 - Vary locations and time of day across pages so the story feels like a progression.`
 }
 
@@ -811,8 +812,10 @@ function buildVerificationChecklistSection(
 ): string {
   const n = getPageCount(ageGroup, pageCount)
   const langName = getLanguageName(language)
+  const wordMin = getWordCountMin(ageGroup)
   return `# VERIFICATION CHECKLIST (before returning JSON)
 - Return EXACTLY ${n} pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
+- Each page "text" must have at least ${wordMin} words (age group: ${ageGroup}). Count words before returning; if a page has fewer, expand that page's text.
 - coverSetting REQUIRED: one sentence, English, setting/background only for the book cover image (e.g. glacier and ice cave, birthday party room with balloons). No character description.
 - suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
