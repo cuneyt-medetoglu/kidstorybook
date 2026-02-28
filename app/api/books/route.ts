@@ -33,6 +33,10 @@ function stopAfter(step: string) {
   }
 }
 
+/** Allowed story models for debug/admin override (STORY_QUALITY_IMPROVEMENT_ANALYSIS.md §8) */
+const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4o', 'o1-mini'] as const
+type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
+
 function normalizeThemeKey(theme: string): string {
   const t = (theme || '').toString().trim().toLowerCase()
   if (!t) return t
@@ -550,37 +554,45 @@ export async function POST(request: NextRequest) {
       story_data: preGeneratedStoryData, // Debug: use story from "Sadece Hikaye" and skip story generation
     } = body
 
-    // Skip-payment: only when DEBUG_SKIP_PAYMENT env or admin (admin sees in prod and dev)
-    if (skipPayment === true) {
-      const debugSkip = process.env.DEBUG_SKIP_PAYMENT === 'true'
-      const role = await getUserRole(user.id)
-      const isAdmin = role === 'admin'
-      const canSkip = debugSkip || isAdmin
-      if (!canSkip) {
-        return CommonErrors.forbidden('Skip payment is not allowed for this user')
-      }
+    // Role check — single call, shared for all permission gates below
+    const userRole = await getUserRole(user.id)
+    const isAdmin = userRole === 'admin'
+    const debugEnvSkip = process.env.DEBUG_SKIP_PAYMENT === 'true'
+    const canUseDebugOptions = debugEnvSkip || isAdmin
+
+    // Skip-payment: only when DEBUG_SKIP_PAYMENT env or admin
+    if (skipPayment === true && !canUseDebugOptions) {
+      return CommonErrors.forbidden('Skip payment is not allowed for this user')
     }
 
-    // Debug run-up-to: admin only (visible in prod and dev)
+    // Debug run-up-to: admin only
     const isDebugCoverMode = debugRunUpTo === 'cover'
     const isDebugMastersMode = debugRunUpTo === 'masters'
     if (debugRunUpTo) {
       if (debugRunUpTo !== 'cover' && debugRunUpTo !== 'masters') {
         return CommonErrors.badRequest('debugRunUpTo only supports "masters" or "cover"')
       }
-      const role = await getUserRole(user.id)
-      const isAdmin = role === 'admin'
       if (!isAdmin) {
         return CommonErrors.forbidden('Debug run-up-to is only allowed for admin')
       }
     }
 
-    // Debug trace: admin only (visible in prod and dev)
+    // Debug trace: admin only
     let debugTrace: DebugTraceEntry[] | null = null
-    if (debugTraceRequested === true) {
-      const role = await getUserRole(user.id)
-      const isAdmin = role === 'admin'
-      if (isAdmin) debugTrace = []
+    if (debugTraceRequested === true && isAdmin) {
+      debugTrace = []
+    }
+
+    // Effective story model (admin/debug can override; default gpt-4o-mini for everyone including example book):
+    const effectiveStoryModel: AllowedStoryModel =
+      canUseDebugOptions &&
+      storyModel &&
+      (ALLOWED_STORY_MODELS as readonly string[]).includes(storyModel)
+        ? (storyModel as AllowedStoryModel)
+        : 'gpt-4o-mini'
+
+    if (effectiveStoryModel !== 'gpt-4o-mini') {
+      console.log(`[Create Book] 🔧 Story model override: ${effectiveStoryModel} (isExample=${!!isExample}, canDebug=${canUseDebugOptions})`)
     }
 
     // Image generation defaults (hardcoded - no override)
@@ -777,7 +789,7 @@ export async function POST(request: NextRequest) {
         images_data: [], // No page images in cover only mode
         ...(isExample === true && { is_example: true }), // Admin "Create example book" (step6)
         generation_metadata: {
-          model: storyModel,
+          model: effectiveStoryModel,
           imageModel: imageModel,
           imageSize: imageSize,
           promptVersion: '1.0.0',
@@ -859,7 +871,7 @@ export async function POST(request: NextRequest) {
       }
       const languageName = languageNames[language] || 'English'
       const storyRequestBody = {
-        model: storyModel,
+        model: effectiveStoryModel,
         messages: [
           {
             role: 'system' as const,
@@ -872,10 +884,10 @@ export async function POST(request: NextRequest) {
         temperature: 0.8,
         max_tokens: 8000, // 12+ sayfa için güvenli; limitin üzerinde kalması sorun değil
       }
-      console.log('[Create Book] 📤 STORY REQUEST sent (model:', storyModel, ', prompt length:', storyPrompt.length, ')')
+      console.log('[Create Book] 📤 STORY REQUEST sent (model:', effectiveStoryModel, ', prompt length:', storyPrompt.length, ')')
       stopAfter('story_request')
 
-      console.log(`[Create Book] 🤖 Calling OpenAI for story generation (model: ${storyModel})`)
+      console.log(`[Create Book] 🤖 Calling OpenAI for story generation (model: ${effectiveStoryModel})`)
       console.log('[Create Book] ⏱️  Story request started at:', new Date().toISOString())
       
       // Retry mechanism for story generation (max 3 attempts)
@@ -945,7 +957,7 @@ export async function POST(request: NextRequest) {
             debugTrace.push({
               step: 'story',
               request: {
-                model: storyModel,
+                model: effectiveStoryModel,
                 effectivePageCount,
                 systemMessage: storyRequestBody.messages[0].content,
                 userPromptLength: storyPrompt.length,
@@ -1091,7 +1103,7 @@ export async function POST(request: NextRequest) {
         images_data: [], // Will be populated after image generation
         ...(isExample === true && { is_example: true }), // Admin "Create example book" (step6)
         generation_metadata: {
-          model: storyModel,
+          model: effectiveStoryModel,
           imageModel: imageModel,
           imageSize: imageSize,
           promptVersion: '1.0.0',

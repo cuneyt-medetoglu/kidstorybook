@@ -5,7 +5,9 @@
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
-**14 Şubat 2026 – Create Book timing:** Entity master’lar paralel üretiliyor (`Promise.allSettled`); TTS prewarm story biter bitmez arka planda başlatılıp masters/cover/page images ile örtüştürülüyor, response öncesi await. Ref: docs/analysis/CREATE_BOOK_TIMING_ANALYSIS.md
+**14 Şubat 2026 – Create Book timing:** Entity master'lar paralel üretiliyor (`Promise.allSettled`); TTS prewarm story biter bitmez arka planda başlatılıp masters/cover/page images ile örtüştürülüyor, response öncesi await. Ref: docs/analysis/CREATE_BOOK_TIMING_ANALYSIS.md
+
+**14 Şubat 2026 – Story model seçimi (admin):** Tek dropdown (Step 6) Create without payment, Example book ve Debug Kalite Paneli "Sadece Hikaye" testini kontrol eder; varsayılan gpt-4o-mini. Example book artık gpt-4o zorlaması yok; seçilen model kullanılır. `POST /api/ai/generate-story`: `storyModel` parametresi (admin whitelist), model-aware maliyet (input/output token). DebugQualityPanel `storyModel` prop ile API'ye iletir.
 
 **9 Şubat 2026 – TTS ve E-book Viewer:** TTS S3 signed URL ile düzeltildi; admin TTS config (tts_settings), kitap tamamlanınca TTS prewarm; Parent Settings sesli okuma (hız, volume, localStorage); BookViewer mute, prefs, Audio badge (dashboard), çocuk UX (44px dokunmatik, active:scale-95). Ref: docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md
 
@@ -422,11 +424,11 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 5. **Status Update:** Tüm görseller hazır olduğunda status `completed` olur
 6. **Error Handling:** Herhangi bir adımda hata olursa status `failed` olur
 
-### Debug Mode
-- **Story Model:** Kullanıcı seçebiliyor (GPT-4o, GPT-4o-mini, GPT-3.5-turbo)
-- **Image Model:** Kullanıcı seçebiliyor (gpt-image-1.5, gpt-image-1, gpt-image-1-mini)
-- **Image Size:** Kullanıcı seçebiliyor (1024x1024, 1024x1792, 1792x1024)
-- **Page Count:** Debug amaçlı override (3-20 sayfa)
+### Debug Mode (Admin)
+- **Story model (tek seçim):** Step 6'da bir dropdown: gpt-4o-mini (varsayılan), gpt-4o, o1-mini. Seçilen model şunlar için kullanılır: Create without payment, Create example book, Debug Kalite Paneli "Sadece Hikaye" testi. Example book artık gpt-4o zorlaması yok.
+- **Image model / size:** (Mevcut davranış değişmedi; gerekirse ayrı dokümanda.)
+- **Page count:** Debug amaçlı override (2–20 sayfa).
+- **generate-story API:** `storyModel` body'de gönderilir (admin/debug); response `metadata.cost` ve `metadata.model` model-bazlı maliyet hesabı ile döner.
 
 ---
 

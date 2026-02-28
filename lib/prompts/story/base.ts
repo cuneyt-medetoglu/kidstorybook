@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.4.0',
-  releaseDate: new Date('2026-02-08'),
+  version: '2.5.0',
+  releaseDate: new Date('2026-02-14'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -50,6 +50,7 @@ export const VERSION: PromptVersion = {
     'v2.2.0: [A3] VERIFICATION CHECKLIST – Tüm verify/check maddeleri tek blokta. LANGUAGE: "Before returning JSON verify..." kaldırıldı. OUTPUT FORMAT: Tekrarlayan "characterIds/suggestedOutfits/characterExpressions REQUIRED" satırları kısaltıldı, "see # VERIFICATION CHECKLIST" referansı. buildCriticalRemindersSection → buildVerificationChecklistSection. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
     'v2.3.0: [A5] shotPlan (optional) – OUTPUT FORMAT: per-page optional shotPlan (shotType, lens, cameraAngle, placement, timeOfDay, mood). English only; used for image composition when provided. Omit if not needed. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
     'v2.4.0: [Plan A] coverSetting REQUIRED – Story JSON top-level field: one sentence English, setting/background only for book cover (no characters). LLM generates it from story; used for cover image BACKGROUND. COVER_PATH_FLOWERS_ANALYSIS.md §7 (8 Şubat 2026)',
+    'v2.5.0: [Seçenek A] STORY SEED section – customRequests promoted from "Special Requests" bullet to dedicated # STORY SEED section with backbone directive. Placed after STORY REQUIREMENTS for prominence. Removed "Special Requests: None" noise when absent. Improves story quality for example book creation. (14 Şubat 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -196,7 +197,8 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
   // Faz 2: Prompt bölümlerini oluştur (açılış system'de; tekrar yok)
   const sections = [
     buildCharacterSection(characterDesc, characters),
-    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 12, language, illustrationStyle, customRequests),
+    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 12, language, illustrationStyle),
+    ...(customRequests?.trim() ? [buildStorySeedSection(customRequests.trim(), pageCount ?? 12, ageGroup)] : []),
     buildSupportingEntitiesSection(theme), // NEW: Supporting entities for master generation
     buildLanguageSection(language),
     buildAgeAppropriateSection(ageGroup),
@@ -635,7 +637,6 @@ function buildStoryRequirementsSection(
   pageCount: number,
   language: string,
   illustrationStyle: string,
-  customRequests?: string
 ): string {
   const n = getPageCount(ageGroup, pageCount)
   const wordTarget = getWordCountRange(ageGroup)
@@ -647,8 +648,19 @@ function buildStoryRequirementsSection(
 - Target words per page: ${wordTarget} (short sentences, simple verbs, repetition where appropriate).
 - CRITICAL: Each page's "text" must be at least ${wordMin} words for this age group. Do not leave pages with only a few words.
 - Language: ${getLanguageName(language)}
-- Illustration Style: ${illustrationStyle}
-- Special Requests: ${customRequests || 'None'}`
+- Illustration Style: ${illustrationStyle}`
+}
+
+function buildStorySeedSection(customRequests: string, pageCount: number, ageGroup: string): string {
+  const n = getPageCount(ageGroup, pageCount)
+  return `# STORY SEED — CRITICAL: USE AS STORY BACKBONE
+The following idea was provided by the book creator. You MUST build the entire ${n}-page narrative around it.
+- Expand it into a complete story with a clear beginning, middle, and end.
+- Maintain its core scenes, mood, atmosphere, and any characters or objects mentioned.
+- Do NOT ignore this idea or replace it with a generic plot.
+- Do NOT copy it word for word — use it as a creative foundation to expand upon.
+
+"${customRequests}"`
 }
 
 function buildSupportingEntitiesSection(theme: string): string {

@@ -21,11 +21,17 @@
     button.secondary { background: #64748b; }
     button.secondary:hover { background: #475569; }
     .hint { font-size: 0.8rem; color: #666; margin-top: 4px; }
+    .callout { background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 12px 14px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.5; color: #0c4a6e; }
   </style>
 </head>
 <body>
   <h1>Story Ideas – Prompt Helper</h1>
   <p>Önce ChatGPT veya Gemini'de <strong>“Step 1”</strong> kutusundaki metni yapıştır. Sonra her hikaye için <strong>“Step 2”</strong> kutusundaki metni oluşturup kopyala ve AI’a gönder.</p>
+
+  <div class="callout">
+    <strong>Custom request'e ne yapıştıracaksın?</strong><br>
+    Step 2 kutusundaki metin (kategori + karakterler) <strong>custom request için yeterli değil</strong>. Kitap üreticiye gidecek olan, ChatGPT'nin cevabındaki <strong>"2) EXAMPLE STORY: …"</strong> paragrafıdır. ChatGPT'ye Step 2'yi gönderdikten sonra dönen cevaptan sadece o paragrafı kopyala ve Create → Step 5 → Story Idea alanına yapıştır.
+  </div>
 
   <label>Kategori</label>
   <select id="category">
@@ -68,23 +74,23 @@
   <button type="button" id="btnCopySystem" class="secondary">Step 1’i kopyala</button>
 
   <script>
-    const SYSTEM_PROMPT = `You are a children's book idea writer. I will send you: (1) category and age group, and (2) how many characters and who they are (e.g. "3 characters: Mia (child), Mom (mother), Sparky (dog)"). You reply with only two things in English:
+    const SYSTEM_PROMPT = `You are a children's book idea writer. I will send you: (1) category and age group, and (2) how many characters and who they are. You reply with only two things in English:
 
 1) TITLE: One short, catchy English title for the book.
 
 2) EXAMPLE STORY: One compelling narrative paragraph (or two short paragraphs) about those exact characters. The story must feature the names and roles I gave you; the child (or main child) is the hero. Maximum 450 characters (strict).
 
-STYLE (like a polished picture-book summary; apply to every story; do not copy one fixed example):
-- Flowing prose: sentences that connect and build one clear scene. Confident, vivid tone—not "baby talk" or talking down.
-- One clear premise: e.g. a child in a forest meeting a guide; friends in a race who help each other. Dense, vivid prose in 3–5 sentences.
-- Dialogue: natural and story-moving (e.g. a welcome, a challenge, a discovery). Not exclamation-only lines like "Got you!" or "Up!" unless they clearly fit.
-- Sensory details: woven in (e.g. "towering green canopy", "glowing mushrooms", "rustling leaves"). No overload.
-- Invent a fresh situation each time from the category and characters. Vary settings, moods, and hooks.
+STYLE:
+- Flowing prose: sentences that connect and build one clear scene. Confident, vivid tone—not baby talk or talking down.
+- One clear premise: a specific situation (e.g. an unexpected encounter, a small quest, a secret place, a problem to solve, a moment of courage or kindness). Dense, vivid prose in 3–5 sentences.
+- Dialogue: natural and story-moving where it fits. No exclamation-only or filler lines.
+- Sensory details: weave in sight, sound, or touch that fit the scene you invent. Keep it specific but not overloaded.
+- CRITICAL: Invent a completely new situation every time. Do NOT copy or paraphrase any example phrases from this prompt. Do NOT reuse the same type of setting (e.g. not every story in a backyard or forest). Vary: indoor/outdoor, time of day, weather, mood, and the kind of challenge or discovery. Surprise the reader.
 
 AVOID:
-- Choppy, list-like sentences ("Little Bear wakes up. The sun is yellow. Stomp, stomp!").
-- Frequent onomatopoeia (tap-tap, boing boing, shh-shh). At most one sound word, woven in naturally.
-- Baby talk or broken grammar to sound cute. Age-appropriate = simpler words and clear sentences, not exclamation-heavy or sound-effect-heavy.
+- Choppy, list-like sentences. No frequent onomatopoeia; at most one sound word, woven in naturally.
+- Baby talk or broken grammar. Age-appropriate = simpler words and clear sentences.
+- Repeating the same premise (e.g. "child explores garden" or "child finds something hidden"). Each story must feel distinct.
 
 Age-appropriate: 0-2 = simpler words but still flowing; 3-5 = clear sentences; 6-9 = slightly richer. Match the category (adventure, fairy_tale, educational, nature, space, sports). This text will be used as a "custom request" to generate a full 12-page book—rich enough to inspire the story, not a page-by-page script.
 

@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 13 Şubat 2026 (Faz 5.5 Deployment tamamlandı: 5.5.1, 1.2.7, 5.5.10. Yeni rehberler: DB_BACKUP_RUNBOOK, PRODUCTION_MIGRATION_RUNBOOK. Kalan maddeler 5.5.4/5.5.5/5.5.8/5.5.2/5.5.3 daha sonra. Detay: `docs/implementation/FAZ5_5_IMPLEMENTATION.md`.)
+**Son güncelleme:** 14 Şubat 2026 (Story model seçimi: tek dropdown Create without payment / Example book / Sadece Hikaye testi; example book gpt-4o zorlaması kaldırıldı. generate-story API: storyModel + model-aware cost. Detay: docs/implementation/FAZ3_IMPLEMENTATION.md, docs/analysis/STORY_QUALITY_IMPROVEMENT_ANALYSIS.md.)
 
 ---
 

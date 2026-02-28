@@ -13,9 +13,11 @@ interface DebugQualityPanelProps {
   wizardData: any
   characterIds: string[]
   canShow: boolean
+  /** Admin/debug: story model to use. Defaults to gpt-4o-mini. */
+  storyModel?: 'gpt-4o-mini' | 'gpt-4o' | 'o1-mini'
 }
 
-export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQualityPanelProps) {
+export function DebugQualityPanel({ wizardData, characterIds, canShow, storyModel = 'gpt-4o-mini' }: DebugQualityPanelProps) {
   const { toast } = useToast()
   const [expanded, setExpanded] = useState(false)
   
@@ -69,6 +71,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQu
         language,
         pageCount: wizardData?.step5?.pageCount,
         debug: true,
+        storyModel,
       }
 
       const response = await fetch("/api/ai/generate-story", {
@@ -344,7 +347,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow }: DebugQu
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm">1. Sadece Hikaye</h4>
                     <p className="text-xs text-gray-600 mt-1">
-                      Hikaye üretimi (kitap oluşturulmaz)
+                      Hikaye üretimi (kitap oluşturulmaz). Model: <strong>{storyModel}</strong> (yukarıdaki seçim)
                     </p>
                   </div>
                 </div>

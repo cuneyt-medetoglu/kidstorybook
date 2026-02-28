@@ -285,7 +285,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
         )}
         {/* Age badge */}
         <Badge className="absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-xs">
-          {book.ageGroup} yaş
+          {book.ageGroup} yrs
         </Badge>
         {/* Theme badge */}
         <Badge variant="secondary" className="absolute top-2 left-2 text-xs">

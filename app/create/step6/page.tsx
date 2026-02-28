@@ -92,6 +92,9 @@ export default function Step6Page() {
   const [traceModalOpen, setTraceModalOpen] = useState(false)
   const [traceData, setTraceData] = useState<DebugTraceEntry[] | null>(null)
 
+  // Debug story model: admin/debug only; example book always uses gpt-4o on backend
+  const [debugStoryModel, setDebugStoryModel] = useState<'gpt-4o-mini' | 'gpt-4o' | 'o1-mini'>('gpt-4o-mini')
+
   // Currency from context (tek seferlik fetch)
   const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
 
@@ -398,6 +401,7 @@ export default function Step6Page() {
       language,
       skipPayment: true,
       ...(canShowDebugQuality && debugTraceRequested && { debugTrace: true }),
+      storyModel: debugStoryModel,
     }
     if (!(payload as { characterIds?: string[]; characterId?: string | null }).characterIds?.length && !(payload as any).characterId) {
       toast({
@@ -471,8 +475,9 @@ export default function Step6Page() {
       customRequests: formData.customRequests || "",
       pageCount: formData.pageCount,
       language,
-      isExample: true, // Mark as example book (admin only)
-      skipPayment: true, // Also skip payment for example book creation
+      isExample: true, // Mark as example book (admin only); backend forces gpt-4o for quality
+      skipPayment: true,
+      storyModel: debugStoryModel,
     }
 
     if (!(payload as { characterIds?: string[]; characterId?: string | null }).characterIds?.length && !(payload as any).characterId) {
@@ -1181,6 +1186,22 @@ export default function Step6Page() {
                   transition={{ delay: 1.35, duration: 0.4 }}
                   className="w-full space-y-2"
                 >
+                  {/* Story model selector — shared for Create without payment, Example book, and Sadece Hikaye test */}
+                  <div className="flex items-center gap-2 rounded-md border border-amber-300/50 bg-amber-50/60 dark:bg-amber-900/20 dark:border-amber-500/30 px-3 py-2">
+                    <span className="text-xs font-medium text-amber-800 dark:text-amber-200 shrink-0">Story model:</span>
+                    <select
+                      value={debugStoryModel}
+                      onChange={(e) => setDebugStoryModel(e.target.value as typeof debugStoryModel)}
+                      className="flex-1 rounded border border-amber-300/60 bg-white dark:bg-slate-800 px-2 py-1 text-xs text-amber-900 dark:text-amber-100 focus:outline-none"
+                    >
+                      <option value="gpt-4o-mini">gpt-4o-mini (default, fast)</option>
+                      <option value="gpt-4o">gpt-4o (quality ↑, slower)</option>
+                      <option value="o1-mini">o1-mini (reasoning, experimental)</option>
+                    </select>
+                  </div>
+                  <p className="text-xs text-amber-700/80 dark:text-amber-300/80 -mt-1">
+                    Create without payment, Example book ve Sadece Hikaye testi bu modeli kullanır. Varsayılan: gpt-4o-mini.
+                  </p>
                   {canShowDebugQuality && (
                     <label className="flex items-center gap-2 text-sm text-amber-800 dark:text-amber-200 cursor-pointer">
                       <Checkbox
@@ -1203,7 +1224,7 @@ export default function Step6Page() {
                         <span>Creating...</span>
                       </>
                     ) : (
-                      <span>Create without payment (Debug)</span>
+                      <span>Create without payment ({debugStoryModel})</span>
                     )}
                   </Button>
                   <p className="mt-1 text-center text-xs text-amber-600/80 dark:text-amber-400/80">
@@ -1235,12 +1256,12 @@ export default function Step6Page() {
                     ) : (
                       <>
                         <BookOpen className="mr-2 h-4 w-4" />
-                        <span>Create example book</span>
+                        <span>Create example book ({debugStoryModel})</span>
                       </>
                     )}
                   </Button>
                   <p className="mt-1 text-center text-xs text-green-600/80 dark:text-green-400/80">
-                    Admin only – create public example for Examples page
+                    Admin only – public example. Uses selected story model above.
                   </p>
                 </motion.div>
               )}
@@ -1257,6 +1278,7 @@ export default function Step6Page() {
                     wizardData={wizardData}
                     characterIds={getCharacterIdsForApi(getCharactersData())}
                     canShow={canShowDebugQuality}
+                    storyModel={debugStoryModel}
                   />
                 </motion.div>
               )}

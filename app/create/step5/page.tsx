@@ -159,14 +159,17 @@ export default function Step5Page() {
                 htmlFor="customRequests"
                 className="mb-3 block text-base font-semibold text-gray-900 dark:text-slate-50"
               >
-                Custom Requests
+                Story Idea{" "}
+                <span className="text-sm font-normal text-gray-500 dark:text-slate-400">
+                  (optional)
+                </span>
               </label>
 
               <div className="relative">
                 <textarea
                   id="customRequests"
                   {...register("customRequests")}
-                  placeholder="E.g., Include dinosaurs in the story, have them play soccer in the park, add a pet dog named Max..."
+                  placeholder="E.g., Emma discovers a hidden door in the old garden wall that leads to a magical land where animals can talk. She befriends a shy fox who is afraid of the dark, and together they find a glowing lantern to light their way home..."
                   className="min-h-[200px] w-full resize-y rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus:border-purple-400 md:min-h-[250px]"
                   aria-label="Custom Requests"
                   aria-describedby="custom-requests-help custom-requests-counter"
@@ -210,7 +213,7 @@ export default function Step5Page() {
                 id="custom-requests-help"
                 className="mt-3 text-sm text-gray-600 dark:text-slate-400"
               >
-                Tell us about any specific elements, characters, or scenarios you'd like to include in the story
+                Describe the story you have in mind — a scene, a journey, a problem to solve. The AI will use your idea as the backbone of the entire story. The more vivid and specific, the better the result.
               </motion.p>
             </motion.div>
 

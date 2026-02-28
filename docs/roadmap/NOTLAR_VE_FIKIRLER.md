@@ -7,6 +7,13 @@
 - **Analiz:** `docs/analysis/STORY_IDEAS_GENERATION_ANALYSIS.md`
 - **Roadmap:** Faz 2 – 2.4.5.4
 
+### Hikaye Kalitesi: İki Aşamalı Üretim + Önizleme + Debug Model (14 Şubat 2026)
+- **Kategori:** İş mantığı / AI / Create Book
+- **Öncelik:** 🟡 Planlandı
+- **Açıklama:** Hikaye kalitesini artırmak için E seçeneği (iki aşamalı: outline → expand). Hedef: Kitabı üretmeden önce hikayeyi ve modele giden input'ları görselden önce görebilmek.
+- **Plan maddeleri:** (1) E – İki aşamalı hikaye (outline → expand; customRequests outline'a entegre). (2) Hikaye önizleme: görselden önce hikaye + input'ları göster, onay/tekrar üret. (3) Debug modda story model seçimi (gpt-4o-mini / gpt-4o) — A/B test için.
+- **Model notu:** Araştırma: gpt-4o yaratıcı yazımda mini'den belirgin daha iyi; mini "derinlikten yoksun". Analiz: `docs/analysis/STORY_QUALITY_IMPROVEMENT_ANALYSIS.md`. Roadmap: Faz 3 – Create Book.
+
 ### ✅ TTS Play butonu çalışmıyor (8 Şubat 2026) – ÇÖZÜLDÜ (9 Şubat 2026)
 - **Kategori:** Bug / E-book viewer
 - **Öncelik:** 🔴 DO (yapıldı)

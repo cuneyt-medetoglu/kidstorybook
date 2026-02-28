@@ -10,10 +10,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getBookById } from '@/lib/db/books'
+import { getUserRole } from '@/lib/db/users'
 import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
 import type { ShotPlan } from '@/lib/prompts/types'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import OpenAI from 'openai'
+
+const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4o', 'o1-mini'] as const
+type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
+
+/** Per-model pricing (USD / 1M tokens). Approximate blended input+output. */
+const MODEL_COST_PER_1M: Record<AllowedStoryModel, { input: number; output: number }> = {
+  'gpt-4o-mini': { input: 0.15, output: 0.60 },
+  'gpt-4o':      { input: 2.50, output: 10.00 },
+  'o1-mini':     { input: 1.10, output: 4.40 },
+}
+
+function calcCost(model: AllowedStoryModel, inputTokens: number, outputTokens: number): string {
+  const pricing = MODEL_COST_PER_1M[model]
+  const cost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000
+  return `~$${cost.toFixed(4)}`
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -29,6 +46,8 @@ export interface StoryGenerationRequest {
   pageCount?: number
   /** Debug: return apiRequest, characterResolved, aiRequest in response metadata.debug */
   debug?: boolean
+  /** Admin/debug only: override story model. Ignored for regular users. */
+  storyModel?: string
 }
 
 export interface StoryGenerationResponse {
@@ -78,7 +97,23 @@ export async function POST(request: NextRequest) {
       language = 'en',
       pageCount: pageCountOverride,
       debug: debugMode = false,
+      storyModel: requestedModel,
     } = body
+
+    // Admin/debug only model override (mirrors books/route.ts logic)
+    const userRole = await getUserRole(user.id)
+    const isAdmin = userRole === 'admin'
+    const canUseDebugOptions = process.env.DEBUG_SKIP_PAYMENT === 'true' || isAdmin
+    const effectiveStoryModel: AllowedStoryModel =
+      canUseDebugOptions &&
+      requestedModel &&
+      (ALLOWED_STORY_MODELS as readonly string[]).includes(requestedModel)
+        ? (requestedModel as AllowedStoryModel)
+        : 'gpt-4o-mini'
+
+    if (effectiveStoryModel !== 'gpt-4o-mini') {
+      console.log(`[generate-story] 🔧 Model override: ${effectiveStoryModel} (admin=${isAdmin})`)
+    }
 
     if (!characterId || !theme || !illustrationStyle) {
       return errorResponse(
@@ -171,7 +206,7 @@ export async function POST(request: NextRequest) {
 LANGUAGE: Only the "text" field of each page (the story narrative) must be in ${languageName}. The fields imagePrompt, sceneDescription, sceneContext, and characterExpressions must be in English (used for image generation APIs).`
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: effectiveStoryModel,
       messages: [
         { role: 'system', content: systemMessage },
         { role: 'user', content: storyPrompt },
@@ -222,7 +257,7 @@ Theme: ${theme}
 Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', needsSuggestedOutfits && 'suggestedOutfits'].filter(Boolean).join(', ')}.`
 
         const repairCompletion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
+          model: effectiveStoryModel,
           messages: [{ role: 'user', content: repairPrompt }],
           response_format: { type: 'json_object' },
           temperature: 0.3,
@@ -278,7 +313,7 @@ ${shortPages.map((p: WordCountItem) => `Page ${p.pageNumber}: "${(storyData.page
 Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
 
         const repairCompletion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
+          model: effectiveStoryModel,
           messages: [{ role: 'user', content: repairPrompt }],
           response_format: { type: 'json_object' },
           temperature: 0.4,
@@ -335,7 +370,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
       status: 'draft', // Story generated, images not yet
       custom_requests: customRequests,
       generation_metadata: {
-        model: 'gpt-4o-mini',
+        model: effectiveStoryModel,
         promptVersion: '1.0.0',
         tokensUsed: completion.usage?.total_tokens || 0,
         generationTime: Date.now() - startTime,
@@ -375,7 +410,12 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
     }
 
     const metadata: Record<string, unknown> = {
-      cost: `~$${((tokensUsed / 1000) * 0.005).toFixed(4)}`,
+      cost: calcCost(
+        effectiveStoryModel,
+        completion.usage?.prompt_tokens || 0,
+        completion.usage?.completion_tokens || 0
+      ),
+      model: effectiveStoryModel,
       characterUsage: character.total_books + 1,
     }
     if (debugMode) {
