@@ -166,18 +166,20 @@ export async function generateTts(
     ttsResponse = res
   } catch (err) {
     ttsError = err instanceof Error ? err.message : String(err)
-    void insertAIRequest({
-      userId: options.userId ?? 'unknown',
-      bookId: options.bookId,
-      operationType: 'tts',
-      provider: 'google',
-      model: modelName,
-      status: 'error',
-      errorMessage: ttsError,
-      charCount: text.length,
-      durationMs: Date.now() - ttsStartedAt,
-      requestMeta: { language, voiceId, speed: validSpeed },
-    })
+    if (options.userId && options.userId !== 'unknown') {
+      void insertAIRequest({
+        userId: options.userId,
+        bookId: options.bookId,
+        operationType: 'tts',
+        provider: 'google',
+        model: modelName,
+        status: 'error',
+        errorMessage: ttsError,
+        charCount: text.length,
+        durationMs: Date.now() - ttsStartedAt,
+        requestMeta: { language, voiceId, speed: validSpeed },
+      })
+    }
     throw err
   }
 
@@ -188,18 +190,20 @@ export async function generateTts(
 
   const durationMs = Date.now() - ttsStartedAt
   const costUsd = text.length * GEMINI_FLASH_TTS_COST_PER_CHAR
-  void insertAIRequest({
-    userId: options.userId ?? 'unknown',
-    bookId: options.bookId,
-    operationType: 'tts',
-    provider: 'google',
-    model: modelName,
-    status: 'success',
-    charCount: text.length,
-    costUsd,
-    durationMs,
-    requestMeta: { language, voiceId, speed: validSpeed },
-  })
+  if (options.userId && options.userId !== 'unknown') {
+    void insertAIRequest({
+      userId: options.userId,
+      bookId: options.bookId,
+      operationType: 'tts',
+      provider: 'google',
+      model: modelName,
+      status: 'success',
+      charCount: text.length,
+      costUsd,
+      durationMs,
+      requestMeta: { language, voiceId, speed: validSpeed },
+    })
+  }
 
   const audioBuffer = Buffer.from(response.audioContent)
   const savedUrl = await saveCachedAudio(cacheHash, audioBuffer)

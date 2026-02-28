@@ -1050,7 +1050,7 @@ export async function POST(request: NextRequest) {
             const batchNum = Math.floor(batchStart / TTS_BATCH_SIZE) + 1
             const batchT = Date.now()
             const batchResults = await Promise.allSettled(
-              ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguageForTts }))
+              ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguageForTts, userId: user.id }))
             )
             const batchMs = Date.now() - batchT
             const ok = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'fulfilled').length
@@ -2654,7 +2654,7 @@ export async function POST(request: NextRequest) {
           const batchNum = Math.floor(batchStart / TTS_BATCH_SIZE) + 1
           const batchT = Date.now()
           const batchResults = await Promise.allSettled(
-            ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguage }))
+            ttsBatch.map((p: any) => generateTts(p.text.trim(), { language: bookLanguage, userId: user.id, bookId: book.id }))
           )
           const batchMs = Date.now() - batchT
           const ok = batchResults.filter((r: PromiseSettledResult<any>) => r.status === 'fulfilled').length
