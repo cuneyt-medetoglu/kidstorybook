@@ -12,6 +12,7 @@ import { getBookById, updateBook } from '@/lib/db/books'
 import { insertEditHistory, getLatestPageVersion, getEditHistory } from '@/lib/db/edit-history'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/negative'
+import { imageEditWithLog } from '@/lib/ai/images'
 
 export interface ImageEditRequest {
   bookId: string
@@ -155,10 +156,6 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 7. PREPARE OPENAI API REQUEST
     // ====================================================================
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not configured')
-    }
 
     // Fetch current image from URL
     console.log('[Image Edit] Fetching current image...')
@@ -196,21 +193,15 @@ export async function POST(request: NextRequest) {
     // 8. CALL OPENAI IMAGE EDIT API
     // ====================================================================
     console.log('[Image Edit] Calling OpenAI Image Edit API...')
-    const openaiResponse = await fetch('https://api.openai.com/v1/images/edits', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: formData,
+    const openaiResult = await imageEditWithLog(formData, {
+      userId: user.id,
+      bookId,
+      operationType: 'image_edit',
+      pageIndex: pageNumber,
+      model: 'gpt-image-1.5',
+      quality: 'low',
+      size: '1024x1536',
     })
-
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text()
-      console.error(`[Image Edit] OpenAI API Error: ${openaiResponse.status} - ${errorText}`)
-      throw new Error(`OpenAI API error: ${openaiResponse.status} - ${errorText}`)
-    }
-
-    const openaiResult = await openaiResponse.json()
     const dataCount = Array.isArray(openaiResult.data) ? openaiResult.data.length : 0
     const firstItem = dataCount > 0 ? openaiResult.data[0] : null
     const b64Length = firstItem?.b64_json ? firstItem.b64_json.length : 0

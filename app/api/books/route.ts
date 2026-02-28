@@ -19,6 +19,8 @@ import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements
 import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import { generateTts } from '@/lib/tts/generate'
+import { chatWithLog } from '@/lib/ai/chat'
+import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -214,7 +216,8 @@ async function generateMasterCharacterIllustration(
   characterGender?: 'boy' | 'girl' | 'other',
   storyClothing?: string, // Hikayeden gelen kıyafet – master bu kıyafetle çizilir (referans sadece yüz/vücut)
   debugTracePush?: (entry: DebugTraceEntry) => void,
-  debugStep?: string
+  debugStep?: string,
+  bookId?: string
 ): Promise<string> {
   const fixedDescription = {
     ...characterDescription,
@@ -284,28 +287,16 @@ async function generateMasterCharacterIllustration(
   formData.append('image[]', imageBlob, `character.${ext}`)
   
   // Call /v1/images/edits API
-  const apiKey = process.env.OPENAI_API_KEY
-  const response = await fetch('https://api.openai.com/v1/images/edits', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}` },
-    body: formData,
+  const result = await imageEditWithLog(formData, {
+    userId,
+    bookId,
+    characterId,
+    operationType: 'image_master',
+    model: 'gpt-image-1.5',
+    quality: 'low',
+    size: '1024x1536',
+    refImageCount: 1,
   })
-  
-  if (!response.ok) {
-    const errorBody = await response.text()
-    let errorMessage = `Master illustration generation failed: ${response.status}`
-    try {
-      const errJson = JSON.parse(errorBody)
-      if (errJson?.error?.message) errorMessage += ` - ${errJson.error.message}`
-      else if (errorBody.length < 500) errorMessage += ` - ${errorBody}`
-    } catch {
-      if (errorBody.length < 300) errorMessage += ` - ${errorBody}`
-    }
-    console.error('[Create Book] ❌ Master illustration API error:', errorMessage)
-    throw new Error(errorMessage)
-  }
-  
-  const result = await response.json()
   const b64Image = result.data?.[0]?.b64_json
 
   if (!b64Image) {
@@ -346,7 +337,8 @@ async function generateSupportingEntityMaster(
   illustrationStyle: string,
   userId: string,
   debugTracePush?: (entry: DebugTraceEntry) => void,
-  debugStep?: string
+  debugStep?: string,
+  bookId?: string
 ): Promise<string> {
   // Build prompt for entity master (text-only, no reference photo)
   // GPT sinematik kalite: aynı STYLE_CORE + CINEMATIC_PACK ile kitap bütünlüğü (7 Şubat 2026)
@@ -362,26 +354,10 @@ async function generateSupportingEntityMaster(
   ].join(' ')
   
   // Call /v1/images/generations API (text-only; no reference image)
-  const apiKey = process.env.OPENAI_API_KEY
-  // gpt-image-1.5 generations API does not accept response_format; returns b64 by default
-  const body = {
-    model: 'gpt-image-1.5',
-    prompt: entityPrompt,
-    size: '1024x1536' as const,
-    quality: 'low' as const,
-  }
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
-
-  if (!response.ok) {
-    const errText = await response.text()
-    throw new Error(`Entity master generation failed: ${response.status}${errText ? ` - ${errText.slice(0, 150)}` : ''}`)
-  }
-
-  const result = await response.json()
+  const result = await imageGenerateWithLog(
+    { model: 'gpt-image-1.5', prompt: entityPrompt, size: '1024x1536', quality: 'low' },
+    { userId, bookId, operationType: 'image_entity', model: 'gpt-image-1.5', quality: 'low', size: '1024x1536' }
+  )
   const b64Image = result.data?.[0]?.b64_json
   if (!b64Image || typeof b64Image !== 'string') {
     throw new Error('No b64_json in entity master response. API may require response_format.')
@@ -900,7 +876,13 @@ export async function POST(request: NextRequest) {
         try {
           const storyReqStart = Date.now()
 
-          completion = await openai.chat.completions.create(storyRequestBody)
+          completion = await chatWithLog(openai, storyRequestBody, {
+            userId: user.id,
+            characterId: characters[0]?.id,
+            operationType: 'story_generation',
+            promptVersion: 'v2.5.0',
+            requestMeta: { language, temperature: 0.8, maxTokens: 8000 },
+          })
           const storyReqMs = Date.now() - storyReqStart
           storyMs = storyReqMs
           console.log(`[Create Book] ⏱️  Story response time (attempt ${attempt}/${MAX_RETRIES}):`, storyReqMs, 'ms')
@@ -1159,7 +1141,8 @@ export async function POST(request: NextRequest) {
             char.gender,
             themeClothing,
             debugTrace ? (e) => debugTrace!.push(e) : undefined,
-            `master_character_${char.name || char.id}`
+            `master_character_${char.name || char.id}`,
+            book.id
           )
           masterIllustrations[char.id] = masterUrl
           console.log(`[Create Book] ✅ From-example master for character ${char.id} (${char.name}): ${masterUrl}`)
@@ -1191,7 +1174,10 @@ export async function POST(request: NextRequest) {
               entity.name,
               entity.description,
               exIllustrationStyle,
-              user.id
+              user.id,
+              undefined,
+              undefined,
+              book.id
             )
             entityMasterIllustrations[entity.id] = entityMasterUrl
             console.log(`[Create Book] ✅ From-example entity master for ${entity.name} (${entity.type}): ${entityMasterUrl}`)
@@ -1275,7 +1261,8 @@ export async function POST(request: NextRequest) {
           char.gender,
           charOutfit,
           debugTrace ? (e) => debugTrace!.push(e) : undefined,
-          `master_character_${char.name || char.id}`
+          `master_character_${char.name || char.id}`,
+          book.id
         )
         masterIllustrations[char.id] = masterUrl
         console.log(`[Create Book] ✅ Master illustration created for character ${char.id} (${char.name}): ${masterUrl}`)
@@ -1329,7 +1316,8 @@ export async function POST(request: NextRequest) {
             illustrationStyle,
             user.id,
             debugTrace ? (e: any) => debugTrace!.push(e) : undefined,
-            `entity_master_${entity.name}`
+            `entity_master_${entity.name}`,
+            book.id
           )
         )
       )

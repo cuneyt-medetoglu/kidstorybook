@@ -10,6 +10,7 @@ import { requireUser } from '@/lib/auth/api-auth'
 import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
 import { getUserById, updateUser } from '@/lib/db/users'
 import { buildDetailedCharacterPrompt } from '@/lib/prompts/image/character'
+import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -90,13 +91,6 @@ export async function POST(request: NextRequest) {
     console.log('[Cover Generation] Text prompt:', textPrompt.substring(0, 200) + '...')
     console.log('[Cover Generation] Reference image:', referenceImageUrl ? 'Provided' : 'Not provided')
 
-    // Call GPT-image API using /v1/images/edits endpoint
-    // This endpoint supports text prompt + reference image (multimodal)
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not configured')
-    }
-
     console.log('[Cover Generation] Calling GPT-image API (edits) with model:', model)
 
     const formData = new FormData()
@@ -133,27 +127,10 @@ export async function POST(request: NextRequest) {
       // Fallback to generations if no image provided
       if (!referenceImageUrl) {
         console.log('[Cover Generation] No reference image, switching to /v1/images/generations')
-        const genResponse = await fetch('https://api.openai.com/v1/images/generations', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-          },
-          body: JSON.stringify({
-            model: model,
-            prompt: textPrompt,
-            n: 1,
-            size: size, // Use provided size parameter
-            response_format: "url"
-          })
-        })
-        
-        if (!genResponse.ok) {
-           const errorText = await genResponse.text()
-           throw new Error(`GPT-image Generation API error: ${genResponse.status} - ${errorText}`)
-        }
-        
-        const genResult = await genResponse.json()
+        const genResult = await imageGenerateWithLog(
+          { model, prompt: textPrompt, n: 1, size, response_format: 'url' },
+          { userId: user.id, operationType: 'image_cover', model, size }
+        )
         const coverUrl = genResult.data[0].url
         
         // ... (rest of the code for upload/response)
@@ -214,46 +191,13 @@ export async function POST(request: NextRequest) {
     console.log('[Cover Generation] - FormData Keys:', Array.from(formData.keys()))
     console.log('[Cover Generation] ==========================================')
 
-    const apiResponse = await fetch('https://api.openai.com/v1/images/edits', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        // Content-Type header is set automatically with FormData
-      },
-      body: formData,
+    const apiResult = await imageEditWithLog(formData, {
+      userId: user.id,
+      operationType: 'image_cover',
+      model,
+      size,
+      refImageCount: 1,
     })
-
-    console.log('[Cover Generation] API Response Status:', apiResponse.status, apiResponse.statusText)
-    console.log('[Cover Generation] API Response Headers:', Object.fromEntries(apiResponse.headers.entries()))
-
-    if (!apiResponse.ok) {
-      const errorText = await apiResponse.text()
-      console.error('[Cover Generation] ==========================================')
-      console.error('[Cover Generation] API Error Details:')
-      console.error('[Cover Generation] - Status:', apiResponse.status)
-      console.error('[Cover Generation] - Status Text:', apiResponse.statusText)
-      console.error('[Cover Generation] - Error Body:', errorText)
-      console.error('[Cover Generation] ==========================================')
-      
-      // Try to parse error JSON for better error handling
-      try {
-        const errorJson = JSON.parse(errorText)
-        console.error('[Cover Generation] Parsed Error:', errorJson?.error?.message ?? errorText?.slice(0, 300))
-        
-        // Check if it's a verification error
-        if (errorJson.error?.message?.includes('organization must be verified')) {
-          console.error('[Cover Generation] ❌ ERROR TYPE: Organization Verification Required')
-          console.error('[Cover Generation] 💡 SOLUTION: Verify organization at https://platform.openai.com/settings/organization/general')
-          console.error('[Cover Generation] ⏱️ PROPAGATION TIME: Up to 15 minutes after verification')
-        }
-      } catch (e) {
-        console.error('[Cover Generation] Could not parse error JSON')
-      }
-      
-      throw new Error(`GPT-image API error: ${apiResponse.status} - ${errorText}`)
-    }
-
-    const apiResult = await apiResponse.json()
     console.log('[Cover Generation] API Response received (hasData:', !!apiResult?.data, ', dataLength:', apiResult?.data?.length ?? 0, ')')
 
     // Extract image URL from response

@@ -8,6 +8,10 @@ import crypto from "crypto"
 import { getLanguageCode, getPromptForLanguage } from "@/lib/prompts/tts/v1.0.0"
 import { uploadFile, getSignedObjectUrl, fileExists } from "@/lib/storage/s3"
 import { getTtsSettings } from "@/lib/db/tts-settings"
+import { insertAIRequest } from "@/lib/db/ai-requests"
+
+/** Gemini Flash TTS pricing: $0.40 / 1M characters */
+const GEMINI_FLASH_TTS_COST_PER_CHAR = 0.40 / 1_000_000
 
 const TTS_CACHE_PREFIX = "tts-cache"
 
@@ -69,6 +73,8 @@ export interface GenerateTtsOptions {
   voiceId?: string
   speed?: number
   prompt?: string
+  userId?: string
+  bookId?: string
 }
 
 export interface GenerateTtsResult {
@@ -125,6 +131,7 @@ export async function generateTts(
     if (process.env.DEBUG_LOGGING === "true") {
       console.log("[TTS] Cache hit:", cacheHash.substring(0, 8))
     }
+    // Cache hit: no API call made, no cost
     return {
       audioUrl: cachedUrl,
       cached: true,
@@ -135,25 +142,64 @@ export async function generateTts(
     }
   }
 
+  const ttsStartedAt = Date.now()
+
   if (process.env.DEBUG_LOGGING === "true") {
     console.log("[TTS] Cache miss, generating audio:", cacheHash.substring(0, 8))
   }
 
   const client = getTTSClient()
-  const [response] = await client.synthesizeSpeech({
-    input: { text, ...(prompt ? { prompt } : {}) },
-    voice: { languageCode, name: voiceId, modelName },
-    audioConfig: {
-      audioEncoding: "MP3",
-      speakingRate: validSpeed,
-      pitch: 0,
-      volumeGainDb: 0,
-    },
-  })
+  let ttsError: string | null = null
+  let ttsResponse: Awaited<ReturnType<typeof client.synthesizeSpeech>>[0] | null = null
 
-  if (!response.audioContent) {
+  try {
+    const [res] = await client.synthesizeSpeech({
+      input: { text, ...(prompt ? { prompt } : {}) },
+      voice: { languageCode, name: voiceId, modelName },
+      audioConfig: {
+        audioEncoding: "MP3",
+        speakingRate: validSpeed,
+        pitch: 0,
+        volumeGainDb: 0,
+      },
+    })
+    ttsResponse = res
+  } catch (err) {
+    ttsError = err instanceof Error ? err.message : String(err)
+    void insertAIRequest({
+      userId: options.userId ?? 'unknown',
+      bookId: options.bookId,
+      operationType: 'tts',
+      provider: 'google',
+      model: modelName,
+      status: 'error',
+      errorMessage: ttsError,
+      charCount: text.length,
+      durationMs: Date.now() - ttsStartedAt,
+      requestMeta: { language, voiceId, speed: validSpeed },
+    })
+    throw err
+  }
+
+  const response = ttsResponse
+  if (!response?.audioContent) {
     throw new Error("Failed to generate audio")
   }
+
+  const durationMs = Date.now() - ttsStartedAt
+  const costUsd = text.length * GEMINI_FLASH_TTS_COST_PER_CHAR
+  void insertAIRequest({
+    userId: options.userId ?? 'unknown',
+    bookId: options.bookId,
+    operationType: 'tts',
+    provider: 'google',
+    model: modelName,
+    status: 'success',
+    charCount: text.length,
+    costUsd,
+    durationMs,
+    requestMeta: { language, voiceId, speed: validSpeed },
+  })
 
   const audioBuffer = Buffer.from(response.audioContent)
   const savedUrl = await saveCachedAudio(cacheHash, audioBuffer)

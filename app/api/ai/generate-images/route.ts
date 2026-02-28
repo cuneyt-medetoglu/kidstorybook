@@ -13,6 +13,7 @@ import { getCharacterById } from '@/lib/db/characters'
 import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternative } from '@/lib/prompts/image/scene'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
+import { imageEditWithLog } from '@/lib/ai/images'
 
 export interface ImageGenerationRequest {
   bookId: string
@@ -129,11 +130,6 @@ export async function POST(request: NextRequest) {
       storagePath: string
       prompt: string
     }> = []
-
-    const apiKey = process.env.OPENAI_API_KEY
-    if (!apiKey) {
-      throw new Error('OPENAI_API_KEY is not configured')
-    }
 
     // Get ALL character reference photos
     const allCharacterReferences = validCharacters
@@ -262,21 +258,15 @@ export async function POST(request: NextRequest) {
       }
       
       // Generate cover
-      const coverApiResponse = await fetch('https://api.openai.com/v1/images/edits', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: coverFormData,
+      const coverApiResult = await imageEditWithLog(coverFormData, {
+        userId: user.id,
+        bookId,
+        operationType: 'image_cover',
+        model,
+        quality,
+        size,
+        refImageCount: allCharacterReferences.length,
       })
-
-      if (!coverApiResponse.ok) {
-        const errorText = await coverApiResponse.text()
-        console.error(`[Image Generation] Cover generation failed:`, coverApiResponse.status, errorText)
-        throw new Error(`Cover generation failed: ${coverApiResponse.status} - ${errorText}`)
-      }
-
-      const coverApiResult = await coverApiResponse.json()
       const coverTempUrl = coverApiResult.data?.[0]?.url
 
       if (!coverTempUrl) {
@@ -445,22 +435,16 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      const apiResponse = await fetch('https://api.openai.com/v1/images/edits', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          // Content-Type header is set automatically with FormData
-        },
-        body: formData,
+      const apiResult = await imageEditWithLog(formData, {
+        userId: user.id,
+        bookId,
+        operationType: 'image_page',
+        pageIndex: pageNumber,
+        model,
+        quality,
+        size,
+        refImageCount: referenceImages.length,
       })
-
-      if (!apiResponse.ok) {
-        const errorText = await apiResponse.text()
-        console.error(`[Image Generation] API Error for page ${pageNumber}:`, apiResponse.status, errorText)
-        throw new Error(`GPT-image API error: ${apiResponse.status} - ${errorText}`)
-      }
-
-      const apiResult = await apiResponse.json()
 
       // Extract image URL from response (standard images API format)
       const imageUrl = apiResult.data?.[0]?.url

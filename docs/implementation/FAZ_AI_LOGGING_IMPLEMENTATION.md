@@ -50,8 +50,9 @@ lib/tts/generate.ts       → Google TTS                        → ai_requests 
 - [ ] `lib/tts/generate.ts` → TTS loglama ekle
 
 ### Faz 2 Test Kontrol
-- [ ] Tam kitap oluştur → tüm operasyon tiplerinde kayıt var mı?
-- [ ] Bir kitabın toplam maliyeti hesaplanabiliyor mu?
+- [ ] Tam kitap oluştur → `SELECT operation_type, cost_usd FROM ai_requests WHERE book_id = '<id>';`
+- [ ] Sonuçlar: story_generation, image_master, image_entity, image_cover, image_page, tts kayıtları görünmeli
+- [ ] Bir kitabın toplam maliyeti: `SELECT SUM(cost_usd) FROM ai_requests WHERE book_id = '<id>';`
 
 ---
 
@@ -80,11 +81,11 @@ lib/tts/generate.ts       → Google TTS                        → ai_requests 
 | `lib/ai/images.ts` | 1 | ✅ Tamamlandı (2026-02-28) |
 | `app/api/ai/generate-story/route.ts` | 1 | ✅ Tamamlandı (2026-02-28) |
 | `app/api/characters/analyze/route.ts` | 1 | ✅ Tamamlandı (2026-02-28) |
-| `app/api/ai/generate-cover/route.ts` | 2 | ⬜ Bekliyor |
-| `app/api/ai/generate-images/route.ts` | 2 | ⬜ Bekliyor |
-| `app/api/ai/edit-image/route.ts` | 2 | ⬜ Bekliyor |
-| `app/api/books/route.ts` | 2 | ⬜ Bekliyor |
-| `lib/tts/generate.ts` | 2 | ⬜ Bekliyor |
+| `app/api/ai/generate-cover/route.ts` | 2 | ✅ Tamamlandı (2026-02-28) |
+| `app/api/ai/generate-images/route.ts` | 2 | ✅ Tamamlandı (2026-02-28) |
+| `app/api/ai/edit-image/route.ts` | 2 | ✅ Tamamlandı (2026-02-28) |
+| `app/api/books/route.ts` | 2 | ✅ Tamamlandı (2026-02-28) — story + master + entity helper'ları |
+| `lib/tts/generate.ts` | 2 | ✅ Tamamlandı (2026-02-28) |
 | `app/api/admin/ai-costs/route.ts` | 3 | ⬜ Bekliyor |
 | `app/admin/ai-costs/page.tsx` | 3 | ⬜ Bekliyor |
 
