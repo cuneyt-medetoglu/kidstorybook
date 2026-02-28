@@ -50,13 +50,37 @@ lib/tts/generate.ts       → Google TTS                        → ai_requests 
 - [ ] `lib/tts/generate.ts` → TTS loglama ekle
 
 ### Faz 2 Test Kontrol
-- [ ] Tam kitap oluştur → `SELECT operation_type, cost_usd FROM ai_requests WHERE book_id = '<id>';`
+- [ ] Tam kitap oluştur → aşağıdaki sorgu ile kontrol et
 - [ ] Sonuçlar: story_generation, image_master, image_entity, image_cover, image_page, tts kayıtları görünmeli
 - [ ] Bir kitabın toplam maliyeti: `SELECT SUM(cost_usd) FROM ai_requests WHERE book_id = '<id>';`
 
+#### Sorguyu nerede / nasıl çalıştırırsın?
+- **DBeaver:** PostgreSQL bağlantısını aç (SSH tüneli veya sunucu IP ile). Yeni SQL Script aç, sorguyu yapıştır, `BOOK_ID` yerine gerçek kitap UUID yaz, Execute.
+- **Sunucuda psql:** Aşağıdaki "Sunucuda tek komut" örneğini kullan veya sorguyu bir `.sql` dosyasına yazıp `psql "..." -f test-ai.sql` çalıştır.
+- **Book ID nereden:** Uygulamadan son oluşturduğun kitabın detay sayfasındaki URL'den veya `SELECT id, title, created_at FROM books ORDER BY created_at DESC LIMIT 5;` ile alırsın.
+
+**Örnek sorgu (DBeaver / SQL Script):**
+```sql
+-- Önce bir book_id al (en son 5 kitap)
+SELECT id, title, created_at FROM books ORDER BY created_at DESC LIMIT 5;
+
+-- Sonra o id ile ai_requests'e bak (XXXXXXXX yerine gerçek UUID)
+SELECT operation_type, model, cost_usd, duration_ms, status
+FROM ai_requests
+WHERE book_id = 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+ORDER BY created_at;
+```
+
+**Sunucuda tek satır (BOOK_UUID'yi değiştir):**
+```bash
+psql "postgresql://kidstorybook:KidStoryBook_Pg_8kL3mN9pQr2@localhost:5432/kidstorybook" -c "SELECT operation_type, model, cost_usd, duration_ms FROM ai_requests WHERE book_id = 'BOOK_UUID' ORDER BY created_at;"
+```
+
 ---
 
-## FAZ 3 — Admin Dashboard
+## FAZ 3 — Admin Dashboard (Sonra Yapılacak)
+
+> **Not:** Faz 3 (Admin Dashboard UI + `/api/admin/ai-costs` endpoint'leri) şimdilik ertelendi. İleride yapılacak; altyapı (tablo + loglar) hazır.
 
 ### Yapılacaklar
 - [ ] `app/api/admin/ai-costs/route.ts` — Maliyet raporu API endpoint'leri
