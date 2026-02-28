@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/lib/auth/api-auth'
 import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import { createCharacter } from '@/lib/db/characters'
+import { chatWithLog } from '@/lib/ai/chat'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -118,20 +119,28 @@ export async function POST(request: NextRequest) {
             image_url: { url: `data:image/jpeg;base64,${photoBase64}` },
           }
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: analysisPrompt },
-              imageInput,
-            ],
-          },
-        ],
-        response_format: { type: 'json_object' },
-        max_tokens: 2000,
-      })
+      const completion = await chatWithLog(
+        openai,
+        {
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: analysisPrompt },
+                imageInput,
+              ],
+            },
+          ],
+          response_format: { type: 'json_object' },
+          max_tokens: 2000,
+        },
+        {
+          userId: user.id,
+          operationType: 'character_analysis',
+          requestMeta: { hasPhoto: !!photoUrl || !!photoBase64, maxTokens: 2000 },
+        }
+      )
 
       const analysisResult = completion.choices[0].message.content
       if (!analysisResult) {

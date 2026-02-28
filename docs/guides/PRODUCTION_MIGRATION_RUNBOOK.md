@@ -46,21 +46,30 @@ scp -i KEY_PEM migrations/018_xxx.sql ubuntu@EC2_IP:~/kidstorybook/migrations/
 
 ## 4. Migration’ı production’da çalıştırma
 
-**4.1** EC2’ye SSH ile bağlan. Şifre: `.pgpass` (zaten varsa) veya `export PGPASSWORD='...'`.
+**4.0 Nerede çalıştırılır?**
+- **Sadece sunucuda (EC2).** Lokal PC'de `psql` kurulu değilse migration orada çalıştırılamaz. Uygulama (hem local hem sunucu) aynı PostgreSQL'e bağlanıyorsa (local SSH tüneli ile), migration **bir kez EC2'de** çalıştırıldığında yeterlidir.
+- EC2'ye SSH ile bağlan, proje dizinine geç: `cd ~/kidstorybook`
 
-**4.2** Sadece **yeni** migration’ı çalıştır (zaten uygulanmış olanları tekrar çalıştırma). Örnek: daha önce 017’ye kadar uygulandıysa, sadece 018’i:
-
-```bash
-cd ~/kidstorybook/migrations   # veya git clone ile migrations proje içindeyse: ~/kidstorybook/migrations
-psql -h localhost -U kidstorybook -d kidstorybook -f 018_tts_settings_add_speaking_rate.sql
-```
-
-**4.3** Birden fazla yeni migration varsa **sırayla** (dosya numarasına göre):
+**4.1** Bağlantı: Sunucuda PostgreSQL kullanıcısı `kidstorybook` (ubuntu değil). `.env` içindeki `DATABASE_URL` ile çalıştır:
 
 ```bash
-psql -h localhost -U kidstorybook -d kidstorybook -f 018_xxx.sql
-psql -h localhost -U kidstorybook -d kidstorybook -f 019_yyy.sql
+cd ~/kidstorybook
+psql "$DATABASE_URL" -f migrations/020_ai_requests.sql
 ```
+
+Eğer `DATABASE_URL` shell'de yüklü değilse (direkt vermek için):
+
+```bash
+psql "postgresql://kidstorybook:ŞİFRENİZ@localhost:5432/kidstorybook" -f migrations/020_ai_requests.sql
+```
+(ŞİFRENİZ = .env'deki DATABASE_URL içindeki parola; boşluk/special char varsa tırnak içinde kullan.)
+
+**4.2** Eski yöntem (Runbook’ta geçen): `-h -U -d` ile tek tek parametre:
+
+```bash
+psql -h localhost -U kidstorybook -d kidstorybook -f migrations/020_ai_requests.sql
+```
+Şifre sorarsa: .env’deki parolayı gir (KidStoryBook_Pg_8kL3mN9pQr2 vb.).
 
 **İlk kurulumda tüm migration’ların sırası** için: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` → Bölüm 3.4.
 

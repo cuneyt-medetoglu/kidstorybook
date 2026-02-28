@@ -35,6 +35,7 @@ docs/
 │   ├── FAZ3_IMPLEMENTATION.md   # Faz 3 implementasyon takibi
 │   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
 │   ├── FAZ5_5_IMPLEMENTATION.md   # Faz 5.5 Deployment (EC2 Next.js, env, backup, migration) ilerleme
+│   ├── FAZ_AI_LOGGING_IMPLEMENTATION.md  # AI istek loglama (ai_requests tablosu, wrapper, admin dashboard)
 │   ├── IMAGE_QUALITY_IMPROVEMENT_PLAN.md # Görsel + sahne kalitesi tek plan
 │   └── (FAZ1, FAZ2, FAZ2.4, FAZ3 PDF plan → archive/2026-q1/implementation/)
 │
@@ -202,6 +203,10 @@ docs/
 2. **implementation/FAZ5_5_IMPLEMENTATION.md** - Adım adım ilerleme, 5.5.1 alt adımları, olası analiz/geçici dosya listesi
 3. **plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md** - EC2 + PostgreSQL + S3 sıfırdan kurulum
 
+### AI Request Loglama
+1. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - Analiz ve tasarım; tablo şeması, maliyet hesaplama, admin dashboard planı
+2. **implementation/FAZ_AI_LOGGING_IMPLEMENTATION.md** - Faz takibi (Faz 1 ✅, Faz 2 ⬜, Faz 3 ⬜)
+
 ### AI ve Prompt'lar
 1. **ai/AI_STRATEGY.md** - AI stratejisi ve prompt engineering
 2. **ai/CHARACTER_CREATION_FLOW.md** - Karakter oluşturma akışı (referans görsel + kullanıcı girdileri)
@@ -219,6 +224,7 @@ docs/
 14. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
 15. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
 16. **archive/2026-02/analysis/** - Arşivlenen analizler
+17. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

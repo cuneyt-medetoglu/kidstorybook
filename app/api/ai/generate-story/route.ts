@@ -14,6 +14,7 @@ import { getUserRole } from '@/lib/db/users'
 import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
 import type { ShotPlan } from '@/lib/prompts/types'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
+import { chatWithLog } from '@/lib/ai/chat'
 import OpenAI from 'openai'
 
 const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4o', 'o1-mini'] as const
@@ -26,11 +27,16 @@ const MODEL_COST_PER_1M: Record<AllowedStoryModel, { input: number; output: numb
   'o1-mini':     { input: 1.10, output: 4.40 },
 }
 
-function calcCost(model: AllowedStoryModel, inputTokens: number, outputTokens: number): string {
+/** Formats cost as a display string for API responses (DB logging is handled by chatWithLog). */
+function formatStoryCost(model: AllowedStoryModel, inputTokens: number, outputTokens: number): string {
   const pricing = MODEL_COST_PER_1M[model]
+  if (!pricing) return '~$0.0000'
   const cost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000
   return `~$${cost.toFixed(4)}`
 }
+
+/** Current story prompt version — update when lib/prompts/story/base.ts changelog advances. */
+const STORY_PROMPT_VERSION = 'v2.5.0'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -205,16 +211,26 @@ export async function POST(request: NextRequest) {
 
 LANGUAGE: Only the "text" field of each page (the story narrative) must be in ${languageName}. The fields imagePrompt, sceneDescription, sceneContext, and characterExpressions must be in English (used for image generation APIs).`
 
-    const completion = await openai.chat.completions.create({
-      model: effectiveStoryModel,
-      messages: [
-        { role: 'system', content: systemMessage },
-        { role: 'user', content: storyPrompt },
-      ],
-      response_format: { type: 'json_object' },
-      temperature: 0.8, // Creative but not too random
-      max_tokens: 4000,
-    })
+    const completion = await chatWithLog(
+      openai,
+      {
+        model: effectiveStoryModel,
+        messages: [
+          { role: 'system', content: systemMessage },
+          { role: 'user', content: storyPrompt },
+        ],
+        response_format: { type: 'json_object' },
+        temperature: 0.8,
+        max_tokens: 4000,
+      },
+      {
+        userId: user.id,
+        characterId,
+        operationType: 'story_generation',
+        promptVersion: STORY_PROMPT_VERSION,
+        requestMeta: { language, temperature: 0.8, maxTokens: 4000 },
+      }
+    )
 
     const storyContent = completion.choices[0].message.content
     if (!storyContent) {
@@ -256,13 +272,23 @@ Theme: ${theme}
 
 Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', needsSuggestedOutfits && 'suggestedOutfits'].filter(Boolean).join(', ')}.`
 
-        const repairCompletion = await openai.chat.completions.create({
-          model: effectiveStoryModel,
-          messages: [{ role: 'user', content: repairPrompt }],
-          response_format: { type: 'json_object' },
-          temperature: 0.3,
-          max_tokens: 1500,
-        })
+        const repairCompletion = await chatWithLog(
+          openai,
+          {
+            model: effectiveStoryModel,
+            messages: [{ role: 'user', content: repairPrompt }],
+            response_format: { type: 'json_object' },
+            temperature: 0.3,
+            max_tokens: 1500,
+          },
+          {
+            userId: user.id,
+            characterId,
+            operationType: 'story_generation',
+            promptVersion: STORY_PROMPT_VERSION,
+            requestMeta: { repairType: 'entities_outfits', temperature: 0.3 },
+          }
+        )
         const repairContent = repairCompletion.choices[0]?.message?.content
         if (repairContent) {
           const repairData = JSON.parse(repairContent)
@@ -312,13 +338,23 @@ ${shortPages.map((p: WordCountItem) => `Page ${p.pageNumber}: "${(storyData.page
 
 Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
 
-        const repairCompletion = await openai.chat.completions.create({
-          model: effectiveStoryModel,
-          messages: [{ role: 'user', content: repairPrompt }],
-          response_format: { type: 'json_object' },
-          temperature: 0.4,
-          max_tokens: 2000,
-        })
+        const repairCompletion = await chatWithLog(
+          openai,
+          {
+            model: effectiveStoryModel,
+            messages: [{ role: 'user', content: repairPrompt }],
+            response_format: { type: 'json_object' },
+            temperature: 0.4,
+            max_tokens: 2000,
+          },
+          {
+            userId: user.id,
+            characterId,
+            operationType: 'story_generation',
+            promptVersion: STORY_PROMPT_VERSION,
+            requestMeta: { repairType: 'word_count', shortPageCount: shortPages.length, temperature: 0.4 },
+          }
+        )
         const repairContent = repairCompletion.choices[0]?.message?.content
         if (repairContent) {
           const repairData = JSON.parse(repairContent)
@@ -410,7 +446,7 @@ Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
     }
 
     const metadata: Record<string, unknown> = {
-      cost: calcCost(
+      cost: formatStoryCost(
         effectiveStoryModel,
         completion.usage?.prompt_tokens || 0,
         completion.usage?.completion_tokens || 0
