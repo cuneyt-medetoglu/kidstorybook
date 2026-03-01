@@ -12,8 +12,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.5.0',
-  releaseDate: new Date('2026-02-14'),
+  version: '2.6.0',
+  releaseDate: new Date('2026-03-01'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -51,6 +51,7 @@ export const VERSION: PromptVersion = {
     'v2.3.0: [A5] shotPlan (optional) – OUTPUT FORMAT: per-page optional shotPlan (shotType, lens, cameraAngle, placement, timeOfDay, mood). English only; used for image composition when provided. Omit if not needed. (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
     'v2.4.0: [Plan A] coverSetting REQUIRED – Story JSON top-level field: one sentence English, setting/background only for book cover (no characters). LLM generates it from story; used for cover image BACKGROUND. COVER_PATH_FLOWERS_ANALYSIS.md §7 (8 Şubat 2026)',
     'v2.5.0: [Seçenek A] STORY SEED section – customRequests promoted from "Special Requests" bullet to dedicated # STORY SEED section with backbone directive. Placed after STORY REQUIREMENTS for prominence. Removed "Special Requests: None" noise when absent. Improves story quality for example book creation. (14 Şubat 2026)',
+    'v2.6.0: SCENE DIVERSITY → ONE STORY STEP BY STEP. User goal: "güzel bir hikaye" — one clear story (e.g. camping day) that flows naturally from start to end; each page = next step, no rigid rules. (1) buildStoryStructureSection: "ONE STORY, STEP BY STEP" with camping example (wake up → pack → go → set tent → explore → activity → sleep); no SCENE DIVERSITY / location-count language. (2) buildStorySeedSection: seed = how the story starts; then "continue the same story step by step" to ending. (3) VERIFICATION: "each page = one step; imagePrompt describes that step". (1 Mart 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -645,20 +646,18 @@ function buildStoryRequirementsSection(
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
 - Target Age: ${characterAge} years old (${ageGroup} age group)
 - Story Length: EXACTLY ${n} pages (CRITICAL: You MUST return exactly ${n} interior pages, no more, no less. Cover is generated separately.)
-- Target words per page: ${wordTarget} (short sentences, simple verbs, repetition where appropriate).
-- CRITICAL: Each page's "text" must be at least ${wordMin} words for this age group. Do not leave pages with only a few words.
+- Words per page: ${wordTarget}. CRITICAL: Each page's "text" must be at least ${wordMin} words. Do not write a page with only 1–2 sentences; expand the narrative, add sensory details or a short dialogue to reach the minimum.
 - Language: ${getLanguageName(language)}
 - Illustration Style: ${illustrationStyle}`
 }
 
 function buildStorySeedSection(customRequests: string, pageCount: number, ageGroup: string): string {
   const n = getPageCount(ageGroup, pageCount)
-  return `# STORY SEED — CRITICAL: USE AS STORY BACKBONE
-The following idea was provided by the book creator. You MUST build the entire ${n}-page narrative around it.
-- Expand it into a complete story with a clear beginning, middle, and end.
-- Maintain its core scenes, mood, atmosphere, and any characters or objects mentioned.
-- Do NOT ignore this idea or replace it with a generic plot.
-- Do NOT copy it word for word — use it as a creative foundation to expand upon.
+  return `# STORY SEED
+The author gave this idea for the story. Use it as the starting point.
+- It describes how the story begins (e.g. who, where, what situation). Use that for the opening (pages 1–2).
+- Then continue the same story step by step for the rest of the ${n} pages — the next natural events, one per page, until you reach a clear ending.
+- Do not copy the text word for word; use it as the beginning and grow the story from there.
 
 "${customRequests}"`
 }
@@ -699,10 +698,14 @@ function buildStoryStructureSection(
   return `# STORY STRUCTURE
 - **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
 - **pages[]:** EXACTLY ${n} items (interior pages only). No cover in this array.
-- **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
 - **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
-- **Narrative arc (CRITICAL):** The story must have a clear beginning, middle, and end. Use the first 1–2 pages to set up the situation and characters; use the middle pages for development (events, choices, small challenges); use the final 1–2 pages to bring the story to a clear resolution or conclusion (e.g. goal reached, problem solved, day ending, return home). The last page must feel like a proper ending, not a random stop.
-- Vary locations and time of day across pages so the story feels like a progression.`
+- **Narrative arc:** One clear story from beginning to end. First 1–2 pages set the situation; middle pages are the main events (things that happen, step by step); last 1–2 pages bring a clear resolution. The last page should feel like an ending.
+
+# ONE STORY, STEP BY STEP
+- Tell ONE story (e.g. a camping day, a birthday, a discovery in the garden). Each page = the next natural step in that story.
+- Example for a camping story: waking up at home → preparing / packing → going to the campsite → setting up the tent → exploring → something small happens (e.g. finding a trail, seeing an animal) → an activity (e.g. picking up litter, playing) → evening in the tent → falling asleep. Each page is one step; no repeating the same step.
+- If the story seed describes how the story starts, use it for the opening (pages 1–2). Then continue with the natural next steps of that same story — do not stretch one moment across many pages.
+- Each page's imagePrompt and sceneDescription should spell out that step clearly (where we are, what is happening), so each illustration is different.`
 }
 
 function buildThemeSpecificSection(
@@ -732,7 +735,7 @@ function buildWritingStyleSection(
   characters?: Array<{ name?: string; type: { displayName: string } }>
 ): string {
   return `# WRITING STYLE
-Each page: ~${getWordCount(ageGroup)} words. Include dialogue, sensory details (see, hear, feel), atmosphere. Show, don't just tell. Structure: opening + action/dialogue + emotion + transition. Example (${getLanguageName(language)}): ${getExampleText(ageGroup, characterName, language, characters)}`
+Each page: ${getWordCount(ageGroup)} words (stay within this range). Include dialogue, sensory details (see, hear, feel), atmosphere. Show, don't just tell. Structure: opening + action/dialogue + emotion + transition. Example (${getLanguageName(language)}): ${getExampleText(ageGroup, characterName, language, characters)}`
 }
 
 function buildSafetySection(ageGroup: string): string {
@@ -793,7 +796,7 @@ Return a valid JSON object:
   "pages": [
     {
       "pageNumber": 1,
-      "text": "Page text (~${getWordCount(ageGroup)} words, dialogue + descriptions)",
+      "text": "Page text (${getWordCount(ageGroup)} words, dialogue + descriptions)",
       "imagePrompt": "English only. Detailed ${illustrationStyle} prompt (200+ chars): location, time of day, composition, character action. No appearance/clothing (master). Each page = distinct scene.",
       "sceneDescription": "English only. Detailed scene (150+ chars): location, time, action, mood. No appearance/clothing.",
       "characterIds": ["id-from-CHARACTER-MAPPING"],
@@ -824,15 +827,15 @@ function buildVerificationChecklistSection(
 ): string {
   const n = getPageCount(ageGroup, pageCount)
   const langName = getLanguageName(language)
-  const wordMin = getWordCountMin(ageGroup)
   return `# VERIFICATION CHECKLIST (before returning JSON)
 - Return EXACTLY ${n} pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
-- Each page "text" must have at least ${wordMin} words (age group: ${ageGroup}). Count words before returning; if a page has fewer, expand that page's text.
 - coverSetting REQUIRED: one sentence, English, setting/background only for the book cover image (e.g. glacier and ice cave, birthday party room with balloons). No character description.
 - suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
 - Verify every page "text" is in ${langName}; verify imagePrompt, sceneDescription, sceneContext are in English.
 - shotPlan REQUIRED per page: include shotType, lens, cameraAngle, placement, timeOfDay, mood (English only; vary per page for visual diversity).
+- Each page = one step in the story. imagePrompt should describe that step clearly (what is happening, where) so each illustration is different.
+- Word count check: count the words in each page's "text". Any page with fewer than ${getWordCountMin(ageGroup)} words must be expanded before returning (add sensory detail, dialogue, or emotion—do not just repeat).
 - ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.`
 }
 

@@ -11,7 +11,7 @@ import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getBookById } from '@/lib/db/books'
 import { getUserRole } from '@/lib/db/users'
-import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
+import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import type { ShotPlan } from '@/lib/prompts/types'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { chatWithLog } from '@/lib/ai/chat'
@@ -36,7 +36,7 @@ function formatStoryCost(model: AllowedStoryModel, inputTokens: number, outputTo
 }
 
 /** Current story prompt version — update when lib/prompts/story/base.ts changelog advances. */
-const STORY_PROMPT_VERSION = 'v2.5.0'
+const STORY_PROMPT_VERSION = 'v2.6.0'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -306,73 +306,6 @@ Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', 
       }
     }
 
-    // ====================================================================
-    // 6.1. Word Count Analysis + Short-Page Repair (7 Şubat 2026)
-    // ====================================================================
-    const ageGroup = storyData.metadata?.ageGroup || 'preschool'
-    const wordMin = getWordCountMin(ageGroup)
-    const wordCounts = storyData.pages.map((page: any, index: number) => {
-      const text = page.text || ''
-      const count = text.trim() ? text.split(/\s+/).length : 0
-      return { pageNumber: page.pageNumber || index + 1, count, pageIndex: index }
-    })
-    type WordCountItem = { pageNumber: number; count: number; pageIndex: number }
-    const shortPages = wordCounts.filter((p: WordCountItem) => p.count < wordMin)
-
-    console.log('[Story Generation] 📊 WORD COUNT ANALYSIS:')
-    wordCounts.forEach((p: WordCountItem) => {
-      console.log(`  Page ${p.pageNumber}: ${p.count} words (min: ${wordMin})${p.count < wordMin ? ' ⚠️ TOO SHORT!' : ' ✓'}`)
-    })
-    const avgWordCount = wordCounts.reduce((sum: number, p: WordCountItem) => sum + p.count, 0) / wordCounts.length
-    console.log(`  Average: ${avgWordCount.toFixed(1)} words per page (min per page: ${wordMin})`)
-
-    // Repair: expand short pages (one LLM pass for all short pages)
-    if (shortPages.length > 0) {
-      try {
-        const repairPrompt = `The following story has some pages with too few words. Return ONLY a valid JSON object with key "pages": an array of objects. Each object has "pageNumber" (number) and "text" (string). Include ONLY the pages that need expansion (page numbers: ${shortPages.map((p: WordCountItem) => p.pageNumber).join(', ')}). For each of these pages, rewrite the "text" to be at least ${wordMin} words while keeping the same story event and tone. Use the same language as the original. Do not change other pages.
-
-Original story title: ${storyData.title}
-Theme: ${theme}
-Current short page texts:
-${shortPages.map((p: WordCountItem) => `Page ${p.pageNumber}: "${(storyData.pages[p.pageIndex].text || '').slice(0, 200)}..."`).join('\n')}
-
-Return JSON: { "pages": [ { "pageNumber": 2, "text": "..." }, ... ] }`
-
-        const repairCompletion = await chatWithLog(
-          openai,
-          {
-            model: effectiveStoryModel,
-            messages: [{ role: 'user', content: repairPrompt }],
-            response_format: { type: 'json_object' },
-            temperature: 0.4,
-            max_tokens: 2000,
-          },
-          {
-            userId: user.id,
-            characterId,
-            operationType: 'story_generation',
-            promptVersion: STORY_PROMPT_VERSION,
-            requestMeta: { repairType: 'word_count', shortPageCount: shortPages.length, temperature: 0.4 },
-          }
-        )
-        const repairContent = repairCompletion.choices[0]?.message?.content
-        if (repairContent) {
-          const repairData = JSON.parse(repairContent)
-          if (Array.isArray(repairData.pages)) {
-            repairData.pages.forEach((item: { pageNumber: number; text: string }) => {
-              const idx = storyData.pages.findIndex((p: any, i: number) => (p.pageNumber || i + 1) === item.pageNumber)
-              if (idx >= 0 && item.text) {
-                storyData.pages[idx].text = item.text
-                console.log(`[Story Generation] Repair: expanded page ${item.pageNumber} to ${item.text.split(/\s+/).length} words`)
-              }
-            })
-          }
-        }
-      } catch (repairErr) {
-        console.warn('[Story Generation] Word count repair pass failed (non-fatal):', repairErr)
-      }
-    }
-    
     // ====================================================================
     // 6.2. LOG: Theme & Clothing Style (NEW: 15 Ocak 2026 - Quality Check)
     // ====================================================================

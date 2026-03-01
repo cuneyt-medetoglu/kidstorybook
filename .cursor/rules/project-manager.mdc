@@ -32,7 +32,7 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Kod:** Gereksiz log kaldır. Sıradaki iş: ROADMAP’tan tespit et.
 
 ### Konu Bazlı Referanslar (detay ilgili dokümanlarda)
-- **Create Book / görsel–hikaye kalitesi:** `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
+- **Create Book / görsel–hikaye kalitesi:** `docs/prompts/STORY_PROMPT_TEMPLATE.md` (güncel: v2.6.0 — ONE STORY STEP BY STEP), `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
 - **Prompt optimizasyon / analiz:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
 - **PDF (limit, sıkıştırma, timeout):** `docs/guides/PDF_GENERATION_GUIDE.md`
 
@@ -92,7 +92,7 @@ Kullanıcı ilerleme sorduğunda:
 - Tamamlanan/kalan iş sayısını göster
 
 ### 6. Prompt Version Sync ve Takip
-Prompt/version değişikliklerinde: kod–doküman sync, version bump, changelog. Detay ve checklist: `docs/prompts/VERSION_SYNC_GUIDE.md`, `lib/prompts/version-sync.ts`.
+Prompt/version değişikliklerinde: kod–doküman sync, version bump, changelog. **Story prompt:** Kod sürümü `lib/prompts/story/base.ts` (VERSION sabiti); doküman `docs/prompts/STORY_PROMPT_TEMPLATE.md` (başlık + changelog). İkisi eşit tutulur. İsteğe bağlı: `lib/prompts/version-sync.ts` (varsa).
 
 ### 7. Eisenhower Matrisi Yönetimi
 ROADMAP.md'deki görevleri aciliyet ve önemine göre kategorize etme:

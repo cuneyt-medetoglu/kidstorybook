@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 14 Şubat 2026 (Story model seçimi: tek dropdown Create without payment / Example book / Sadece Hikaye testi; example book gpt-4o zorlaması kaldırıldı. generate-story API: storyModel + model-aware cost. Detay: docs/implementation/FAZ3_IMPLEMENTATION.md, docs/analysis/STORY_QUALITY_IMPROVEMENT_ANALYSIS.md.)
+**Son güncelleme:** 1 Mart 2026 (Story prompt v2.6.0: ONE STORY, STEP BY STEP — tek konu, her sayfa sıradaki adım; STORY SEED = başlangıç; journeyMap/sabit lokasyon kuralları kaldırıldı. Detay: docs/prompts/STORY_PROMPT_TEMPLATE.md, docs/analysis/SCENE_DIVERSITY_ROOT_CAUSE_ANALYSIS.md.)
 
 ---
 

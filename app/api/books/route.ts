@@ -12,7 +12,7 @@ import { appConfig } from '@/lib/config'
 import { getCharacterById } from '@/lib/db/characters'
 import { getUserRole } from '@/lib/db/users'
 import { createBook, getUserBooks, updateBook, getBookById, deleteBook } from '@/lib/db/books'
-import { generateStoryPrompt, getWordCountMin } from '@/lib/prompts/story/base'
+import { generateStoryPrompt } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
@@ -880,7 +880,7 @@ export async function POST(request: NextRequest) {
             userId: user.id,
             characterId: characters[0]?.id,
             operationType: 'story_generation',
-            promptVersion: 'v2.5.0',
+            promptVersion: 'v2.6.0',
             requestMeta: { language, temperature: 0.8, maxTokens: 8000 },
           })
           const storyReqMs = Date.now() - storyReqStart
@@ -1020,16 +1020,6 @@ export async function POST(request: NextRequest) {
       storyData = generatedStoryData
 
       } // end if (!storyData) — story generation
-
-      // Sıra 17: Kelime sayısı kontrolü – sadece log (repair kaldırıldı; ilk istekte doğru gelmesi prompt ile hedefleniyor, WORD_COUNT_REPAIR_ANALYSIS.md)
-      const ageGroupForWordCount = storyData?.metadata?.ageGroup || 'preschool'
-      const wordMin = getWordCountMin(ageGroupForWordCount)
-      const wordCounts = storyData.pages.map((page: any, index: number) => {
-        const text = page.text || ''
-        const count = text.trim() ? text.split(/\s+/).length : 0
-        return { pageNumber: page.pageNumber ?? index + 1, count, pageIndex: index }
-      })
-      console.log(`[Create Book] 📊 Word count (min ${wordMin}):`, wordCounts.map((p: { pageNumber: number; count: number }) => `p${p.pageNumber}=${p.count}`).join(', '))
 
       console.log(`[Create Book] ✅ Story ready: ${storyData.pages.length} pages`)
 

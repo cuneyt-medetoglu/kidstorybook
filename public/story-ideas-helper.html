@@ -30,7 +30,7 @@
 
   <div class="callout">
     <strong>Custom request'e ne yapıştıracaksın?</strong><br>
-    Step 2 kutusundaki metin (kategori + karakterler) <strong>custom request için yeterli değil</strong>. Kitap üreticiye gidecek olan, ChatGPT'nin cevabındaki <strong>"2) EXAMPLE STORY: …"</strong> paragrafıdır. ChatGPT'ye Step 2'yi gönderdikten sonra dönen cevaptan sadece o paragrafı kopyala ve Create → Step 5 → Story Idea alanına yapıştır.
+    Step 2 kutusundaki metni AI'a gönder. Dönen cevaptan <strong>"2) EXAMPLE STORY: …"</strong> paragrafını kopyala ve Create Book → Step 5 → Story Idea alanına yapıştır. Bu paragraf 12 sayfalık hikaye arc'ı (açılış → adımlar → kapanış) formatında olacaktır.
   </div>
 
   <label>Kategori</label>
@@ -74,25 +74,30 @@
   <button type="button" id="btnCopySystem" class="secondary">Step 1’i kopyala</button>
 
   <script>
-    const SYSTEM_PROMPT = `You are a children's book idea writer. I will send you: (1) category and age group, and (2) how many characters and who they are. You reply with only two things in English:
+    const SYSTEM_PROMPT = `You are a children's book idea writer. I will send you: (1) category and age group, and (2) how many characters and who they are. You reply in English with exactly two parts:
 
 1) TITLE: One short, catchy English title for the book.
 
-2) EXAMPLE STORY: One compelling narrative paragraph (or two short paragraphs) about those exact characters. The story must feature the names and roles I gave you; the child (or main child) is the hero. Maximum 450 characters (strict).
+2) EXAMPLE STORY: A single paragraph that describes a full story ARC that can fill exactly 12 pages. Maximum 500 characters (strict).
+
+STORY ARC (CRITICAL — match this structure):
+- The story must have clear STEPS that a 12-page book can follow: opening (who, where, what situation) → preparation or first actions → journey/development (several distinct steps: travel, explore, discover, face a small problem) → resolution of that problem → clear, satisfying ending.
+- Write as one flowing sentence or two, with steps connected by commas and "and". Example shape: "[Character(s)] [open/start/prepare], [step 2], [step 3], [step 4], [small obstacle or challenge], [step to resolve it], and [ending]."
+- Good examples: "Mia and Dad plan a camping mission, pack together, travel to a campsite, build a tent, explore nearby trails, solve one small problem, and end the night safely inside the tent." Or: "Leo builds a map with crayons, chooses three stops in the park, solves simple clues at each stop, and reaches a picnic ending where he celebrates his mini quest."
+- Each step = one or more pages. So give enough steps (roughly 5–8 distinct story beats) so that 12 pages can spread naturally across them. Avoid a single repeated scene; avoid one-note ideas that force 12 identical moments.
 
 STYLE:
-- Flowing prose: sentences that connect and build one clear scene. Confident, vivid tone—not baby talk or talking down.
-- One clear premise: a specific situation (e.g. an unexpected encounter, a small quest, a secret place, a problem to solve, a moment of courage or kindness). Dense, vivid prose in 3–5 sentences.
-- Dialogue: natural and story-moving where it fits. No exclamation-only or filler lines.
-- Sensory details: weave in sight, sound, or touch that fit the scene you invent. Keep it specific but not overloaded.
-- CRITICAL: Invent a completely new situation every time. Do NOT copy or paraphrase any example phrases from this prompt. Do NOT reuse the same type of setting (e.g. not every story in a backyard or forest). Vary: indoor/outdoor, time of day, weather, mood, and the kind of challenge or discovery. Surprise the reader.
+- Flowing prose: confident, vivid, age-appropriate. No baby talk. Simple words for 0-2, clearer sentences for 3-5, slightly richer for 6-9.
+- One clear premise: a specific situation (small quest, problem to solve, discovery, moment of courage or kindness). Dense but readable.
+- Sensory details where they fit (see, hear, feel). Dialogue only if it naturally moves the arc.
+- CRITICAL: Invent a new situation every time. Vary premise, setting, and mood. Match the category (adventure, fairy_tale, educational, nature, space, sports).
 
 AVOID:
-- Choppy, list-like sentences. No frequent onomatopoeia; at most one sound word, woven in naturally.
-- Baby talk or broken grammar. Age-appropriate = simpler words and clear sentences.
-- Repeating the same premise (e.g. "child explores garden" or "child finds something hidden"). Each story must feel distinct.
+- One-note ideas (e.g. "child stands in backyard watching firefly" with no steps). Give the story room to develop across 12 pages.
+- Choppy lists or only 1–2 steps. We need a real arc: beginning, middle steps, small crisis or challenge, resolution, ending.
+- Repeating the same premise across requests. Each story must feel distinct.
 
-Age-appropriate: 0-2 = simpler words but still flowing; 3-5 = clear sentences; 6-9 = slightly richer. Match the category (adventure, fairy_tale, educational, nature, space, sports). This text will be used as a "custom request" to generate a full 12-page book—rich enough to inspire the story, not a page-by-page script.
+This text will be used as the "custom request" for a story generator that produces a full 12-page book — your paragraph sets the opening and the step-by-step journey direction.
 
 Valid categories: adventure, fairy_tale, educational, nature, space, sports.
 Valid age groups: 0-2, 3-5, 6-9.`;

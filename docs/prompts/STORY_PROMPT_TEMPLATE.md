@@ -1,15 +1,15 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
-**Versiyon (kod):** 2.4.0  
+**Versiyon (kod):** 2.6.0  
 Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse doküman da güncellenmelidir; **base.ts = gerçek kaynak**.
 
 **v2.2.0 (8 Şubat 2026):** Tüm doğrulama maddeleri tek blokta: `# VERIFICATION CHECKLIST`. LANGUAGE'dan "Before returning..." kaldırıldı; OUTPUT FORMAT kuyruğu "see # VERIFICATION CHECKLIST below" ile kısaltıldı.  
 **v2.3.0 (8 Şubat 2026):** shotPlan sayfa başına **zorunlu**; OUTPUT FORMAT ve VERIFICATION CHECKLIST güncellendi.  
 **v2.4.0 (8 Şubat 2026):** **coverSetting** üst seviye alan eklendi (REQUIRED): kapak görseli için tek cümle İngilizce ortam tarifi (karakter yok). Plan A – COVER_PATH_FLOWERS_ANALYSIS.md §7.  
 **v2.5.0 (8 Şubat 2026):** **Story JSON validation (Sıra 17):** route.ts story cevabında suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. Kelime sayısı kontrolü ve kısa sayfa repair pass.  
-**v2.6.0 (Şubat 2026):** **Anlatı yayı (narrative arc):** STORY STRUCTURE bölümüne zorunlu kural eklendi: hikaye tek bir anlatı yayı izlemeli; ilk 1–2 sayfa giriş, orta sayfalar gelişme, son 1–2 sayfa net kapanış. Son sayfa rastgele durmamalı.  
-(v2.1.0: Görsel çeşitlilik (ardışık sayfada aynı poz/eylem yok), sayfa başı kelime hedefleri artırıldı (toddler 30–45 … pre-teen 130–180), CRITICAL min kelime; generate-story’de kısa sayfa repair.)
+**v2.6.0 (1 Mart 2026):** **ONE STORY, STEP BY STEP** — Hikaye tek bir konudan (örn. bir kamp günü) başlayıp doğal adımlarla sonuna gelir; her sayfa = sıradaki adım. STORY STRUCTURE'a kamp örneği eklendi (uyanma → hazırlık → yola çıkma → çadır kurma → keşif → aktivite → uyku). STORY SEED: yazar fikri hikayenin başlangıcı; aynı hikaye adım adım sonuna kadar devam eder. journeyMap / sabit lokasyon kuralları kaldırıldı. VERIFICATION: each page = one step; imagePrompt describes that step.
+(v2.5.0: Story JSON validation, suggestedOutfits/characterExpressions REQUIRED, kısa sayfa repair. v2.4.0: coverSetting. v2.3.0: shotPlan. v2.2.0: VERIFICATION CHECKLIST tek blok. v2.1.0: Görsel çeşitlilik, kelime hedefi, kısa sayfa repair.)
 
 ---
 
@@ -94,10 +94,29 @@ PHYSICAL APPEARANCE (use in every image – only what we have; rest from referen
 # STORY REQUIREMENTS
 - Theme: [themeConfig.name] ([themeConfig.mood] mood)
 - Target Age: [characterAge] years old ([ageGroup] age group)
-- Story Length: EXACTLY [getPageCount(ageGroup, pageCount)] pages (CRITICAL: You MUST return exactly N pages, no more, no less)
+- Story Length: EXACTLY [getPageCount(ageGroup, pageCount)] pages (CRITICAL: You MUST return exactly N interior pages, no more, no less. Cover is generated separately.)
+- Target words per page: [getWordCountRange(ageGroup)] (short sentences, simple verbs, repetition where appropriate).
 - Language: [getLanguageName(language)]
 - Illustration Style: [illustrationStyle]
-- Special Requests: [customRequests || 'None']
+```
+
+**Not:** customRequests varsa bir sonraki bölüm `# STORY SEED` olarak eklenir (aşağıda).
+
+---
+
+### 2b. STORY SEED (customRequests varsa)
+
+**Kod:** `buildStorySeedSection(customRequests, pageCount, ageGroup)`  
+**Koşul:** Sadece `customRequests?.trim()` doluysa eklenir (sections içinde `...(customRequests?.trim() ? [buildStorySeedSection(...)] : [])`).
+
+```
+# STORY SEED
+The author gave this idea for the story. Use it as the starting point.
+- It describes how the story begins (e.g. who, where, what situation). Use that for the opening (pages 1–2).
+- Then continue the same story step by step for the rest of [n] pages — the next natural events, one per page, until you reach a clear ending.
+- Do not copy the text word for word; use it as the beginning and grow the story from there.
+
+"[customRequests]"
 ```
 
 ---
@@ -154,10 +173,14 @@ Identify ALL animals and important objects that appear in the story; each gets a
 # STORY STRUCTURE
 - **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
 - **pages[]:** EXACTLY [getPageCount] items (interior pages only). No cover in this array.
-- **Interior pages:** Each page = one distinct scene. No repeating scenes; vary location, time, composition.
 - **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
-- **Narrative arc (CRITICAL):** The story must have a clear beginning, middle, and end. Use the first 1–2 pages to set up the situation and characters; use the middle pages for development (events, choices, small challenges); use the final 1–2 pages to bring the story to a clear resolution or conclusion (e.g. goal reached, problem solved, day ending, return home). The last page must feel like a proper ending, not a random stop.
-- Vary locations and time of day across pages so the story feels like a progression.
+- **Narrative arc:** One clear story from beginning to end. First 1–2 pages set the situation; middle pages are the main events (things that happen, step by step); last 1–2 pages bring a clear resolution. The last page should feel like an ending.
+
+# ONE STORY, STEP BY STEP
+- Tell ONE story (e.g. a camping day, a birthday, a discovery in the garden). Each page = the next natural step in that story.
+- Example for a camping story: waking up at home → preparing / packing → going to the campsite → setting up the tent → exploring → something small happens (e.g. finding a trail, seeing an animal) → an activity (e.g. picking up litter, playing) → evening in the tent → falling asleep. Each page is one step; no repeating the same step.
+- If the story seed describes how the story starts, use it for the opening (pages 1–2). Then continue with the natural next steps of that same story — do not stretch one moment across many pages.
+- Each page's imagePrompt and sceneDescription should spell out that step clearly (where we are, what is happening), so each illustration is different.
 ```
 
 ---
@@ -292,6 +315,7 @@ Tüm doğrulama maddeleri tek blokta (A3); LANGUAGE veya OUTPUT FORMAT içinde t
 - characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth)—not just an emotion word.
 - Verify every page "text" is in [langName]; verify imagePrompt, sceneDescription, sceneContext are in English.
 - shotPlan REQUIRED per page: include shotType, lens, cameraAngle, placement, timeOfDay, mood (English only; vary per page for visual diversity).
+- Each page = one step in the story. imagePrompt should describe that step clearly (what is happening, where) so each illustration is different.
 - [characterName] = main character in every scene. Positive, age-appropriate, no scary/violent content.
 ```
 
@@ -312,7 +336,7 @@ Generate the story now in valid JSON format with EXACTLY [getPageCount(ageGroup,
 | Helper | Kullanım |
 |--------|----------|
 | `getAgeGroup(age)` | toddler | preschool | early-elementary | elementary | pre-teen |
-| `getPageCount(ageGroup, override)` | Varsayılan 10; override 2–20 arası kabul |
+| `getPageCount(ageGroup, override)` | Varsayılan 12; override 2–20 arası kabul |
 | `getLanguageName(language)` | en→English, tr→Turkish, de, fr, es, zh, pt, ru |
 | `getVocabularyLevel(ageGroup)` | Örn. "very simple, common words only" |
 | `getSentenceLength(ageGroup)` | Örn. "very short (3-5 words)" |
@@ -339,7 +363,7 @@ Generate the story now in valid JSON format with EXACTLY [getPageCount(ageGroup,
 
 ## Bilinen konular / İyileştirme alanları
 
-- **Tekrarlayan arka planlar:** Custom request girilmeden de görsellerde sık tekrar eden sahne (yol, etrafında çiçekler, arkada ev) gözlemlenebilir. Hikaye modeli rastgele hikaye üretiyor; görsel pipeline'da sahne çeşitliliği (location/time/atmosphere) story çıktısına daha sıkı bağlanabilir ve “avoid generic road+flowers+house unless story specifies” gibi direktifler değerlendirilebilir. Story tarafında VISUAL DIVERSITY ve tema bazlı setting zaten vurgulanıyor; görsel prompt'ta sahne betimlemesinin story'den birebir kullanılması ve tekrarlayan şablonların azaltılması iyileştirme alanıdır.
+- **Tekrarlayan arka planlar:** Story artık ONE STORY, STEP BY STEP ile tek konu (örn. kamp günü) ve her sayfa sıradaki adım olacak şekilde yönlendiriliyor; tek sahnenin çok sayfaya yayılması azaltıldı. Görsel pipeline sahne betimlemesini story çıktısından kullanıyor; çeşitlilik hikaye adımlarına bağlı.
 
 ---
 
