@@ -243,14 +243,14 @@ async function generateMasterCharacterIllustration(
     layoutSafeDirectives,
   ].join(' ')
 
-  const masterRequestRaw = {
-    model: 'gpt-image-1.5',
-    prompt: masterPrompt,
-    size: '1024x1536',
-    quality: 'low',
-    input_fidelity: 'high',
-    image: '(FormData Blob)',
-  }
+  // Moderation-safe fallback prompt: removes body/feet triggers, adds child-safe framing
+  const softMasterPrompt = [
+    `[STYLE] ${styleDirective}, children's book illustration [/STYLE]`,
+    '[EXPRESSION] Gentle facial expression, calm soft smile, relaxed. [/EXPRESSION]',
+    `Standing, neutral pose, fully clothed. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style only (NOT photorealistic). Match reference photo for face and hair. Fully clothed character. Child-safe illustration for children's book.`,
+    layoutSafeDirectives,
+  ].join(' ')
+
   console.log('[Create Book] 📤 MASTER REQUEST sent (model, prompt length:', masterPrompt.length, ')')
   stopAfter('master_request')
 
@@ -280,26 +280,47 @@ async function generateMasterCharacterIllustration(
   const imageBlob = new Blob([new Uint8Array(refImageBuffer)], { type: imageMime })
   const ext = imageMime.includes('jpeg') ? 'jpg' : imageMime.includes('webp') ? 'webp' : 'png'
 
-  // Prepare FormData
-  const formData = new FormData()
-  formData.append('model', 'gpt-image-1.5')
-  formData.append('prompt', masterPrompt)
-  formData.append('size', '1024x1536')
-  formData.append('quality', 'low')
-  formData.append('input_fidelity', 'high')
-  formData.append('image[]', imageBlob, `character.${ext}`)
-  
-  // Call /v1/images/edits API
-  const result = await imageEditWithLog(formData, {
+  // Helper to build FormData for a given prompt
+  const buildMasterFormData = (prompt: string) => {
+    const fd = new FormData()
+    fd.append('model', 'gpt-image-1.5')
+    fd.append('prompt', prompt)
+    fd.append('size', '1024x1536')
+    fd.append('quality', 'low')
+    fd.append('input_fidelity', 'high')
+    fd.append('image[]', imageBlob, `character.${ext}`)
+    return fd
+  }
+
+  const logCtx = {
     userId,
     bookId,
     characterId,
-    operationType: 'image_master',
+    operationType: 'image_master' as const,
     model: 'gpt-image-1.5',
     quality: 'low',
     size: '1024x1536',
     refImageCount: 1,
-  })
+  }
+
+  // Call /v1/images/edits API — retry with safe prompt on content policy block
+  let result
+  let usedPrompt = masterPrompt
+  try {
+    result = await imageEditWithLog(buildMasterFormData(masterPrompt), logCtx)
+  } catch (err: any) {
+    const isModerationBlocked =
+      (err?.message || '').includes('moderation_blocked') ||
+      (err?.message || '').includes('safety_violations')
+    if (!isModerationBlocked) throw err
+
+    console.log('[Create Book] ⚠️ Master blocked by content policy, retrying with safe prompt...')
+    usedPrompt = softMasterPrompt
+    // Second attempt: throws if also blocked — caller decides whether to fallback or propagate
+    result = await imageEditWithLog(buildMasterFormData(softMasterPrompt), logCtx)
+    console.log('[Create Book] ✅ Master succeeded on retry with safe prompt')
+  }
+
   const b64Image = result.data?.[0]?.b64_json
 
   if (!b64Image) {
@@ -319,7 +340,7 @@ async function generateMasterCharacterIllustration(
   if (debugTracePush) {
     debugTracePush({
       step: debugStep || `master_character_${characterId}`,
-      request: { model: 'gpt-image-1.5', prompt: masterPrompt, size: '1024x1536', quality: 'low', characterId },
+      request: { model: 'gpt-image-1.5', prompt: usedPrompt, size: '1024x1536', quality: 'low', characterId },
       response: { url: masterUrl, b64Length: (b64Image as string).length, rawResponse: result },
     })
   }
@@ -1127,6 +1148,7 @@ export async function POST(request: NextRequest) {
       const themeClothing = themeClothingForMaster[exThemeKey] || 'age-appropriate casual clothing'
       for (const char of characters) {
         if (!char.reference_photo_url) continue
+        const isMainChar = char.id === characters[0].id
         try {
           const masterUrl = await generateMasterCharacterIllustration(
             char.reference_photo_url,
@@ -1144,7 +1166,17 @@ export async function POST(request: NextRequest) {
           masterIllustrations[char.id] = masterUrl
           console.log(`[Create Book] ✅ From-example master for character ${char.id} (${char.name}): ${masterUrl}`)
         } catch (err: any) {
-          console.warn(`[Create Book] ⚠️ From-example master failed for ${char.id}, using reference photo:`, err?.message)
+          if (isMainChar) {
+            const isModerationBlocked =
+              (err?.message || '').includes('moderation_blocked') ||
+              (err?.message || '').includes('safety_violations')
+            const userMessage = isModerationBlocked
+              ? 'Character illustration could not be created due to a content safety check. This is a temporary issue — please try again. If the problem persists, try a different photo.'
+              : `Character illustration generation failed. Please try again. (${err?.message?.slice(0, 120) || 'Unknown error'})`
+            console.error(`[Create Book] ❌ FATAL: From-example main character master failed for ${char.id} (${char.name}):`, err)
+            throw new Error(userMessage)
+          }
+          console.warn(`[Create Book] ⚠️ From-example secondary character master failed for ${char.id}, using original photo:`, err?.message)
         }
       }
       if (Object.keys(masterIllustrations).length > 0) {
@@ -1268,8 +1300,20 @@ export async function POST(request: NextRequest) {
         if (error?.message?.startsWith?.('STOP_AFTER')) {
           throw error
         }
-        console.error(`[Create Book] ❌ Master illustration generation failed for character ${char.id} (${char.name}):`, error)
-        // Continue with other characters - this character will use original photo as fallback
+        if (isMainCharacter) {
+          // Ana karakter için master başarısız olursa kitap üretimi durdurulur.
+          // Kullanıcıya anlamlı hata mesajı gösterilir.
+          const isModerationBlocked =
+            (error?.message || '').includes('moderation_blocked') ||
+            (error?.message || '').includes('safety_violations')
+          const userMessage = isModerationBlocked
+            ? 'Character illustration could not be created due to a content safety check. This is a temporary issue — please try again. If the problem persists, try a different photo.'
+            : `Character illustration generation failed. Please try again. (${error?.message?.slice(0, 120) || 'Unknown error'})`
+          console.error(`[Create Book] ❌ FATAL: Main character master failed for ${char.id} (${char.name}):`, error)
+          throw new Error(userMessage)
+        }
+        // Secondary characters: log and use original photo as fallback
+        console.warn(`[Create Book] ⚠️ Secondary character master failed for ${char.id} (${char.name}), using original photo:`, error?.message)
       }
     }
     

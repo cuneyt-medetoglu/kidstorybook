@@ -917,3 +917,20 @@ Response: {
 
 ---
 
+## 🔔 Post-MVP: Hata Bildirimleri (Operasyonel İzleme)
+
+### Master Illustration – Kullanıcı/Admin Bildirimi (2026-03-01)
+**Bağlam:** Kitap oluşturma sırasında master karakter illüstrasyonu oluşturulamadığında (örn. OpenAI moderation block sonrası retry'da da başarısız) kullanıcıya hata mesajı gösteriliyor ve kitap oluşturma durduruluyor.
+
+**Eksik:** Şu an bu hata sadece kullanıcıya toast mesajı olarak görünüyor. Mail/bildirim altyapısı kurulmadığı için admin bildirimi yok.
+
+**İstenen:** Mail altyapısı (Resend, SendGrid, SES vb.) kurulduktan sonra:
+- Kullanıcıya: "Bir sorun oluştu, tekrar deneyebilirsiniz, sorun devam ederse destek@... ile iletişime geçin" emaili
+- Admin'e: Hangi kullanıcı, hangi kitap, hangi hata kodu, kaç retry yapıldı bilgisini içeren operasyonel alert
+
+**Öncelik:** Post-MVP (mail altyapısı gerektiriyor)  
+**İlgili:** `app/api/books/route.ts` → `generateMasterCharacterIllustration`, call site catch blokları  
+**Kategori:** Operasyonel izleme / kullanıcı deneyimi
+
+---
+
