@@ -1,13 +1,12 @@
 /**
  * GET /api/examples/[id]
  *
- * Get a single example book by id (for "Create Your Own" flow).
- * Only returns books with is_example = true.
- * Requires authentication (user must be logged in to create from example).
+ * Get a single example book by id. Public endpoint – no authentication required.
+ * Used for: viewing example books at /examples/[id], and "Create Your Own" flow.
+ * Only returns books with is_example = true and status = completed.
  */
 
 import { NextRequest } from 'next/server'
-import { requireUser } from '@/lib/auth/api-auth'
 import { getBookById } from '@/lib/db/books'
 import { successResponse, CommonErrors } from '@/lib/api/response'
 
@@ -16,8 +15,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await requireUser()
-
     const exampleId = params.id
     if (!exampleId) {
       return CommonErrors.badRequest('Example book ID is required')

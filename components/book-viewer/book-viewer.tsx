@@ -114,9 +114,11 @@ type MobileLayoutMode = "stacked" | "flip"
 interface BookViewerProps {
   bookId?: string
   onClose?: () => void
+  /** When true, fetch from /api/examples/[id] (public); when false, from /api/books/[id] (requires auth). */
+  useExampleApi?: boolean
 }
 
-export function BookViewer({ bookId, onClose }: BookViewerProps) {
+export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewerProps) {
   const router = useRouter()
   const [book, setBook] = useState<any>(null)
   const [isLoadingBook, setIsLoadingBook] = useState(true)
@@ -167,7 +169,14 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
     const fetchBook = async () => {
       try {
         setIsLoadingBook(true)
-        const response = await fetch(`/api/books/${bookId}`)
+        const url = useExampleApi ? `/api/examples/${bookId}` : `/api/books/${bookId}`
+        const response = await fetch(url)
+
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Kitap yüklenemedi. Giriş yapmanız gerekebilir.')
+        }
+
         const result = await response.json()
 
         if (!response.ok || !result.success) {
@@ -256,7 +265,7 @@ export function BookViewer({ bookId, onClose }: BookViewerProps) {
     }
 
     fetchBook()
-  }, [bookId])
+  }, [bookId, useExampleApi])
 
   // Load reading progress/bookmarks once book is available
   useEffect(() => {
