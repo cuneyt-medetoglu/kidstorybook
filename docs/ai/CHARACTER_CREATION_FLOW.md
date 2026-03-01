@@ -1,8 +1,14 @@
 # 👶 Karakter Oluşturma Akışı
 # KidStoryBook Platform
 
-**Doküman Versiyonu:** 1.0  
-**Tarih:** 4 Ocak 2026
+**Doküman Versiyonu:** 1.1  
+**Tarih:** 4 Ocak 2026 | **Güncelleme:** 2026-03-01 (OpenAI Vision kaldırıldı)
+
+---
+
+## ⚠️ Güncel Davranış (2026-03-01)
+
+Karakter oluşturma artık **OpenAI Vision kullanmıyor**. Tüm karakter tipleri (Child, Family Members, Pets) aynı pipeline ile oluşturulur: **form verisi** (name, age, gender, hairColor, eyeColor) + **referans fotoğraf**. Referans fotoğraf doğrudan görsel üretiminde (master illüstrasyon, kapak, sayfalar) kullanılır. Detay: `docs/analysis/VISION_ANALYSIS_NECESSITY.md`.
 
 ---
 
@@ -53,24 +59,11 @@ Kullanıcı çocuğun fotoğrafını yükler:
    - Kullanıcı butona tıklar
    - AI fotoğrafı analiz eder
 
-### Adım 3: AI Analizi
+### Adım 3: Karakter Açıklaması (Form + Referans Görsel)
 
-AI (GPT-4 Vision veya Gemini Vision) fotoğrafı analiz eder:
+**Güncel (2026-03-01):** AI fotoğraf analizi (Vision) kullanılmıyor. Açıklama yalnızca kullanıcı girdilerinden (Adım 1) ve yaşa göre varsayılanlardan oluşturulur. Referans görsel, görsel üretiminde doğrudan kullanılır.
 
-**Analiz Edilenler:**
-- ✅ Saç uzunluğu (kısa, orta, uzun) - **KRİTİK**
-- ✅ Saç stili (düz, dalgalı, kıvırcık, örgülü, ponytail) - **KRİTİK**
-- ✅ Saç dokusu ve detayları
-- ✅ Yüz şekli
-- ✅ Göz şekli ve detayları
-- ✅ Ten rengi (tam ton)
-- ✅ Vücut oranları
-- ✅ Kıyafet (varsa)
-- ✅ Özel özellikler (AI doğrulama)
-
-**Kullanıcı Girdilerini Doğrulama:**
-- AI, kullanıcının girdiği saç rengi, göz rengi gibi bilgileri doğrular
-- Eğer farklılık varsa, kullanıcıya sorulur veya AI'nın analizi kullanılır
+~~Eski davranış (referans): AI (GPT-4 Vision) fotoğrafı analiz ederdi.~~
 
 ### Adım 4: Birleştirilmiş Karakter Tanımı
 

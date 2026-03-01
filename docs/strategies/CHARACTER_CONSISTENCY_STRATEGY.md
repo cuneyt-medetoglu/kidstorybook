@@ -33,11 +33,9 @@ Aynı kitap içinde sayfa sayfa karakter tutarsızlığı:
 ```
 User uploads photo
       ↓
-AI analyzes photo (OpenAI Vision API)
+Form data (name, age, gender, hairColor, eyeColor) → character description
       ↓
-Creates detailed "Master Character Description"
-      ↓
-Saves to database (characters table)
+Saves to database (characters table) — no OpenAI Vision since 2026-03-01
       ↓
 User's character library
 ```

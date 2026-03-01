@@ -264,9 +264,7 @@
   - Kategori: MVP
   - İlgili Faz: Faz 3
   - Notlar: Model karşılaştırması (1.5 vs 1 vs mini), benzerlik skorlaması
-- [ ] **Character Analysis İyileştirme** - OpenAI Vision API'den daha detaylı bilgi almak (opsiyonel)
-  - Kategori: Post-MVP
-  - İlgili Faz: Faz 3+
+- [x] ~~**Character Analysis İyileştirme**~~ - OpenAI Vision API kaldırıldı (2026-03-01). Tüm karakterler form verisi + referans görsel ile oluşturuluyor. Detay: `docs/analysis/VISION_ANALYSIS_NECESSITY.md`.
   - Notlar: GPT-image yeterli olmazsa uygulama, yüz hatları detayı artırma
 - [ ] **Multi-Attempt Generation** - 3x cover üret, en iyisini seç
   - Kategori: Post-MVP

@@ -20,19 +20,19 @@
 - [ ] **3.2.8** `GET /api/auth/instagram` - Instagram OAuth callback - ⏸️ **Opsiyonel, MVP'de gerekli değil**
 
 ### 3.4 Karakter API'leri ✅
-- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ OpenAI Vision API entegrasyonu
+- [x] **3.4.1** `POST /api/characters/analyze` - Fotoğraf analiz et ve Master Character oluştur - ✅ (Not: 2026-03-01 itibarıyla karakter oluşturma Vision kullanmıyor; açıklama form verisinden. Ref: docs/analysis/VISION_ANALYSIS_NECESSITY.md)
   - [x] Kullanıcı girdilerini doğrula
-  - [x] Fotoğraf analizi (OpenAI Vision API)
-  - [x] Detaylı karakter tanımı oluştur (fiziksel özellikler, saç, göz, yüz, vb.)
+  - ~~[x] Fotoğraf analizi (OpenAI Vision API)~~ Kaldırıldı
+  - [x] Karakter tanımı form verisinden oluşturulur
   - [x] Master Character olarak database'e kaydet
 - [x] **3.4.2** `GET /api/characters` - Kullanıcının karakterleri - ✅ Character library API
 - [x] **3.4.3** `GET /api/characters/:id` - Karakter detayları - ✅ Single character API
 - [x] **3.4.4** `PATCH /api/characters/:id` - Karakter güncelle - ✅ Update character API
 - [x] **3.4.5** `DELETE /api/characters/:id` - Karakter sil - ✅ Delete character API
 - [x] **3.4.6** `POST /api/characters/:id/set-default` - Default karakter olarak ayarla - ✅ Set default API
-- [x] **3.4.7** `POST /api/characters` - AI Analysis for Non-Child Characters (25 Ocak 2026) - ✅ Family Members, Pets, Other, Toys için fotoğraf analizi eklendi
-  - [x] Non-Child karakterler için OpenAI Vision API analizi entegrasyonu
-  - [x] User-provided data (hairColor, eyeColor) ile AI analizi merge
+- [x] **3.4.7** `POST /api/characters` - Karakter oluştur (form + referans fotoğraf) - ✅ (2026-03-01: Vision kaldırıldı)
+  - ~~[x] Non-Child karakterler için OpenAI Vision API analizi~~ Kaldırıldı
+  - [x] Tüm tipler için form verisi ile description; referans fotoğraf doğrudan görsel üretiminde kullanılır
   - [x] Toys için gender-neutral validation
 - [ ] **3.4.8** `POST /api/characters/upload-photo` - Referans görsel yükle (Supabase Storage) - ⏳ Sonraki adım
 - [ ] **3.4.9** API iyileştirmeleri (Character Library için) - 🆕 **Karakter Yönetimi Sistemi (15 Ocak 2026)**

@@ -73,7 +73,7 @@ All API endpoints require authentication via Supabase.
 }
 ```
 
-**Cost:** ~$0.01-0.02 per analysis (OpenAI Vision API)
+**Cost:** ~~~$0.01-0.02 per analysis (OpenAI Vision API)~~ **Not (2026-03-01):** Karakter oluşturma artık OpenAI Vision kullanmıyor; açıklama yalnızca form verisinden (name, age, gender, hairColor, eyeColor) üretilir. Referans fotoğraf doğrudan görsel üretiminde kullanılır.
 
 ---
 

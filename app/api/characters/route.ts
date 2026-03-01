@@ -1,21 +1,17 @@
 /**
  * Character Creation API
- * 
+ *
  * POST /api/characters
- * Creates a character with AI photo analysis for non-Child characters
+ * Creates a character from form data (name, age, gender, hairColor, eyeColor, photo).
+ * All character types (Child, Family Members, Pets) use the same pipeline: no OpenAI Vision.
+ * Reference photo is used directly in image generation; description is built from form only.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createCharacter } from '@/lib/db/characters'
 import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
 import { getUser } from '@/lib/auth/api-auth'
-import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import type { CharacterDescription } from '@/lib/prompts/types'
-import OpenAI from 'openai'
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,130 +83,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Determine if AI analysis is needed
-    const needsAIAnalysis = photoBase64 && characterType && characterType.group !== 'Child'
-    let characterDescription: CharacterDescription
-    let aiAnalysisData: any = null
-    let analysisConfidence: number | null = null
-
-    if (needsAIAnalysis) {
-      // Perform AI analysis for non-Child characters with photos
-      console.log(`[Character Creation] 📷 Analyzing photo for ${characterType.group} character`)
-      
-      try {
-        const additionalStr = [hairColor && `Hair: ${hairColor}`, eyeColor && `Eyes: ${eyeColor}`].filter(Boolean).join(', ') || undefined
-        const analysisPrompt = generateCharacterAnalysisPrompt(
-          'Analyze this photo and extract detailed character features',
-          {
-            name,
-            age: parseInt(age) || 5,
-            gender: validatedGender || 'other',
-            additionalDetails: additionalStr,
-          }
-        )
-
-        const imageInput = {
-          type: 'image_url' as const,
-          image_url: { url: `data:image/jpeg;base64,${photoBase64.includes(',') ? photoBase64.split(',')[1] : photoBase64}` },
-        }
-
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: analysisPrompt },
-                imageInput,
-              ],
-            },
-          ],
-          response_format: { type: 'json_object' },
-          max_tokens: 2000,
-        })
-
-        const analysisResult = completion.choices[0].message.content
-        if (!analysisResult) {
-          throw new Error('No analysis result from OpenAI')
-        }
-
-        aiAnalysisData = JSON.parse(analysisResult)
-        analysisConfidence = aiAnalysisData.confidence || 0.8
-
-        // Extract fields from AI analysis, merge with user-provided data
-        const analyzedHairColor = aiAnalysisData.hair?.color || aiAnalysisData.finalDescription?.hairColor || hairColor || 'brown'
-        const analyzedEyeColor = aiAnalysisData.physicalFeatures?.eyeColor || aiAnalysisData.finalDescription?.eyeColor || eyeColor || 'brown'
-        const analyzedFeatures = aiAnalysisData.uniqueFeatures || aiAnalysisData.finalDescription?.uniqueFeatures || []
-
-        // Build character description from AI analysis (Faz 1: defaultClothing for consistency)
-        const rawDesc = aiAnalysisData.finalDescription || {
-          age: aiAnalysisData.age || parseInt(age) || 5,
-          gender: validatedGender || aiAnalysisData.gender || 'other',
-          skinTone: aiAnalysisData.physicalFeatures?.skinTone || 'fair',
-          hairColor: hairColor || analyzedHairColor,
-          hairStyle: aiAnalysisData.hair?.style || 'natural',
-          hairLength: aiAnalysisData.hair?.length || (parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long'),
-          eyeColor: eyeColor || analyzedEyeColor,
-          eyeShape: aiAnalysisData.physicalFeatures?.eyeShape || 'round',
-          faceShape: aiAnalysisData.physicalFeatures?.faceShape || 'round',
-          height: aiAnalysisData.body?.heightForAge || 'average',
-          build: aiAnalysisData.body?.build || 'normal',
-          clothingStyle: aiAnalysisData.clothingStyle?.style || 'casual',
-          clothingColors: aiAnalysisData.clothingStyle?.colors || ['blue', 'red'],
-          uniqueFeatures: analyzedFeatures,
-          typicalExpression: aiAnalysisData.expression?.typical || 'happy',
-          personalityTraits: aiAnalysisData.personalityTraits || ['curious', 'friendly'],
-        }
-        const defaultCloth =
-          aiAnalysisData.defaultClothing ||
-          (rawDesc.clothingStyle && Array.isArray(rawDesc.clothingColors)
-            ? `${rawDesc.clothingStyle} in ${rawDesc.clothingColors.join(' and ')}`
-            : undefined)
-        characterDescription = { ...rawDesc, ...(defaultCloth && { defaultClothing: defaultCloth }) }
-
-        console.log(`[Character Creation] ✅ Photo analysis completed (confidence: ${analysisConfidence})`)
-      } catch (analysisError) {
-        console.error('[Character Creation] ⚠️ Photo analysis failed, using basic description:', analysisError)
-        // Fallback to basic description if analysis fails
-        characterDescription = {
-          age: parseInt(age) || 5,
-          gender: validatedGender || 'other',
-          skinTone: 'fair',
-          hairColor: hairColor || 'brown',
-          hairStyle: 'natural',
-          hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long',
-          eyeColor: eyeColor || 'brown',
-          eyeShape: 'round',
-          faceShape: 'round',
-          height: 'average',
-          build: 'normal',
-          clothingStyle: 'casual',
-          clothingColors: ['blue', 'red'],
-          uniqueFeatures: [],
-          typicalExpression: 'happy',
-          personalityTraits: ['curious', 'friendly'],
-        }
-      }
-    } else {
-      // Build character description from Step 1 data (simple mapping, no AI Analysis)
-      characterDescription = {
-        age: parseInt(age) || 5,
-        gender: validatedGender || 'other',
-        skinTone: 'fair', // Default, can be adjusted later
-        hairColor: hairColor || 'brown',
-        hairStyle: 'natural', // Default
-        hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long', // Age-based default
-        eyeColor: eyeColor || 'brown',
-        eyeShape: 'round', // Default for children
-        faceShape: 'round', // Default for children
-        height: 'average',
-        build: 'normal',
-        clothingStyle: 'casual',
-        clothingColors: ['blue', 'red'], // Default
-        uniqueFeatures: [],
-        typicalExpression: 'happy',
-        personalityTraits: ['curious', 'friendly'], // Default
-      }
+    // Build character description from form data (same for all types: Child, Family, Pets).
+    // No OpenAI Vision — reference photo is used directly in image generation.
+    const characterDescription: CharacterDescription = {
+      age: parseInt(age) || 5,
+      gender: validatedGender || 'other',
+      skinTone: 'fair',
+      hairColor: hairColor || 'brown',
+      hairStyle: 'natural',
+      hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long',
+      eyeColor: eyeColor || 'brown',
+      eyeShape: 'round',
+      faceShape: 'round',
+      height: 'average',
+      build: 'normal',
+      clothingStyle: 'casual',
+      clothingColors: ['blue', 'red'],
+      uniqueFeatures: [],
+      typicalExpression: 'happy',
+      personalityTraits: ['curious', 'friendly'],
     }
 
     let referencePhotoUrl: string | undefined
@@ -275,11 +166,10 @@ export async function POST(request: NextRequest) {
         reference_photo_path: referencePhotoPath,
         description: characterDescription,
         is_default: true, // First character is default
-        // AI analysis fields (only for non-Child characters with photos)
-        ai_analysis: aiAnalysisData,
-        full_description: aiAnalysisData ? JSON.stringify(aiAnalysisData) : undefined,
-        analysis_raw: aiAnalysisData,
-        analysis_confidence: analysisConfidence ?? undefined,
+        ai_analysis: null,
+        full_description: null,
+        analysis_raw: null,
+        analysis_confidence: null,
       }
     )
 

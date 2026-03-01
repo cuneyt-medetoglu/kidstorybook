@@ -248,11 +248,10 @@ SELECT * FROM get_books_by_character('character-id-here');
 ### Creating a Character
 
 ```
-1. User uploads photo
-2. AI analyzes (OpenAI Vision)
-3. Extract detailed features
-4. INSERT INTO characters (description JSONB)
-5. Set as default if first character
+1. User uploads photo + form (name, age, gender, hairColor, eyeColor)
+2. Description built from form only (no OpenAI Vision since 2026-03-01)
+3. INSERT INTO characters (description JSONB, reference_photo_url, …)
+4. Set as default if first character
 ```
 
 ### Creating a Book
