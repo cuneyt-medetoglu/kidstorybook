@@ -221,10 +221,11 @@ docs/
 11. **analysis/STORY_FLOW_AND_EXAMPLES_ANALYSIS.md** - Hikaye akışı (başlangıç–gelişme–sonuç) ve Examples için Debug akışı; custom request formatı; sadece analiz
 12. **analysis/CREATE_BOOK_TIMING_ANALYSIS.md** - Create Book timing özeti; entity master paralel ve TTS pipeline örtüştürme (Şubat 2026)
 13. **analysis/PARALLEL_PROCESSING_ANALYSIS.md** - Kitap oluşturma paralel işleme (sayfa batch, TTS batch ve pipeline örtüştürme)
-14. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
-15. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
-16. **archive/2026-02/analysis/** - Arşivlenen analizler
-17. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
+14. **analysis/CHARACTER_LIMIT_3_TO_5_ANALYSIS.md** - Kitap oluşturma karakter limiti 3→5 analizi; etkilenen yerler ve dokümantasyon güncellemeleri
+15. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
+16. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+17. **archive/2026-02/analysis/** - Arşivlenen analizler
+18. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

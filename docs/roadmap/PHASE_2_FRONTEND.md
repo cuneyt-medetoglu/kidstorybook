@@ -90,14 +90,14 @@
     - Fotoğraf yükleme talimatları (format, boyut, kalite)
     - Otomatik yüz algılama ve crop özelliği
     - Manuel crop düzenleme seçeneği
-  - [x] **Multi-karakter desteği (3 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026)**
+  - [x] **Multi-karakter desteği (5 karaktere kadar) + Karakter Gruplama Sistemi** - ✅ **TAMAMLANDI (25 Ocak 2026); limit 5'e çıkarıldı (1 Mart 2026)**
     - [x] Karakter tipi gruplama sistemi (Child, Pets, Family Members, Toys, Other)
     - [x] Ana dropdown (grup seçimi) + conditional alt dropdown/text input
     - [x] Pets grubu: Dog, Cat, Rabbit, Bird, Other Pet (custom input)
     - [x] Family Members grubu: Mom, Dad, Grandma, Grandpa, Sister, Brother, Uncle, Aunt, Other Family (custom input)
     - [x] Toys grubu: Teddy Bear, Doll, Action Figure, Robot, Car, Train, Ball, Blocks, Puzzle, Stuffed Animal, Other Toy (custom input) - ✅ **EKLENDI (25 Ocak 2026)**
     - [x] Other: Custom text input
-    - [x] "Add Character" butonu (maksimum 3 karakter)
+    - [x] "Add Character" butonu (maksimum 5 karakter)
     - [x] Her karakter için ayrı upload alanı
     - [ ] Karakter sıralaması (drag & drop ile yeniden sıralama, opsiyonel) - ⏸️ Ertelendi
     - [x] Karakter silme butonu

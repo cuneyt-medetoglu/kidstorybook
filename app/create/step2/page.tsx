@@ -92,6 +92,9 @@ const CHARACTER_OPTIONS = {
   },
 } as const
 
+/** Maximum number of characters (main + additional) in book creation. */
+const MAX_CHARACTERS = 5
+
 export default function Step2Page() {
   const router = useRouter()
   const { toast } = useToast()
@@ -514,7 +517,7 @@ export default function Step2Page() {
   }
 
   const handleAddCharacter = () => {
-    if (characters.length >= 3) return
+    if (characters.length >= MAX_CHARACTERS) return
 
     const newCharacter: Character = {
       id: Date.now().toString(),
@@ -1356,7 +1359,7 @@ export default function Step2Page() {
                 ))}
               </AnimatePresence>
 
-              {characters.length < 3 && (
+              {characters.length < MAX_CHARACTERS && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                   <Button
                     type="button"

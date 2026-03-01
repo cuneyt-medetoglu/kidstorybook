@@ -1,9 +1,11 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 14 Şubat 2026  
+**Son Güncelleme:** 1 Mart 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
+
+**1 Mart 2026 – Karakter limiti 3→5:** Kitap oluşturmada maksimum karakter sayısı 5'e çıkarıldı. Değişiklikler: `app/create/step2/page.tsx` (MAX_CHARACTERS=5), `app/api/books/route.ts` (MAX_CHARACTERS validasyonu). Ref: docs/analysis/CHARACTER_LIMIT_3_TO_5_ANALYSIS.md
 
 **14 Şubat 2026 – Create Book timing:** Entity master'lar paralel üretiliyor (`Promise.allSettled`); TTS prewarm story biter bitmez arka planda başlatılıp masters/cover/page images ile örtüştürülüyor, response öncesi await. Ref: docs/analysis/CREATE_BOOK_TIMING_ANALYSIS.md
 

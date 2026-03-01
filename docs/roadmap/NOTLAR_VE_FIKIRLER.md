@@ -470,16 +470,16 @@
   - **Kategori:** Post-MVP / Backlog
   - **Durum:** ⏸️ Ertelendi - MVP için gerekli değil
   - **Not:** Header ve Footer'dan About linki kaldırıldı. Gelecekte ihtiyaç duyulduğunda eklenebilir.
-- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026)**
+- [x] **Multi-karakter desteği (5 karaktere kadar)** - ✅ **MVP'ye taşındı (4 Ocak 2026); limit 5'e çıkarıldı (1 Mart 2026)**
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** MVP / Faz 2.4.2
   - **Özellikler:**
-    - 3 karaktere kadar destek (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi)
+    - 5 karaktere kadar destek (örnek: 2 çocuk 1 köpek 1 kedi, vb.)
     - Her karakter için ayrı fotoğraf yükleme
     - Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
     - Ücretsiz özellik (MVP'de dahil)
   - **Detaylar:** Faz 2.4.2'ye bakın
-- [ ] Multi-karakter desteği genişletme (5 karaktere kadar) - Post-MVP
+- [x] Multi-karakter desteği genişletme (5 karaktere kadar) - ✅ **Tamamlandı (1 Mart 2026)**
 - [ ] Pet ve oyuncak karakterleri (genişletilmiş liste)
 - [ ] Görsel yeniden oluşturma (revize)
 - [ ] Sesli kitap (text-to-speech)
@@ -526,12 +526,12 @@
 ### Referans Siteden (magicalchildrensbook.com) Eksik Özellikler
 
 #### MVP'ye Eklenmeli (Önemli)
-- [x] **Multi-karakter desteği (3 karaktere kadar)** - ✅ **MVP'ye eklendi (4 Ocak 2026)**
+- [x] **Multi-karakter desteği (5 karaktere kadar)** - ✅ **MVP'ye eklendi (4 Ocak 2026); limit 5'e çıkarıldı (1 Mart 2026)**
   - **Tarih:** 4 Ocak 2026
   - **Kategori:** MVP / Faz 2.4.2
-  - **Açıklama:** Hikaye oluştururken 3 karaktere kadar eklenebilmeli (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi)
+  - **Açıklama:** Hikaye oluştururken 5 karaktere kadar eklenebilmeli (örnek: 2 çocuk 1 köpek, 1 çocuk 1 kedi, vb.)
   - **Özellikler:**
-    - "Add Character" butonu (maksimum 3 karakter)
+    - "Add Character" butonu (maksimum 5 karakter)
     - Her karakter için ayrı upload alanı
     - Karakter tipi seçimi (Çocuk, Köpek, Kedi, vb.)
     - Ücretsiz özellik

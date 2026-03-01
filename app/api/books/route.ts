@@ -39,6 +39,9 @@ function stopAfter(step: string) {
 const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4o', 'o1-mini'] as const
 type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
 
+/** Maximum number of characters (main + additional) per book. Must match create flow (Step 2). */
+const MAX_CHARACTERS = 5
+
 function normalizeThemeKey(theme: string): string {
   const t = (theme || '').toString().trim().toLowerCase()
   if (!t) return t
@@ -619,6 +622,10 @@ export async function POST(request: NextRequest) {
       characters.push(char)
     } else {
       return CommonErrors.badRequest('characterId or characterIds is required')
+    }
+
+    if (characters.length > MAX_CHARACTERS) {
+      return CommonErrors.badRequest(`Maximum ${MAX_CHARACTERS} characters allowed per book`)
     }
 
     // Main character (first character)
