@@ -491,6 +491,34 @@ function getThemeConfig(theme: string) {
         ]
       }
     },
+    educational: {
+      name: 'Learning & Discovery',
+      mood: 'inspiring',
+      setting: 'science, nature, or cosmic exploration (classroom, lab, space, or outdoor discovery)',
+      commonElements: ['learning', 'discovery', 'science', 'facts', 'exploration', 'wonder', 'cosmic adventures'],
+      clothingStyle: 'age-appropriate casual clothing suitable for learning and exploration (comfortable, practical)',
+      clothingExamples: {
+        correct: [
+          'casual clothes for learning',
+          'comfortable exploration outfit',
+          'age-appropriate casual clothing'
+        ],
+        wrong: [
+          'mavi ve kırmızı rahat giysiler'
+        ]
+      }
+    },
+    custom: {
+      name: 'Custom',
+      mood: 'imaginative',
+      setting: 'based on the story seed provided by the author',
+      commonElements: ['creativity', 'imagination', 'unique adventure'],
+      clothingStyle: 'age-appropriate casual clothing suitable for the story setting',
+      clothingExamples: {
+        correct: ['age-appropriate casual clothing', 'outfit fitting the story'],
+        wrong: []
+      }
+    },
     underwater: {
       name: 'Underwater',
       mood: 'mysterious',
@@ -540,6 +568,8 @@ function getEducationalFocus(ageGroup: string, theme: string): string {
     animals: 'empathy and care for animals',
     'daily-life': 'social-emotional skills',
     space: 'curiosity and science',
+    educational: 'curiosity, science, and learning',
+    custom: 'creativity and imagination',
     underwater: 'environmental awareness',
   }
   

@@ -17,6 +17,7 @@ import {
   Star,
   Heart,
   Globe,
+  Wand2,
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -27,7 +28,7 @@ import { z } from "zod"
 
 // Validation schema
 const formSchema = z.object({
-  theme: z.enum(["adventure", "fairy_tale", "educational", "nature", "space", "sports"], { message: "Please select a theme for your story" }),
+  theme: z.enum(["adventure", "fairy_tale", "educational", "nature", "sports", "custom"], { message: "Please select a theme for your story" }),
   ageGroup: z.enum(["0-2", "3-5", "6-9"], { message: "Please select an age group" }),
   language: z.enum(["en", "tr", "de", "fr", "es", "zh", "pt", "ru"], { message: "Please select a language for your story" }),
 })
@@ -35,7 +36,7 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>
 
 type Theme = {
-  id: "adventure" | "fairy_tale" | "educational" | "nature" | "space" | "sports"
+  id: "adventure" | "fairy_tale" | "educational" | "nature" | "sports" | "custom"
   Icon: typeof Mountain
   title: string
   description: string
@@ -86,9 +87,9 @@ const themes: Theme[] = [
   },
   {
     id: "educational",
-    Icon: BookOpen,
-    title: "Educational",
-    description: "Learning adventures with fun facts",
+    Icon: Rocket,
+    title: "Learning & Discovery",
+    description: "Science, facts, and cosmic adventures",
     gradientFrom: "from-blue-500",
     gradientTo: "to-cyan-500",
     borderColor: "border-blue-500",
@@ -103,15 +104,6 @@ const themes: Theme[] = [
     borderColor: "border-green-500",
   },
   {
-    id: "space",
-    Icon: Rocket,
-    title: "Space & Science",
-    description: "Cosmic adventures and discoveries",
-    gradientFrom: "from-indigo-500",
-    gradientTo: "to-violet-500",
-    borderColor: "border-indigo-500",
-  },
-  {
     id: "sports",
     Icon: Trophy,
     title: "Sports & Activities",
@@ -119,6 +111,15 @@ const themes: Theme[] = [
     gradientFrom: "from-red-500",
     gradientTo: "to-rose-500",
     borderColor: "border-red-500",
+  },
+  {
+    id: "custom",
+    Icon: Wand2,
+    title: "Custom",
+    description: "Your own unique story idea",
+    gradientFrom: "from-fuchsia-500",
+    gradientTo: "to-violet-500",
+    borderColor: "border-fuchsia-500",
   },
 ]
 

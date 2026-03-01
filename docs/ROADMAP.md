@@ -4,6 +4,8 @@
 **Tarih:** 4 Şubat 2026  
 **Durum:** AKTİF – Modüler yapı (detaylar `docs/roadmap/` altında)
 
+**Son güncelleme (1 Mart 2026):** Custom tema (Step 3) eklendi; Educational + Space birleştirildi (Learning & Discovery). Custom seçildiğinde Step 5’te “Story idea” zorunlu; API ve prompt custom temasını destekliyor.
+
 ---
 
 ## 📋 İçindekiler

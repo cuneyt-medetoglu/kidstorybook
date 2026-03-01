@@ -610,6 +610,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (themeKey === 'custom' && (!customRequests || !String(customRequests).trim())) {
+      return CommonErrors.badRequest('customRequests is required when theme is custom')
+    }
+
     // Get Characters (NEW: Support both single and multiple characters)
     let characters: any[] = []
     
@@ -1135,6 +1139,7 @@ export async function POST(request: NextRequest) {
         sports: 'sportswear, athletic clothes',
         fantasy: 'fantasy-appropriate casual clothing, adventure-style',
         'daily-life': 'everyday casual clothing',
+        custom: 'age-appropriate casual clothing',
       }
       const exThemeKey = normalizeThemeKey(exampleBook.theme)
       const themeClothing = themeClothingForMaster[exThemeKey] || 'age-appropriate casual clothing'
@@ -1238,6 +1243,7 @@ export async function POST(request: NextRequest) {
       sports: 'sportswear, athletic clothes',
       fantasy: 'fantasy-appropriate casual clothing, adventure-style',
       'daily-life': 'everyday casual clothing',
+      custom: 'age-appropriate casual clothing',
     }
     const themeClothing = themeClothingForMaster[themeKey] || 'age-appropriate casual clothing'
     const suggestedOutfits = storyData?.suggestedOutfits && typeof storyData.suggestedOutfits === 'object' ? storyData.suggestedOutfits as Record<string, string> : null

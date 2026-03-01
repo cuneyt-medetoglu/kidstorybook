@@ -8,21 +8,40 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useState, useMemo } from "react"
 
-// Validation schema
-const formSchema = z.object({
-  customRequests: z.string().max(500, "Custom requests must not exceed 500 characters").optional().or(z.literal("")),
-  pageCount: z.number().min(0).max(20).optional(), // Debug: Page count override (0 = cover only, undefined = cover only)
-})
+// Build schema based on whether custom theme is selected (Step 5 requires customRequests when theme is custom)
+function getFormSchema(isCustomTheme: boolean) {
+  return z.object({
+    customRequests: isCustomTheme
+      ? z.string().min(10, "Please describe your story idea").max(500, "Custom requests must not exceed 500 characters")
+      : z.string().max(500, "Custom requests must not exceed 500 characters").optional().or(z.literal("")),
+    pageCount: z.number().min(0).max(20).optional(),
+  })
+}
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<ReturnType<typeof getFormSchema>>
 
 export default function Step5Page() {
   const router = useRouter()
+  const [isCustomTheme, setIsCustomTheme] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false
+    try {
+      const saved = localStorage.getItem("kidstorybook_wizard")
+      const wizardData = saved ? JSON.parse(saved) : {}
+      return wizardData?.step3?.theme?.id === "custom"
+    } catch {
+      return false
+    }
+  })
+
+  const formSchema = useMemo(() => getFormSchema(isCustomTheme), [isCustomTheme])
+
   const {
     register,
     watch,
     formState: { errors },
+    trigger,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,7 +54,9 @@ export default function Step5Page() {
   const pageCount = watch("pageCount")
   const remainingChars = 500 - customRequests.length
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    const valid = await trigger()
+    if (!valid) return
     // Save custom requests and page count to localStorage
     try {
       const saved = localStorage.getItem("kidstorybook_wizard")
@@ -144,9 +165,26 @@ export default function Step5Page() {
             >
               <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-50">Custom Requests</h1>
               <p className="mt-2 text-sm text-gray-600 dark:text-slate-400">
-                Optional - Add any special requests for your story
+                {isCustomTheme
+                  ? "Describe your story idea below (required for Custom theme)"
+                  : "Optional - Add any special requests for your story"}
               </p>
             </motion.div>
+
+            {isCustomTheme && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 rounded-xl border-2 border-amber-200 bg-amber-50/80 p-4 dark:border-amber-700 dark:bg-amber-900/30"
+              >
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
+                  Custom Theme Selected
+                </p>
+                <p className="mt-1 text-sm text-amber-800 dark:text-amber-200">
+                  Since you chose a custom theme, please describe your story idea below. This field is required.
+                </p>
+              </motion.div>
+            )}
 
             {/* Custom Requests Textarea Section */}
             <motion.div
@@ -159,10 +197,19 @@ export default function Step5Page() {
                 htmlFor="customRequests"
                 className="mb-3 block text-base font-semibold text-gray-900 dark:text-slate-50"
               >
-                Story Idea{" "}
-                <span className="text-sm font-normal text-gray-500 dark:text-slate-400">
-                  (optional)
-                </span>
+                {isCustomTheme ? (
+                  <>
+                    Story Idea{" "}
+                    <span className="text-amber-600 dark:text-amber-400">(required for Custom theme)</span>
+                  </>
+                ) : (
+                  <>
+                    Story Idea{" "}
+                    <span className="text-sm font-normal text-gray-500 dark:text-slate-400">
+                      (optional)
+                    </span>
+                  </>
+                )}
               </label>
 
               <div className="relative">

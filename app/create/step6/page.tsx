@@ -252,12 +252,14 @@ export default function Step6Page() {
     },
     theme: wizardData?.step3?.theme
       ? {
+          id: wizardData.step3.theme.id,
           name: wizardData.step3.theme.title || wizardData.step3.theme.name || "Adventure",
           description: wizardData.step3.theme.description || "Exciting adventures and explorations",
           icon: wizardData.step3.theme.icon || "🗺️",
           color: wizardData.step3.theme.gradientFrom || "from-blue-400 to-cyan-500",
         }
       : {
+          id: "adventure",
           name: "Adventure",
           description: "Exciting adventures and explorations",
           icon: "🗺️",
@@ -303,6 +305,8 @@ export default function Step6Page() {
     customRequests: wizardData?.step5?.customRequests || "",
     pageCount: wizardData?.step5?.pageCount,
   }
+
+  const isCustomTheme = formData.theme?.id === "custom"
 
   // Floating animations for decorative elements
   const floatingVariants = {
@@ -379,6 +383,15 @@ export default function Step6Page() {
 
   const handleCreateWithoutPayment = async () => {
     if (!wizardData || !user) return
+    if (isCustomTheme && (!formData.customRequests || !String(formData.customRequests).trim())) {
+      toast({
+        title: "Story idea required",
+        description: "For Custom theme, please describe your story idea in Step 5.",
+        variant: "destructive",
+      })
+      router.push("/create/step5")
+      return
+    }
     const chars = getCharactersData()
     const characterIds = getCharacterIdsForApi(chars)
     const singleId = characterIds.length === 1 ? characterIds[0] : null
@@ -452,6 +465,15 @@ export default function Step6Page() {
   // Create example book: admin creates a book and marks it as is_example = true (public, viewable by everyone)
   const handleCreateExampleBook = async () => {
     if (!wizardData || !user) return
+    if (isCustomTheme && (!formData.customRequests || !String(formData.customRequests).trim())) {
+      toast({
+        title: "Story idea required",
+        description: "For Custom theme, please describe your story idea in Step 5.",
+        variant: "destructive",
+      })
+      router.push("/create/step5")
+      return
+    }
 
     const chars = getCharactersData()
     const characterIds = getCharacterIdsForApi(chars)
@@ -861,7 +883,14 @@ export default function Step6Page() {
                     <div className="flex gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-900">
                       <div className="text-3xl">{formData.theme.icon}</div>
                       <div>
-                        <h3 className="font-bold text-gray-900 dark:text-slate-50">{formData.theme.name}</h3>
+                        <h3 className="font-bold text-gray-900 dark:text-slate-50">
+                          {formData.theme.name}
+                          {isCustomTheme && (
+                            <span className="ml-2 rounded bg-fuchsia-100 px-2 py-0.5 text-xs font-medium text-fuchsia-800 dark:bg-fuchsia-900/40 dark:text-fuchsia-200">
+                              Your story idea required
+                            </span>
+                          )}
+                        </h3>
                         <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">{formData.theme.description}</p>
                       </div>
                     </div>
@@ -948,7 +977,9 @@ export default function Step6Page() {
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Lightbulb className="h-6 w-6 text-purple-500" />
-                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Custom Requests</h2>
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
+                        Custom Requests{isCustomTheme ? " (required for Custom theme)" : ""}
+                      </h2>
                     </div>
                     <Link
                       href="/create/step5"
@@ -960,11 +991,20 @@ export default function Step6Page() {
                   </div>
 
                   {formData.customRequests ? (
-                    <p className="text-base leading-relaxed text-gray-700 dark:text-slate-300">
-                      {formData.customRequests}
-                    </p>
+                    <>
+                      {isCustomTheme && (
+                        <p className="mb-2 text-sm font-medium text-fuchsia-700 dark:text-fuchsia-300">
+                          Your custom story idea (drives the entire story):
+                        </p>
+                      )}
+                      <p className="text-base leading-relaxed text-gray-700 dark:text-slate-300">
+                        {formData.customRequests}
+                      </p>
+                    </>
                   ) : (
-                    <p className="italic text-sm text-gray-500 dark:text-slate-500">No custom requests</p>
+                    <p className="italic text-sm text-gray-500 dark:text-slate-500">
+                      {isCustomTheme ? "Please go back to Step 5 and describe your story idea." : "No custom requests"}
+                    </p>
                   )}
 
                   {/* Page Count Display */}

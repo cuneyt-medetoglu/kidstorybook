@@ -9,6 +9,7 @@ Bu doküman, koddaki prompt yapısının okunabilir şablonudur. Kod değişirse
 **v2.4.0 (8 Şubat 2026):** **coverSetting** üst seviye alan eklendi (REQUIRED): kapak görseli için tek cümle İngilizce ortam tarifi (karakter yok). Plan A – COVER_PATH_FLOWERS_ANALYSIS.md §7.  
 **v2.5.0 (8 Şubat 2026):** **Story JSON validation (Sıra 17):** route.ts story cevabında suggestedOutfits ve characterExpressions REQUIRED; eksikse retry. Kelime sayısı kontrolü ve kısa sayfa repair pass.  
 **v2.6.0 (1 Mart 2026):** **ONE STORY, STEP BY STEP** — Hikaye tek bir konudan (örn. bir kamp günü) başlayıp doğal adımlarla sonuna gelir; her sayfa = sıradaki adım. STORY STRUCTURE'a kamp örneği eklendi (uyanma → hazırlık → yola çıkma → çadır kurma → keşif → aktivite → uyku). STORY SEED: yazar fikri hikayenin başlangıcı; aynı hikaye adım adım sonuna kadar devam eder. journeyMap / sabit lokasyon kuralları kaldırıldı. VERIFICATION: each page = one step; imagePrompt describes that step.
+**v2.6.1 (1 Mart 2026):** **Custom tema:** `theme === "custom"` seçildiğinde `getThemeConfig("custom")` kullanılır; hikaye yönü tamamen STORY SEED (customRequests) ile belirlenir. Step 5’te Custom tema seçiliyse customRequests zorunludur (min 10 karakter). Educational + Space birleşik tema “Learning & Discovery” olarak güncellendi.
 (v2.5.0: Story JSON validation, suggestedOutfits/characterExpressions REQUIRED, kısa sayfa repair. v2.4.0: coverSetting. v2.3.0: shotPlan. v2.2.0: VERIFICATION CHECKLIST tek blok. v2.1.0: Görsel çeşitlilik, kelime hedefi, kısa sayfa repair.)
 
 ---
