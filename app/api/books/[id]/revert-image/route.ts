@@ -76,14 +76,14 @@ export async function POST(
       if (!currentPage.imageUrl) {
         return errorResponse(`Page ${pageNumber} has no original image`, undefined, 404)
       }
-      const firstEdit = pageHistory.sort((a: any, b: any) => a.version_number - b.version_number)[0]
-      targetImageUrl = firstEdit?.previous_image_url || currentPage.imageUrl
+      const firstEdit = pageHistory.sort((a: any, b: any) => a.version - b.version)[0]
+      targetImageUrl = firstEdit?.original_image_url || currentPage.imageUrl
     } else {
-      const targetEdit = pageHistory.find((h: any) => h.version_number === targetVersion)
+      const targetEdit = pageHistory.find((h: any) => h.version === targetVersion)
       if (!targetEdit) {
         return errorResponse(`Version ${targetVersion} not found for page ${pageNumber}`, undefined, 404)
       }
-      targetImageUrl = targetEdit.new_image_url
+      targetImageUrl = targetEdit.edited_image_url
     }
 
     console.log(`[Revert Image] Target image URL: ${targetImageUrl}`)

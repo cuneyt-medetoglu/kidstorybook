@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Edit, Download, Share2, Trash2, Loader2, History } from "lucide-react"
+import { ArrowLeft, Edit, Download, Share2, Trash2, Loader2, History, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { ImageEditModal } from "@/components/book-viewer/ImageEditModal"
+import { RegenerateImageModal } from "@/components/book-viewer/RegenerateImageModal"
 import { EditHistoryPanel } from "@/components/book-viewer/EditHistoryPanel"
 import { getTtsPrefs, setTtsPrefs } from "@/lib/tts-prefs"
 
@@ -42,6 +43,8 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   const [isDownloading, setIsDownloading] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [editingPage, setEditingPage] = useState<number | null>(null)
+  const [showRegenerateModal, setShowRegenerateModal] = useState(false)
+  const [regeneratingPage, setRegeneratingPage] = useState<number | null>(null)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
   const [ttsSpeed, setTtsSpeed] = useState(1)
   const [ttsVolume, setTtsVolume] = useState(1)
@@ -91,11 +94,37 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
     setShowEditModal(true)
   }
 
+  const handleRegenerateImage = (pageNumber: number) => {
+    setRegeneratingPage(pageNumber)
+    setShowRegenerateModal(true)
+  }
+
   const handleEditSuccess = (editedImageUrl: string) => {
     // Refresh book data to show updated image
     if (book && book.story_data && editingPage) {
       const updatedPages = [...book.story_data.pages]
       const pageIndex = editingPage - 1
+      if (updatedPages[pageIndex]) {
+        updatedPages[pageIndex] = {
+          ...updatedPages[pageIndex],
+          imageUrl: editedImageUrl,
+        }
+        setBook({
+          ...book,
+          story_data: {
+            ...book.story_data,
+            pages: updatedPages,
+          },
+          edit_quota_used: book.edit_quota_used + 1,
+        })
+      }
+    }
+  }
+
+  const handleRegenerateSuccess = (editedImageUrl: string) => {
+    if (book && book.story_data && regeneratingPage) {
+      const updatedPages = [...book.story_data.pages]
+      const pageIndex = regeneratingPage - 1
       if (updatedPages[pageIndex]) {
         updatedPages[pageIndex] = {
           ...updatedPages[pageIndex],
@@ -265,7 +294,7 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
             <p className="text-muted-foreground">{book.title}</p>
           </div>
           <Badge variant="secondary" className="text-lg px-4 py-2">
-            {quotaRemaining}/{book.edit_quota_limit} Edits Left
+            {quotaRemaining}/{book.edit_quota_limit} Changes Left
           </Badge>
         </div>
 
@@ -364,7 +393,7 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
           <CardHeader>
             <CardTitle>🎨 Edit Images</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Fix any issues with the generated images. You have {quotaRemaining} edit{quotaRemaining !== 1 ? 's' : ''} remaining.
+              Fix or regenerate page images. You have {quotaRemaining} change{quotaRemaining !== 1 ? 's' : ''} remaining (edit or regenerate).
             </p>
           </CardHeader>
           <CardContent>
@@ -400,6 +429,16 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
                   >
                     <Edit className="mr-2 h-4 w-4" />
                     Edit Image
+                  </Button>
+                  <Button
+                    onClick={() => handleRegenerateImage(page.pageNumber)}
+                    disabled={quotaRemaining === 0 || !page.imageUrl}
+                    className="w-full"
+                    size="sm"
+                    variant="outline"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Regenerate
                   </Button>
                 </div>
               ))}
@@ -482,6 +521,20 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
             bookId={book.id}
             onClose={() => setShowHistoryPanel(false)}
             onRevert={handleRevert}
+          />
+        )}
+
+        {/* Regenerate Image Modal */}
+        {showRegenerateModal && regeneratingPage && book && (
+          <RegenerateImageModal
+            bookId={book.id}
+            pageNumber={regeneratingPage}
+            pageText={book.story_data.pages[regeneratingPage - 1]?.text ?? ""}
+            onClose={() => {
+              setShowRegenerateModal(false)
+              setRegeneratingPage(null)
+            }}
+            onSuccess={handleRegenerateSuccess}
           />
         )}
       </div>

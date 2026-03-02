@@ -59,6 +59,29 @@ export function getPublicUrl(key: string): string {
 }
 
 /**
+ * Check if URL is our S3 bucket's public URL and extract key
+ */
+export function getKeyFromOurS3Url(url: string): string | null {
+  const base = `https://${bucket}.s3.${region}.amazonaws.com/`
+  if (!url || !url.startsWith(base)) return null
+  return url.slice(base.length) || null
+}
+
+/**
+ * Download S3 object as Buffer using backend credentials (avoids 403 on private buckets).
+ * Use this when fetching reference images from our S3 in API routes.
+ * @param url - Full S3 URL (from getPublicUrl) or key
+ * @returns { buffer, contentType } or null if not our URL / not found
+ */
+export async function getObjectBufferFromUrl(
+  url: string
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const key = url.startsWith('http') ? getKeyFromOurS3Url(url) : url
+  if (!key) return null
+  return getObjectBuffer(key)
+}
+
+/**
  * Get a time-limited signed URL for S3 object
  * @param key - S3 key (full path)
  * @param expiresInSeconds - Expiration time in seconds (default: 1 hour)

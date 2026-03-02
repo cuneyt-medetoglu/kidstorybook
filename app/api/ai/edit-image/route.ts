@@ -279,12 +279,12 @@ export async function POST(request: NextRequest) {
     await insertEditHistory({
       book_id: bookId,
       page_number: pageNumber,
-      version_number: nextVersion,
-      previous_image_url: currentImageUrl,
-      new_image_url: editedImageUrl,
+      version: nextVersion,
+      original_image_url: currentImageUrl,
+      edited_image_url: editedImageUrl,
       edit_prompt: editPrompt,
       mask_image_url: maskImageUrl,
-      edited_by: user.id,
+      edit_metadata: { mode: 'mask-edit' },
     })
 
     console.log('[Image Edit] ✅ Edit history saved')
@@ -303,6 +303,7 @@ export async function POST(request: NextRequest) {
         ...book.story_data,
         pages: updatedPages,
       },
+      edit_quota_used: quotaUsed + 1,
     })
 
     console.log('[Image Edit] ✅ Book updated with new image and quota')
@@ -315,8 +316,8 @@ export async function POST(request: NextRequest) {
     const history = (historyData || [])
       .filter((h: any) => h.page_number === pageNumber)
       .map((h: any) => ({
-        version: h.version_number,
-        imageUrl: h.new_image_url,
+        version: h.version,
+        imageUrl: h.edited_image_url,
         editPrompt: h.edit_prompt,
         createdAt: h.created_at,
       }))

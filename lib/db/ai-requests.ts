@@ -16,6 +16,7 @@ export type AIOperationType =
   | 'image_master'
   | 'image_entity'
   | 'image_edit'
+  | 'image_regenerate'
   | 'character_analysis'
   | 'tts'
 

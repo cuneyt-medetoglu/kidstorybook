@@ -71,8 +71,8 @@ export async function GET(
         const firstEdit = historyData?.find(
           (item: any) => item.page_number === pageNumber
         )
-        if (firstEdit?.previous_image_url) {
-          originalImageUrl = firstEdit.previous_image_url
+        if (firstEdit?.original_image_url) {
+          originalImageUrl = firstEdit.original_image_url
         }
       }
 
@@ -92,7 +92,7 @@ export async function GET(
     if (historyData && Array.isArray(historyData)) {
       historyData.forEach((item: any) => {
         const pageNumber = item.page_number
-        const version = item.version_number ?? item.version
+        const version = item.version
 
         if (!pageHistoryMap[pageNumber]) {
           pageHistoryMap[pageNumber] = {
@@ -100,7 +100,7 @@ export async function GET(
             versions: [
               {
                 version: 0,
-                imageUrl: item.previous_image_url || item.new_image_url,
+                imageUrl: item.original_image_url || item.edited_image_url,
                 editPrompt: 'Original generated image',
                 createdAt: book.created_at ? String(book.created_at) : new Date().toISOString(),
               },
@@ -110,7 +110,7 @@ export async function GET(
 
         pageHistoryMap[pageNumber].versions.push({
           version,
-          imageUrl: item.new_image_url,
+          imageUrl: item.edited_image_url,
           editPrompt: item.edit_prompt || 'Image edit',
           createdAt: String(item.created_at),
         })
