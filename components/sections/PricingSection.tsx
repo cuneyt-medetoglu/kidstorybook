@@ -4,18 +4,19 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Check, Download, BookOpen, Info } from "lucide-react"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { useCurrency } from "@/contexts/CurrencyContext"
+import { useTranslations } from "next-intl"
 
 export function PricingSection() {
   const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
+  const t = useTranslations("homePricing")
 
-  // Compact features for E-book (4 items)
   const ebookFeatures = [
-    "Instant download",
-    "PDF format",
-    "High-quality illustrations",
-    "Personalized story",
+    t("ebook.feature1"),
+    t("ebook.feature2"),
+    t("ebook.feature3"),
+    t("ebook.feature4"),
   ]
 
   return (
@@ -36,10 +37,10 @@ export function PricingSection() {
           className="mb-6 text-center md:mb-12"
         >
           <h2 className="mb-2 bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-3xl font-bold leading-tight pb-1 text-transparent md:mb-4 md:text-5xl md:leading-normal">
-            Pricing
+            {t("title")}
           </h2>
           <p className="mx-auto max-w-2xl text-base text-slate-600 dark:text-slate-300 md:text-lg">
-            Choose the perfect option for your child
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -66,9 +67,9 @@ export function PricingSection() {
                 {/* Plan name */}
                 <div className="mb-3 text-center md:mb-4">
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white md:text-2xl">
-                    E-Book
+                    {t("ebook.title")}
                   </h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 md:text-sm">Digital</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 md:text-sm">{t("ebook.type")}</p>
                 </div>
 
                 {/* Price */}
@@ -86,7 +87,7 @@ export function PricingSection() {
                       variant="secondary"
                       className="bg-primary/10 text-xs text-primary md:text-sm"
                     >
-                      12 pages
+                      {t("ebook.pages")}
                     </Badge>
                   </div>
                 </div>
@@ -121,7 +122,7 @@ export function PricingSection() {
                     size="lg"
                     className="w-full rounded-xl bg-gradient-to-r from-primary to-brand-2 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl md:py-6 md:text-lg"
                   >
-                    Get Started
+                    {t("ebook.cta")}
                   </Button>
                 </Link>
               </div>
@@ -146,9 +147,9 @@ export function PricingSection() {
                 {/* Title */}
                 <div className="mb-3 text-center md:mb-2">
                   <h4 className="text-xl font-bold text-slate-900 dark:text-white md:text-xl">
-                    Printed Book
+                    {t("hardcover.title")}
                   </h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 md:text-xs">Physical</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 md:text-xs">{t("hardcover.type")}</p>
                 </div>
 
                 {/* Price */}
@@ -161,9 +162,9 @@ export function PricingSection() {
                 {/* Compact features (3 key points) */}
                 <ul className="mb-4 space-y-2 md:mb-4 md:space-y-2">
                   {[
-                    "Hardcover book",
-                    "A4 format",
-                    "Free shipping",
+                    t("hardcover.feature1"),
+                    t("hardcover.feature2"),
+                    t("hardcover.feature3"),
                   ].map((feature, index) => (
                     <li key={index} className="flex items-start gap-2 md:gap-2">
                       <div className="mt-0.5 flex-shrink-0 rounded-full bg-green-100 p-0.5 dark:bg-green-900/30">
@@ -181,12 +182,11 @@ export function PricingSection() {
                   <div className="mb-2 flex flex-col items-center gap-1.5 md:mb-1 md:flex-row md:gap-1.5">
                     <Info className="h-3.5 w-3.5 flex-shrink-0 text-primary md:h-3 md:w-3" />
                     <span className="text-center text-xs font-semibold text-slate-900 dark:text-white md:text-left md:text-xs">
-                      Available in My Library
+                      {t("hardcover.availableIn")}
                     </span>
                   </div>
                   <p className="text-center text-xs leading-relaxed text-slate-600 dark:text-slate-400 md:text-left md:text-xs">
-                    Convert your{" "}
-                    <span className="whitespace-nowrap">E-Books</span> to hardcover
+                    {t("hardcover.convertText")}
                   </p>
                 </div>
 
@@ -197,7 +197,7 @@ export function PricingSection() {
                     size="sm"
                     className="w-full rounded-lg border-primary/20 bg-transparent text-sm text-primary hover:bg-primary/5 md:text-xs"
                   >
-                    View in Library
+                    {t("hardcover.viewInLibrary")}
                   </Button>
                 </Link>
               </div>
@@ -214,7 +214,7 @@ export function PricingSection() {
           className="mt-8 text-center md:mt-12"
         >
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Secure payment • Money-back guarantee • Trusted by thousands of parents
+            {t("trust")}
           </p>
         </motion.div>
       </div>

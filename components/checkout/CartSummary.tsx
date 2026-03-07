@@ -5,16 +5,18 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Check, Download, BookOpen } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 export function CartSummary() {
   const { items, getCartTotal } = useCart()
   const total = getCartTotal()
   const hasHardcopy = items.some((item) => item.type === "hardcopy")
   const hasEbook = items.some((item) => item.type === "ebook_plan")
+  const t = useTranslations("cart")
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-bold text-slate-900 dark:text-white">Order Summary</h3>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t("orderSummary")}</h3>
 
       {/* Items List */}
       <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -53,8 +55,8 @@ export function CartSummary() {
                 {item.bookTitle}
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {item.type === "hardcopy" && "Hardcover Book"}
-                {item.type === "ebook_plan" && `E-Book Plan (${item.planType ?? "10"} pages)`}
+                {item.type === "hardcopy" && t("hardcoverBook")}
+                {item.type === "ebook_plan" && t("ebookPlan", { n: item.planType ?? "10" })}
               </p>
               <p className="mt-1 text-sm font-bold text-primary">
                 ${item.price.toFixed(2)}
@@ -68,21 +70,21 @@ export function CartSummary() {
       <Card>
         <CardContent className="p-4 space-y-3">
           <div className="flex justify-between text-slate-600 dark:text-slate-400">
-            <span>Subtotal</span>
+            <span>{t("subtotal")}</span>
             <span>${total.toFixed(2)}</span>
           </div>
 
           <div className="flex justify-between text-green-600 dark:text-green-400">
             <span className="flex items-center gap-1">
               <Check className="h-4 w-4" />
-              Shipping
+              {t("shipping")}
             </span>
-            <span>{hasHardcopy ? "Free" : hasEbook ? "N/A" : "Free"}</span>
+            <span>{hasHardcopy ? t("shippingFree") : hasEbook ? t("shippingNA") : t("shippingFree")}</span>
           </div>
 
           <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
             <div className="flex justify-between">
-              <span className="text-lg font-bold text-slate-900 dark:text-white">Total</span>
+              <span className="text-lg font-bold text-slate-900 dark:text-white">{t("total")}</span>
               <span className="text-xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 ${total.toFixed(2)}
               </span>

@@ -390,5 +390,18 @@
   - **Email Pazarlama:** Yeni kullanıcılara sesli hikaye özelliği tanıtımı
   - **Product Hunt:** Launch sırasında sesli hikaye özelliği öne çıkarılmalı
 
+### 5.11 Localization (i18n) Sistemi (7 Mart 2026)
+**Analiz:** `docs/analysis/LOCALIZATION_ANALYSIS.md` | **İlerleme:** `docs/implementation/LOCALIZATION_IMPLEMENTATION.md` | **Sorumlu:** @localization-agent
+- [x] **5.11.1** Altyapı: next-intl kurulumu, [locale] routing, middleware (DEV-1) — ✅ 7 Mart 2026
+- [x] **5.11.2** Çeviri dosyaları + Header/Footer lokalizasyonu + dil seçici (DEV-2) — ✅ 7 Mart 2026
+- [x] **5.11.3** Ana sayfa bileşenleri metin taşıma: Hero, HowItWorks, Features, FAQ, CampaignBanners, CookieConsent (DEV-3) — ✅ 7 Mart 2026
+- [x] **5.11.4** Auth + Create wizard metin taşıma (DEV-4) ✅ 7 Mart 2026 — Login/Register/ForgotPassword/VerifyEmail + Create Step1–Step6 + from-example tüm UI metinleri lokalize edildi
+- [x] **5.11.5** Dashboard + Kitap sayfaları metin taşıma (DEV-5) ✅ 7 Mart 2026 — Dashboard/Settings + BookViewer + books/[id]/settings/view lokalize edildi; dashboard.settings + bookViewer.settings namespace'leri eklendi; yeni sayfa ekleme rehberi localization-agent'a yüklendi
+- [x] **5.11.6** E-ticaret sayfaları metin taşıma (DEV-6) ✅ — pricing, cart, checkout, checkout/success, CartSummary, CheckoutForm, PlanSelectionModal, draft-preview lokalize edildi; `pricing`, `cart`, `draftPreview` namespace eklendi; `checkout.plan` & `checkout.success` & `checkout.shipping` genişletildi
+- [x] **5.11.7** Örnek hikaye içerik lokalizasyonu (DEV-7) ✅ — `ExampleBook.localeKey` + `UsedPhoto.characterNameKey` alanları; mock data oluşturucu yapısı; examples sayfası tam lokalize (başlık, filtreler, boş durum, before/after, butonlar, kitap title/description/theme, karakter isimleri); TR: Ada/Can/Ece/Zeynep/Arya karakter isimleri
+- [x] **5.11.8** API hata mesajları lokalizasyonu (DEV-8) ✅ — `lib/api/client-errors.ts` utility (getApiErrorMessage/getApiResponseError); `response.ts`'e error code→i18n key dokümantasyonu; `create.step6.toasts` ve `create.fromExample.toasts` namespace'leri genişletildi; step6 + from-example tüm toast mesajları t() ile lokalize edildi
+- [x] **5.11.9** SEO: hreflang, locale-aware metadata, sitemap (DEV-9) ✅ — `lib/metadata.ts` buildPageMetadata helper; hreflang alternates; OG locale; `app/sitemap.ts` (locale-aware); `app/robots.ts`; examples/pricing/create/auth layout'ları ile page-level metadata
+- [x] **5.11.10** Test ve QA (DEV-10) ✅ — next/link + next/navigation tarama ve düzeltme; hardcoded string lokalizasyonu (PricingSection, ExampleBooksCarousel, auth/callback); 871 key tam EN=TR eşleşmesi doğrulandı; middleware + auth redirect locale doğrulaması
+
 ---
 

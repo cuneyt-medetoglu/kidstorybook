@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCart } from "@/contexts/CartContext"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/navigation"
 import { Loader2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 // Base form validation schema
 const createCheckoutSchema = (hasHardcopy: boolean) =>
@@ -45,6 +46,7 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
   const router = useRouter()
   const { items, clearCart } = useCart()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations("checkout")
 
   const checkoutSchema = createCheckoutSchema(hasHardcopy)
 
@@ -93,13 +95,13 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
         <h3 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
-          Customer Information
+          {t("customerInfo")}
         </h3>
 
         {/* Email */}
         <div className="mb-4">
           <Label htmlFor="email" className="mb-2">
-            Email <span className="text-red-500">*</span>
+            {t("emailLabel")} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="email"
@@ -116,7 +118,7 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
         {/* Name */}
         <div className="mb-4">
           <Label htmlFor="name" className="mb-2">
-            Full Name (Optional)
+            {t("fullNameLabel")}
           </Label>
           <Input
             id="name"
@@ -131,17 +133,17 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
       {hasHardcopy && (
         <div>
           <h3 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
-            Shipping Address
+            {t("shipping.title")}
           </h3>
 
           <div className="mb-4">
             <Label htmlFor="address" className="mb-2">
-              Street Address <span className="text-red-500">*</span>
+              {t("shipping.streetLabel")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="address"
               type="text"
-              placeholder="123 Main St"
+              placeholder={t("shipping.streetPlaceholder")}
               {...register("address")}
               className={errors.address ? "border-red-500" : ""}
             />
@@ -153,12 +155,12 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <Label htmlFor="city" className="mb-2">
-                City <span className="text-red-500">*</span>
+                {t("shipping.cityLabel")} <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="city"
                 type="text"
-                placeholder="Istanbul"
+                placeholder={t("shipping.cityPlaceholder")}
                 {...register("city")}
                 className={errors.city ? "border-red-500" : ""}
               />
@@ -169,12 +171,12 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
 
             <div>
               <Label htmlFor="state" className="mb-2">
-                State/Province <span className="text-red-500">*</span>
+                {t("shipping.stateLabel")} <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="state"
                 type="text"
-                placeholder="Istanbul"
+                placeholder={t("shipping.statePlaceholder")}
                 {...register("state")}
                 className={errors.state ? "border-red-500" : ""}
               />
@@ -186,12 +188,12 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
 
           <div className="mb-4">
             <Label htmlFor="zipCode" className="mb-2">
-              ZIP/Postal Code <span className="text-red-500">*</span>
+              {t("shipping.zipLabel")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="zipCode"
               type="text"
-              placeholder="34000"
+              placeholder={t("shipping.zipPlaceholder")}
               {...register("zipCode")}
               className={errors.zipCode ? "border-red-500" : ""}
             />
@@ -202,12 +204,12 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
 
           <div className="mb-4">
             <Label htmlFor="phone" className="mb-2">
-              Phone Number <span className="text-red-500">*</span>
+              {t("shipping.phoneLabel")} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="phone"
               type="tel"
-              placeholder="+90 555 123 4567"
+              placeholder={t("shipping.phonePlaceholder")}
               {...register("phone")}
               className={errors.phone ? "border-red-500" : ""}
             />
@@ -221,12 +223,11 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
       {/* Payment Method (placeholder for future integration) */}
       <div>
         <h3 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
-          Payment Method
+          {t("paymentMethod")}
         </h3>
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Payment integration will be added in Faz 4.1 (Stripe) and Faz 4.2 (İyzico).
-            For now, this is a mock checkout flow.
+            {t("paymentPlaceholder")}
           </p>
         </div>
       </div>
@@ -241,10 +242,10 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            Processing...
+            {t("processing")}
           </>
         ) : (
-          "Complete Purchase"
+          t("completePurchase")
         )}
       </Button>
     </form>

@@ -14,7 +14,8 @@ import {
   Mail,
   ArrowUp,
 } from "lucide-react"
-import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 const socialLinks = [
   { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
@@ -23,31 +24,33 @@ const socialLinks = [
   { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
 ]
 
-const quickLinks = [
-  { label: "Home", href: "/" },
-  { label: "Examples", href: "/examples" },
-  { label: "Pricing", href: "/pricing" },
-]
-
-const supportLinks = [
-  { label: "Help Center", href: "/help" },
-  { label: "Contact", href: "/contact" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Terms", href: "/terms" },
-]
-
-const legalLinks = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Service", href: "/terms" },
-  { label: "Cookie Policy", href: "/cookies" },
-]
-
-/** Buton sadece sayfa en alttan bu kadar px içerideyken gösterilir (en altlara gelince çıkar) */
+/** Show scroll-to-top button only when this many px from the bottom */
 const SCROLL_TOP_SHOW_WHEN_PX_FROM_BOTTOM = 400
 
 export function Footer() {
+  const t = useTranslations("footer")
   const [email, setEmail] = useState("")
   const [showScrollTop, setShowScrollTop] = useState(false)
+
+  // link arrays inside component so translations work
+  const quickLinks = [
+    { labelKey: "home" as const, href: "/" },
+    { labelKey: "examples" as const, href: "/examples" },
+    { labelKey: "pricing" as const, href: "/pricing" },
+  ]
+
+  const supportLinks = [
+    { labelKey: "helpCenter" as const, href: "/help" },
+    { labelKey: "contact" as const, href: "/contact" },
+    { labelKey: "faq" as const, href: "/faq" },
+    { labelKey: "terms" as const, href: "/terms" },
+  ]
+
+  const legalLinks = [
+    { labelKey: "privacyPolicy" as const, href: "/privacy" },
+    { labelKey: "termsOfService" as const, href: "/terms" },
+    { labelKey: "cookiePolicy" as const, href: "/cookies" },
+  ]
 
   useEffect(() => {
     const update = () => {
@@ -99,8 +102,7 @@ export function Footer() {
               </h3>
             </Link>
             <p className="text-sm text-gray-600 dark:text-slate-400">
-              Creating magical personalized storybooks that inspire imagination
-              and wonder in every child.
+              {t("tagline")}
             </p>
             {/* Social Media Icons */}
             <div className="flex gap-3">
@@ -137,7 +139,7 @@ export function Footer() {
             className="space-y-4"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Quick Links
+              {t("quickLinks")}
             </h4>
             <ul className="space-y-2">
               {quickLinks.map((link, index) => (
@@ -152,7 +154,7 @@ export function Footer() {
                     href={link.href}
                     className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
                   >
-                    {link.label}
+                    {t(`links.${link.labelKey}`)}
                     <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-brand-2 transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 </motion.li>
@@ -169,7 +171,7 @@ export function Footer() {
             className="space-y-4"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Support
+              {t("support")}
             </h4>
             <ul className="space-y-2">
               {supportLinks.map((link, index) => (
@@ -184,7 +186,7 @@ export function Footer() {
                     href={link.href}
                     className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
                   >
-                    {link.label}
+                    {t(`supportLinks.${link.labelKey}`)}
                     <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-brand-2 transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 </motion.li>
@@ -201,17 +203,17 @@ export function Footer() {
             className="space-y-4"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
-              Newsletter
+              {t("newsletter")}
             </h4>
             <p className="text-sm text-gray-600 dark:text-slate-400">
-              Subscribe to get special offers and updates.
+              {t("newsletterDesc")}
             </p>
             <form onSubmit={handleNewsletterSubmit} className="space-y-2">
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                 <Input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -223,7 +225,7 @@ export function Footer() {
                   type="submit"
                   className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-md transition-all hover:shadow-lg"
                 >
-                  Subscribe
+                  {t("subscribe")}
                 </Button>
               </motion.div>
             </form>
@@ -249,7 +251,7 @@ export function Footer() {
         >
           {/* Copyright */}
           <p className="text-center text-sm text-gray-600 dark:text-slate-400">
-            © {new Date().getFullYear()} KidStoryBook. All rights reserved.
+            © {new Date().getFullYear()} KidStoryBook. {t("allRightsReserved")}
           </p>
 
           {/* Legal Links */}
@@ -260,14 +262,14 @@ export function Footer() {
                 href={link.href}
                 className="text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
               >
-                {link.label}
+                {t(`legalLinks.${link.labelKey}`)}
               </Link>
             ))}
           </div>
         </motion.div>
       </div>
 
-      {/* Scroll to Top Button - only visible when near bottom (≈400px from bottom); hides at top */}
+      {/* Scroll to Top Button */}
       <motion.button
         onClick={scrollToTop}
         animate={{ opacity: showScrollTop ? 1 : 0 }}
@@ -275,7 +277,7 @@ export function Footer() {
         whileHover={showScrollTop ? { scale: 1.1 } : undefined}
         whileTap={showScrollTop ? { scale: 0.9 } : undefined}
         className={`fixed bottom-8 right-8 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg transition-all hover:shadow-xl ${!showScrollTop ? "pointer-events-none" : ""}`}
-        aria-label="Scroll to top"
+        aria-label={t("scrollToTop")}
         aria-hidden={!showScrollTop}
         tabIndex={showScrollTop ? 0 : -1}
       >
@@ -284,4 +286,3 @@ export function Footer() {
     </motion.footer>
   )
 }
-

@@ -3,15 +3,16 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, ChevronLeft, ChevronRight, Eye, BookOpen } from "lucide-react"
-import { mockExampleBooks, type ExampleBook } from "@/app/examples/types"
+import { mockExampleBooks, type ExampleBook } from "@/app/[locale]/examples/types"
+import { useTranslations } from "next-intl"
 
 export function ExampleBooksCarousel() {
-  // Use first 6 books from mockExampleBooks
+  const t = useTranslations("homeExamples")
   const exampleBooks = mockExampleBooks.slice(0, 6)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
@@ -148,10 +149,10 @@ export function ExampleBooksCarousel() {
           className="mb-12 text-center"
         >
           <h2 className="text-balance text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
-            Example Books
+            {t("title")}
           </h2>
           <p className="text-pretty mx-auto mt-4 max-w-2xl text-lg text-muted-foreground md:text-xl">
-            See how photos become magical stories
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -267,7 +268,11 @@ interface BookCardProps {
 }
 
 function BookCard({ book }: BookCardProps) {
+  const t = useTranslations("homeExamples")
+  const tBooks = useTranslations("examples.books")
   const firstPhoto = book.usedPhotos[0]
+  const title = book.localeKey ? tBooks(`${book.localeKey}.title`) : book.title
+  const description = book.localeKey ? tBooks(`${book.localeKey}.description`) : book.description
 
   return (
     <Card className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:bg-slate-900">
@@ -340,19 +345,19 @@ function BookCard({ book }: BookCardProps) {
 
       {/* Book Information */}
       <div>
-        <h3 className="text-balance text-xl font-bold text-foreground mb-3">{book.title}</h3>
+        <h3 className="text-balance text-xl font-bold text-foreground mb-3">{title}</h3>
 
         <div className="flex flex-wrap gap-2 mb-3">
           <Badge className="bg-primary/10 text-primary border-0">
             {book.theme}
           </Badge>
           <Badge className="bg-brand-2/10 text-brand-2 border-0">
-            {book.ageGroup === '10+' ? '10+ years' : `${book.ageGroup} years`}
+            {book.ageGroup === '10+' ? t("ageYearsPlus") : `${book.ageGroup} ${t("ageYearsSuffix")}`}
           </Badge>
         </div>
 
         <p className="text-pretty text-sm text-muted-foreground line-clamp-2 mb-1">
-          {book.description}
+          {description}
         </p>
 
         {/* CTA Button */}
@@ -362,7 +367,7 @@ function BookCard({ book }: BookCardProps) {
             size="sm"
           >
             <Eye className="mr-2 h-4 w-4" />
-            View Example
+            {t("viewExample")}
           </Button>
         </Link>
       </div>

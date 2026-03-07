@@ -3,33 +3,9 @@
 import { motion } from "framer-motion"
 import { Upload, Sparkles, Gift, ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { useTranslations } from "next-intl"
 
-const steps = [
-  {
-    number: 1,
-    icon: Upload,
-    title: "Personalize Your Character",
-    titleTr: "Karakteri Kişiselleştir",
-    description:
-      "Upload your child's photo and add their details (name, age, appearance)",
-  },
-  {
-    number: 2,
-    icon: Sparkles,
-    title: "Create Your Story",
-    titleTr: "Hikaye Oluştur",
-    description:
-      "Choose a theme and illustration style. AI generates a personalized story",
-  },
-  {
-    number: 3,
-    icon: Gift,
-    title: "Get Your Book",
-    titleTr: "Kitabını Al",
-    description:
-      "Receive your e-book instantly or order a printed hardcover version",
-  },
-]
+const stepIcons = [Upload, Sparkles, Gift]
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -55,9 +31,17 @@ const itemVariants = {
 }
 
 export function HowItWorks() {
+  const t = useTranslations("howItWorks")
+
+  const steps = [
+    { number: 1, icon: stepIcons[0], title: t("step1.title"), description: t("step1.description") },
+    { number: 2, icon: stepIcons[1], title: t("step2.title"), description: t("step2.description") },
+    { number: 3, icon: stepIcons[2], title: t("step3.title"), description: t("step3.description") },
+  ]
+
   return (
     <section className="relative overflow-visible bg-gradient-to-b from-brand-2/5 via-primary/5 to-brand-2/5 pb-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 sm:pb-20 md:overflow-hidden md:pt-4 md:pb-24 lg:pt-5 lg:pb-32">
-      {/* Top Wave Separator (mobile) - Merges with Hero section badges */}
+      {/* Top Wave Separator (mobile) */}
       <div className="pointer-events-none absolute left-0 top-0 z-0 w-full -translate-y-[48px] md:hidden sm:-translate-y-[64px]">
         <svg
           className="h-12 w-full text-brand-2/10 dark:text-slate-950 sm:h-16"
@@ -88,10 +72,10 @@ export function HowItWorks() {
           className="mb-16 text-center"
         >
           <h2 className="text-balance text-4xl font-bold text-foreground md:text-5xl lg:text-6xl">
-            How It Works
+            {t("title")}
           </h2>
           <p className="mt-4 text-pretty text-lg text-muted-foreground md:text-xl">
-            Create your personalized storybook in just 3 simple steps
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -109,10 +93,9 @@ export function HowItWorks() {
               <div key={step.number} className="relative flex">
                 <motion.div variants={itemVariants} className="flex w-full">
                   <Card className="group relative flex w-full flex-col overflow-visible border-2 border-primary/10 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:border-primary/10 dark:bg-slate-900 md:p-5 lg:p-8">
-                    {/* Gradient overlay on hover */}
                     <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 to-brand-2/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
 
-                    {/* Step number - large gradient */}
+                    {/* Step number — large gradient background */}
                     <div className="absolute -right-4 -top-4 text-6xl font-bold text-transparent opacity-10 md:text-7xl lg:text-8xl">
                       <span className="bg-gradient-to-br from-primary to-brand-2 bg-clip-text">
                         {step.number}
@@ -120,11 +103,8 @@ export function HowItWorks() {
                     </div>
 
                     <div className="relative space-y-4 md:space-y-3 lg:space-y-6">
-                      {/* Icon with floating animation */}
                       <motion.div
-                        animate={{
-                          y: [0, -8, 0],
-                        }}
+                        animate={{ y: [0, -8, 0] }}
                         transition={{
                           duration: 3,
                           repeat: Number.POSITIVE_INFINITY,
@@ -135,22 +115,19 @@ export function HowItWorks() {
                         <Icon className="h-6 w-6 text-white md:h-5 md:w-5 lg:h-8 lg:w-8" />
                       </motion.div>
 
-                      {/* Step number badge */}
                       <div className="inline-flex items-center gap-2">
                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-brand-2 text-base font-bold text-white shadow-md md:h-7 md:w-7 md:text-sm lg:h-10 lg:w-10 lg:text-lg">
                           {step.number}
                         </span>
                         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground md:text-[0.65rem] lg:text-sm">
-                          Step {step.number}
+                          {t("stepLabel")} {step.number}
                         </span>
                       </div>
 
-                      {/* Title */}
                       <h3 className="text-balance text-xl font-bold text-foreground md:text-lg lg:text-2xl">
                         {step.title}
                       </h3>
 
-                      {/* Description */}
                       <p className="text-pretty text-sm text-muted-foreground md:text-xs lg:text-base">
                         {step.description}
                       </p>
@@ -158,7 +135,7 @@ export function HowItWorks() {
                   </Card>
                 </motion.div>
 
-                {/* Connecting arrow (between cards, outside) */}
+                {/* Connecting arrow between cards */}
                 {!isLast && (
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -177,7 +154,6 @@ export function HowItWorks() {
           })}
         </motion.div>
 
-        {/* Call to action */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -185,12 +161,9 @@ export function HowItWorks() {
           transition={{ duration: 0.6, delay: 0.8 }}
           className="mt-16 text-center"
         >
-          <p className="text-balance text-lg text-muted-foreground">
-            Ready to create a magical story for your child?
-          </p>
+          <p className="text-balance text-lg text-muted-foreground">{t("cta")}</p>
         </motion.div>
       </div>
     </section>
   )
 }
-

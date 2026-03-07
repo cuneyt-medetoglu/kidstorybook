@@ -5,19 +5,19 @@ import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, BookOpen, Star } from "lucide-react"
 import { useRef } from "react"
 import { HeroBookTransformation } from "./HeroBookTransformation"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 export function Hero() {
+  const t = useTranslations("hero")
   const heroRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   })
 
-  // Parallax effect for hero image
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]) // Declared imageScale variable
 
-  // Floating animations for decorative elements
   const getFloatingAnimation = (i: number) => ({
     y: [0, -20, 0],
     rotate: [0, 5, 0, -5, 0],
@@ -42,7 +42,7 @@ export function Hero() {
       <section
         className="relative min-h-[85vh] overflow-x-hidden overflow-y-visible bg-gradient-to-br from-primary/5 via-white to-brand-2/5 sm:min-h-[80vh] md:min-h-0 md:overflow-hidden lg:min-h-0 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
       >
-      {/* Decorative floating elements - hidden on mobile for performance */}
+      {/* Decorative floating elements — hidden on mobile for performance */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
           const Icon = element.Icon
@@ -69,7 +69,7 @@ export function Hero() {
 
       <div className="container relative mx-auto px-4 pb-0 pt-12 sm:pb-0 sm:pt-14 md:px-6 md:pb-12 md:pt-12 lg:pb-16 lg:pt-16">
         <div className="grid items-center gap-8 sm:gap-10 md:grid-cols-2 md:gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-14">
-          {/* Left Column - Text Content (responsive typography: tablet scales proportionally) */}
+          {/* Left Column — Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -84,35 +84,34 @@ export function Hero() {
               className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1.5 md:text-xs lg:px-4 lg:py-2 lg:text-sm"
             >
               <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" />
-              <span>AI-Powered Personalization</span>
+              <span>{t("badge")}</span>
             </motion.div>
 
-            {/* Main Heading - tablet (md) smaller than desktop (lg) for proportional scaling */}
+            {/* Main Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-balance text-3xl font-bold leading-tight text-gray-900 dark:text-slate-50 sm:text-4xl md:text-4xl md:leading-snug lg:text-5xl xl:text-6xl 2xl:text-7xl"
             >
-              Create{" "}
+              {t("titlePart1")}
               <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
-                Magical Stories
-              </span>{" "}
-              Starring Your Child
+                {t("titleHighlight")}
+              </span>
+              {t("titlePart2")}
             </motion.h1>
 
-            {/* Subheading - tablet proportionally smaller */}
+            {/* Subheading */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-pretty text-base leading-relaxed text-gray-600 dark:text-slate-400 sm:text-lg md:text-sm md:leading-relaxed lg:text-base xl:text-lg"
             >
-              Transform your child into the hero of their own adventure with AI-generated personalized storybooks.
-              Beautifully illustrated tales that inspire imagination and create lasting memories.
+              {t("subtitle")}
             </motion.p>
 
-            {/* CTA Buttons - tablet smaller padding */}
+            {/* CTA Buttons */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -120,27 +119,31 @@ export function Hero() {
               className="flex flex-col gap-3 sm:flex-row sm:justify-center sm:gap-4 md:justify-start md:gap-3 lg:gap-4"
             >
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-primary to-brand-2 px-6 py-5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
-                >
-                  Create Your Book
-                </Button>
+                <Link href="/create/step1">
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 px-6 py-5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
+                  >
+                    {t("cta")}
+                  </Button>
+                </Link>
               </motion.div>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full border-2 border-primary/30 bg-white/50 px-6 py-5 text-sm font-semibold text-primary backdrop-blur-sm transition-all hover:bg-primary/5 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
-                >
-                  See Examples
-                </Button>
+                <Link href="/examples">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-2 border-primary/30 bg-white/50 px-6 py-5 text-sm font-semibold text-primary backdrop-blur-sm transition-all hover:bg-primary/5 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
+                  >
+                    {t("seeExamples")}
+                  </Button>
+                </Link>
               </motion.div>
             </motion.div>
           </motion.div>
 
-          {/* Right Column - Book Transformation */}
+          {/* Right Column — Book Transformation */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -148,16 +151,13 @@ export function Hero() {
             className="relative"
             style={{ y: imageY }}
           >
-            {/* Background Glow */}
             <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-primary/20 to-brand-2/20 blur-3xl" />
-            
-            {/* 3D Book Transformation Component */}
             <HeroBookTransformation />
           </motion.div>
         </div>
       </div>
 
-      {/* Bottom Wave Separator - Only on tablet/web */}
+      {/* Bottom Wave Separator — Only on tablet/web */}
       <div className="hidden md:absolute md:bottom-0 md:left-0 md:block md:w-full">
         <svg
           className="h-12 w-full text-brand-2/10 dark:text-slate-950 sm:h-16 md:h-20 lg:h-24"

@@ -1,5 +1,17 @@
 /**
  * Standard API Response Types and Helpers
+ *
+ * Error Code → i18n Key Mapping (errors.* namespace):
+ *   UNAUTHORIZED        → errors.unauthorized
+ *   FORBIDDEN           → errors.forbidden
+ *   NOT_FOUND           → errors.notFound
+ *   BAD_REQUEST         → errors.badRequest
+ *   VALIDATION_ERROR    → errors.validation
+ *   INTERNAL_ERROR      → errors.server
+ *   SERVICE_UNAVAILABLE → errors.unavailable
+ *   RATE_LIMIT          → errors.rateLimit
+ *
+ * Client-side helper: lib/api/client-errors.ts → getApiErrorMessage(code, t)
  */
 
 import { NextResponse } from 'next/server'

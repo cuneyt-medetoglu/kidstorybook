@@ -33,6 +33,7 @@ docs/
 ├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
 │   ├── README.md               # Klasör açıklaması (FAZ 6)
 │   ├── DESIGN_TOKEN_IMPLEMENTATION.md # ✅ Design Token renk sistemi (7 Mart 2026) — 2.1.9
+│   ├── LOCALIZATION_IMPLEMENTATION.md # Localization (i18n) ilerleme — Faz 5.11, @localization-agent
 │   ├── CUSTOM_THEME_IMPLEMENTATION.md # Custom tema + theme merge (1 Mart 2026)
 │   ├── FAZ3_IMPLEMENTATION.md   # Faz 3 implementasyon takibi
 │   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
@@ -232,10 +233,11 @@ docs/
 14. **analysis/CREATE_BOOK_FLOW_SEQUENCE.md** - Kitap oluşturma akışı, sıra ve paralellik (TTS prewarm, master→kapak→sayfa, Step 6 butonları, timing summary, Google TTS quota); optimizasyon önerileri (OPT-1/2/3)
 15. **analysis/CHARACTER_LIMIT_3_TO_5_ANALYSIS.md** - Kitap oluşturma karakter limiti 3→5 analizi; etkilenen yerler ve dokümantasyon güncellemeleri
 16. **analysis/VISION_ANALYSIS_NECESSITY.md** - Karakter oluşturmada OpenAI Vision analizi; Vision kaldırıldı (2026-03-01), form + referans fotoğraf
-17. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
-18. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
-19. **archive/2026-02/analysis/** - Arşivlenen analizler
-20. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
+17. **analysis/LOCALIZATION_ANALYSIS.md** - Localization (i18n) analiz ve kararlar; next-intl, URL yapısı, örnek hikaye/karakter isimleri; DEV-1…DEV-10 fazları; ilerleme: implementation/LOCALIZATION_IMPLEMENTATION.md; sorumlu: @localization-agent
+18. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
+19. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+20. **archive/2026-02/analysis/** - Arşivlenen analizler
+21. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

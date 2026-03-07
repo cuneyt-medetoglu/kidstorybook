@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Check, BookOpen } from "lucide-react"
 import type { CurrencyConfig } from "@/lib/currency"
 import { useCurrency } from "@/contexts/CurrencyContext"
+import { useTranslations } from "next-intl"
 
 interface PlanSelectionModalProps {
   isOpen: boolean
@@ -47,6 +48,7 @@ export function PlanSelectionModal({
   const currencyConfig = externalCurrencyConfig ?? contextCurrency
   const isLoadingCurrency = !externalCurrencyConfig && contextLoading
   const [selectedPlan, setSelectedPlan] = useState<"10" | "15" | "20">("10")
+  const t = useTranslations("checkout.plan")
 
   // Calculate price for selected plan
   const getPlanPrice = (planType: "10" | "15" | "20"): number => {
@@ -69,20 +71,20 @@ export function PlanSelectionModal({
     {
       type: "10" as const,
       pages: 10,
-      description: "Perfect for a short, sweet story",
-      features: ["10 pages", "Quick read", "Perfect for bedtime"],
+      description: t("10pages.description"),
+      features: [t("10pages.feature1"), t("10pages.feature2"), t("10pages.feature3")],
     },
     {
       type: "15" as const,
       pages: 15,
-      description: "Ideal length for most stories",
-      features: ["15 pages", "Balanced story", "More illustrations"],
+      description: t("15pages.description"),
+      features: [t("15pages.feature1"), t("15pages.feature2"), t("15pages.feature3")],
     },
     {
       type: "20" as const,
       pages: 20,
-      description: "Extended adventure with more details",
-      features: ["20 pages", "Detailed story", "Rich illustrations"],
+      description: t("20pages.description"),
+      features: [t("20pages.feature1"), t("20pages.feature2"), t("20pages.feature3")],
     },
   ]
 
@@ -91,10 +93,10 @@ export function PlanSelectionModal({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white">
-            Choose Your Book Plan
+            {t("title")}
           </DialogTitle>
           <DialogDescription className="text-slate-600 dark:text-slate-400">
-            Select the number of pages for your personalized book
+            {t("subtitle")}
           </DialogDescription>
         </DialogHeader>
 
@@ -121,11 +123,11 @@ export function PlanSelectionModal({
                     <div className="mb-2 flex items-center gap-3">
                       <BookOpen className="h-5 w-5 text-primary" />
                       <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                        {plan.pages} Pages
+                        {t("pages", { n: plan.pages })}
                       </h3>
                       {isSelected && (
                         <Badge className="bg-primary text-white">
-                          Selected
+                          {t("selected")}
                         </Badge>
                       )}
                     </div>
@@ -172,13 +174,13 @@ export function PlanSelectionModal({
 
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleConfirm}
             className="bg-gradient-to-r from-primary to-brand-2 text-white hover:opacity-90"
           >
-            Add to Cart
+            {t("addToCart")}
           </Button>
         </div>
       </DialogContent>

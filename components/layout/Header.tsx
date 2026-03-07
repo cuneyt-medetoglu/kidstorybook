@@ -25,11 +25,12 @@ import {
   User,
   LogOut,
   Settings,
+  Globe,
 } from "lucide-react"
-import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { useCart } from "@/contexts/CartContext"
+import { useTranslations, useLocale } from "next-intl"
+import { Link, useRouter, usePathname } from "@/i18n/navigation"
 
 const countries = [
   { code: "US", flag: "🇺🇸", currency: "USD" },
@@ -38,15 +39,17 @@ const countries = [
   { code: "EU", flag: "🇪🇺", currency: "EUR" },
 ]
 
-const navLinks = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Examples", href: "/examples", icon: BookOpen },
-  { label: "Pricing", href: "/pricing", icon: Tag },
-]
+const LOCALE_META: Record<string, { flag: string; label: string }> = {
+  en: { flag: "🇬🇧", label: "EN" },
+  tr: { flag: "🇹🇷", label: "TR" },
+}
 
 export function Header() {
+  const t = useTranslations("nav")
+  const locale = useLocale()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
+  const pathname = usePathname()
   const { data: session, status } = useSession()
   const user = session?.user ?? null
   const isLoading = status === "loading"
@@ -57,12 +60,23 @@ export function Header() {
   const { getCartCount } = useCart()
   const cartCount = getCartCount()
 
+  // nav links defined here so translations work
+  const navLinks = [
+    { labelKey: "home" as const, href: "/", icon: Home },
+    { labelKey: "examples" as const, href: "/examples", icon: BookOpen },
+    { labelKey: "pricing" as const, href: "/pricing", icon: Tag },
+  ]
+
   const handleLogout = () => {
-    signOut({ callbackUrl: "/" })
-    router.refresh()
+    signOut({ callbackUrl: `/${locale}` })
   }
 
-  // Avoid hydration mismatch
+  const handleLocaleSwitch = (newLocale: string) => {
+    // Persist preference so middleware remembers on next visit
+    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000;SameSite=Lax`
+    router.replace(pathname, { locale: newLocale })
+  }
+
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -75,6 +89,8 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  const currentLocaleMeta = LOCALE_META[locale] ?? LOCALE_META["en"]
+  const otherLocales = Object.entries(LOCALE_META).filter(([code]) => code !== locale)
 
   return (
     <motion.header
@@ -116,7 +132,7 @@ export function Header() {
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
-                  {link.label}
+                  {t(link.labelKey)}
                 </motion.span>
               </Link>
             </motion.div>
@@ -125,7 +141,7 @@ export function Header() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
-          {/* Country/Currency Selector */}
+          {/* Currency Selector */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -152,12 +168,41 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Language Selector — Desktop */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden gap-1 text-xs sm:text-sm lg:flex items-center"
+                aria-label="Switch language"
+              >
+                <Globe className="h-4 w-4" />
+                <span className="font-medium">{currentLocaleMeta.flag} {currentLocaleMeta.label}</span>
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-28">
+              {otherLocales.map(([code, meta]) => (
+                <DropdownMenuItem
+                  key={code}
+                  onClick={() => handleLocaleSwitch(code)}
+                  className="cursor-pointer gap-2"
+                >
+                  <span>{meta.flag}</span>
+                  <span className="font-medium">{meta.label}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Shopping Cart */}
           <Link href="/cart">
             <motion.button
               className="relative"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
+              aria-label={t("shoppingCart")}
             >
               <ShoppingCart className="h-6 w-6 text-gray-800 dark:text-slate-100" />
               <AnimatePresence>
@@ -188,7 +233,7 @@ export function Header() {
                 size="icon"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="h-9 w-9 text-gray-800 dark:text-slate-100"
-                aria-label="Toggle theme"
+                aria-label={theme === "dark" ? t("lightMode") : t("darkMode")}
               >
                 <motion.div
                   initial={false}
@@ -218,8 +263,8 @@ export function Header() {
                 >
                   <Link href="/create/step1">
                     <Button className="bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
-                      <span className="hidden lg:inline">Create a children's book</span>
-                      <span className="lg:hidden">Create</span>
+                      <span className="hidden lg:inline">{t("createBook")}</span>
+                      <span className="lg:hidden">{t("create")}</span>
                     </Button>
                   </Link>
                 </motion.div>
@@ -237,19 +282,19 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link href="/dashboard" className="flex items-center">
                         <User className="mr-2 h-4 w-4" />
-                        My Library
+                        {t("myLibrary")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
-                        Settings
+                        {t("settings")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
                       <LogOut className="mr-2 h-4 w-4" />
-                      Logout
+                      {t("logout")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -258,12 +303,12 @@ export function Header() {
               <>
                 <Link href="/auth/login">
                   <Button variant="ghost" className="font-medium text-gray-800 hover:text-primary dark:text-slate-100">
-                    Sign In
+                    {t("signIn")}
                   </Button>
                 </Link>
                 <Link href="/auth/register">
                   <Button variant="ghost" className="font-medium text-gray-800 hover:text-primary dark:text-slate-100">
-                    Sign Up
+                    {t("signUp")}
                   </Button>
                 </Link>
                 <motion.div
@@ -273,8 +318,8 @@ export function Header() {
                 >
                   <Link href="/create/step1">
                     <Button className="bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
-                      <span className="hidden lg:inline">Create a children's book</span>
-                      <span className="lg:hidden">Create</span>
+                      <span className="hidden lg:inline">{t("createBook")}</span>
+                      <span className="lg:hidden">{t("create")}</span>
                     </Button>
                   </Link>
                 </motion.div>
@@ -330,7 +375,7 @@ export function Header() {
                         >
                           <Icon className="h-5 w-5 text-primary transition-transform group-hover:scale-110" />
                           <span className="text-base font-medium text-gray-800 dark:text-slate-100">
-                            {link.label}
+                            {t(link.labelKey)}
                           </span>
                         </Link>
                       </motion.div>
@@ -348,7 +393,7 @@ export function Header() {
                       className="flex items-center justify-between rounded-xl bg-white/60 px-4 py-3 transition-colors hover:bg-white/80 dark:bg-slate-800/60 dark:hover:bg-slate-800/80"
                     >
                       <span className="text-sm font-medium text-gray-800 dark:text-slate-100">
-                        Shopping Cart
+                        {t("shoppingCart")}
                       </span>
                       <div className="flex items-center gap-2">
                         <ShoppingCart className="h-5 w-5 text-primary" />
@@ -359,7 +404,7 @@ export function Header() {
                     </motion.div>
                   </Link>
 
-                  {/* Country Selector */}
+                  {/* Currency Selector — Mobile */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -373,9 +418,7 @@ export function Header() {
                         >
                           <span className="flex items-center gap-2">
                             <span>{selectedCountry.flag}</span>
-                            <span className="font-medium">
-                              {selectedCountry.currency}
-                            </span>
+                            <span className="font-medium">{selectedCountry.currency}</span>
                           </span>
                           <ChevronDown className="h-4 w-4" />
                         </Button>
@@ -395,7 +438,46 @@ export function Header() {
                     </DropdownMenu>
                   </motion.div>
 
-                  {/* Theme Toggle - Mobile */}
+                  {/* Language Selector — Mobile */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.62 }}
+                  >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between bg-white/60 backdrop-blur-sm dark:bg-slate-800/60"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Globe className="h-4 w-4" />
+                            <span className="font-medium">
+                              {currentLocaleMeta.flag} {currentLocaleMeta.label}
+                            </span>
+                          </span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[272px]">
+                        {otherLocales.map(([code, meta]) => (
+                          <DropdownMenuItem
+                            key={code}
+                            onClick={() => {
+                              handleLocaleSwitch(code)
+                              setIsMobileMenuOpen(false)
+                            }}
+                            className="cursor-pointer gap-2"
+                          >
+                            <span>{meta.flag}</span>
+                            <span className="font-medium">{meta.label}</span>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </motion.div>
+
+                  {/* Theme Toggle — Mobile */}
                   {mounted && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -414,14 +496,14 @@ export function Header() {
                             <Moon className="h-4 w-4" />
                           )}
                           <span className="font-medium">
-                            {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                            {theme === "dark" ? t("lightMode") : t("darkMode")}
                           </span>
                         </span>
                       </Button>
                     </motion.div>
                   )}
 
-                  {/* Auth Buttons / User Menu - Mobile */}
+                  {/* Auth Buttons / User Menu — Mobile */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -446,18 +528,18 @@ export function Header() {
                         <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
                             <User className="mr-2 h-4 w-4" />
-                            <span className="font-medium">My Library</span>
+                            <span className="font-medium">{t("myLibrary")}</span>
                           </Button>
                         </Link>
                         <Link href="/settings" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
                             <Settings className="mr-2 h-4 w-4" />
-                            <span className="font-medium">Settings</span>
+                            <span className="font-medium">{t("settings")}</span>
                           </Button>
                         </Link>
                         <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl">
-                            Create a children's book
+                            {t("createBook")}
                           </Button>
                         </Link>
                         <Button
@@ -469,24 +551,24 @@ export function Header() {
                           }}
                         >
                           <LogOut className="mr-2 h-4 w-4" />
-                          <span className="font-medium">Logout</span>
+                          <span className="font-medium">{t("logout")}</span>
                         </Button>
                       </>
                     ) : (
                       <>
                         <Link href="/auth/login" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
-                            <span className="font-medium">Sign In</span>
+                            <span className="font-medium">{t("signIn")}</span>
                           </Button>
                         </Link>
                         <Link href="/auth/register" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button variant="outline" className="w-full justify-start bg-white/60 backdrop-blur-sm dark:bg-slate-800/60">
-                            <span className="font-medium">Sign Up</span>
+                            <span className="font-medium">{t("signUp")}</span>
                           </Button>
                         </Link>
                         <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
                           <Button className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl">
-                            Create a children's book
+                            {t("createBook")}
                           </Button>
                         </Link>
                       </>
@@ -501,4 +583,3 @@ export function Header() {
     </motion.header>
   )
 }
-

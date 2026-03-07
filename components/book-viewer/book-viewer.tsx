@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useRouter } from "next/navigation"
+import { useRouter } from "@/i18n/navigation"
+import { useTranslations } from "next-intl"
 import {
   ArrowLeft,
   ArrowRight,
@@ -119,6 +120,7 @@ interface BookViewerProps {
 }
 
 export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewerProps) {
+  const t = useTranslations("bookViewer")
   const router = useRouter()
   const [book, setBook] = useState<any>(null)
   const [isLoadingBook, setIsLoadingBook] = useState(true)
@@ -669,7 +671,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
-          <p className="text-gray-600 dark:text-slate-400">Loading book...</p>
+          <p className="text-gray-600 dark:text-slate-400">{t("loadingBook")}</p>
         </div>
       </div>
     )
@@ -680,10 +682,10 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-red-600 dark:text-red-400 mb-4">{error || 'Book not found'}</p>
+          <p className="text-red-600 dark:text-red-400 mb-4">{error || t("bookNotFound")}</p>
           {onClose && (
             <Button onClick={onClose} variant="outline">
-              Go Back
+              {t("goBack")}
             </Button>
           )}
         </div>
@@ -698,10 +700,10 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
         <div className="text-center max-w-md px-4">
           <BookOpen className="h-24 w-24 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
           <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{book.title}</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">This book has no pages yet. It's a cover-only book.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{t("noPagesYet")}</p>
           {onClose && (
             <Button onClick={onClose} variant="outline">
-              Go Back
+              {t("goBack")}
             </Button>
           )}
         </div>
@@ -839,7 +841,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">
-                Page {currentPage + 1} of {totalPages}
+                {t("pageOf", { current: currentPage + 1, total: totalPages })}
               </span>
               {autoplayMode !== "off" && (
                 <motion.div
@@ -848,7 +850,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
                   className="flex items-center gap-1 rounded-full bg-gradient-to-r from-primary to-brand-2 px-2 py-0.5 text-[10px] font-semibold text-white"
                 >
                   <RotateCcw className="h-3 w-3" />
-                  {autoplayMode === "tts" ? "Auto-reading" : `Auto (${autoplayCountdown}s)`}
+                  {autoplayMode === "tts" ? t("autoReading") : t("autoSeconds", { count: autoplayCountdown })}
                 </motion.div>
               )}
             </div>
@@ -1229,7 +1231,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
           aria-label="Parent Settings"
         >
           <Settings className="h-3 w-3 mr-1" />
-          <span className="hidden lg:inline">Parent Settings</span>
+          <span className="hidden lg:inline">{t("parentSettings")}</span>
         </Button>
       </footer>
     </div>

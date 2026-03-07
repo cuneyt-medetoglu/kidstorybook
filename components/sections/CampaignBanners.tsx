@@ -4,62 +4,54 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Truck, Tag, Gift, ChevronLeft, ChevronRight } from "lucide-react"
+import { useTranslations } from "next-intl"
 
-const banners = [
+type BannerKey = "shipping" | "discount" | "bundle"
+
+const bannerMeta: { id: number; icon: React.ElementType; key: BannerKey; gradient: string; iconColor: string }[] = [
   {
     id: 1,
     icon: Truck,
-    title: "Free Shipping on All Printed Books",
-    titleTR: "Tüm Basılı Kitaplarda Ücretsiz Kargo",
-    description: "No minimum order required",
-    cta: "Order Now",
+    key: "shipping",
     gradient: "from-primary via-primary/80 to-brand-2",
     iconColor: "text-white/70",
   },
   {
     id: 2,
     icon: Tag,
-    title: "10% Off Your First Order",
-    titleTR: "İlk Siparişinizde %10 İndirim",
-    description: "Use code: FIRST10 at checkout",
-    cta: "Get Started",
+    key: "discount",
     gradient: "from-brand-2 via-rose-500 to-primary",
     iconColor: "text-white/70",
   },
   {
     id: 3,
     icon: Gift,
-    title: "Limited Time: Get E-Book + Printed Book Bundle",
-    titleTR: "Sınırlı Süre: E-Kitap + Basılı Kitap Paketi",
-    description: "Save 15% on combo packages",
-    cta: "View Offer",
+    key: "bundle",
     gradient: "from-primary to-brand-2",
     iconColor: "text-white/70",
   },
 ]
 
 export function CampaignBanners() {
+  const t = useTranslations("campaign")
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
 
-  // Auto-rotate every 6 seconds
   useEffect(() => {
     if (!isAutoPlaying) return
-
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % banners.length)
+      setCurrentIndex((prev) => (prev + 1) % bannerMeta.length)
     }, 6000)
-
     return () => clearInterval(interval)
   }, [isAutoPlaying])
 
   const goToPrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length)
+    setCurrentIndex((prev) => (prev - 1 + bannerMeta.length) % bannerMeta.length)
     setIsAutoPlaying(false)
   }
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % banners.length)
+    setCurrentIndex((prev) => (prev + 1) % bannerMeta.length)
     setIsAutoPlaying(false)
   }
 
@@ -68,7 +60,7 @@ export function CampaignBanners() {
     setIsAutoPlaying(false)
   }
 
-  const currentBanner = banners[currentIndex]
+  const currentBanner = bannerMeta[currentIndex]
   const Icon = currentBanner.icon
 
   return (
@@ -97,15 +89,10 @@ export function CampaignBanners() {
                   <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     {/* Icon and Text */}
                     <div className="flex items-center gap-6 text-white flex-1">
-                      {/* Animated Icon */}
                       <motion.div
                         initial={{ scale: 0, rotate: -180 }}
                         animate={{ scale: 1, rotate: 0 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 200,
-                          damping: 15,
-                        }}
+                        transition={{ type: "spring", stiffness: 200, damping: 15 }}
                         className="hidden md:block"
                       >
                         <div className="bg-white/20 backdrop-blur-sm p-4 rounded-2xl">
@@ -113,7 +100,6 @@ export function CampaignBanners() {
                         </div>
                       </motion.div>
 
-                      {/* Text Content */}
                       <div className="text-center md:text-left">
                         <motion.div
                           initial={{ opacity: 0, y: 10 }}
@@ -122,9 +108,11 @@ export function CampaignBanners() {
                         >
                           <Icon className={`h-8 w-8 ${currentBanner.iconColor} mx-auto md:hidden mb-3`} />
                           <h3 className="text-2xl md:text-3xl font-bold mb-2 text-balance">
-                            {currentBanner.title}
+                            {t(`${currentBanner.key}.title`)}
                           </h3>
-                          <p className="text-white/90 text-sm md:text-base">{currentBanner.description}</p>
+                          <p className="text-white/90 text-sm md:text-base">
+                            {t(`${currentBanner.key}.description`)}
+                          </p>
                         </motion.div>
                       </div>
                     </div>
@@ -141,7 +129,7 @@ export function CampaignBanners() {
                         size="lg"
                         className="bg-white text-primary hover:bg-white/90 shadow-xl font-semibold px-8 py-6 text-lg rounded-full"
                       >
-                        {currentBanner.cta}
+                        {t(`${currentBanner.key}.cta`)}
                       </Button>
                     </motion.div>
                   </div>
@@ -168,7 +156,7 @@ export function CampaignBanners() {
 
             {/* Dots Indicator */}
             <div className="flex justify-center gap-2 mt-6">
-              {banners.map((banner, index) => (
+              {bannerMeta.map((banner, index) => (
                 <button
                   key={banner.id}
                   onClick={() => goToSlide(index)}
@@ -187,4 +175,3 @@ export function CampaignBanners() {
     </section>
   )
 }
-

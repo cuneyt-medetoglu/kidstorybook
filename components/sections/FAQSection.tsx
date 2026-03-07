@@ -3,62 +3,12 @@
 import { motion } from "framer-motion"
 import { ChevronDown, HelpCircle } from "lucide-react"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 
 interface FAQItem {
   question: string
   answer: string
 }
-
-const faqs: FAQItem[] = [
-  {
-    question: "How does it work?",
-    answer:
-      "It's simple! Upload your child's photo, choose a theme and style, and our AI creates a personalized storybook. You can download it as an e-book or order a printed hardcover version.",
-  },
-  {
-    question: "How long does it take to create a book?",
-    answer: "E-books are ready within 2 hours. Printed books take 3-5 weeks for printing and delivery.",
-  },
-  {
-    question: "Can I customize the story?",
-    answer:
-      "Yes! You can choose from various themes (adventure, fairy tale, science fiction, etc.) and select your child's age group. The AI tailors the story accordingly.",
-  },
-  {
-    question: "What age groups are supported?",
-    answer:
-      "Our books are designed for children aged 0-2, 3-5, 6-9, and 10+ years. The content and complexity are adjusted based on the selected age group.",
-  },
-  {
-    question: "Can I use multiple photos?",
-    answer:
-      "Yes, you can upload up to 5 character photos per book. These can include your child, family members, pets, or toys.",
-  },
-  {
-    question: "What formats are available?",
-    answer:
-      "E-books are available as PDF files for instant download. Printed books come as hardcover, A4 format (21x29.7 cm) with high-quality printing.",
-  },
-  {
-    question: "Is my child's photo secure?",
-    answer:
-      "We use secure encryption and follow strict privacy policies. Your photos are used solely for creating your personalized book and are not shared with third parties.",
-  },
-  {
-    question: "Can I get a refund?",
-    answer:
-      "Yes, we offer a money-back guarantee. If you're not satisfied with your e-book, contact us within 30 days for a full refund.",
-  },
-  {
-    question: "Do you ship internationally?",
-    answer:
-      "Yes! We ship printed books to over 26 countries worldwide. Shipping times vary by location (typically 3-5 weeks).",
-  },
-  {
-    question: "Can I order multiple copies?",
-    answer: "Yes! You can order multiple copies of the same book. We offer discounts for orders of 3 or more books.",
-  },
-]
 
 const FAQAccordionItem = ({
   item,
@@ -111,8 +61,16 @@ const FAQAccordionItem = ({
   )
 }
 
+const FAQ_COUNT = 10
+
 export function FAQSection() {
+  const t = useTranslations("faq")
   const [openIndex, setOpenIndex] = useState<number | null>(0)
+
+  const faqs: FAQItem[] = Array.from({ length: FAQ_COUNT }, (_, i) => ({
+    question: t(`q${i}`),
+    answer: t(`a${i}`),
+  }))
 
   const handleToggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index)
@@ -123,18 +81,12 @@ export function FAQSection() {
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.1, 0.15, 0.1],
-          }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.15, 0.1] }}
           transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
           className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-gradient-to-br from-primary to-brand-2 blur-3xl opacity-10"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.1, 0.15, 0.1],
-          }}
+          animate={{ scale: [1, 1.3, 1], opacity: [0.1, 0.15, 0.1] }}
           transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
           className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-gradient-to-br from-brand-2 to-primary blur-3xl opacity-10"
         />
@@ -161,10 +113,10 @@ export function FAQSection() {
           </motion.div>
 
           <h2 className="mb-4 text-balance text-3xl font-bold text-slate-900 dark:text-white md:text-4xl lg:text-5xl">
-            Frequently Asked Questions
+            {t("title")}
           </h2>
           <p className="mx-auto max-w-2xl text-pretty text-lg text-slate-600 dark:text-slate-300">
-            Everything you need to know about KidStoryBook
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -189,18 +141,19 @@ export function FAQSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-16 text-center"
         >
-          <p className="mb-4 text-lg text-slate-600 dark:text-slate-300">Still have questions?</p>
+          <p className="mb-4 text-lg text-slate-600 dark:text-slate-300">
+            {t("stillHaveQuestions")}
+          </p>
           <motion.a
             href="#contact"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-brand-2 px-8 py-4 font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
           >
-            Contact Us
+            {t("contactUs")}
           </motion.a>
         </motion.div>
       </div>
     </section>
   )
 }
-

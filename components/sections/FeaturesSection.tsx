@@ -3,41 +3,20 @@
 import { motion } from "framer-motion"
 import { Sparkles, Palette, Heart, BookOpen, Compass, Download } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { useTranslations } from "next-intl"
 
-const features = [
-  {
-    icon: Sparkles,
-    title: "AI-Powered Stories",
-    description: "Advanced AI creates personalized stories tailored to your child's age and interests",
-  },
-  {
-    icon: Palette,
-    title: "Multiple Art Styles",
-    description: "Choose from watercolor, 3D animation, cartoon, and more illustration styles",
-  },
-  {
-    icon: Heart,
-    title: "True Character Match",
-    description: "Your child's photo becomes the hero with accurate appearance matching",
-  },
-  {
-    icon: BookOpen,
-    title: "Age-Appropriate Stories",
-    description: "Content tailored for 0-2, 3-5, 6-9, and 10+ age groups",
-  },
-  {
-    icon: Compass,
-    title: "Adventure Themes",
-    description: "Choose from adventure, fairy tale, science fiction, and more exciting themes",
-  },
-  {
-    icon: Download,
-    title: "Digital & Physical",
-    description: "Get instant e-book download or order a beautiful printed hardcover version",
-  },
-]
+const featureIcons = [Sparkles, Palette, Heart, BookOpen, Compass, Download]
+const featureKeys = ["aiPowered", "artStyles", "characterMatch", "ageAppropriate", "themes", "digitalPhysical"] as const
 
 export function FeaturesSection() {
+  const t = useTranslations("features")
+
+  const features = featureKeys.map((key, i) => ({
+    icon: featureIcons[i],
+    title: t(`${key}.title`),
+    description: t(`${key}.description`),
+  }))
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-white via-primary/5 to-white py-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 md:py-24">
       {/* Background decorative elements */}
@@ -56,10 +35,10 @@ export function FeaturesSection() {
           className="mb-12 text-center md:mb-16"
         >
           <h2 className="text-balance text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
-            Features
+            {t("title")}
           </h2>
           <p className="mt-4 text-pretty text-lg text-muted-foreground md:text-xl">
-            Everything you need to create magical stories
+            {t("subtitle")}
           </p>
         </motion.div>
 
@@ -80,11 +59,9 @@ export function FeaturesSection() {
                 }}
               >
                 <Card className="group relative h-full overflow-hidden border-2 border-primary/10 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:border-primary/20 hover:shadow-xl dark:border-primary/10 dark:bg-slate-900 dark:hover:border-primary/20 md:p-8">
-                  {/* Gradient overlay on hover */}
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/0 via-brand-2/0 to-primary/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
 
                   <div className="relative space-y-4">
-                    {/* Icon with gradient background */}
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.3 }}
@@ -93,18 +70,15 @@ export function FeaturesSection() {
                       <Icon className="h-8 w-8 text-white md:h-10 md:w-10" />
                     </motion.div>
 
-                    {/* Title */}
                     <h3 className="text-balance text-xl font-bold text-foreground md:text-2xl">
                       {feature.title}
                     </h3>
 
-                    {/* Description */}
                     <p className="text-pretty text-sm text-muted-foreground md:text-base">
                       {feature.description}
                     </p>
                   </div>
 
-                  {/* Decorative corner element */}
                   <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-primary/10 to-brand-2/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100 md:opacity-0" />
                 </Card>
               </motion.div>
@@ -115,4 +89,3 @@ export function FeaturesSection() {
     </section>
   )
 }
-

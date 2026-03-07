@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Cookie, X, Settings, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 type ConsentState = "accepted" | "declined" | "custom" | null
 
@@ -14,19 +16,18 @@ interface CookiePreferences {
 }
 
 export function CookieConsentBanner() {
+  const t = useTranslations("cookies")
   const [showBanner, setShowBanner] = useState(false)
   const [showCustomize, setShowCustomize] = useState(false)
   const [preferences, setPreferences] = useState<CookiePreferences>({
-    essential: true, // Always true, cannot be disabled
+    essential: true,
     analytics: false,
     marketing: false,
   })
 
   useEffect(() => {
-    // Check if user has already made a choice
     const consent = localStorage.getItem("cookie-consent")
     if (!consent) {
-      // Small delay before showing banner for better UX
       setTimeout(() => setShowBanner(true), 1000)
     }
   }, [])
@@ -35,11 +36,7 @@ export function CookieConsentBanner() {
     localStorage.setItem("cookie-consent", "accepted")
     localStorage.setItem(
       "cookie-preferences",
-      JSON.stringify({
-        essential: true,
-        analytics: true,
-        marketing: true,
-      }),
+      JSON.stringify({ essential: true, analytics: true, marketing: true }),
     )
     setShowBanner(false)
     setShowCustomize(false)
@@ -49,11 +46,7 @@ export function CookieConsentBanner() {
     localStorage.setItem("cookie-consent", "declined")
     localStorage.setItem(
       "cookie-preferences",
-      JSON.stringify({
-        essential: true,
-        analytics: false,
-        marketing: false,
-      }),
+      JSON.stringify({ essential: true, analytics: false, marketing: false }),
     )
     setShowBanner(false)
     setShowCustomize(false)
@@ -67,11 +60,8 @@ export function CookieConsentBanner() {
   }
 
   const togglePreference = (key: keyof CookiePreferences) => {
-    if (key === "essential") return // Essential cookies cannot be disabled
-    setPreferences((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }))
+    if (key === "essential") return
+    setPreferences((prev) => ({ ...prev, [key]: !prev[key] }))
   }
 
   return (
@@ -96,16 +86,17 @@ export function CookieConsentBanner() {
 
                 {/* Message */}
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Cookie Preferences</h3>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                    {t("title")}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                    We use cookies to enhance your experience, analyze site usage, and assist in our marketing efforts.
-                    By clicking &apos;Accept All&apos;, you consent to our use of cookies.{" "}
-                    <a
-                      href="/privacy-policy"
+                    {t("bannerDescription")}{" "}
+                    <Link
+                      href="/privacy"
                       className="text-primary hover:text-brand-2 underline transition-colors"
                     >
-                      Learn more
-                    </a>
+                      {t("learnMore")}
+                    </Link>
                   </p>
                 </div>
 
@@ -115,14 +106,14 @@ export function CookieConsentBanner() {
                     onClick={handleAcceptAll}
                     className="flex-1 sm:flex-none bg-gradient-to-r from-primary to-brand-2 text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
-                    Accept All
+                    {t("acceptAll")}
                   </Button>
                   <Button
                     onClick={handleDecline}
                     variant="outline"
                     className="flex-1 sm:flex-none border-2 border-primary/30 text-primary hover:bg-primary/5 font-semibold px-6 py-2 rounded-full transition-all duration-300 bg-transparent"
                   >
-                    Decline
+                    {t("decline")}
                   </Button>
                   <Button
                     onClick={() => setShowCustomize(true)}
@@ -130,14 +121,16 @@ export function CookieConsentBanner() {
                     className="flex-1 sm:flex-none text-gray-700 dark:text-gray-300 hover:text-primary font-semibold px-6 py-2 rounded-full transition-all duration-300"
                   >
                     <Settings className="w-4 h-4 mr-2" />
-                    Customize
+                    {t("customize")}
                   </Button>
                 </div>
               </div>
             ) : (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">Customize Cookie Preferences</h3>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {t("customizeTitle")}
+                  </h3>
                   <Button
                     onClick={() => setShowCustomize(false)}
                     variant="ghost"
@@ -158,12 +151,10 @@ export function CookieConsentBanner() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
-                        Essential Cookies{" "}
-                        <span className="text-xs text-gray-500 dark:text-gray-400 font-normal">(Always Active)</span>
+                        {t("essential.title")}
                       </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Required for the website to function properly. These cookies enable core functionality such as
-                        security, network management, and accessibility.
+                        {t("essential.description")}
                       </p>
                     </div>
                   </div>
@@ -183,10 +174,11 @@ export function CookieConsentBanner() {
                       </button>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Analytics Cookies</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                        {t("analytics.title")}
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Help us understand how visitors interact with our website by collecting and reporting
-                        information anonymously.
+                        {t("analytics.description")}
                       </p>
                     </div>
                   </div>
@@ -206,9 +198,11 @@ export function CookieConsentBanner() {
                       </button>
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Marketing Cookies</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                        {t("marketing.title")}
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Used to track visitors across websites to display relevant advertisements and campaigns.
+                        {t("marketing.description")}
                       </p>
                     </div>
                   </div>
@@ -220,14 +214,14 @@ export function CookieConsentBanner() {
                     className="w-full sm:w-auto bg-gradient-to-r from-primary to-brand-2 text-white font-semibold px-8 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
                     <Check className="w-4 h-4 mr-2" />
-                    Save Preferences
+                    {t("savePreferences")}
                   </Button>
                   <Button
                     onClick={handleAcceptAll}
                     variant="outline"
                     className="w-full sm:w-auto border-2 border-primary/30 text-primary hover:bg-primary/5 font-semibold px-8 py-2 rounded-full transition-all duration-300 bg-transparent"
                   >
-                    Accept All
+                    {t("acceptAll")}
                   </Button>
                 </div>
               </motion.div>
@@ -238,4 +232,3 @@ export function CookieConsentBanner() {
     </AnimatePresence>
   )
 }
-

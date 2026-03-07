@@ -219,12 +219,12 @@ export async function POST(request: NextRequest) {
     console.log('[Image Edit] OpenAI Response Summary:', {
       dataCount,
       b64Length,
-      size: openaiResult.size,
-      quality: openaiResult.quality,
-      output_format: openaiResult.output_format,
-      usage: openaiResult.usage ? {
-        input_tokens: openaiResult.usage.input_tokens,
-        output_tokens: openaiResult.usage.output_tokens,
+      size: (openaiResult as any).size,
+      quality: (openaiResult as any).quality,
+      output_format: (openaiResult as any).output_format,
+      usage: (openaiResult as any).usage ? {
+        input_tokens: (openaiResult as any).usage.input_tokens,
+        output_tokens: (openaiResult as any).usage.output_tokens,
       } : undefined,
     })
     
@@ -240,10 +240,10 @@ export async function POST(request: NextRequest) {
     if (!editedImageBase64) {
       console.error('[Image Edit] Missing b64_json in OpenAI response', {
         dataCount,
-        hasUsage: Boolean(openaiResult.usage),
-        size: openaiResult.size,
-        quality: openaiResult.quality,
-        output_format: openaiResult.output_format,
+        hasUsage: Boolean((openaiResult as any).usage),
+        size: (openaiResult as any).size,
+        quality: (openaiResult as any).quality,
+        output_format: (openaiResult as any).output_format,
       })
       throw new Error('No b64_json found in OpenAI response')
     }

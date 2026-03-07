@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
         console.log('[Cover Generation] Cover generated successfully:', coverUrl)
 
         // Download image and upload to S3
-        const imageBuffer = await fetch(coverUrl).then((res) => res.arrayBuffer())
+        const imageBuffer = await fetch(coverUrl!).then((res) => res.arrayBuffer())
         const fileName = `${user.id}/covers/cover_${Date.now()}.png`
 
         console.log('[Cover Generation] Uploading to S3:', fileName)
