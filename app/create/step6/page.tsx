@@ -32,6 +32,12 @@ import { useCurrency } from "@/contexts/CurrencyContext"
 import { DebugQualityPanel } from "@/components/debug/DebugQualityPanel"
 import { TraceViewerModal, type DebugTraceEntry } from "@/components/debug/TraceViewerModal"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 // Timeline step configuration
 const timelineSteps = [
@@ -102,6 +108,7 @@ export default function Step6Page() {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
   const [illustrationStyleImageError, setIllustrationStyleImageError] = useState(false)
+  const [showStyleImageModal, setShowStyleImageModal] = useState(false)
 
   // Check free cover status: üyeli → API; üyesiz → 1 hak var varsayımı (API "zaten kullanıldı" dönebilir)
   useEffect(() => {
@@ -962,7 +969,12 @@ export default function Step6Page() {
 
                   <div className="flex items-center gap-4">
                     {formData.illustrationStyle.id && !illustrationStyleImageError ? (
-                      <div className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-lg shadow-lg">
+                      <button
+                        type="button"
+                        onClick={() => setShowStyleImageModal(true)}
+                        className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 hover:opacity-90 transition-opacity"
+                        aria-label={`View ${formData.illustrationStyle.name} style example`}
+                      >
                         <Image
                           src={`/illustration-styles/${formData.illustrationStyle.id}.jpg`}
                           alt={`${formData.illustrationStyle.name} style example`}
@@ -971,7 +983,7 @@ export default function Step6Page() {
                           className="object-cover"
                           onError={() => setIllustrationStyleImageError(true)}
                         />
-                      </div>
+                      </button>
                     ) : (
                       <div
                         className={`flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${formData.illustrationStyle.color} shadow-lg`}
@@ -1390,6 +1402,26 @@ export default function Step6Page() {
           trace={traceData}
         />
       )}
+
+      {/* Illustration Style image enlarge modal */}
+      <Dialog open={showStyleImageModal} onOpenChange={setShowStyleImageModal}>
+        <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle>{formData.illustrationStyle.name}</DialogTitle>
+          </DialogHeader>
+          {formData.illustrationStyle.id && (
+            <div className="relative aspect-[2/3] w-full max-h-[80vh] bg-muted">
+              <Image
+                src={`/illustration-styles/${formData.illustrationStyle.id}.jpg`}
+                alt={`${formData.illustrationStyle.name} style example`}
+                fill
+                sizes="(max-width: 672px) 100vw, 672px"
+                className="object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

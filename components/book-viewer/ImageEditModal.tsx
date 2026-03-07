@@ -168,7 +168,9 @@ export function ImageEditModal({
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-border px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-foreground">Edit Image - Page {pageNumber}</h2>
+            <h2 className="text-2xl font-bold text-foreground">
+              {pageNumber === 0 ? 'Edit Image - Cover' : `Edit Image - Page ${pageNumber}`}
+            </h2>
             <p className="text-sm text-muted-foreground mt-1">
               Paint the EXACT areas you want to edit (red brush), then describe the changes
             </p>

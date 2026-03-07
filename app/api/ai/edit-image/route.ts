@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
       return errorResponse('Missing required fields: bookId, pageNumber, maskImageBase64, editPrompt', undefined, 400)
     }
 
-    if (pageNumber < 1) {
-      return errorResponse('Invalid pageNumber: must be >= 1', undefined, 400)
+    if (pageNumber < 0) {
+      return errorResponse('Invalid pageNumber: must be >= 0 (0 = cover)', undefined, 400)
     }
 
     if (!maskImageBase64.startsWith('data:image/png;base64,')) {
@@ -129,22 +129,30 @@ export async function POST(request: NextRequest) {
     console.log(`[Image Edit] Quota check: ${quotaUsed}/${quotaLimit} used`)
 
     // ====================================================================
-    // 5. GET CURRENT IMAGE FOR THE PAGE
+    // 5. GET CURRENT IMAGE FOR THE PAGE (OR COVER)
     // ====================================================================
-    if (!book.story_data || !Array.isArray(book.story_data.pages)) {
-      return errorResponse('Book has no story data', undefined, 400)
-    }
+    let currentImageUrl: string
 
-    const pageIndex = pageNumber - 1
-    if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
-      return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, undefined, 400)
-    }
-
-    const currentPage = book.story_data.pages[pageIndex]
-    const currentImageUrl = currentPage.imageUrl
-
-    if (!currentImageUrl) {
-      return errorResponse(`Page ${pageNumber} has no image to edit`, undefined, 400)
+    if (pageNumber === 0) {
+      // Cover: use book.cover_image_url
+      currentImageUrl = book.cover_image_url || ''
+      if (!currentImageUrl) {
+        return errorResponse('Book has no cover image to edit', undefined, 400)
+      }
+    } else {
+      // Story page
+      if (!book.story_data || !Array.isArray(book.story_data.pages)) {
+        return errorResponse('Book has no story data', undefined, 400)
+      }
+      const pageIndex = pageNumber - 1
+      if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
+        return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, undefined, 400)
+      }
+      const currentPage = book.story_data.pages[pageIndex]
+      currentImageUrl = currentPage.imageUrl || ''
+      if (!currentImageUrl) {
+        return errorResponse(`Page ${pageNumber} has no image to edit`, undefined, 400)
+      }
     }
 
     console.log(`[Image Edit] Current image URL: ${currentImageUrl}`)
@@ -293,26 +301,37 @@ export async function POST(request: NextRequest) {
     console.log('[Image Edit] ✅ Edit history saved')
 
     // ====================================================================
-    // 12. UPDATE BOOK: INCREMENT QUOTA & UPDATE PAGE IMAGE
+    // 12. UPDATE BOOK: INCREMENT QUOTA & UPDATE PAGE IMAGE OR COVER
     // ====================================================================
-    const updatedPages = [...book.story_data.pages]
-    updatedPages[pageIndex] = {
-      ...updatedPages[pageIndex],
-      imageUrl: editedImageUrl,
+    if (pageNumber === 0) {
+      const bookUpdateData: Parameters<typeof updateBook>[1] = {
+        cover_image_url: editedImageUrl,
+        cover_image_path: s3Key,
+      }
+      if (!isAdmin) {
+        bookUpdateData.edit_quota_used = quotaUsed + 1
+      }
+      await updateBook(bookId, bookUpdateData)
+      console.log('[Image Edit] ✅ Book cover updated and quota incremented')
+    } else {
+      const pageIndex = pageNumber - 1
+      const updatedPages = [...book.story_data.pages]
+      updatedPages[pageIndex] = {
+        ...updatedPages[pageIndex],
+        imageUrl: editedImageUrl,
+      }
+      const bookUpdateData: Parameters<typeof updateBook>[1] = {
+        story_data: {
+          ...book.story_data,
+          pages: updatedPages,
+        },
+      }
+      if (!isAdmin) {
+        bookUpdateData.edit_quota_used = quotaUsed + 1
+      }
+      await updateBook(bookId, bookUpdateData)
+      console.log('[Image Edit] ✅ Book updated with new image and quota')
     }
-
-    const bookUpdateData: Parameters<typeof updateBook>[1] = {
-      story_data: {
-        ...book.story_data,
-        pages: updatedPages,
-      },
-    }
-    if (!isAdmin) {
-      bookUpdateData.edit_quota_used = quotaUsed + 1
-    }
-    await updateBook(bookId, bookUpdateData)
-
-    console.log('[Image Edit] ✅ Book updated with new image and quota')
 
     // ====================================================================
     // 13. FETCH EDIT HISTORY FOR RESPONSE

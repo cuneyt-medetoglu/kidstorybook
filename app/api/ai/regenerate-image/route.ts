@@ -48,11 +48,11 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 1. Validasyon ──────────────────────────────────────────────────────
-    if (!bookId || !pageNumber) {
+    if (!bookId || pageNumber == null) {
       return errorResponse("Missing required fields: bookId, pageNumber", undefined, 400)
     }
-    if (pageNumber < 1) {
-      return errorResponse("Invalid pageNumber: must be >= 1", undefined, 400)
+    if (pageNumber < 0) {
+      return errorResponse("Invalid pageNumber: must be >= 0 (0 = cover)", undefined, 400)
     }
 
     // ── 2. Kitap + yetki ───────────────────────────────────────────────────
@@ -75,19 +75,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // ── 4. Sayfa ───────────────────────────────────────────────────────────
-    if (!book.story_data?.pages?.length) {
-      return errorResponse("Book has no story data", undefined, 400)
-    }
-    const pageIndex = pageNumber - 1
-    if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
-      return errorResponse(
-        `Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`,
-        undefined,
-        400
-      )
-    }
-    const page = book.story_data.pages[pageIndex] as {
+    // ── 4. Sayfa veya kapak ─────────────────────────────────────────────────
+    const isCover = pageNumber === 0
+    let pageIndex: number
+    let page: {
       pageNumber?: number
       text?: string
       imagePrompt?: string
@@ -97,6 +88,30 @@ export async function POST(request: NextRequest) {
       characterExpressions?: Record<string, string>
       shotPlan?: { shotType?: string; lens?: string; cameraAngle?: string; placement?: string; timeOfDay?: string; mood?: string }
       imageUrl?: string
+    }
+
+    if (isCover) {
+      if (!book.cover_image_url) {
+        return errorResponse("Book has no cover image to regenerate", undefined, 400)
+      }
+      if (!book.story_data?.pages?.length) {
+        return errorResponse("Book has no story data (need first page for cover scene)", undefined, 400)
+      }
+      pageIndex = 0
+      page = book.story_data.pages[0] as typeof page
+    } else {
+      if (!book.story_data?.pages?.length) {
+        return errorResponse("Book has no story data", undefined, 400)
+      }
+      pageIndex = pageNumber - 1
+      if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
+        return errorResponse(
+          `Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`,
+          undefined,
+          400
+        )
+      }
+      page = book.story_data.pages[pageIndex] as typeof page
     }
 
     // ── 5. Karakterler ─────────────────────────────────────────────────────
@@ -237,7 +252,7 @@ export async function POST(request: NextRequest) {
         : buildCharacterPrompt(mainChar.description, true, true)
 
     // ── 10. Full prompt (create-book ile aynı parametreler) ─────────────────
-    // Kapak ayrı; story_data.pages = sadece iç sayfalar. Page 1 = ilk iç sayfa → isCover: false
+    // Cover (pageNumber 0) için isCover: true; sayfalar için false
     const previousScenes: SceneDiversityAnalysis[] = []
     const fullPrompt = generateFullPagePrompt(
       characterPrompt,
@@ -245,8 +260,8 @@ export async function POST(request: NextRequest) {
       illustrationStyle,
       ageGroup,
       pageAdditionalCharacters.length,
-      false,  // isCover: kapak bu API'de yok, tüm sayfalar iç sayfa
-      false,  // useCoverReference: master kullanıldığı için false
+      isCover,
+      false,
       previousScenes,
       totalPages,
       pageCharacters.map((id) => ({
@@ -274,9 +289,11 @@ export async function POST(request: NextRequest) {
       characters.map((c) => (c.name || "").trim().toLowerCase()).filter(Boolean)
     )
     const pageEntityIds: string[] = []
+    // Cover için bu sayfada görünen entity'ler: pageNumber 1 kullan (ilk sayfa)
+    const pageNumForEntity = isCover ? 1 : pageNumber
     if (supportingEntities.length > 0) {
       for (const entity of supportingEntities) {
-        if (!entity.appearsOnPages?.includes(pageNumber)) continue
+        if (!entity.appearsOnPages?.includes(pageNumForEntity)) continue
         const entityName = (entity.name || "").trim().toLowerCase()
         if (entityName && characterNamesLower.has(entityName)) continue
         pageEntityIds.push(entity.id)
@@ -456,31 +473,42 @@ export async function POST(request: NextRequest) {
     const newImageUrl = getPublicUrl(s3Key)
 
     // ── 15. History kaydı ──────────────────────────────────────────────────
+    const originalImageForHistory = isCover ? book.cover_image_url || null : (page.imageUrl || null)
     const editPromptForHistory =
-      (userPrompt?.trim() || sceneDescription || fullPrompt || "[Regenerate page]").trim() ||
-      "[Regenerate page]"
+      (userPrompt?.trim() || sceneDescription || fullPrompt || (isCover ? "[Regenerate cover]" : "[Regenerate page]")).trim() ||
+      (isCover ? "[Regenerate cover]" : "[Regenerate page]")
     await insertEditHistory({
       book_id: bookId,
       page_number: pageNumber,
       version: nextVersion,
-      original_image_url: page.imageUrl || null,
+      original_image_url: originalImageForHistory,
       edited_image_url: newImageUrl,
       edit_prompt: editPromptForHistory,
       ai_model: IMAGE_MODEL,
       edit_metadata: { mode: "regenerate", refCount: imageBlobs.length },
     })
 
-    // ── 16. Book güncelle (imageUrl + quota) ───────────────────────────────
-    const updatedPages = [...book.story_data.pages]
-    updatedPages[pageIndex] = { ...updatedPages[pageIndex], imageUrl: newImageUrl }
-
-    const bookUpdateData: Parameters<typeof updateBook>[1] = {
-      story_data: { ...book.story_data, pages: updatedPages },
+    // ── 16. Book güncelle (imageUrl + quota veya cover) ──────────────────────
+    if (isCover) {
+      const bookUpdateData: Parameters<typeof updateBook>[1] = {
+        cover_image_url: newImageUrl,
+        cover_image_path: s3Key,
+      }
+      if (!isAdmin) {
+        bookUpdateData.edit_quota_used = quotaUsed + 1
+      }
+      await updateBook(bookId, bookUpdateData)
+    } else {
+      const updatedPages = [...book.story_data.pages]
+      updatedPages[pageIndex] = { ...updatedPages[pageIndex], imageUrl: newImageUrl }
+      const bookUpdateData: Parameters<typeof updateBook>[1] = {
+        story_data: { ...book.story_data, pages: updatedPages },
+      }
+      if (!isAdmin) {
+        bookUpdateData.edit_quota_used = quotaUsed + 1
+      }
+      await updateBook(bookId, bookUpdateData)
     }
-    if (!isAdmin) {
-      bookUpdateData.edit_quota_used = quotaUsed + 1
-    }
-    await updateBook(bookId, bookUpdateData)
 
     // ── 17. Yanıt ──────────────────────────────────────────────────────────
     const historyData = await getEditHistory(bookId)

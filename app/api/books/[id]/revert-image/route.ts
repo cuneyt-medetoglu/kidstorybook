@@ -34,12 +34,12 @@ export async function POST(
     const body: RevertImageRequest = await request.json()
     const { pageNumber, targetVersion } = body
 
-    if (!pageNumber || targetVersion === undefined || targetVersion === null) {
+    if (pageNumber == null || targetVersion === undefined || targetVersion === null) {
       return errorResponse('Missing required fields: pageNumber, targetVersion', undefined, 400)
     }
 
-    if (pageNumber < 1) {
-      return errorResponse('Invalid pageNumber: must be >= 1', undefined, 400)
+    if (pageNumber < 0) {
+      return errorResponse('Invalid pageNumber: must be >= 0 (0 = cover)', undefined, 400)
     }
 
     if (targetVersion < 0) {
@@ -57,13 +57,19 @@ export async function POST(
       return errorResponse('Unauthorized', undefined, 403)
     }
 
-    if (!book.story_data || !Array.isArray(book.story_data.pages)) {
-      return errorResponse('Book has no story data', undefined, 400)
-    }
-
-    const pageIndex = pageNumber - 1
-    if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
-      return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, undefined, 400)
+    const isCover = pageNumber === 0
+    if (isCover) {
+      if (!book.cover_image_url) {
+        return errorResponse('Book has no cover image to revert', undefined, 400)
+      }
+    } else {
+      if (!book.story_data || !Array.isArray(book.story_data.pages)) {
+        return errorResponse('Book has no story data', undefined, 400)
+      }
+      const pageIndex = pageNumber - 1
+      if (pageIndex < 0 || pageIndex >= book.story_data.pages.length) {
+        return errorResponse(`Invalid page number: ${pageNumber}. Book has ${book.story_data.pages.length} pages.`, undefined, 400)
+      }
     }
 
     const history = await getEditHistory(bookId)
@@ -72,12 +78,18 @@ export async function POST(
     let targetImageUrl: string
 
     if (targetVersion === 0) {
-      const currentPage = book.story_data.pages[pageIndex]
-      if (!currentPage.imageUrl) {
-        return errorResponse(`Page ${pageNumber} has no original image`, undefined, 404)
+      if (isCover) {
+        const firstEdit = pageHistory.sort((a: any, b: any) => a.version - b.version)[0]
+        targetImageUrl = firstEdit?.original_image_url || book.cover_image_url!
+      } else {
+        const pageIndex = pageNumber - 1
+        const currentPage = book.story_data!.pages[pageIndex]
+        if (!currentPage.imageUrl) {
+          return errorResponse(`Page ${pageNumber} has no original image`, undefined, 404)
+        }
+        const firstEdit = pageHistory.sort((a: any, b: any) => a.version - b.version)[0]
+        targetImageUrl = firstEdit?.original_image_url || currentPage.imageUrl
       }
-      const firstEdit = pageHistory.sort((a: any, b: any) => a.version - b.version)[0]
-      targetImageUrl = firstEdit?.original_image_url || currentPage.imageUrl
     } else {
       const targetEdit = pageHistory.find((h: any) => h.version === targetVersion)
       if (!targetEdit) {
@@ -88,20 +100,24 @@ export async function POST(
 
     console.log(`[Revert Image] Target image URL: ${targetImageUrl}`)
 
-    const updatedPages = [...book.story_data.pages]
-    updatedPages[pageIndex] = {
-      ...updatedPages[pageIndex],
-      imageUrl: targetImageUrl,
+    if (isCover) {
+      await updateBook(bookId, { cover_image_url: targetImageUrl })
+      console.log('[Revert Image] ✅ Book cover reverted')
+    } else {
+      const pageIndex = pageNumber - 1
+      const updatedPages = [...book.story_data!.pages]
+      updatedPages[pageIndex] = {
+        ...updatedPages[pageIndex],
+        imageUrl: targetImageUrl,
+      }
+      await updateBook(bookId, {
+        story_data: {
+          ...book.story_data!,
+          pages: updatedPages,
+        },
+      })
+      console.log('[Revert Image] ✅ Book updated with reverted image')
     }
-
-    await updateBook(bookId, {
-      story_data: {
-        ...book.story_data,
-        pages: updatedPages,
-      },
-    })
-
-    console.log('[Revert Image] ✅ Book updated with reverted image')
 
     return successResponse<RevertImageResponse>(
       {

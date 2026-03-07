@@ -2,16 +2,22 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Edit, Download, Share2, Trash2, Loader2, History, RefreshCw } from "lucide-react"
+import { ArrowLeft, Edit, Download, Share2, Trash2, Loader2, History, RefreshCw, Palette } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import Image from "next/image"
 import { ImageEditModal } from "@/components/book-viewer/ImageEditModal"
 import { RegenerateImageModal } from "@/components/book-viewer/RegenerateImageModal"
 import { EditHistoryPanel } from "@/components/book-viewer/EditHistoryPanel"
-import { getTtsPrefs, setTtsPrefs } from "@/lib/tts-prefs"
+import { getIllustrationStyleName } from "@/lib/constants/illustration-styles"
 
 interface Book {
   id: string
@@ -21,6 +27,7 @@ interface Book {
   language: string
   age_group?: string
   status: string
+  cover_image_url?: string
   story_data: {
     title: string
     pages: Array<{
@@ -47,15 +54,13 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   const [showRegenerateModal, setShowRegenerateModal] = useState(false)
   const [regeneratingPage, setRegeneratingPage] = useState<number | null>(null)
   const [showHistoryPanel, setShowHistoryPanel] = useState(false)
-  const [ttsSpeed, setTtsSpeed] = useState(1)
-  const [ttsVolume, setTtsVolume] = useState(1)
+  const [illustrationStyleImageError, setIllustrationStyleImageError] = useState(false)
+  const [showStyleImageModal, setShowStyleImageModal] = useState(false)
 
-  // Load TTS prefs from localStorage (user-level global)
+  // Reset illustration style image error when book changes
   useEffect(() => {
-    const prefs = getTtsPrefs()
-    setTtsSpeed(prefs.ttsSpeed)
-    setTtsVolume(prefs.volume)
-  }, [])
+    setIllustrationStyleImageError(false)
+  }, [book?.id, book?.illustration_style])
 
   // Fetch book data
   useEffect(() => {
@@ -101,8 +106,16 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   }
 
   const handleEditSuccess = (editedImageUrl: string) => {
-    // Refresh book data to show updated image
-    if (book && book.story_data && editingPage) {
+    if (!book) return
+    if (editingPage === 0) {
+      setBook({
+        ...book,
+        cover_image_url: editedImageUrl,
+        edit_quota_used: book.edit_quota_used + 1,
+      })
+      return
+    }
+    if (book.story_data && editingPage) {
       const updatedPages = [...book.story_data.pages]
       const pageIndex = editingPage - 1
       if (updatedPages[pageIndex]) {
@@ -123,7 +136,16 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
   }
 
   const handleRegenerateSuccess = (editedImageUrl: string) => {
-    if (book && book.story_data && regeneratingPage) {
+    if (!book) return
+    if (regeneratingPage === 0) {
+      setBook({
+        ...book,
+        cover_image_url: editedImageUrl,
+        edit_quota_used: book.edit_quota_used + 1,
+      })
+      return
+    }
+    if (book.story_data && regeneratingPage) {
       const updatedPages = [...book.story_data.pages]
       const pageIndex = regeneratingPage - 1
       if (updatedPages[pageIndex]) {
@@ -317,7 +339,29 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Illustration Style</p>
-                <p className="font-medium">{book.illustration_style}</p>
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => !illustrationStyleImageError && setShowStyleImageModal(true)}
+                    className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-muted flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 hover:opacity-90 transition-opacity disabled:pointer-events-none"
+                    disabled={illustrationStyleImageError}
+                    aria-label={`View ${getIllustrationStyleName(book.illustration_style)} style example`}
+                  >
+                    {!illustrationStyleImageError ? (
+                      <Image
+                        src={`/illustration-styles/${book.illustration_style}.jpg`}
+                        alt=""
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                        onError={() => setIllustrationStyleImageError(true)}
+                      />
+                    ) : (
+                      <Palette className="h-6 w-6 text-muted-foreground" />
+                    )}
+                  </button>
+                  <p className="font-medium">{getIllustrationStyleName(book.illustration_style)}</p>
+                </div>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Language</p>
@@ -337,59 +381,6 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
           </CardContent>
         </Card>
 
-        {/* Sesli okuma (kullanıcı bazlı global tercihler) */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>🔊 Sesli Okuma</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Tüm kitaplar için geçerli ayarlar. Okuyucuda sadece oynat/durdur ve ses aç/kapa görünür.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <p className="text-sm font-medium mb-2">Okuma hızı</p>
-              <div className="flex gap-2">
-                {[
-                  { value: 0.75, label: "Yavaş" },
-                  { value: 1, label: "Normal" },
-                  { value: 1.25, label: "Hızlı" },
-                ].map((opt) => (
-                  <Button
-                    key={opt.value}
-                    variant={ttsSpeed === opt.value ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      setTtsSpeed(opt.value)
-                      setTtsPrefs({ ttsSpeed: opt.value })
-                      toast({ title: "Kaydedildi", description: `Okuma hızı: ${opt.label}` })
-                    }}
-                  >
-                    {opt.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="text-sm font-medium mb-2">Ses seviyesi</p>
-              <div className="flex items-center gap-3">
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={Math.round(ttsVolume * 100)}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) / 100
-                    setTtsVolume(v)
-                    setTtsPrefs({ volume: v })
-                  }}
-                  className="w-32 md:w-48 h-2 rounded-full appearance-none bg-muted accent-primary"
-                />
-                <span className="text-sm text-muted-foreground w-10">{Math.round(ttsVolume * 100)}%</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Edit Images Section */}
         <Card className="mb-6">
           <CardHeader>
@@ -403,13 +394,50 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Cover card when book has separate cover image */}
+              {book.cover_image_url && (
+                <div className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Cover</span>
+                    <Badge variant="outline" className="text-xs">Cover</Badge>
+                  </div>
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md bg-muted">
+                    <Image
+                      src={book.cover_image_url}
+                      alt="Cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 200px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                  <Button
+                    onClick={() => handleEditImage(0)}
+                    disabled={(!isQuotaBypass && quotaRemaining === 0)}
+                    className="w-full"
+                    size="sm"
+                    variant="outline"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Image
+                  </Button>
+                  <Button
+                    onClick={() => handleRegenerateImage(0)}
+                    disabled={(!isQuotaBypass && quotaRemaining === 0)}
+                    className="w-full"
+                    size="sm"
+                    variant="outline"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Regenerate
+                  </Button>
+                </div>
+              )}
               {book.story_data?.pages?.map((page) => (
                 <div key={page.pageNumber} className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Page {page.pageNumber}</span>
-                    <Badge variant="outline" className="text-xs">
-                      {page.pageNumber === 1 ? 'Cover' : 'Story'}
-                    </Badge>
+                    <Badge variant="outline" className="text-xs">Story</Badge>
                   </div>
                   
                   {page.imageUrl && (
@@ -507,11 +535,11 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
         </Card>
 
         {/* Image Edit Modal */}
-        {showEditModal && editingPage && book && (
+        {showEditModal && editingPage !== null && editingPage !== undefined && book && (
           <ImageEditModal
             bookId={book.id}
             pageNumber={editingPage}
-            currentImageUrl={book.story_data.pages[editingPage - 1]?.imageUrl || ''}
+            currentImageUrl={editingPage === 0 ? (book.cover_image_url || '') : (book.story_data.pages[editingPage - 1]?.imageUrl || '')}
             onClose={() => {
               setShowEditModal(false)
               setEditingPage(null)
@@ -530,11 +558,11 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
         )}
 
         {/* Regenerate Image Modal */}
-        {showRegenerateModal && regeneratingPage && book && (
+        {showRegenerateModal && regeneratingPage !== null && regeneratingPage !== undefined && book && (
           <RegenerateImageModal
             bookId={book.id}
             pageNumber={regeneratingPage}
-            pageText={book.story_data.pages[regeneratingPage - 1]?.text ?? ""}
+            pageText={regeneratingPage === 0 ? (book.story_data.pages[0]?.text ?? "") : (book.story_data.pages[regeneratingPage - 1]?.text ?? "")}
             onClose={() => {
               setShowRegenerateModal(false)
               setRegeneratingPage(null)
@@ -542,6 +570,24 @@ export default function BookSettingsPage({ params }: { params: { id: string } })
             onSuccess={handleRegenerateSuccess}
           />
         )}
+
+        {/* Illustration Style image enlarge modal */}
+        <Dialog open={showStyleImageModal} onOpenChange={setShowStyleImageModal}>
+          <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden">
+            <DialogHeader className="p-4 pb-0">
+              <DialogTitle>{getIllustrationStyleName(book.illustration_style)}</DialogTitle>
+            </DialogHeader>
+            <div className="relative aspect-[2/3] w-full max-h-[80vh] bg-muted">
+              <Image
+                src={`/illustration-styles/${book.illustration_style}.jpg`}
+                alt={`${getIllustrationStyleName(book.illustration_style)} style example`}
+                fill
+                sizes="(max-width: 672px) 100vw, 672px"
+                className="object-contain"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

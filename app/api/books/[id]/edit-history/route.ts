@@ -55,6 +55,21 @@ export async function GET(
     const pageHistoryMap: { [pageNumber: number]: PageEditHistory } = {}
     const allPages = book.story_data?.pages || []
 
+    // Seed cover (page 0) when book has cover image
+    if (book.cover_image_url) {
+      pageHistoryMap[0] = {
+        currentVersion: 0,
+        versions: [
+          {
+            version: 0,
+            imageUrl: book.cover_image_url,
+            editPrompt: 'Original cover',
+            createdAt: book.created_at ? String(book.created_at) : new Date().toISOString(),
+          },
+        ],
+      }
+    }
+
     const pagesWithEdits = new Set<number>()
     if (historyData && Array.isArray(historyData)) {
       historyData.forEach((item: any) => {

@@ -78,7 +78,9 @@ export function RegenerateImageModal({
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-border px-6 py-4 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-foreground">Regenerate Image - Page {pageNumber}</h2>
+            <h2 className="text-xl font-bold text-foreground">
+              {pageNumber === 0 ? 'Regenerate Image - Cover' : `Regenerate Image - Page ${pageNumber}`}
+            </h2>
             <p className="text-sm text-muted-foreground mt-1">
               Create a new image for this page. Story text stays the same; the scene can change.
             </p>
