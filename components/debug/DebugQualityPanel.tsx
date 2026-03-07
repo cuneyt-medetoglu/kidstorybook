@@ -391,7 +391,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow, storyMode
             <div className="border rounded-lg p-4 bg-white">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
-                  <User className="h-5 w-5 text-purple-600 mt-1" />
+                  <User className="h-5 w-5 text-primary mt-1" />
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm">2. Masters (karakter + entity)</h4>
                     <p className="text-xs text-gray-600 mt-1">
@@ -449,7 +449,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow, storyMode
             <div className="border rounded-lg p-4 bg-white opacity-50">
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3 flex-1">
-                  <FileText className="h-5 w-5 text-pink-600 mt-1" />
+                  <FileText className="h-5 w-5 text-brand-2 mt-1" />
                   <div className="flex-1">
                     <h4 className="font-semibold text-sm">4. Sadece Sayfa X</h4>
                     <p className="text-xs text-gray-600 mt-1">

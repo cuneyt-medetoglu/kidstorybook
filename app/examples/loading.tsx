@@ -2,7 +2,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header skeleton */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-background py-12 md:py-20">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-brand-2/5 to-background py-12 md:py-20">
         <div className="container relative px-4 md:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-muted mb-6 animate-pulse" />

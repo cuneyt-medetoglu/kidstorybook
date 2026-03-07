@@ -754,15 +754,15 @@ export default function Step2Page() {
 
   const decorativeElements = [
     { Icon: Star, top: "10%", left: "8%", delay: 0, size: "h-6 w-6", color: "text-yellow-400" },
-    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
-    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-purple-400" },
+    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
+    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-primary" },
     { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
   ]
 
   const hasUploadedPhotos = characters.some((char) => char.uploadedFile !== null)
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
           const Icon = element.Icon
@@ -806,7 +806,7 @@ export default function Step2Page() {
                 initial={{ width: 0 }}
                 animate={{ width: "33.33%" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-gradient-to-r from-primary to-brand-2"
               />
             </div>
           </div>
@@ -858,12 +858,12 @@ export default function Step2Page() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="rounded-xl border-2 border-purple-200 bg-gradient-to-br from-white to-purple-50/50 p-6 shadow-lg dark:border-purple-700 dark:from-slate-800 dark:to-purple-900/20"
+                    className="rounded-xl border-2 border-primary/20 bg-gradient-to-br from-white to-primary/5 p-6 shadow-lg dark:border-primary/20 dark:from-slate-800 dark:to-primary/5"
                   >
                     <div className="mb-4 space-y-3">
                       {/* Header: Character Number + Remove Button */}
                       <div className="flex items-center justify-between">
-                        <span className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-bold text-white">
+                        <span className="rounded-full bg-gradient-to-r from-primary to-brand-2 px-3 py-1 text-xs font-bold text-white">
                           Character {index + 1}
                         </span>
                         {characters.length > 1 && (
@@ -888,7 +888,7 @@ export default function Step2Page() {
                           value={character.characterType.group} 
                           onValueChange={(value) => handleCharacterGroupChange(character.id, value as CharacterGroup)}
                         >
-                          <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                          <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -911,7 +911,7 @@ export default function Step2Page() {
                             value={character.characterType.value} 
                             onValueChange={(value) => handleCharacterValueChange(character.id, value)}
                           >
-                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                            <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -935,7 +935,7 @@ export default function Step2Page() {
                             value={character.characterType.value} 
                             onValueChange={(value) => handleCharacterValueChange(character.id, value)}
                           >
-                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                            <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -959,7 +959,7 @@ export default function Step2Page() {
                             value={character.characterType.value} 
                             onValueChange={(value) => handleCharacterValueChange(character.id, value)}
                           >
-                            <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                            <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -1001,7 +1001,7 @@ export default function Step2Page() {
                             }
                             value={character.characterType.displayName}
                             onChange={(e) => handleCharacterDisplayNameChange(character.id, e.target.value)}
-                            className="border-purple-300 dark:border-purple-600"
+                            className="border-primary/30 dark:border-primary/30"
                           />
                         </div>
                       )}
@@ -1053,7 +1053,7 @@ export default function Step2Page() {
 
                       {/* NEW: Detailed Form for Additional Child Characters (2, 3) */}
                       {character.characterType.group === "Child" && (index > 0 || !step1Data) && (
-                        <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+                        <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4 dark:border-primary/20 dark:bg-primary/5">
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
                             Child Details
                           </h3>
@@ -1068,7 +1068,7 @@ export default function Step2Page() {
                               placeholder="e.g., Arya, Aras"
                               value={character.name || ""}
                               onChange={(e) => handleChildDetailsChange(character.id, "name", e.target.value)}
-                              className="border-purple-300 dark:border-purple-600"
+                              className="border-primary/30 dark:border-primary/30"
                               required
                             />
                           </div>
@@ -1086,7 +1086,7 @@ export default function Step2Page() {
                                 placeholder="e.g., 5"
                                 value={character.age || ""}
                                 onChange={(e) => handleChildDetailsChange(character.id, "age", parseInt(e.target.value) || 0)}
-                                className="border-purple-300 dark:border-purple-600"
+                                className="border-primary/30 dark:border-primary/30"
                                 required
                               />
                             </div>
@@ -1098,7 +1098,7 @@ export default function Step2Page() {
                                 value={character.gender || ""}
                                 onValueChange={(value) => handleChildDetailsChange(character.id, "gender", value as "boy" | "girl")}
                               >
-                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                                   <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1119,7 +1119,7 @@ export default function Step2Page() {
                                 value={character.hairColor || ""}
                                 onValueChange={(value) => handleChildDetailsChange(character.id, "hairColor", value)}
                               >
-                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                                   <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1139,7 +1139,7 @@ export default function Step2Page() {
                                 value={character.eyeColor || ""}
                                 onValueChange={(value) => handleChildDetailsChange(character.id, "eyeColor", value)}
                               >
-                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                                   <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1176,7 +1176,7 @@ export default function Step2Page() {
                             }
                             value={character.name || ""}
                             onChange={(e) => handleCharacterNameChange(character.id, e.target.value)}
-                            className="border-purple-300 dark:border-purple-600"
+                            className="border-primary/30 dark:border-primary/30"
                           />
                           <p className="text-xs text-gray-500 dark:text-slate-400">
                             {(character.characterType.group as string) === "Pets" 
@@ -1192,7 +1192,7 @@ export default function Step2Page() {
 
                       {/* NEW: Appearance Details for Non-Child Characters (Family Members, Toys, Other - Pets excluded) */}
                       {character.characterType.group !== "Child" && character.characterType.group !== "Pets" && (
-                        <div className="space-y-4 rounded-lg border border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+                        <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4 dark:border-primary/20 dark:bg-primary/5">
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-50">
                             Appearance Details
                           </h3>
@@ -1215,7 +1215,7 @@ export default function Step2Page() {
                                 value={character.hairColor || ""}
                                 onValueChange={(value) => handleChildDetailsChange(character.id, "hairColor", value)}
                               >
-                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                                   <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1244,7 +1244,7 @@ export default function Step2Page() {
                                 value={character.eyeColor || ""}
                                 onValueChange={(value) => handleChildDetailsChange(character.id, "eyeColor", value)}
                               >
-                                <SelectTrigger className="border-purple-300 bg-white dark:border-purple-600 dark:bg-slate-700">
+                                <SelectTrigger className="border-primary/30 bg-white dark:border-primary/30 dark:bg-slate-700">
                                   <SelectValue placeholder="Select..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1278,8 +1278,8 @@ export default function Step2Page() {
                         onDrop={(e) => handleFileDrop(character.id, e)}
                         className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-all ${
                           character.isDragging
-                            ? "border-purple-500 bg-purple-100 dark:bg-purple-900/30"
-                            : "border-purple-300 bg-white/50 hover:border-purple-400 hover:bg-purple-50/50 dark:border-purple-600 dark:bg-slate-700/50 dark:hover:border-purple-500"
+                            ? "border-primary bg-primary/10"
+                            : "border-primary/30 bg-white/50 hover:border-primary/50 hover:bg-primary/5 dark:border-primary/30 dark:bg-slate-700/50 dark:hover:border-primary/50"
                         }`}
                       >
                         <input
@@ -1296,7 +1296,7 @@ export default function Step2Page() {
                           <motion.div
                             whileHover={{ scale: 1.1, rotate: 5 }}
                             whileTap={{ scale: 0.9 }}
-                            className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg"
+                            className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg"
                           >
                             <Upload className="h-8 w-8" />
                           </motion.div>
@@ -1365,7 +1365,7 @@ export default function Step2Page() {
                     type="button"
                     variant="outline"
                     onClick={handleAddCharacter}
-                    className="w-full border-2 border-dashed border-purple-300 bg-transparent py-6 text-base font-semibold text-purple-600 transition-all hover:border-purple-500 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-400 dark:hover:border-purple-500 dark:hover:bg-purple-900/20"
+                    className="w-full border-2 border-dashed border-primary/30 bg-transparent py-6 text-base font-semibold text-primary transition-all hover:border-primary hover:bg-primary/5 dark:border-primary/30 dark:hover:border-primary"
                   >
                     <Plus className="mr-2 h-5 w-5" />
                     <span>Add Another Character</span>
@@ -1384,7 +1384,7 @@ export default function Step2Page() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20 sm:w-auto"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/5 dark:border-primary/30 sm:w-auto"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   <span>Back</span>
@@ -1405,7 +1405,7 @@ export default function Step2Page() {
                   router.push("/create/step3")
                 }}
                 disabled={!hasUploadedPhotos}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 sm:w-auto"
+                className="w-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 sm:w-auto"
               >
                 <span>Next</span>
                 <ArrowRight className="ml-2 h-4 w-4" />

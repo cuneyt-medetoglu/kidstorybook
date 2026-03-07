@@ -82,14 +82,14 @@ export function CookieConsentBanner() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-purple-200 dark:border-purple-800 shadow-2xl"
+          className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-primary/20 shadow-2xl"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
             {!showCustomize ? (
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {/* Cookie Icon */}
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-brand-2 flex items-center justify-center">
                     <Cookie className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -102,7 +102,7 @@ export function CookieConsentBanner() {
                     By clicking &apos;Accept All&apos;, you consent to our use of cookies.{" "}
                     <a
                       href="/privacy-policy"
-                      className="text-purple-600 dark:text-purple-400 hover:text-pink-600 dark:hover:text-pink-400 underline transition-colors"
+                      className="text-primary hover:text-brand-2 underline transition-colors"
                     >
                       Learn more
                     </a>
@@ -113,21 +113,21 @@ export function CookieConsentBanner() {
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <Button
                     onClick={handleAcceptAll}
-                    className="flex-1 sm:flex-none bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="flex-1 sm:flex-none bg-gradient-to-r from-primary to-brand-2 text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
                     Accept All
                   </Button>
                   <Button
                     onClick={handleDecline}
                     variant="outline"
-                    className="flex-1 sm:flex-none border-2 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-semibold px-6 py-2 rounded-full transition-all duration-300 bg-transparent"
+                    className="flex-1 sm:flex-none border-2 border-primary/30 text-primary hover:bg-primary/5 font-semibold px-6 py-2 rounded-full transition-all duration-300 bg-transparent"
                   >
                     Decline
                   </Button>
                   <Button
                     onClick={() => setShowCustomize(true)}
                     variant="ghost"
-                    className="flex-1 sm:flex-none text-gray-700 dark:text-gray-300 hover:text-purple-700 dark:hover:text-purple-300 font-semibold px-6 py-2 rounded-full transition-all duration-300"
+                    className="flex-1 sm:flex-none text-gray-700 dark:text-gray-300 hover:text-primary font-semibold px-6 py-2 rounded-full transition-all duration-300"
                   >
                     <Settings className="w-4 h-4 mr-2" />
                     Customize
@@ -152,7 +152,7 @@ export function CookieConsentBanner() {
                   {/* Essential Cookies */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
                     <div className="flex-shrink-0 mt-1">
-                      <div className="w-12 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-end px-1 cursor-not-allowed opacity-50">
+                      <div className="w-12 h-6 bg-gradient-to-r from-primary to-brand-2 rounded-full flex items-center justify-end px-1 cursor-not-allowed opacity-50">
                         <div className="w-5 h-5 bg-white rounded-full shadow-md" />
                       </div>
                     </div>
@@ -175,7 +175,7 @@ export function CookieConsentBanner() {
                         onClick={() => togglePreference("analytics")}
                         className={`w-12 h-6 rounded-full flex items-center transition-all duration-300 ${
                           preferences.analytics
-                            ? "bg-gradient-to-r from-purple-500 to-pink-500 justify-end"
+                            ? "bg-gradient-to-r from-primary to-brand-2 justify-end"
                             : "bg-gray-300 dark:bg-gray-600 justify-start"
                         } px-1`}
                       >
@@ -198,7 +198,7 @@ export function CookieConsentBanner() {
                         onClick={() => togglePreference("marketing")}
                         className={`w-12 h-6 rounded-full flex items-center transition-all duration-300 ${
                           preferences.marketing
-                            ? "bg-gradient-to-r from-purple-500 to-pink-500 justify-end"
+                            ? "bg-gradient-to-r from-primary to-brand-2 justify-end"
                             : "bg-gray-300 dark:bg-gray-600 justify-start"
                         } px-1`}
                       >
@@ -217,7 +217,7 @@ export function CookieConsentBanner() {
                 <div className="flex flex-col sm:flex-row items-center gap-3">
                   <Button
                     onClick={handleSaveCustom}
-                    className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-primary to-brand-2 text-white font-semibold px-8 py-2 rounded-full transition-all duration-300 hover:scale-105 hover:shadow-lg"
                   >
                     <Check className="w-4 h-4 mr-2" />
                     Save Preferences
@@ -225,7 +225,7 @@ export function CookieConsentBanner() {
                   <Button
                     onClick={handleAcceptAll}
                     variant="outline"
-                    className="w-full sm:w-auto border-2 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 font-semibold px-8 py-2 rounded-full transition-all duration-300 bg-transparent"
+                    className="w-full sm:w-auto border-2 border-primary/30 text-primary hover:bg-primary/5 font-semibold px-8 py-2 rounded-full transition-all duration-300 bg-transparent"
                   >
                     Accept All
                   </Button>

@@ -98,13 +98,13 @@ export default function Step1Page() {
 
   const decorativeElements = [
     { Icon: Star, top: "10%", left: "8%", delay: 0, size: "h-6 w-6", color: "text-yellow-400" },
-    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
-    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-purple-400" },
+    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
+    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-primary" },
     { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -150,7 +150,7 @@ export default function Step1Page() {
                 initial={{ width: 0 }}
                 animate={{ width: "16.67%" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-gradient-to-r from-primary to-brand-2"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function Step1Page() {
                     className={`pl-10 ${
                       errors.name
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.name ? "true" : "false"}
                     aria-describedby={errors.name ? "name-error" : undefined}
@@ -237,7 +237,7 @@ export default function Step1Page() {
                     className={`pl-10 ${
                       errors.age
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.age ? "true" : "false"}
                     aria-describedby={errors.age ? "age-error" : undefined}
@@ -269,7 +269,7 @@ export default function Step1Page() {
                     whileTap={{ scale: 0.98 }}
                     className={`flex cursor-pointer items-center justify-center rounded-lg border-2 p-4 transition-all ${
                       selectedGender === "boy"
-                        ? "border-purple-500 bg-purple-50 dark:border-purple-400 dark:bg-purple-900/20"
+                        ? "border-primary bg-primary/5"
                         : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800"
                     }`}
                   >
@@ -282,7 +282,7 @@ export default function Step1Page() {
                     whileTap={{ scale: 0.98 }}
                     className={`flex cursor-pointer items-center justify-center rounded-lg border-2 p-4 transition-all ${
                       selectedGender === "girl"
-                        ? "border-pink-500 bg-pink-50 dark:border-pink-400 dark:bg-pink-900/20"
+                        ? "border-brand-2 bg-brand-2/5"
                         : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800"
                     }`}
                   >
@@ -319,7 +319,7 @@ export default function Step1Page() {
                     className={`w-full rounded-md border pl-10 pr-4 py-2 text-sm transition-colors focus:outline-none focus:ring-2 ${
                       errors.hairColor
                         ? "border-red-500 ring-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-purple-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
+                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
                     }`}
                     aria-invalid={errors.hairColor ? "true" : "false"}
                     aria-describedby={errors.hairColor ? "hairColor-error" : undefined}
@@ -362,7 +362,7 @@ export default function Step1Page() {
                     className={`w-full rounded-md border pl-10 pr-4 py-2 text-sm transition-colors focus:outline-none focus:ring-2 ${
                       errors.eyeColor
                         ? "border-red-500 ring-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-purple-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
+                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
                     }`}
                     aria-invalid={errors.eyeColor ? "true" : "false"}
                     aria-describedby={errors.eyeColor ? "eyeColor-error" : undefined}
@@ -398,7 +398,7 @@ export default function Step1Page() {
                   <Button
                     type="submit"
                     disabled={!isValid || isSubmitting}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400 sm:w-auto"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
                   >
                     <span>{isSubmitting ? "Saving..." : "Next"}</span>
                     {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
@@ -419,7 +419,7 @@ export default function Step1Page() {
               Need help?{" "}
               <Link
                 href="/help"
-                className="font-semibold text-purple-600 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400"
+                className="font-semibold text-primary underline underline-offset-2 transition-colors hover:text-brand-2"
               >
                 Contact Support
               </Link>

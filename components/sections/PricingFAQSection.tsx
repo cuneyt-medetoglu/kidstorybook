@@ -78,7 +78,7 @@ const FAQAccordionItem = ({
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="shrink-0"
         >
-          <ChevronDown className="h-5 w-5 text-purple-500" />
+          <ChevronDown className="h-5 w-5 text-primary" />
         </motion.div>
       </button>
 

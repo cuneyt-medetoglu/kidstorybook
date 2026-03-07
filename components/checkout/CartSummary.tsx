@@ -37,11 +37,11 @@ export function CartSummary() {
                   unoptimized
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30">
+                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 to-brand-2/10">
                   {item.type === "ebook_plan" ? (
-                    <Download className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                    <Download className="h-6 w-6 text-primary" />
                   ) : (
-                    <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                    <BookOpen className="h-6 w-6 text-primary" />
                   )}
                 </div>
               )}
@@ -56,7 +56,7 @@ export function CartSummary() {
                 {item.type === "hardcopy" && "Hardcover Book"}
                 {item.type === "ebook_plan" && `E-Book Plan (${item.planType ?? "10"} pages)`}
               </p>
-              <p className="mt-1 text-sm font-bold text-purple-600 dark:text-purple-400">
+              <p className="mt-1 text-sm font-bold text-primary">
                 ${item.price.toFixed(2)}
               </p>
             </div>
@@ -83,7 +83,7 @@ export function CartSummary() {
           <div className="border-t border-slate-200 pt-3 dark:border-slate-700">
             <div className="flex justify-between">
               <span className="text-lg font-bold text-slate-900 dark:text-white">Total</span>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+              <span className="text-xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 ${total.toFixed(2)}
               </span>
             </div>

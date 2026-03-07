@@ -69,7 +69,7 @@ function MagicArrow() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 p-2.5 shadow-2xl md:p-2.5 lg:p-4"
+        className="rounded-full bg-gradient-to-r from-primary to-brand-2 p-2.5 shadow-2xl md:p-2.5 lg:p-4"
       >
         <Wand2 className="h-4 w-4 text-white md:h-4 md:w-4 lg:h-6 lg:w-6" />
       </motion.div>
@@ -134,11 +134,11 @@ export function HeroBookTransformation() {
         className="mb-2 text-center sm:mb-3 md:mb-2 lg:mb-4"
       >
         <h3 className="flex items-center justify-center gap-2 text-lg font-bold text-gray-800 dark:text-white sm:text-xl md:text-lg md:gap-1.5 lg:text-xl xl:text-2xl">
-          <Wand2 className="h-4 w-4 text-purple-500 sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
-          <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <Wand2 className="h-4 w-4 text-primary sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
+          <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
             Your Child, The Hero
           </span>
-          <Wand2 className="h-4 w-4 scale-x-[-1] text-pink-500 sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
+          <Wand2 className="h-4 w-4 scale-x-[-1] text-brand-2 sm:h-5 sm:w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 xl:h-6 xl:w-6" />
         </h3>
         <motion.p
           initial={{ opacity: 0 }}
@@ -194,7 +194,7 @@ export function HeroBookTransformation() {
             transition={{ delay: 0.2, duration: 0.8 }}
             className="relative"
           >
-            <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-purple-200 dark:bg-slate-800 dark:ring-purple-800 md:p-2 lg:p-3">
+            <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-primary/20 dark:bg-slate-800 md:p-2 lg:p-3">
               {/* Label */}
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -223,7 +223,7 @@ export function HeroBookTransformation() {
 
               {/* Corner decoration */}
               <div className="absolute right-3 top-3 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
-                <Star className="h-3 w-3 text-purple-500" fill="currentColor" />
+                <Star className="h-3 w-3 text-primary" fill="currentColor" />
               </div>
             </div>
           </motion.div>
@@ -245,9 +245,9 @@ export function HeroBookTransformation() {
                 animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                <ArrowRight className="h-8 w-8 rotate-90 text-purple-500" strokeWidth={3} />
+                <ArrowRight className="h-8 w-8 rotate-90 text-primary" strokeWidth={3} />
               </motion.div>
-              <span className="text-xs font-bold text-purple-600 dark:text-purple-400">Magic!</span>
+              <span className="text-xs font-bold text-primary">Magic!</span>
             </motion.div>
           </div>
 
@@ -261,7 +261,7 @@ export function HeroBookTransformation() {
               transition={{ delay: 0.3, duration: 0.8 }}
               className="relative"
             >
-              <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-pink-200 dark:bg-slate-800 dark:ring-pink-800 md:p-2 lg:p-3">
+              <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-brand-2/20 dark:bg-slate-800 md:p-2 lg:p-3">
                 {/* Label */}
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
@@ -269,11 +269,11 @@ export function HeroBookTransformation() {
                   transition={{ delay: 0.5 }}
                   className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2"
                 >
-                  <Sparkles className="h-3 w-3 text-pink-500" />
+                  <Sparkles className="h-3 w-3 text-brand-2" />
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                     Story Character
                   </span>
-                  <Sparkles className="h-3 w-3 text-pink-500" />
+                  <Sparkles className="h-3 w-3 text-brand-2" />
                 </motion.div>
 
                 {/* Character frame - image only (5.1: footer outside to avoid corner artifacts) */}
@@ -298,7 +298,7 @@ export function HeroBookTransformation() {
                 {/* Footer outside image container */}
                 <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
                   <div className="flex items-center justify-center gap-1.5">
-                    <Icon className="h-3 w-3 text-purple-600" />
+                    <Icon className="h-3 w-3 text-primary" />
                     <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
                       {currentItem.name}
                     </p>
@@ -307,7 +307,7 @@ export function HeroBookTransformation() {
 
                 {/* Corner decoration */}
                 <div className="absolute left-3 top-3 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
-                  <Sparkles className="h-3 w-3 text-pink-500" />
+                  <Sparkles className="h-3 w-3 text-brand-2" />
                 </div>
 
                 {/* Pulsing glow effect */}
@@ -378,7 +378,7 @@ export function HeroBookTransformation() {
             whileHover={{ scale: 1.05, y: -2 }}
             className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-medium text-gray-700 shadow-md backdrop-blur-sm ring-1 ring-gray-200 dark:bg-slate-800/90 dark:text-gray-200 dark:ring-slate-700 md:gap-1 md:px-2.5 md:py-1 lg:gap-1.5 lg:px-4 lg:py-2"
           >
-            <stat.icon className="h-3.5 w-3.5 text-purple-500 md:h-3 md:w-3 lg:h-4 lg:w-4" />
+            <stat.icon className="h-3.5 w-3.5 text-primary md:h-3 md:w-3 lg:h-4 lg:w-4" />
             <span className="whitespace-nowrap">{stat.label}</span>
           </motion.div>
         ))}

@@ -38,7 +38,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
 
         {/* Right: Text */}
         <div className="flex h-full w-1/2 flex-col justify-center overflow-hidden rounded-xl bg-white p-8 shadow-xl dark:bg-slate-800">
-          <span className="mb-4 text-sm font-medium text-purple-500">Page {page.pageNumber}</span>
+          <span className="mb-4 text-sm font-medium text-primary">Page {page.pageNumber}</span>
           <p className="text-lg leading-relaxed text-foreground md:text-xl lg:text-2xl">{page.text}</p>
         </div>
       </>
@@ -51,7 +51,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
     return (
       <div className="flex h-full w-full max-w-[800px] flex-col overflow-hidden rounded-xl bg-white shadow-xl dark:bg-slate-800 relative">
         <div className="absolute top-3 left-3 z-20">
-          <span className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-medium text-white">
+          <span className="rounded-full bg-gradient-to-r from-primary to-brand-2 px-3 py-1 text-xs font-medium text-white">
             Page {page.pageNumber}
           </span>
         </div>
@@ -79,7 +79,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
               {/* Tap to read overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 pointer-events-none">
-                <span className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white shadow-lg">
+                <span className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-brand-2 px-4 py-2 text-sm font-medium text-white shadow-lg">
                   <BookOpen className="h-4 w-4" />
                   Read
                 </span>
@@ -109,7 +109,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
                     e.stopPropagation()
                     onToggleFlip?.()
                   }}
-                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-medium text-white shadow-lg hover:scale-105 transition-transform"
+                  className="flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-brand-2 px-4 py-2 text-sm font-medium text-white shadow-lg hover:scale-105 transition-transform"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
@@ -137,7 +137,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
           unoptimized
         />
         <div className="absolute bottom-3 left-3">
-          <span className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-medium text-white">
+          <span className="rounded-full bg-gradient-to-r from-primary to-brand-2 px-3 py-1 text-xs font-medium text-white">
             Page {page.pageNumber}
           </span>
         </div>

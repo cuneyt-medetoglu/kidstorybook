@@ -13,8 +13,8 @@ const banners = [
     titleTR: "Tüm Basılı Kitaplarda Ücretsiz Kargo",
     description: "No minimum order required",
     cta: "Order Now",
-    gradient: "from-purple-500 via-purple-600 to-pink-500",
-    iconColor: "text-purple-200",
+    gradient: "from-primary via-primary/80 to-brand-2",
+    iconColor: "text-white/70",
   },
   {
     id: 2,
@@ -23,8 +23,8 @@ const banners = [
     titleTR: "İlk Siparişinizde %10 İndirim",
     description: "Use code: FIRST10 at checkout",
     cta: "Get Started",
-    gradient: "from-pink-500 via-rose-500 to-purple-500",
-    iconColor: "text-pink-200",
+    gradient: "from-brand-2 via-rose-500 to-primary",
+    iconColor: "text-white/70",
   },
   {
     id: 3,
@@ -33,8 +33,8 @@ const banners = [
     titleTR: "Sınırlı Süre: E-Kitap + Basılı Kitap Paketi",
     description: "Save 15% on combo packages",
     cta: "View Offer",
-    gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
-    iconColor: "text-violet-200",
+    gradient: "from-primary to-brand-2",
+    iconColor: "text-white/70",
   },
 ]
 
@@ -139,7 +139,7 @@ export function CampaignBanners() {
                     >
                       <Button
                         size="lg"
-                        className="bg-white text-purple-600 hover:bg-white/90 shadow-xl font-semibold px-8 py-6 text-lg rounded-full"
+                        className="bg-white text-primary hover:bg-white/90 shadow-xl font-semibold px-8 py-6 text-lg rounded-full"
                       >
                         {currentBanner.cta}
                       </Button>
@@ -174,7 +174,7 @@ export function CampaignBanners() {
                   onClick={() => goToSlide(index)}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     index === currentIndex
-                      ? "w-8 bg-gradient-to-r from-purple-500 to-pink-500"
+                      ? "w-8 bg-gradient-to-r from-primary to-brand-2"
                       : "w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to banner ${index + 1}`}

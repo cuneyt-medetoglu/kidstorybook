@@ -130,14 +130,14 @@ export default function RegisterPage() {
 
   const decorativeElements = [
     { Icon: Star, top: "10%", left: "8%", delay: 0, size: "h-6 w-6", color: "text-yellow-400" },
-    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
-    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-purple-400" },
+    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
+    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-primary" },
     { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
-    { Icon: Star, top: "40%", left: "3%", delay: 0.8, size: "h-5 w-5", color: "text-pink-300" },
+    { Icon: Star, top: "40%", left: "3%", delay: 0.8, size: "h-5 w-5", color: "text-brand-2/60" },
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -180,10 +180,10 @@ export default function RegisterPage() {
             className="mb-8 text-center"
           >
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-brand-2">
                 <BookOpen className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 KidStoryBook
               </span>
             </Link>
@@ -219,10 +219,10 @@ export default function RegisterPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5, duration: 0.4 }}
-                className="mt-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-4 py-2 dark:from-purple-900/30 dark:to-pink-900/30"
+                className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2"
               >
-                <Sparkles className="h-4 w-4 text-purple-500 dark:text-purple-400" />
-                <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-xs font-semibold text-primary">
                   Get 1 free book cover when you sign up!
                 </span>
               </motion.div>
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                     className={`pl-10 ${
                       errors.name
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.name ? "true" : "false"}
                     aria-describedby={errors.name ? "name-error" : undefined}
@@ -288,7 +288,7 @@ export default function RegisterPage() {
                     className={`pl-10 ${
                       errors.email
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.email ? "true" : "false"}
                     aria-describedby={errors.email ? "email-error" : undefined}
@@ -326,7 +326,7 @@ export default function RegisterPage() {
                     className={`pl-10 pr-10 ${
                       errors.password
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.password ? "true" : "false"}
                     aria-describedby={errors.password ? "password-error" : undefined}
@@ -372,7 +372,7 @@ export default function RegisterPage() {
                     className={`pl-10 pr-10 ${
                       errors.confirmPassword
                         ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                     }`}
                     aria-invalid={errors.confirmPassword ? "true" : "false"}
                     aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
@@ -425,7 +425,7 @@ export default function RegisterPage() {
                     I agree to the{" "}
                     <Link
                       href="/terms"
-                      className="text-purple-600 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400"
+                      className="text-primary underline underline-offset-2 transition-colors hover:text-brand-2"
                     >
                       Terms & Conditions
                     </Link>
@@ -462,7 +462,7 @@ export default function RegisterPage() {
                     I agree to the{" "}
                     <Link
                       href="/privacy"
-                      className="text-purple-600 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400"
+                      className="text-primary underline underline-offset-2 transition-colors hover:text-brand-2"
                     >
                       Privacy Policy
                     </Link>
@@ -489,7 +489,7 @@ export default function RegisterPage() {
                   <Button
                     type="submit"
                     disabled={isLoading || !isValid}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
@@ -583,7 +583,7 @@ export default function RegisterPage() {
                 Already have an account?{" "}
                 <Link
                   href="/auth/login"
-                  className="font-semibold text-purple-600 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400"
+                  className="font-semibold text-primary underline underline-offset-2 transition-colors hover:text-brand-2"
                 >
                   Sign in
                 </Link>

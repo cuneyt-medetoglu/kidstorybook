@@ -90,7 +90,7 @@ const FAQAccordionItem = ({
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="shrink-0"
         >
-          <ChevronDown className="h-5 w-5 text-purple-500" />
+          <ChevronDown className="h-5 w-5 text-primary" />
         </motion.div>
       </button>
 
@@ -119,7 +119,7 @@ export function FAQSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-purple-50/30 to-white py-20 dark:from-slate-950 dark:via-purple-950/10 dark:to-slate-950 md:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-primary/5 to-white py-20 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 md:py-32">
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
@@ -128,7 +128,7 @@ export function FAQSection() {
             opacity: [0.1, 0.15, 0.1],
           }}
           transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
-          className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 blur-3xl"
+          className="absolute -left-32 top-20 h-96 w-96 rounded-full bg-gradient-to-br from-primary to-brand-2 blur-3xl opacity-10"
         />
         <motion.div
           animate={{
@@ -136,7 +136,7 @@ export function FAQSection() {
             opacity: [0.1, 0.15, 0.1],
           }}
           transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut", delay: 1 }}
-          className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-gradient-to-br from-pink-400 to-purple-400 blur-3xl"
+          className="absolute -right-32 bottom-20 h-96 w-96 rounded-full bg-gradient-to-br from-brand-2 to-primary blur-3xl opacity-10"
         />
       </div>
 
@@ -154,7 +154,7 @@ export function FAQSection() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg"
+            className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-brand-2 px-4 py-2 text-sm font-semibold text-white shadow-lg"
           >
             <HelpCircle className="h-4 w-4" />
             FAQ
@@ -194,7 +194,7 @@ export function FAQSection() {
             href="#contact"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-4 font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-brand-2 px-8 py-4 font-semibold text-white shadow-lg transition-shadow hover:shadow-xl"
           >
             Contact Us
           </motion.a>

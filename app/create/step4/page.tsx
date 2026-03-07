@@ -92,20 +92,20 @@ const illustrationStyles: IllustrationStyle[] = [
     Icon: Heart,
     title: "Kawaii",
     description: "Exaggerated cuteness, large sparkling eyes, simplified round features, bright cheerful colors",
-    gradientFrom: "from-pink-400",
+    gradientFrom: "from-brand-2",
     gradientTo: "to-rose-400",
-    borderColor: "border-pink-400",
-    iconBgColor: "bg-gradient-to-br from-pink-400 to-rose-400",
+    borderColor: "border-brand-2",
+    iconBgColor: "bg-gradient-to-br from-brand-2 to-rose-400",
   },
   {
     id: "watercolor",
     Icon: Palette,
     title: "Watercolor",
     description: "Soft, translucent appearance, visible brushstrokes, blended edges, warm inviting atmosphere",
-    gradientFrom: "from-purple-500",
-    gradientTo: "to-pink-500",
-    borderColor: "border-purple-500",
-    iconBgColor: "bg-gradient-to-br from-purple-500 to-pink-500",
+    gradientFrom: "from-primary",
+    gradientTo: "to-brand-2",
+    borderColor: "border-primary",
+    iconBgColor: "bg-gradient-to-br from-primary to-brand-2",
   },
   {
     id: "clay_animation",
@@ -209,14 +209,14 @@ export default function Step4Page() {
   }
 
   const decorativeElements = [
-    { Icon: Palette, top: "10%", left: "8%", delay: 0, size: "h-7 w-7", color: "text-purple-400" },
-    { Icon: Brush, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
+    { Icon: Palette, top: "10%", left: "8%", delay: 0, size: "h-7 w-7", color: "text-primary" },
+    { Icon: Brush, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
     { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-blue-400" },
     { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-amber-400" },
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -262,7 +262,7 @@ export default function Step4Page() {
                 initial={{ width: 0 }}
                 animate={{ width: "66.67%" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-gradient-to-r from-primary to-brand-2"
               />
             </div>
           </div>
@@ -399,7 +399,7 @@ export default function Step4Page() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-2 border-gray-300 bg-transparent px-6 py-6 text-base font-semibold transition-all hover:border-purple-500 hover:bg-purple-50 dark:border-slate-600 dark:hover:border-purple-400 dark:hover:bg-purple-900/20 sm:w-auto"
+                    className="w-full border-2 border-gray-300 bg-transparent px-6 py-6 text-base font-semibold transition-all hover:border-primary hover:bg-primary/5 dark:border-slate-600 dark:hover:border-primary sm:w-auto"
                   >
                     <ArrowLeft className="mr-2 h-5 w-5" />
                     <span>Back</span>
@@ -412,7 +412,7 @@ export default function Step4Page() {
                   type="button"
                   disabled={!isFormValid}
                   onClick={handleNext}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 dark:from-purple-400 dark:to-pink-400 sm:w-auto"
+                  className="w-full bg-gradient-to-r from-primary to-brand-2 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                 >
                   <span>Next</span>
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -432,7 +432,7 @@ export default function Step4Page() {
               Need help?{" "}
               <Link
                 href="/help"
-                className="font-semibold text-purple-600 underline underline-offset-2 transition-colors hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                className="font-semibold text-primary underline underline-offset-2 transition-colors hover:text-primary/80"
               >
                 Contact Support
               </Link>

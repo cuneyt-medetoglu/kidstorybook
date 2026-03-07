@@ -62,7 +62,7 @@ export default function CartPage() {
               Add books from My Library to get started
             </p>
             <Button
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+              className="bg-gradient-to-r from-primary to-brand-2 text-white"
               onClick={() => router.push("/dashboard")}
             >
               Go to My Library
@@ -110,7 +110,7 @@ export default function CartPage() {
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                               Hardcover Book
                             </p>
-                            <p className="mt-2 text-xl font-bold text-purple-600 dark:text-purple-400">
+                            <p className="mt-2 text-xl font-bold text-primary">
                               ${item.price.toFixed(2)}
                             </p>
                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -160,7 +160,7 @@ export default function CartPage() {
                 <div className="mb-4 border-t border-slate-200 pt-4 dark:border-slate-700">
                   <div className="flex justify-between">
                     <span className="text-lg font-bold text-slate-900 dark:text-white">Total</span>
-                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                       ${total.toFixed(2)}
                     </span>
                   </div>
@@ -169,7 +169,7 @@ export default function CartPage() {
                 <Button
                   size="lg"
                   disabled={items.length === 0}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600"
+                  className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
                   onClick={() => {
                     // ROADMAP: 4.3.1 Checkout sayfası - navigate to checkout
                     router.push("/checkout")

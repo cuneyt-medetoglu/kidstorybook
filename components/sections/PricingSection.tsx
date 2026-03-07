@@ -19,11 +19,11 @@ export function PricingSection() {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-pink-50 to-white py-8 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 md:py-24">
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-brand-2/5 to-white py-8 dark:from-slate-900 dark:via-slate-800 dark:to-slate-950 md:py-24">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -right-20 top-20 h-64 w-64 rounded-full bg-purple-200/30 blur-3xl dark:bg-purple-500/10" />
-        <div className="absolute -left-20 bottom-20 h-64 w-64 rounded-full bg-pink-200/30 blur-3xl dark:bg-pink-500/10" />
+        <div className="absolute -right-20 top-20 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute -left-20 bottom-20 h-64 w-64 rounded-full bg-brand-2/15 blur-3xl" />
       </div>
 
       <div className="container relative mx-auto px-4 md:px-6">
@@ -35,7 +35,7 @@ export function PricingSection() {
           transition={{ duration: 0.5 }}
           className="mb-6 text-center md:mb-12"
         >
-          <h2 className="mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold leading-tight pb-1 text-transparent dark:from-purple-400 dark:to-pink-400 md:mb-4 md:text-5xl md:leading-normal">
+          <h2 className="mb-2 bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-3xl font-bold leading-tight pb-1 text-transparent md:mb-4 md:text-5xl md:leading-normal">
             Pricing
           </h2>
           <p className="mx-auto max-w-2xl text-base text-slate-600 dark:text-slate-300 md:text-lg">
@@ -58,8 +58,8 @@ export function PricingSection() {
               <div className="relative h-full rounded-3xl bg-white p-6 shadow-xl transition-shadow duration-300 hover:shadow-2xl dark:bg-slate-900 md:p-8">
                 {/* Plan icon */}
                 <div className="mb-4 flex items-center justify-center md:mb-6">
-                  <div className="rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-3 dark:from-purple-900/30 dark:to-pink-900/30 md:p-4">
-                    <Download className="h-6 w-6 text-purple-600 dark:text-purple-400 md:h-8 md:w-8" />
+                  <div className="rounded-2xl bg-primary/10 p-3 md:p-4">
+                    <Download className="h-6 w-6 text-primary md:h-8 md:w-8" />
                   </div>
                 </div>
 
@@ -76,7 +76,7 @@ export function PricingSection() {
                   {isLoadingCurrency ? (
                     <div className="mb-1 h-10 animate-pulse rounded-lg bg-slate-200 dark:bg-slate-700 md:h-16" />
                   ) : (
-                    <div className="mb-1 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400 md:text-5xl">
+                    <div className="mb-1 bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-3xl font-bold text-transparent md:text-5xl">
                       {currencyConfig.price}
                     </div>
                   )}
@@ -84,7 +84,7 @@ export function PricingSection() {
                   <div className="mt-1.5 flex justify-center md:mt-2">
                     <Badge
                       variant="secondary"
-                      className="bg-purple-100 text-xs text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 md:text-sm"
+                      className="bg-primary/10 text-xs text-primary md:text-sm"
                     >
                       12 pages
                     </Badge>
@@ -119,7 +119,7 @@ export function PricingSection() {
                 <Link href="/create/step1">
                   <Button
                     size="lg"
-                    className="w-full rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600 md:py-6 md:text-lg"
+                    className="w-full rounded-xl bg-gradient-to-r from-primary to-brand-2 py-4 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl md:py-6 md:text-lg"
                   >
                     Get Started
                   </Button>
@@ -135,11 +135,11 @@ export function PricingSection() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="relative"
             >
-              <div className="rounded-2xl bg-gradient-to-br from-purple-50 to-pink-50 p-6 shadow-lg dark:from-purple-900/20 dark:to-pink-900/20 md:p-6">
+              <div className="rounded-2xl bg-gradient-to-br from-primary/5 to-brand-2/5 p-6 shadow-lg dark:from-primary/10 dark:to-brand-2/10 md:p-6">
                 {/* Icon */}
                 <div className="mb-4 flex items-center justify-center md:mb-3">
-                  <div className="rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 p-3 dark:from-purple-900/30 dark:to-pink-900/30 md:p-2">
-                    <BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400 md:h-6 md:w-6" />
+                  <div className="rounded-xl bg-primary/10 p-3 md:p-2">
+                    <BookOpen className="h-6 w-6 text-primary md:h-6 md:w-6" />
                   </div>
                 </div>
 
@@ -153,7 +153,7 @@ export function PricingSection() {
 
                 {/* Price */}
                 <div className="mb-3 text-center md:mb-3">
-                  <div className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400 md:text-3xl">
+                  <div className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-3xl font-bold text-transparent md:text-3xl">
                     $34.99
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export function PricingSection() {
                 {/* Info message */}
                 <div className="rounded-lg bg-white/60 p-3 dark:bg-slate-800/60 md:p-3">
                   <div className="mb-2 flex flex-col items-center gap-1.5 md:mb-1 md:flex-row md:gap-1.5">
-                    <Info className="h-3.5 w-3.5 flex-shrink-0 text-purple-600 dark:text-purple-400 md:h-3 md:w-3" />
+                    <Info className="h-3.5 w-3.5 flex-shrink-0 text-primary md:h-3 md:w-3" />
                     <span className="text-center text-xs font-semibold text-slate-900 dark:text-white md:text-left md:text-xs">
                       Available in My Library
                     </span>
@@ -195,7 +195,7 @@ export function PricingSection() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full rounded-lg border-purple-200 bg-transparent text-sm text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/20 md:text-xs"
+                    className="w-full rounded-lg border-primary/20 bg-transparent text-sm text-primary hover:bg-primary/5 md:text-xs"
                   >
                     View in Library
                   </Button>

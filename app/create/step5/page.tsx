@@ -97,13 +97,13 @@ export default function Step5Page() {
 
   const decorativeElements = [
     { Icon: Lightbulb, top: "10%", left: "8%", delay: 0, size: "h-8 w-8", color: "text-yellow-400" },
-    { Icon: Sparkles, top: "15%", right: "10%", delay: 0.5, size: "h-7 w-7", color: "text-purple-400" },
-    { Icon: BookOpen, top: "70%", left: "5%", delay: 1, size: "h-7 w-7", color: "text-pink-400" },
+    { Icon: Sparkles, top: "15%", right: "10%", delay: 0.5, size: "h-7 w-7", color: "text-primary" },
+    { Icon: BookOpen, top: "70%", left: "5%", delay: 1, size: "h-7 w-7", color: "text-brand-2" },
     { Icon: PenTool, top: "75%", right: "8%", delay: 1.5, size: "h-6 w-6", color: "text-blue-400" },
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -149,7 +149,7 @@ export default function Step5Page() {
                 initial={{ width: 0 }}
                 animate={{ width: "83.33%" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-gradient-to-r from-primary to-brand-2"
               />
             </div>
           </div>
@@ -224,7 +224,7 @@ export default function Step5Page() {
                   id="customRequests"
                   {...register("customRequests")}
                   placeholder="E.g., Emma discovers a hidden door in the old garden wall that leads to a magical land where animals can talk. She befriends a shy fox who is afraid of the dark, and together they find a glowing lantern to light their way home..."
-                  className="min-h-[200px] w-full resize-y rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus:border-purple-400 md:min-h-[250px]"
+                  className="min-h-[200px] w-full resize-y rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus:border-primary md:min-h-[250px]"
                   aria-label="Custom Requests"
                   aria-describedby="custom-requests-help custom-requests-counter"
                 />
@@ -319,7 +319,7 @@ export default function Step5Page() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-2 border-gray-300 bg-transparent px-6 py-6 text-base font-semibold transition-all hover:border-purple-500 hover:bg-purple-50 dark:border-slate-600 dark:hover:border-purple-400 dark:hover:bg-purple-900/20 sm:w-auto"
+                    className="w-full border-2 border-gray-300 bg-transparent px-6 py-6 text-base font-semibold transition-all hover:border-primary hover:bg-primary/5 dark:border-slate-600 dark:hover:border-primary sm:w-auto"
                   >
                     <ArrowLeft className="mr-2 h-5 w-5" />
                     <span>Back</span>
@@ -331,7 +331,7 @@ export default function Step5Page() {
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 sm:w-auto"
+                  className="w-full bg-gradient-to-r from-primary to-brand-2 px-6 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl sm:w-auto"
                 >
                   <span>Next</span>
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -351,7 +351,7 @@ export default function Step5Page() {
               Need help?{" "}
               <Link
                 href="/help"
-                className="font-semibold text-purple-600 underline underline-offset-2 transition-colors hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                className="font-semibold text-primary underline underline-offset-2 transition-colors hover:text-primary/80"
               >
                 Contact Support
               </Link>

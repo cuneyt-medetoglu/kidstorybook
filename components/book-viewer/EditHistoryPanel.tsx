@@ -128,7 +128,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
         <div className="p-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : pageNumbers.length === 0 ? (
             <div className="text-center py-12">
@@ -172,7 +172,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
                           <div
                             key={item.version}
                             className={`border rounded-lg p-4 space-y-3 ${
-                              isCurrent ? 'ring-2 ring-purple-500' : ''
+                              isCurrent ? 'ring-2 ring-primary' : ''
                             }`}
                           >
                             <div className="flex items-center justify-between">
@@ -181,7 +181,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
                                   {item.version === 0 ? 'Original' : `Version ${item.version}`}
                                 </Badge>
                                 {isCurrent && (
-                                  <Badge variant="default" className="bg-purple-500">
+                                  <Badge variant="default" className="bg-primary">
                                     Current
                                   </Badge>
                                 )}

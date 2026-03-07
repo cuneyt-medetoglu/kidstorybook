@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 1 Mart 2026 (Story prompt v2.6.0: ONE STORY, STEP BY STEP — tek konu, her sayfa sıradaki adım; STORY SEED = başlangıç; journeyMap/sabit lokasyon kuralları kaldırıldı. Detay: docs/prompts/STORY_PROMPT_TEMPLATE.md, docs/analysis/SCENE_DIVERSITY_ROOT_CAUSE_ANALYSIS.md.)
+**Son güncelleme:** 7 Mart 2026 (Design Token renk sistemi tamamlandı: `globals.css` → `tailwind.config.ts` → ~46 bileşen; hardcoded `purple/pink` → `primary/brand-2` semantic token; 5 hazır palet alternatifi; rehber: `docs/guides/THEME_AND_COLOR_GUIDE.md`; detay: `docs/implementation/DESIGN_TOKEN_IMPLEMENTATION.md`. Önceki: 1 Mart 2026 — Story prompt v2.6.0.)
 
 ---
 
@@ -32,6 +32,8 @@ docs/
 │
 ├── implementation/              # İmplementasyon takip dosyaları (Faz bazlı)
 │   ├── README.md               # Klasör açıklaması (FAZ 6)
+│   ├── DESIGN_TOKEN_IMPLEMENTATION.md # ✅ Design Token renk sistemi (7 Mart 2026) — 2.1.9
+│   ├── CUSTOM_THEME_IMPLEMENTATION.md # Custom tema + theme merge (1 Mart 2026)
 │   ├── FAZ3_IMPLEMENTATION.md   # Faz 3 implementasyon takibi
 │   ├── FAZ4_4_5_IMPLEMENTATION.md # Faz 4/5 implementasyon takibi
 │   ├── FAZ5_5_IMPLEMENTATION.md   # Faz 5.5 Deployment (EC2 Next.js, env, backup, migration) ilerleme
@@ -69,7 +71,7 @@ docs/
 │   ├── EXAMPLES_PAGE_README.md # Examples sayfası (API, Used Photos, test)
 │   ├── ENVIRONMENT_SETUP.md    # Environment variables kurulum rehberi
 │   ├── V0_APP_WORKFLOW.md      # v0.app çalışma akışı rehberi
-│   ├── COLOR_PALETTE.md        # Renk paleti rehberi
+│   ├── THEME_AND_COLOR_GUIDE.md # ✅ Design Token renk sistemi (7 Mart 2026) — tek yerden renk değişimi
 │   ├── API_TESTING_GUIDE.md    # API test rehberi (Postman)
 │   ├── AUTHENTICATION_ISSUES.md # Authentication sorunları ve geçici çözümler
 │   ├── PDF_GENERATION_GUIDE.md # PDF generation rehberi (A4 landscape, double-page spread)

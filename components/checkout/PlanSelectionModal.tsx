@@ -112,19 +112,19 @@ export function PlanSelectionModal({
                 onClick={() => setSelectedPlan(plan.type)}
                 className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all ${
                   isSelected
-                    ? "border-purple-500 bg-purple-50 dark:border-purple-400 dark:bg-purple-900/20"
-                    : "border-gray-200 bg-white hover:border-purple-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-purple-600"
+                    ? "border-primary bg-primary/5 dark:border-primary dark:bg-primary/10"
+                    : "border-gray-200 bg-white hover:border-primary/30 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary/30"
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      <BookOpen className="h-5 w-5 text-primary" />
                       <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                         {plan.pages} Pages
                       </h3>
                       {isSelected && (
-                        <Badge className="bg-purple-600 text-white dark:bg-purple-500">
+                        <Badge className="bg-primary text-white">
                           Selected
                         </Badge>
                       )}
@@ -148,7 +148,7 @@ export function PlanSelectionModal({
                     {isLoadingCurrency ? (
                       <div className="h-8 w-20 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
                     ) : (
-                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      <div className="text-2xl font-bold text-primary">
                         {formatPrice(price)}
                       </div>
                     )}
@@ -160,7 +160,7 @@ export function PlanSelectionModal({
                     animate={{ scale: 1 }}
                     className="absolute right-4 top-4"
                   >
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-600 text-white dark:bg-purple-500">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
                       <Check className="h-4 w-4" />
                     </div>
                   </motion.div>
@@ -176,7 +176,7 @@ export function PlanSelectionModal({
           </Button>
           <Button
             onClick={handleConfirm}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600"
+            className="bg-gradient-to-r from-primary to-brand-2 text-white hover:opacity-90"
           >
             Add to Cart
           </Button>

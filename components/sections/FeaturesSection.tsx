@@ -39,11 +39,11 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-purple-50/30 to-white py-16 dark:from-slate-950 dark:via-purple-950/10 dark:to-slate-950 md:py-24">
+    <section className="relative overflow-hidden bg-gradient-to-b from-white via-primary/5 to-white py-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 md:py-24">
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-purple-200/20 blur-3xl dark:bg-purple-500/5" />
-        <div className="absolute -right-20 top-3/4 h-64 w-64 rounded-full bg-pink-200/20 blur-3xl dark:bg-pink-500/5" />
+        <div className="absolute -left-20 top-1/4 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-20 top-3/4 h-64 w-64 rounded-full bg-brand-2/10 blur-3xl" />
       </div>
 
       <div className="container relative mx-auto px-4 md:px-6">
@@ -79,16 +79,16 @@ export function FeaturesSection() {
                   ease: "easeOut",
                 }}
               >
-                <Card className="group relative h-full overflow-hidden border-2 border-purple-100 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:border-purple-200 hover:shadow-xl dark:border-purple-900/30 dark:bg-slate-900 dark:hover:border-purple-800/50 md:p-8">
+                <Card className="group relative h-full overflow-hidden border-2 border-primary/10 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-105 hover:border-primary/20 hover:shadow-xl dark:border-primary/10 dark:bg-slate-900 dark:hover:border-primary/20 md:p-8">
                   {/* Gradient overlay on hover */}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-purple-500/0 via-pink-500/0 to-purple-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/0 via-brand-2/0 to-primary/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
 
                   <div className="relative space-y-4">
                     {/* Icon with gradient background */}
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ duration: 0.3 }}
-                      className="inline-flex rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-3 shadow-lg"
+                      className="inline-flex rounded-2xl bg-gradient-to-br from-primary to-brand-2 p-3 shadow-lg"
                     >
                       <Icon className="h-8 w-8 text-white md:h-10 md:w-10" />
                     </motion.div>
@@ -105,7 +105,7 @@ export function FeaturesSection() {
                   </div>
 
                   {/* Decorative corner element */}
-                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-purple-500/10 to-pink-500/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100 dark:from-purple-500/5 dark:to-pink-500/5 md:opacity-0" />
+                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-primary/10 to-brand-2/10 blur-2xl transition-opacity duration-300 group-hover:opacity-100 md:opacity-0" />
                 </Card>
               </motion.div>
             )

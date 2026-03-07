@@ -180,7 +180,7 @@ export default function LibraryPage() {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-purple-500 border-t-transparent mx-auto" />
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
           <p className="text-gray-600 dark:text-slate-400">Loading...</p>
         </div>
       </div>
@@ -478,7 +478,7 @@ export default function LibraryPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-4 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-4 dark:border-purple-800 dark:bg-purple-900/20"
+              className="mb-4 rounded-xl border-2 border-primary/20 bg-primary/5 p-4 dark:border-primary/20 dark:bg-primary/5"
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -498,7 +498,7 @@ export default function LibraryPage() {
                     </Badge>
                   )}
                   {selectedBooks.length > 0 && (
-                    <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                    <span className="text-sm font-semibold text-primary">
                       Total: ${selectedTotal.toFixed(2)}
                     </span>
                   )}
@@ -518,7 +518,7 @@ export default function LibraryPage() {
                     size="sm"
                     onClick={handleAddSelectedToCart}
                     disabled={selectedBooks.length === 0}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                    className="bg-gradient-to-r from-primary to-brand-2 text-white"
                   >
                     <ShoppingCart className="mr-2 h-4 w-4" />
                     Add Selected to Cart ({selectedBooks.length})
@@ -557,7 +557,7 @@ export default function LibraryPage() {
                 <Button
                   size="lg"
                   onClick={handleCreateBook}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity w-full sm:w-auto shrink-0 text-white text-sm sm:text-base"
+                  className="bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 transition-opacity w-full sm:w-auto shrink-0 text-white text-sm sm:text-base"
                 >
                   <Plus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden sm:inline">Create New Book</span>
@@ -640,7 +640,7 @@ export default function LibraryPage() {
               <Button
                 size="lg"
                 onClick={handleCreateBook}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity text-white"
+                className="bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 transition-opacity text-white"
               >
                 <Plus className="mr-2 h-5 w-5" />
                 Create New Book
@@ -661,7 +661,7 @@ export default function LibraryPage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className={`group relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
-                  selectedBooks.includes(book.id) ? "ring-2 ring-purple-500 dark:ring-purple-400" : ""
+                  selectedBooks.includes(book.id) ? "ring-2 ring-primary" : ""
                 }`}>
                   <CardContent className="p-4">
                     {/* Checkbox (when in select mode) */}
@@ -724,7 +724,7 @@ export default function LibraryPage() {
                       <Button
                         size="sm"
                         onClick={() => handleReadBook(book.id)}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity text-white"
+                        className="flex-1 bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 transition-opacity text-white"
                       >
                         Read
                       </Button>
@@ -741,7 +741,7 @@ export default function LibraryPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => handleAddSingleToCart(book.id)}
-                          className="w-full border-purple-200 text-purple-600 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                          className="w-full border-primary/20 text-primary hover:bg-primary/5 dark:border-primary/20"
                         >
                           <ShoppingCart className="mr-2 h-4 w-4" />
                           Add to Cart (Hardcopy)

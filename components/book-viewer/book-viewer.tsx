@@ -668,7 +668,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-purple-500 border-t-transparent mx-auto" />
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
           <p className="text-gray-600 dark:text-slate-400">Loading book...</p>
         </div>
       </div>
@@ -694,7 +694,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
   // Show empty state for cover-only books (no pages)
   if (book.pages.length === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 to-brand-2/5 dark:from-slate-900 dark:to-slate-800">
         <div className="text-center max-w-md px-4">
           <BookOpen className="h-24 w-24 mx-auto mb-4 text-gray-400 dark:text-gray-600" />
           <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">{book.title}</h2>
@@ -827,7 +827,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
+      className="fixed inset-0 z-50 flex flex-col bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -845,7 +845,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center gap-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 text-[10px] font-semibold text-white"
+                  className="flex items-center gap-1 rounded-full bg-gradient-to-r from-primary to-brand-2 px-2 py-0.5 text-[10px] font-semibold text-white"
                 >
                   <RotateCcw className="h-3 w-3" />
                   {autoplayMode === "tts" ? "Auto-reading" : `Auto (${autoplayCountdown}s)`}
@@ -854,7 +854,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
             </div>
             <div className="mt-1 h-1.5 w-24 overflow-hidden rounded-full bg-secondary md:w-32">
               <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-brand-2"
                 initial={{ width: 0 }}
                 animate={{ width: `${((currentPage + 1) / totalPages) * 100}%` }}
                 transition={{ duration: 0.3 }}
@@ -1204,10 +1204,10 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
           variant="ghost"
           size="icon"
           onClick={toggleBookmark}
-          className={cn("h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12", isBookmarked && "text-pink-500")}
+          className={cn("h-11 w-11 min-h-[44px] min-w-[44px] transition-transform active:scale-95 md:h-12 md:w-12", isBookmarked && "text-brand-2")}
           aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
         >
-          {isBookmarked ? <BookmarkCheck className="h-5 w-5 md:h-6 md:w-6 fill-pink-500" /> : <Bookmark className="h-5 w-5 md:h-6 md:w-6" />}
+          {isBookmarked ? <BookmarkCheck className="h-5 w-5 md:h-6 md:w-6 fill-brand-2" /> : <Bookmark className="h-5 w-5 md:h-6 md:w-6" />}
         </Button>
 
         <Button

@@ -47,8 +47,8 @@ const timelineSteps = [
     description:
       "After payment, we immediately create your digital children's book. Available within just 2 hours and you'll receive an email when it's ready!",
     icon: BookOpen,
-    gradient: "from-purple-500 to-purple-600",
-    shadowColor: "shadow-purple-500/50",
+    gradient: "from-primary to-primary/80",
+    shadowColor: "shadow-primary/50",
   },
   {
     id: 2,
@@ -56,8 +56,8 @@ const timelineSteps = [
     description:
       "After creation you can easily adjust texts and illustrations until the result is perfect.",
     icon: Pencil,
-    gradient: "from-pink-500 to-rose-500",
-    shadowColor: "shadow-pink-500/50",
+    gradient: "from-brand-2 to-rose-500",
+    shadowColor: "shadow-brand-2/50",
   },
   {
     id: 3,
@@ -65,8 +65,8 @@ const timelineSteps = [
     description:
       "Happy with it? Share your digital book directly with family and friends or order a beautiful hardcover copy as a lasting memory.",
     icon: Share2,
-    gradient: "from-purple-600 to-pink-600",
-    shadowColor: "shadow-purple-600/50",
+    gradient: "from-primary to-brand-2",
+    shadowColor: "shadow-primary/50",
   },
 ]
 
@@ -316,7 +316,7 @@ export default function Step6Page() {
           id: "3d_animation",
           name: "3D Animation",
           description: "Modern 3D animated style",
-          color: "from-purple-400",
+          color: "from-primary",
         },
     customRequests: wizardData?.step5?.customRequests || "",
     pageCount: wizardData?.step5?.pageCount,
@@ -339,8 +339,8 @@ export default function Step6Page() {
 
   const decorativeElements = [
     { Icon: CheckCircle, top: "8%", left: "8%", delay: 0, size: "h-8 w-8", color: "text-green-400" },
-    { Icon: Sparkles, top: "12%", right: "10%", delay: 0.5, size: "h-7 w-7", color: "text-purple-400" },
-    { Icon: BookOpen, top: "50%", left: "5%", delay: 1, size: "h-7 w-7", color: "text-pink-400" },
+    { Icon: Sparkles, top: "12%", right: "10%", delay: 0.5, size: "h-7 w-7", color: "text-primary" },
+    { Icon: BookOpen, top: "50%", left: "5%", delay: 1, size: "h-7 w-7", color: "text-brand-2" },
     { Icon: Star, top: "75%", right: "8%", delay: 1.5, size: "h-8 w-8", color: "text-yellow-400" },
   ]
 
@@ -565,7 +565,7 @@ export default function Step6Page() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -611,7 +611,7 @@ export default function Step6Page() {
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                className="h-full bg-gradient-to-r from-primary to-brand-2"
               />
             </div>
           </div>
@@ -661,14 +661,14 @@ export default function Step6Page() {
                 <div className="group relative rounded-xl border border-gray-200 bg-white p-6 shadow transition-all hover:scale-[1.01] hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <User className="h-6 w-6 text-purple-500" />
+                      <User className="h-6 w-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
                         Character{formData.characters.length > 1 ? 's' : ''} Information
                       </h2>
                     </div>
                     <Link
                       href="/create/step1"
-                      className="text-sm font-medium text-purple-600 underline underline-offset-2 opacity-0 transition-opacity hover:text-purple-700 group-hover:opacity-100 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-sm font-medium text-primary underline underline-offset-2 opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100"
                     >
                       <Pencil className="mr-1 inline h-3 w-3" />
                       Edit
@@ -699,7 +699,7 @@ export default function Step6Page() {
                               ? "border-green-300 bg-green-50/50 dark:border-green-700 dark:bg-green-900/20"
                               : characterType === "Family Members"
                               ? "border-amber-300 bg-amber-50/50 dark:border-amber-700 dark:bg-amber-900/20"
-                              : "border-purple-300 bg-purple-50/50 dark:border-purple-700 dark:bg-purple-900/20"
+                              : "border-primary/30 bg-primary/5 dark:border-primary/30 dark:bg-primary/5"
                           }`}
                         >
                           <div className="flex items-start gap-4">
@@ -814,14 +814,14 @@ export default function Step6Page() {
                 <div className="group relative rounded-xl border border-gray-200 bg-white p-6 shadow transition-all hover:scale-[1.01] hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <ImageIcon className="h-6 w-6 text-purple-500" />
+                      <ImageIcon className="h-6 w-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
                         Character Photo{formData.characters.length > 1 ? 's' : ''}
                       </h2>
                     </div>
                     <Link
                       href="/create/step2"
-                      className="text-sm font-medium text-purple-600 underline underline-offset-2 opacity-0 transition-opacity hover:text-purple-700 group-hover:opacity-100 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-sm font-medium text-primary underline underline-offset-2 opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100"
                     >
                       <Pencil className="mr-1 inline h-3 w-3" />
                       Edit
@@ -882,12 +882,12 @@ export default function Step6Page() {
                 <div className="group relative rounded-xl border border-gray-200 bg-white p-6 shadow transition-all hover:scale-[1.01] hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-6 w-6 text-purple-500" />
+                      <Sparkles className="h-6 w-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Theme, Age Group & Language</h2>
                     </div>
                     <Link
                       href="/create/step3"
-                      className="text-sm font-medium text-purple-600 underline underline-offset-2 opacity-0 transition-opacity hover:text-purple-700 group-hover:opacity-100 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-sm font-medium text-primary underline underline-offset-2 opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100"
                     >
                       <Pencil className="mr-1 inline h-3 w-3" />
                       Edit
@@ -923,7 +923,7 @@ export default function Step6Page() {
                           {formData.ageGroup.features.map((feature: string, index: number) => (
                             <span
                               key={index}
-                              className="rounded bg-purple-100 px-2 py-0.5 text-xs text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
+                              className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary"
                             >
                               {feature}
                             </span>
@@ -955,12 +955,12 @@ export default function Step6Page() {
                 <div className="group relative rounded-xl border border-gray-200 bg-white p-6 shadow transition-all hover:scale-[1.01] hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Palette className="h-6 w-6 text-purple-500" />
+                      <Palette className="h-6 w-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">Illustration Style</h2>
                     </div>
                     <Link
                       href="/create/step4"
-                      className="text-sm font-medium text-purple-600 underline underline-offset-2 opacity-0 transition-opacity hover:text-purple-700 group-hover:opacity-100 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-sm font-medium text-primary underline underline-offset-2 opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100"
                     >
                       <Pencil className="mr-1 inline h-3 w-3" />
                       Edit
@@ -972,7 +972,7 @@ export default function Step6Page() {
                       <button
                         type="button"
                         onClick={() => setShowStyleImageModal(true)}
-                        className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 hover:opacity-90 transition-opacity"
+                        className="relative h-32 w-24 flex-shrink-0 overflow-hidden rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:opacity-90 transition-opacity"
                         aria-label={`View ${formData.illustrationStyle.name} style example`}
                       >
                         <Image
@@ -1010,14 +1010,14 @@ export default function Step6Page() {
                 <div className="group relative rounded-xl border border-gray-200 bg-white p-6 shadow transition-all hover:scale-[1.01] hover:shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   <div className="mb-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Lightbulb className="h-6 w-6 text-purple-500" />
+                      <Lightbulb className="h-6 w-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
                         Custom Requests{isCustomTheme ? " (required for Custom theme)" : ""}
                       </h2>
                     </div>
                     <Link
                       href="/create/step5"
-                      className="text-sm font-medium text-purple-600 underline underline-offset-2 opacity-0 transition-opacity hover:text-purple-700 group-hover:opacity-100 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="text-sm font-medium text-primary underline underline-offset-2 opacity-0 transition-opacity hover:text-primary/80 group-hover:opacity-100"
                     >
                       <Pencil className="mr-1 inline h-3 w-3" />
                       Edit
@@ -1042,12 +1042,12 @@ export default function Step6Page() {
                   )}
 
                   {/* Page Count Display */}
-                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-purple-50 p-3 dark:bg-purple-900/20">
-                    <BookOpen className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <div className="mt-4 flex items-center gap-2 rounded-lg bg-primary/5 p-3">
+                    <BookOpen className="h-5 w-5 text-primary" />
                     <span className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                       Page Count:
                     </span>
-                    <span className="text-sm font-bold text-purple-600 dark:text-purple-400">
+                    <span className="text-sm font-bold text-primary">
                       {formData.pageCount ? `${formData.pageCount} pages` : 'Cover Only'}
                     </span>
                   </div>
@@ -1060,11 +1060,11 @@ export default function Step6Page() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.85 }}
-              className="mt-8 rounded-2xl border border-purple-200/50 bg-gradient-to-br from-purple-50/30 to-pink-50/30 p-6 dark:border-slate-700/50 dark:from-slate-800/30 dark:to-slate-900/30 md:p-8"
+              className="mt-8 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-brand-2/5 p-6 dark:border-slate-700/50 dark:from-slate-800/30 dark:to-slate-900/30 md:p-8"
             >
               {/* Timeline Title */}
               <h2 className="mb-6 text-center text-lg font-bold text-gray-900 dark:text-white md:mb-8 md:text-xl">
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+                <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                   What Happens Next
                 </span>
               </h2>
@@ -1076,7 +1076,7 @@ export default function Step6Page() {
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 1, delay: 0.9, ease: "easeInOut" }}
-                  className="absolute left-[calc(16.666%-0.5rem)] top-10 hidden h-1 w-[calc(66.666%+1rem)] origin-left bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 md:block"
+                  className="absolute left-[calc(16.666%-0.5rem)] top-10 hidden h-1 w-[calc(66.666%+1rem)] origin-left bg-gradient-to-r from-primary via-brand-2 to-primary md:block"
                   style={{ transformOrigin: "left center" }}
                 />
 
@@ -1085,7 +1085,7 @@ export default function Step6Page() {
                   initial={{ scaleY: 0 }}
                   animate={{ scaleY: 1 }}
                   transition={{ duration: 1, delay: 0.9, ease: "easeInOut" }}
-                  className="absolute left-[2.375rem] top-8 bottom-[5.5rem] w-1 origin-top bg-gradient-to-b from-purple-500 via-pink-500 to-purple-600 md:hidden"
+                  className="absolute left-[2.375rem] top-8 bottom-[5.5rem] w-1 origin-top bg-gradient-to-b from-primary via-brand-2 to-primary md:hidden"
                 />
 
                 {/* Timeline Steps - Mobil: CSS Grid 3 eşit satır (metin uzunluğundan bağımsız); md: flex yatay */}
@@ -1117,7 +1117,7 @@ export default function Step6Page() {
                               isHovered ? `shadow-xl ${step.shadowColor}` : ""
                             }`}
                           >
-                            <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-purple-600 shadow-md dark:bg-slate-800 dark:text-purple-400">
+                            <div className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold text-primary shadow-md dark:bg-slate-800">
                               {step.id}
                             </div>
                             <motion.div
@@ -1156,10 +1156,10 @@ export default function Step6Page() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.2, duration: 0.4 }}
-                className="mt-6 rounded-xl border-2 border-purple-200 bg-purple-50/50 p-6 dark:border-purple-800 dark:bg-purple-900/20"
+                className="mt-6 rounded-xl border-2 border-primary/20 bg-primary/5 p-6 dark:border-primary/20 dark:bg-primary/5"
               >
                 <div className="mb-4 flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <Mail className="h-5 w-5 text-primary" />
                   <Label htmlFor="email" className="text-base font-semibold text-gray-900 dark:text-slate-50">
                     Email Address
                   </Label>
@@ -1232,7 +1232,7 @@ export default function Step6Page() {
                     type="button"
                     disabled={isCreating || isLoadingCurrency}
                     onClick={() => router.push(`/cart?plan=ebook`)}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoadingCurrency ? (
                       <>

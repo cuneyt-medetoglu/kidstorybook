@@ -98,8 +98,8 @@ const floatingVariants = {
 
 const decorativeElements = [
   { Icon: Star, top: "10%", left: "8%", delay: 0, size: "h-6 w-6", color: "text-yellow-400" },
-  { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
-  { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-purple-400" },
+  { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
+  { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-primary" },
   { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
 ]
 
@@ -295,14 +295,14 @@ function FromExampleContent() {
 
   if (loading || !example) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
-        <Loader2 className="h-10 w-10 animate-spin text-purple-500" />
+      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     )
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((el, i) => {
           const Icon = el.Icon
@@ -326,7 +326,7 @@ function FromExampleContent() {
 
       <div className="container relative mx-auto px-4 py-8 md:py-12">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <Link href="/examples" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-purple-600 dark:text-slate-400 dark:hover:text-purple-400">
+          <Link href="/examples" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary">
             <ArrowLeft className="h-4 w-4" /> Back to Examples
           </Link>
         </motion.div>
@@ -338,7 +338,7 @@ function FromExampleContent() {
               <span>{step === "summary" ? "Payment" : characterCount === 1 ? "Character" : `${characterCount} Characters`}</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-gray-200 dark:bg-slate-700">
-              <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.8, ease: "easeOut" }} className="h-full bg-gradient-to-r from-purple-500 to-pink-500" />
+              <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.8, ease: "easeOut" }} className="h-full bg-gradient-to-r from-primary to-brand-2" />
             </div>
           </div>
         </motion.div>
@@ -377,7 +377,7 @@ function FromExampleContent() {
                           onChange={(e) => updateCharacter(index, { name: e.target.value })}
                           placeholder="Enter child's name"
                           required
-                          className="pl-10 border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                          className="pl-10 border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                         />
                       </div>
                     </div>
@@ -400,7 +400,7 @@ function FromExampleContent() {
                               if (!isNaN(n)) updateCharacter(index, { age: Math.min(12, Math.max(0, n)) })
                             }
                           }}
-                          className="pl-10 border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                          className="pl-10 border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                         />
                       </div>
                     </div>
@@ -414,7 +414,7 @@ function FromExampleContent() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() => updateCharacter(index, { gender: "boy" })}
                           className={`rounded-lg border-2 p-3 font-medium transition-all ${
-                            char.gender === "boy" ? "border-purple-500 bg-purple-50 dark:border-purple-400 dark:bg-purple-900/20 text-gray-900 dark:text-slate-50" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800 text-gray-600 dark:text-slate-400"
+                            char.gender === "boy" ? "border-primary bg-primary/5 text-gray-900 dark:text-slate-50" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800 text-gray-600 dark:text-slate-400"
                           }`}
                           aria-pressed={char.gender === "boy"}
                         >
@@ -426,7 +426,7 @@ function FromExampleContent() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() => updateCharacter(index, { gender: "girl" })}
                           className={`rounded-lg border-2 p-3 font-medium transition-all ${
-                            char.gender === "girl" ? "border-pink-500 bg-pink-50 dark:border-pink-400 dark:bg-pink-900/20 text-gray-900 dark:text-slate-50" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800 text-gray-600 dark:text-slate-400"
+                            char.gender === "girl" ? "border-brand-2 bg-brand-2/5 text-gray-900 dark:text-slate-50" : "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-800 text-gray-600 dark:text-slate-400"
                           }`}
                           aria-pressed={char.gender === "girl"}
                         >
@@ -444,7 +444,7 @@ function FromExampleContent() {
                             value={char.hairColor === "" || !char.hairColor ? "__placeholder_hair__" : char.hairColor}
                             onValueChange={(v) => updateCharacter(index, { hairColor: v === "__placeholder_hair__" ? "" : v })}
                           >
-                            <SelectTrigger className="pl-10 border-gray-300 focus:ring-purple-500 dark:border-slate-600">
+                            <SelectTrigger className="pl-10 border-gray-300 focus:ring-primary dark:border-slate-600">
                               <SelectValue placeholder="Select hair color" />
                             </SelectTrigger>
                             <SelectContent>
@@ -464,7 +464,7 @@ function FromExampleContent() {
                             value={char.eyeColor === "" || !char.eyeColor ? "__placeholder_eye__" : char.eyeColor}
                             onValueChange={(v) => updateCharacter(index, { eyeColor: v === "__placeholder_eye__" ? "" : v })}
                           >
-                            <SelectTrigger className="pl-10 border-gray-300 focus:ring-purple-500 dark:border-slate-600">
+                            <SelectTrigger className="pl-10 border-gray-300 focus:ring-primary dark:border-slate-600">
                               <SelectValue placeholder="Select eye color" />
                             </SelectTrigger>
                             <SelectContent>
@@ -487,8 +487,8 @@ function FromExampleContent() {
                           onDrop={(e) => handleFileDrop(index, e)}
                           className={`relative rounded-xl border-2 border-dashed p-8 text-center transition-all ${
                             char.isDragging
-                              ? "border-purple-500 bg-purple-100 dark:bg-purple-900/30"
-                              : "border-purple-300 bg-white/50 hover:border-purple-400 hover:bg-purple-50/50 dark:border-purple-600 dark:bg-slate-700/50 dark:hover:border-purple-500"
+                              ? "border-primary bg-primary/10"
+                              : "border-primary/30 bg-white/50 hover:border-primary/50 hover:bg-primary/5 dark:border-primary/30 dark:bg-slate-700/50 dark:hover:border-primary/50"
                           }`}
                         >
                           <input
@@ -499,7 +499,7 @@ function FromExampleContent() {
                             onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(index, f) }}
                           />
                           <label htmlFor={`file-input-from-example-${index}`} className="flex cursor-pointer flex-col items-center justify-center">
-                            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }} className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg">
+                            <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }} className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg">
                               <Upload className="h-8 w-8" />
                             </motion.div>
                             <p className="mb-1 text-sm font-semibold text-gray-700 dark:text-slate-300">Upload character photo</p>
@@ -544,7 +544,7 @@ function FromExampleContent() {
                     type="button"
                     onClick={handleContinue}
                     disabled={!isFormValid}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 dark:from-purple-400 dark:to-pink-400"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 px-8 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
                   >
                     Continue to payment
                   </Button>
@@ -565,7 +565,7 @@ function FromExampleContent() {
                       type="button"
                       disabled={isLoadingCurrency}
                       onClick={() => router.push(`/cart?plan=ebook&fromExampleId=${exampleId}`)}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 dark:from-purple-400 dark:to-pink-400"
+                      className="w-full bg-gradient-to-r from-primary to-brand-2 px-8 py-8 text-lg font-bold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50"
                     >
                       {isLoadingCurrency ? (
                         <>
@@ -616,7 +616,7 @@ function FromExampleContent() {
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.2 }} className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-slate-400">
               Need help?{" "}
-              <Link href="/help" className="font-semibold text-purple-600 underline underline-offset-2 hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400">
+              <Link href="/help" className="font-semibold text-primary underline underline-offset-2 hover:text-brand-2">
                 Contact Support
               </Link>
             </p>
@@ -629,7 +629,7 @@ function FromExampleContent() {
 
 export default function FromExamplePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
       <FromExampleContent />
     </Suspense>
   )

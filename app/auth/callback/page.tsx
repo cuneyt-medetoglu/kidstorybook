@@ -25,7 +25,7 @@ function OAuthCallbackContent() {
   }, [searchParams, router])
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       <div className="container relative mx-auto flex min-h-screen items-center justify-center px-4 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -41,10 +41,10 @@ function OAuthCallbackContent() {
             className="mb-8 text-center"
           >
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-brand-2">
                 <BookOpen className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 KidStoryBook
               </span>
             </Link>
@@ -63,9 +63,9 @@ function OAuthCallbackContent() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
-                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30"
+                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"
                 >
-                  <Loader2 className="h-8 w-8 text-purple-600 dark:text-purple-400 animate-spin" />
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
                 </motion.div>
                 <motion.h1
                   initial={{ opacity: 0, y: 10 }}
@@ -119,7 +119,7 @@ function OAuthCallbackContent() {
                 >
                   <Link href="/">
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                      <Button className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl">
                         Go to Home
                       </Button>
                     </motion.div>
@@ -134,7 +134,7 @@ function OAuthCallbackContent() {
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
-                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30"
+                  className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-red-50 dark:from-red-900/30 dark:to-red-900/10"
                 >
                   <XCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
                 </motion.div>
@@ -162,7 +162,7 @@ function OAuthCallbackContent() {
                 >
                   <Link href="/auth/login">
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                      <Button className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl">
                         Try Again
                       </Button>
                     </motion.div>
@@ -171,7 +171,7 @@ function OAuthCallbackContent() {
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Button
                         variant="outline"
-                        className="w-full border-purple-300 py-6 text-purple-600 transition-all hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                        className="w-full border-primary/30 py-6 text-primary transition-all hover:bg-primary/5"
                       >
                         Go to Home
                       </Button>
@@ -189,7 +189,7 @@ function OAuthCallbackContent() {
 
 export default function OAuthCallbackPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-purple-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}>
       <OAuthCallbackContent />
     </Suspense>
   )

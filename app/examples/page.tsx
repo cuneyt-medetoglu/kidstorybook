@@ -194,7 +194,7 @@ function PhotoModal({
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                     !showTransformed 
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white" 
+                      ? "bg-gradient-to-r from-primary to-brand-2 text-white" 
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -205,7 +205,7 @@ function PhotoModal({
                   className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors",
                     showTransformed 
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white" 
+                      ? "bg-gradient-to-r from-primary to-brand-2 text-white" 
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -285,7 +285,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
           </div>
         )}
         {/* Age badge */}
-        <Badge className="absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 text-xs">
+        <Badge className="absolute top-2 right-2 bg-gradient-to-r from-primary to-brand-2 text-white border-0 text-xs">
           {book.ageGroup} yrs
         </Badge>
         {/* Theme badge */}
@@ -323,7 +323,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
                 <button
                   key={photo.id}
                   onClick={() => onPhotoClick(book.usedPhotos, index)}
-                  className="relative w-10 h-10 md:w-14 md:h-14 rounded overflow-hidden ring-2 ring-transparent hover:ring-purple-500 transition-all bg-muted"
+                  className="relative w-10 h-10 md:w-14 md:h-14 rounded overflow-hidden ring-2 ring-transparent hover:ring-primary transition-all bg-muted"
                 >
                   {photo.originalPhoto ? (
                     <>
@@ -380,7 +380,7 @@ function BookCard({ book, onPhotoClick }: { book: ExampleBook; onPhotoClick: (ph
       {/* Action buttons */}
       <div className="flex flex-col gap-2">
         <Link href={`/examples/${book.id}`} className="w-full">
-          <Button className="w-full h-11 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white">
+          <Button className="w-full h-11 bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 text-white">
             <Eye className="w-4 h-4 mr-2" />
             View Example
           </Button>
@@ -480,7 +480,7 @@ function ExamplesPageContent() {
   return (
     <div className="min-h-screen bg-background">
       {/* Minimal title strip – then filters */}
-      <section className="border-b bg-gradient-to-br from-purple-500/5 via-transparent to-pink-500/5">
+      <section className="border-b bg-gradient-to-br from-primary/5 via-transparent to-brand-2/5">
         <div className="container px-4 md:px-6 lg:px-8 py-5 md:py-6">
           <div className="max-w-2xl">
             <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">
@@ -504,7 +504,7 @@ function ExamplesPageContent() {
                 className={cn(
                   "flex-shrink-0 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap",
                   selectedAge === filter.value
-                    ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md"
+                    ? "bg-gradient-to-r from-primary to-brand-2 text-white shadow-md"
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
               >
@@ -637,7 +637,7 @@ export default function ExamplesPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Yükleniyor...</p>
         </div>
       </div>

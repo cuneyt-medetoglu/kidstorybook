@@ -215,7 +215,7 @@ function DraftPreviewContent() {
             <Card>
               <CardContent className="p-6">
                 <div className="mb-4 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  <Sparkles className="h-5 w-5 text-primary" />
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                     {draft.characterData.name}'s Story
                   </h2>
@@ -238,7 +238,7 @@ function DraftPreviewContent() {
                   </div>
                 </div>
 
-                <Badge className="mt-4 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                <Badge className="mt-4 bg-primary/10 text-primary">
                   Draft Cover
                 </Badge>
               </CardContent>
@@ -249,7 +249,7 @@ function DraftPreviewContent() {
               <Button
                 size="lg"
                 onClick={handleBuyFullBook}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                className="w-full bg-gradient-to-r from-primary to-brand-2 text-white"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Buy Full Book
@@ -297,7 +297,7 @@ function DraftPreviewContent() {
                   onClick={() => setSelectedPlan(plan)}
                   className={`w-full rounded-lg border-2 p-4 text-left transition-all ${
                     selectedPlan === plan
-                      ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
+                      ? "border-primary bg-primary/5"
                       : "border-slate-200 dark:border-slate-700"
                   }`}
                 >
@@ -310,7 +310,7 @@ function DraftPreviewContent() {
                         Perfect for {plan === "10" ? "younger" : plan === "15" ? "middle" : "older"} children
                       </div>
                     </div>
-                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                    <div className="text-lg font-bold text-primary">
                       ${planPrices[plan].toFixed(2)}
                     </div>
                   </div>
@@ -328,7 +328,7 @@ function DraftPreviewContent() {
               </Button>
               <Button
                 onClick={handlePlanSelect}
-                className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                className="flex-1 bg-gradient-to-r from-primary to-brand-2 text-white"
               >
                 Add to Cart
               </Button>
@@ -342,7 +342,7 @@ function DraftPreviewContent() {
 
 export default function DraftPreviewPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
       <DraftPreviewContent />
     </Suspense>
   )

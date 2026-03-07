@@ -112,14 +112,14 @@ export function ExampleBooksCarousel() {
 
   return (
     <section
-      className="relative overflow-hidden bg-gradient-to-b from-white via-purple-50/30 to-white py-16 dark:from-slate-950 dark:via-purple-950/20 dark:to-slate-950 md:py-24"
+      className="relative overflow-hidden bg-gradient-to-b from-white via-primary/5 to-white py-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 md:py-24"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
-          className="absolute -left-20 top-20 h-64 w-64 rounded-full bg-gradient-to-br from-purple-300/20 to-pink-300/20 blur-3xl dark:from-purple-600/10 dark:to-pink-600/10"
+          className="absolute -left-20 top-20 h-64 w-64 rounded-full bg-gradient-to-br from-primary/15 to-brand-2/10 blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             x: [0, 30, 0],
@@ -128,7 +128,7 @@ export function ExampleBooksCarousel() {
           transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -right-20 bottom-20 h-64 w-64 rounded-full bg-gradient-to-br from-pink-300/20 to-purple-300/20 blur-3xl dark:from-pink-600/10 dark:to-purple-600/10"
+          className="absolute -right-20 bottom-20 h-64 w-64 rounded-full bg-gradient-to-br from-brand-2/15 to-primary/10 blur-3xl"
           animate={{
             scale: [1, 1.3, 1],
             x: [0, -30, 0],
@@ -225,9 +225,9 @@ export function ExampleBooksCarousel() {
               variant="outline"
               size="icon"
               onClick={handlePrev}
-              className="h-12 w-12 rounded-full border-2 border-purple-200 bg-white shadow-lg transition-all hover:scale-110 hover:border-purple-400 hover:bg-purple-50 hover:shadow-xl dark:border-purple-800 dark:bg-slate-900 dark:hover:border-purple-600 dark:hover:bg-slate-800"
+              className="h-12 w-12 rounded-full border-2 border-primary/20 bg-white shadow-lg transition-all hover:scale-110 hover:border-primary/40 hover:bg-primary/5 hover:shadow-xl dark:bg-slate-900 dark:hover:bg-slate-800"
             >
-              <ChevronLeft className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <ChevronLeft className="h-6 w-6 text-primary" />
             </Button>
 
             {/* Dots Indicator */}
@@ -238,7 +238,7 @@ export function ExampleBooksCarousel() {
                   onClick={() => handleDotClick(index)}
                   className={`h-2.5 rounded-full transition-all ${
                     index === currentIndex
-                      ? "w-8 bg-gradient-to-r from-purple-500 to-pink-500"
+                      ? "w-8 bg-gradient-to-r from-primary to-brand-2"
                       : "w-2.5 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
@@ -250,9 +250,9 @@ export function ExampleBooksCarousel() {
               variant="outline"
               size="icon"
               onClick={handleNext}
-              className="h-12 w-12 rounded-full border-2 border-purple-200 bg-white shadow-lg transition-all hover:scale-110 hover:border-purple-400 hover:bg-purple-50 hover:shadow-xl dark:border-purple-800 dark:bg-slate-900 dark:hover:border-purple-600 dark:hover:bg-slate-800"
+              className="h-12 w-12 rounded-full border-2 border-primary/20 bg-white shadow-lg transition-all hover:scale-110 hover:border-primary/40 hover:bg-primary/5 hover:shadow-xl dark:bg-slate-900 dark:hover:bg-slate-800"
             >
-              <ChevronRight className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <ChevronRight className="h-6 w-6 text-primary" />
             </Button>
           </div>
         </div>
@@ -309,7 +309,7 @@ function BookCard({ book }: BookCardProps) {
             ease: "easeInOut",
           }}
         >
-          <ArrowRight className="h-8 w-8 text-purple-500 dark:text-purple-400" />
+          <ArrowRight className="h-8 w-8 text-primary" />
         </motion.div>
 
         {/* Book Cover */}
@@ -343,10 +343,10 @@ function BookCard({ book }: BookCardProps) {
         <h3 className="text-balance text-xl font-bold text-foreground mb-3">{book.title}</h3>
 
         <div className="flex flex-wrap gap-2 mb-3">
-          <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 border-0">
+          <Badge className="bg-primary/10 text-primary border-0">
             {book.theme}
           </Badge>
-          <Badge className="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300 border-0">
+          <Badge className="bg-brand-2/10 text-brand-2 border-0">
             {book.ageGroup === '10+' ? '10+ years' : `${book.ageGroup} years`}
           </Badge>
         </div>
@@ -358,7 +358,7 @@ function BookCard({ book }: BookCardProps) {
         {/* CTA Button */}
         <Link href={`/examples#book-${book.id}`} className="block mt-1">
           <Button
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:scale-105 hover:from-purple-600 hover:to-pink-600 hover:shadow-xl"
+            className="w-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
             size="sm"
           >
             <Eye className="mr-2 h-4 w-4" />
@@ -368,7 +368,7 @@ function BookCard({ book }: BookCardProps) {
       </div>
 
       {/* Decorative Corner Accent */}
-      <div className="absolute right-0 top-0 h-20 w-20 translate-x-10 -translate-y-10 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-2xl transition-all group-hover:translate-x-8 group-hover:-translate-y-8" />
+      <div className="absolute right-0 top-0 h-20 w-20 translate-x-10 -translate-y-10 rounded-full bg-gradient-to-br from-primary/20 to-brand-2/20 blur-2xl transition-all group-hover:translate-x-8 group-hover:-translate-y-8" />
     </Card>
   )
 }

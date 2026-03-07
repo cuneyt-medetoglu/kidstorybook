@@ -137,7 +137,7 @@ export default function ProfilePage() {
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-6">
                   <div className="relative group">
-                    <div className="size-[120px] rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-4xl font-semibold">
+                    <div className="size-[120px] rounded-full bg-gradient-to-br from-primary to-brand-2 flex items-center justify-center text-white text-4xl font-semibold">
                       {name
                         .split(" ")
                         .map((n) => n[0])
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                   <Button
                     onClick={handleSaveProfile}
                     disabled={isSaving}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90"
+                    className="bg-gradient-to-r from-primary to-brand-2 text-white hover:opacity-90"
                   >
                     {isSaving ? "Saving..." : "Save Changes"}
                   </Button>
@@ -390,7 +390,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center size-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                  <div className="inline-flex items-center justify-center size-24 rounded-full bg-gradient-to-br from-primary to-brand-2 mb-4">
                     <Gift className="size-12 text-white" />
                   </div>
                   <Badge variant="secondary" className="mb-4">
@@ -481,7 +481,7 @@ export default function ProfilePage() {
                   <Button
                     onClick={handleSaveNotifications}
                     disabled={isSaving}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90"
+                    className="bg-gradient-to-r from-primary to-brand-2 text-white hover:opacity-90"
                   >
                     {isSaving ? "Saving..." : "Save Preferences"}
                   </Button>
@@ -510,7 +510,7 @@ export default function ProfilePage() {
                 {mockPaymentMethods.map((method) => (
                   <div key={method.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-4">
-                      <div className="size-12 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                      <div className="size-12 rounded-lg bg-gradient-to-br from-primary to-brand-2 flex items-center justify-center">
                         <CreditCard className="size-6 text-white" />
                       </div>
                       <div>
@@ -580,7 +580,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-background to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
             Profile Settings
           </h1>
           <p className="text-muted-foreground">Manage your account settings and preferences</p>
@@ -618,7 +618,7 @@ export default function ProfilePage() {
                           w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-colors
                           ${
                             activeSection === item.id
-                              ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                              ? "bg-gradient-to-r from-primary to-brand-2 text-white"
                               : "hover:bg-muted"
                           }
                         `}

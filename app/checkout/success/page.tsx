@@ -79,7 +79,7 @@ function CheckoutSuccessContent() {
 
               {/* Email Status */}
               <div className="mb-6 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-                <Mail className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <Mail className="h-5 w-5 text-primary" />
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">
                     {emailSent ? "Email sent successfully" : "Sending confirmation email..."}
@@ -118,7 +118,7 @@ function CheckoutSuccessContent() {
                 <Link href="/dashboard" className="flex-1">
                   <Button
                     size="lg"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                    className="w-full bg-gradient-to-r from-primary to-brand-2 text-white"
                   >
                     <BookOpen className="mr-2 h-5 w-5" />
                     View in My Library
@@ -140,7 +140,7 @@ function CheckoutSuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-purple-500 border-t-transparent" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
       <CheckoutSuccessContent />
     </Suspense>
   )

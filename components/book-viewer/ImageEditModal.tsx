@@ -307,7 +307,7 @@ export function ImageEditModal({
             <Button
               onClick={handleSubmit}
               disabled={isSubmitting || !editPrompt.trim()}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              className="bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 text-white"
             >
               {isSubmitting ? (
                 <>

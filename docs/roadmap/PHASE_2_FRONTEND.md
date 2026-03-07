@@ -6,25 +6,24 @@
 ### 2.1 Layout ve Navigasyon
 - [x] **2.1.1** Ana layout component (header, footer, nav) - ✅ Header + Footer component'leri entegre edildi (v0.app'den alındı)
 - [x] **2.1.2** Responsive tasarım (mobile-first) - ✅ Header ve Footer responsive (mobile menu mevcut)
-- [ ] **2.1.3** Tema sistemi (renk paleti, typography)
+- [x] **2.1.3** Tema sistemi (renk paleti, typography)
   - [x] Dark mode / Light mode toggle component - ✅ next-themes ile entegre edildi
   - [x] Theme provider (next-themes) - ✅ ThemeProvider eklendi
-  - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Mevcut (purple-500, pink-500, vb. kullanılıyor)
+  - [x] Renk paleti: çocuklara uygun, dark/light mode uyumlu - ✅ Design Token sistemi (7 Mart 2026): Teal→Cyan paleti, tek dosyadan değiştirilebilir (`globals.css`)
   - [ ] Typography: çocuk dostu fontlar (Fredoka, Quicksand, vb.) - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
 - [ ] **2.1.4** Loading states ve error boundaries - ⏸️ **Ertelendi (Faz 2.2 sonrası)**
 - [x] **2.1.5** Header'da ülke/para birimi seçici - ✅ DropdownMenu ile entegre edildi
 - [x] **2.1.6** Header'da sepet ikonu (shopping bag) - ✅ ShoppingCart icon + badge animasyonu
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
-- [ ] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi (23 Ocak 2026)
-  - Genel olarak sitenin renkler ve teması ile ilgili dark ve light için gözden geçirmeliyiz
-  - Şu anki kullanılan renkler AI ile site yapanların hepsindeki gibi mor renk ağırlıklı
-  - Daha çocuklara uyan bir şeye dönmeliyiz
-  - Araştırılacak
-  - Çocuk dostu renk paleti araştırması
-  - Dark/Light mode renk uyumu
-  - Brand identity gözden geçirmesi
-  - Color psychology for children
+- [x] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi ✅ Tamamlandı (7 Mart 2026)
+  - ✅ Design Token sistemi kuruldu (`globals.css` → `tailwind.config.ts` → tüm bileşenler)
+  - ✅ Hardcoded `purple-X / pink-X` → Semantic token (`primary`, `brand-2`, `accent`) — ~46 dosya, ~400+ referans
+  - ✅ Aktif palet: Teal→Cyan (çocuk dostu, macera/deniz teması)
+  - ✅ 5 hazır palet alternatifi `globals.css`'de comment olarak hazır (tek uncomment ile değişir)
+  - ✅ Dark mode token bazlı otomatik yönetilir — ayrıca `dark:` class yazmaya gerek yok
+  - ✅ Rehber: `docs/guides/THEME_AND_COLOR_GUIDE.md`
+  - ✅ Detay: `docs/implementation/DESIGN_TOKEN_IMPLEMENTATION.md`
 - [ ] **2.1.10** Mobil drawer (menü) tasarım iyileştirmesi (Şubat 2026) | 🔴 DO
   - Mobilde açılan drawer'da iki kapatma (X) simgesi görünüyor; tek kapatma butonu olmalı
   - Renk paleti ve genel görünüm kötü algılanıyor; çocuk dostu/tutarlı tasarım yapılmalı

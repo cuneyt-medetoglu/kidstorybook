@@ -56,11 +56,11 @@ const itemVariants = {
 
 export function HowItWorks() {
   return (
-    <section className="relative overflow-visible bg-gradient-to-b from-pink-50 via-purple-50/30 to-pink-50/30 pb-16 dark:from-slate-950 dark:via-purple-950/10 dark:to-pink-950/10 sm:pb-20 md:overflow-hidden md:pt-4 md:pb-24 lg:pt-5 lg:pb-32">
+    <section className="relative overflow-visible bg-gradient-to-b from-brand-2/5 via-primary/5 to-brand-2/5 pb-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 sm:pb-20 md:overflow-hidden md:pt-4 md:pb-24 lg:pt-5 lg:pb-32">
       {/* Top Wave Separator (mobile) - Merges with Hero section badges */}
       <div className="pointer-events-none absolute left-0 top-0 z-0 w-full -translate-y-[48px] md:hidden sm:-translate-y-[64px]">
         <svg
-          className="h-12 w-full text-pink-50 dark:text-slate-950 sm:h-16"
+          className="h-12 w-full text-brand-2/10 dark:text-slate-950 sm:h-16"
           viewBox="0 0 1440 120"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -75,8 +75,8 @@ export function HowItWorks() {
 
       {/* Decorative background elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-4 top-20 h-72 w-72 rounded-full bg-purple-200/20 blur-3xl dark:bg-purple-500/10" />
-        <div className="absolute -right-4 bottom-20 h-72 w-72 rounded-full bg-pink-200/20 blur-3xl dark:bg-pink-500/10" />
+        <div className="absolute -left-4 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-4 bottom-20 h-72 w-72 rounded-full bg-brand-2/10 blur-3xl" />
       </div>
 
       <div className="container relative mx-auto px-4 md:px-6">
@@ -108,13 +108,13 @@ export function HowItWorks() {
             return (
               <div key={step.number} className="relative flex">
                 <motion.div variants={itemVariants} className="flex w-full">
-                  <Card className="group relative flex w-full flex-col overflow-visible border-2 border-purple-100 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:border-purple-900/20 dark:bg-slate-900 md:p-5 lg:p-8">
+                  <Card className="group relative flex w-full flex-col overflow-visible border-2 border-primary/10 bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:border-primary/10 dark:bg-slate-900 md:p-5 lg:p-8">
                     {/* Gradient overlay on hover */}
-                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-purple-500/0 to-pink-500/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
+                    <div className="pointer-events-none absolute inset-0 rounded-lg bg-gradient-to-br from-primary/0 to-brand-2/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
 
                     {/* Step number - large gradient */}
                     <div className="absolute -right-4 -top-4 text-6xl font-bold text-transparent opacity-10 md:text-7xl lg:text-8xl">
-                      <span className="bg-gradient-to-br from-purple-500 to-pink-500 bg-clip-text">
+                      <span className="bg-gradient-to-br from-primary to-brand-2 bg-clip-text">
                         {step.number}
                       </span>
                     </div>
@@ -130,14 +130,14 @@ export function HowItWorks() {
                           repeat: Number.POSITIVE_INFINITY,
                           ease: "easeInOut",
                         }}
-                        className="inline-flex rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-3 shadow-lg md:p-2.5 lg:p-4"
+                        className="inline-flex rounded-2xl bg-gradient-to-br from-primary to-brand-2 p-3 shadow-lg md:p-2.5 lg:p-4"
                       >
                         <Icon className="h-6 w-6 text-white md:h-5 md:w-5 lg:h-8 lg:w-8" />
                       </motion.div>
 
                       {/* Step number badge */}
                       <div className="inline-flex items-center gap-2">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-base font-bold text-white shadow-md md:h-7 md:w-7 md:text-sm lg:h-10 lg:w-10 lg:text-lg">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-brand-2 text-base font-bold text-white shadow-md md:h-7 md:w-7 md:text-sm lg:h-10 lg:w-10 lg:text-lg">
                           {step.number}
                         </span>
                         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground md:text-[0.65rem] lg:text-sm">
@@ -168,7 +168,7 @@ export function HowItWorks() {
                     className="absolute -right-3 top-1/2 z-10 hidden -translate-y-1/2 md:block md:-right-2 lg:-right-4 xl:-right-6"
                   >
                     <div className="flex items-center justify-center rounded-full bg-white p-1.5 shadow-lg dark:bg-slate-800 md:p-1 lg:p-2">
-                      <ArrowRight className="h-4 w-4 text-purple-500 dark:text-purple-400 md:h-3 md:w-3 lg:h-6 lg:w-6" />
+                      <ArrowRight className="h-4 w-4 text-primary md:h-3 md:w-3 lg:h-6 lg:w-6" />
                     </div>
                   </motion.div>
                 )}

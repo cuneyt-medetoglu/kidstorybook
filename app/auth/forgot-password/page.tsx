@@ -57,14 +57,14 @@ export default function ForgotPasswordPage() {
 
   const decorativeElements = [
     { Icon: Star, top: "10%", left: "8%", delay: 0, size: "h-6 w-6", color: "text-yellow-400" },
-    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-pink-400" },
-    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-purple-400" },
+    { Icon: Heart, top: "15%", right: "10%", delay: 0.5, size: "h-8 w-8", color: "text-brand-2" },
+    { Icon: Sparkles, top: "70%", left: "5%", delay: 1, size: "h-6 w-6", color: "text-primary" },
     { Icon: BookOpen, top: "75%", right: "8%", delay: 1.5, size: "h-7 w-7", color: "text-blue-400" },
-    { Icon: Star, top: "40%", left: "3%", delay: 0.8, size: "h-5 w-5", color: "text-pink-300" },
+    { Icon: Star, top: "40%", left: "3%", delay: 0.8, size: "h-5 w-5", color: "text-brand-2/60" },
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-purple-50 via-white to-pink-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-primary/5 via-white to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
       {/* Decorative floating elements - hidden on mobile */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
         {decorativeElements.map((element, index) => {
@@ -107,10 +107,10 @@ export default function ForgotPasswordPage() {
             className="mb-8 text-center"
           >
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-brand-2">
                 <BookOpen className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 KidStoryBook
               </span>
             </Link>
@@ -131,9 +131,9 @@ export default function ForgotPasswordPage() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
-                    className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30"
+                    className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10"
                   >
-                    <Mail className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    <Mail className="h-8 w-8 text-primary" />
                   </motion.div>
                   <motion.h1
                     initial={{ opacity: 0, y: 10 }}
@@ -175,7 +175,7 @@ export default function ForgotPasswordPage() {
                         className={`pl-10 ${
                           errors.email
                             ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                            : "border-gray-300 focus-visible:ring-purple-500 dark:border-slate-600"
+                            : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
                         }`}
                         aria-invalid={errors.email ? "true" : "false"}
                         aria-describedby={errors.email ? "email-error" : undefined}
@@ -203,7 +203,7 @@ export default function ForgotPasswordPage() {
                       <Button
                         type="submit"
                         disabled={!isValid || isLoading}
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed dark:from-purple-400 dark:to-pink-400"
+                        className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isLoading ? (
                           <div className="flex items-center gap-2">
@@ -227,7 +227,7 @@ export default function ForgotPasswordPage() {
                 >
                   <Link
                     href="/auth/login"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-purple-600 underline underline-offset-2 transition-colors hover:text-pink-600 dark:text-purple-400 dark:hover:text-pink-400"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary underline underline-offset-2 transition-colors hover:text-brand-2"
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Back to Sign In
@@ -261,14 +261,14 @@ export default function ForgotPasswordPage() {
                     className="mt-2 text-sm text-gray-600 dark:text-slate-400"
                   >
                     We've sent a password reset link to{" "}
-                    <span className="font-semibold text-purple-600 dark:text-purple-400">{getValues("email")}</span>
+                    <span className="font-semibold text-primary">{getValues("email")}</span>
                   </motion.p>
 
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6, duration: 0.4 }}
-                    className="mt-6 rounded-xl bg-purple-50 p-4 dark:bg-purple-900/20"
+                    className="mt-6 rounded-xl bg-primary/5 p-4"
                   >
                     <p className="text-sm text-gray-700 dark:text-slate-300">
                       <strong>Didn't receive the email?</strong>
@@ -287,7 +287,7 @@ export default function ForgotPasswordPage() {
                       <Button
                         onClick={() => setEmailSent(false)}
                         variant="outline"
-                        className="w-full border-purple-300 py-6 text-purple-600 transition-all hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                        className="w-full border-primary/30 py-6 text-primary transition-all hover:bg-primary/5"
                       >
                         Send Again
                       </Button>
@@ -295,7 +295,7 @@ export default function ForgotPasswordPage() {
 
                     <Link href="/auth/login">
                       <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                        <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                        <Button className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-base font-semibold text-white shadow-lg transition-all hover:shadow-xl">
                           <ArrowLeft className="mr-2 h-4 w-4" />
                           Back to Sign In
                         </Button>

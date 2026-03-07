@@ -95,7 +95,7 @@ export function Header() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+            <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
               KidStoryBook
             </span>
           </motion.div>
@@ -112,7 +112,7 @@ export function Header() {
             >
               <Link href={link.href}>
                 <motion.span
-                  className="text-sm font-medium text-gray-800 transition-colors hover:text-purple-500 dark:text-slate-100 dark:hover:text-purple-400 lg:text-base"
+                  className="text-sm font-medium text-gray-800 transition-colors hover:text-primary dark:text-slate-100 lg:text-base"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
@@ -217,7 +217,7 @@ export function Header() {
                   className="shrink-0"
                 >
                   <Link href="/create/step1">
-                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
+                    <Button className="bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
                       <span className="hidden lg:inline">Create a children's book</span>
                       <span className="lg:hidden">Create</span>
                     </Button>
@@ -226,7 +226,7 @@ export function Header() {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="flex items-center gap-2 font-medium">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white">
                         {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                       </div>
                       <span className="hidden lg:inline">{user.name || user.email?.split("@")[0]}</span>
@@ -257,12 +257,12 @@ export function Header() {
             ) : (
               <>
                 <Link href="/auth/login">
-                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-purple-500 dark:text-slate-100 dark:hover:text-purple-400">
+                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-primary dark:text-slate-100">
                     Sign In
                   </Button>
                 </Link>
                 <Link href="/auth/register">
-                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-purple-500 dark:text-slate-100 dark:hover:text-purple-400">
+                  <Button variant="ghost" className="font-medium text-gray-800 hover:text-primary dark:text-slate-100">
                     Sign Up
                   </Button>
                 </Link>
@@ -272,7 +272,7 @@ export function Header() {
                   className="shrink-0"
                 >
                   <Link href="/create/step1">
-                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
+                    <Button className="bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl text-xs sm:text-sm px-2 sm:px-3 lg:px-4">
                       <span className="hidden lg:inline">Create a children's book</span>
                       <span className="lg:hidden">Create</span>
                     </Button>
@@ -291,7 +291,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[320px] rounded-l-3xl border-l-0 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 backdrop-blur-md dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900"
+              className="w-[320px] rounded-l-3xl border-l-0 bg-gradient-to-br from-white via-primary/5 to-brand-2/5 backdrop-blur-md dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900"
             >
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -300,14 +300,14 @@ export function Header() {
                 className="flex h-full flex-col"
               >
                 <div className="mb-8 flex items-center justify-between">
-                  <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400">
+                  <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
                     KidStoryBook
                   </span>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="h-8 w-8 rounded-full hover:bg-purple-100 dark:hover:bg-slate-700"
+                    className="h-8 w-8 rounded-full hover:bg-primary/10 dark:hover:bg-slate-700"
                   >
                     <X className="h-5 w-5 text-gray-800 dark:text-slate-100" />
                   </Button>
@@ -328,7 +328,7 @@ export function Header() {
                           onClick={() => setIsMobileMenuOpen(false)}
                           className="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-white/60 dark:hover:bg-slate-800/60"
                         >
-                          <Icon className="h-5 w-5 text-purple-500 transition-transform group-hover:scale-110 dark:text-purple-400" />
+                          <Icon className="h-5 w-5 text-primary transition-transform group-hover:scale-110" />
                           <span className="text-base font-medium text-gray-800 dark:text-slate-100">
                             {link.label}
                           </span>
@@ -351,7 +351,7 @@ export function Header() {
                         Shopping Cart
                       </span>
                       <div className="flex items-center gap-2">
-                        <ShoppingCart className="h-5 w-5 text-purple-500 dark:text-purple-400" />
+                        <ShoppingCart className="h-5 w-5 text-primary" />
                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-orange-400 text-xs font-bold text-white dark:bg-orange-300">
                           {cartCount}
                         </span>
@@ -433,7 +433,7 @@ export function Header() {
                     ) : user ? (
                       <>
                         <div className="mb-4 flex items-center gap-3 rounded-lg bg-white/60 p-3 backdrop-blur-sm dark:bg-slate-800/60">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white">
                             {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                           </div>
                           <div className="flex-1">
@@ -456,7 +456,7 @@ export function Header() {
                           </Button>
                         </Link>
                         <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                          <Button className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl">
                             Create a children's book
                           </Button>
                         </Link>
@@ -485,7 +485,7 @@ export function Header() {
                           </Button>
                         </Link>
                         <Link href="/create/step1" onClick={() => setIsMobileMenuOpen(false)}>
-                          <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400">
+                          <Button className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-lg transition-all hover:shadow-xl">
                             Create a children's book
                           </Button>
                         </Link>

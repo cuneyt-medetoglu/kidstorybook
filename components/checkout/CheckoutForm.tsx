@@ -236,7 +236,7 @@ export function CheckoutForm({ hasHardcopy, hasEbook }: CheckoutFormProps) {
         type="submit"
         size="lg"
         disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl dark:from-purple-600 dark:to-pink-600"
+        className="w-full bg-gradient-to-r from-primary to-brand-2 py-6 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
       >
         {isSubmitting ? (
           <>

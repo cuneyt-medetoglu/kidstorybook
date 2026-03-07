@@ -80,7 +80,7 @@ export function Footer() {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="relative bg-gradient-to-b from-white via-purple-50/30 to-pink-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
+      className="relative bg-gradient-to-b from-white via-primary/5 to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
     >
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
         {/* Main Footer Content */}
@@ -94,7 +94,7 @@ export function Footer() {
             className="space-y-4"
           >
             <Link href="/">
-              <h3 className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-2xl font-bold text-transparent dark:from-purple-400 dark:to-pink-400">
+              <h3 className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-2xl font-bold text-transparent">
                 KidStoryBook
               </h3>
             </Link>
@@ -119,7 +119,7 @@ export function Footer() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 + index * 0.1 }}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-all hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white dark:bg-slate-800 dark:text-slate-400 dark:hover:from-purple-400 dark:hover:to-pink-400"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-all hover:bg-gradient-to-r hover:from-primary hover:to-brand-2 hover:text-white dark:bg-slate-800 dark:text-slate-400"
                   >
                     <Icon className="h-5 w-5" />
                   </motion.a>
@@ -150,10 +150,10 @@ export function Footer() {
                 >
                   <Link
                     href={link.href}
-                    className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+                    className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
                   >
                     {link.label}
-                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 group-hover:w-full dark:from-purple-400 dark:to-pink-400"></span>
+                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-brand-2 transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 </motion.li>
               ))}
@@ -182,10 +182,10 @@ export function Footer() {
                 >
                   <Link
                     href={link.href}
-                    className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+                    className="group relative inline-block text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
                   >
                     {link.label}
-                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 group-hover:w-full dark:from-purple-400 dark:to-pink-400"></span>
+                    <span className="absolute bottom-0 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-brand-2 transition-all duration-300 group-hover:w-full"></span>
                   </Link>
                 </motion.li>
               ))}
@@ -215,13 +215,13 @@ export function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="pl-10 focus:border-purple-500 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800/50"
+                  className="pl-10 focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800/50"
                 />
               </div>
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 font-semibold text-white shadow-md transition-all hover:shadow-lg dark:from-purple-400 dark:to-pink-400"
+                  className="w-full bg-gradient-to-r from-primary to-brand-2 font-semibold text-white shadow-md transition-all hover:shadow-lg"
                 >
                   Subscribe
                 </Button>
@@ -258,7 +258,7 @@ export function Footer() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-gray-600 transition-colors hover:text-purple-500 dark:text-slate-400 dark:hover:text-purple-400"
+                className="text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
               >
                 {link.label}
               </Link>
@@ -274,7 +274,7 @@ export function Footer() {
         transition={{ duration: 0.2 }}
         whileHover={showScrollTop ? { scale: 1.1 } : undefined}
         whileTap={showScrollTop ? { scale: 0.9 } : undefined}
-        className={`fixed bottom-8 right-8 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 ${!showScrollTop ? "pointer-events-none" : ""}`}
+        className={`fixed bottom-8 right-8 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg transition-all hover:shadow-xl ${!showScrollTop ? "pointer-events-none" : ""}`}
         aria-label="Scroll to top"
         aria-hidden={!showScrollTop}
         tabIndex={showScrollTop ? 0 : -1}

@@ -53,8 +53,8 @@ export function PageThumbnails({ pages, currentPage, onSelectPage, onClose }: Pa
               className={cn(
                 "group relative aspect-[3/4] overflow-hidden rounded-lg border-2 transition-all duration-200 hover:scale-105",
                 currentPage === index
-                  ? "border-purple-500 ring-2 ring-purple-500/30"
-                  : "border-transparent hover:border-purple-300",
+                  ? "border-primary ring-2 ring-primary/30"
+                  : "border-transparent hover:border-primary/30",
               )}
             >
               <Image
@@ -69,7 +69,7 @@ export function PageThumbnails({ pages, currentPage, onSelectPage, onClose }: Pa
               <span
                 className={cn(
                   "absolute bottom-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium text-white",
-                  currentPage === index ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-black/50",
+                  currentPage === index ? "bg-gradient-to-r from-primary to-brand-2" : "bg-black/50",
                 )}
               >
                 {page.pageNumber}

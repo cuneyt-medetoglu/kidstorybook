@@ -4,7 +4,7 @@
 **Tarih:** 4 Şubat 2026  
 **Durum:** AKTİF – Modüler yapı (detaylar `docs/roadmap/` altında)
 
-**Son güncelleme (1 Mart 2026):** Custom tema (Step 3) eklendi; Educational + Space birleştirildi (Learning & Discovery). Custom seçildiğinde Step 5’te “Story idea” zorunlu; API ve prompt custom temasını destekliyor.
+**Son güncelleme (7 Mart 2026):** Design Token renk sistemi tamamlandı (2.1.9 ✅). Hardcoded `purple/pink` → semantic `primary/brand-2` token; ~46 dosya migrate edildi; `globals.css`de 5 palet alternatifi hazır. Rehber: `docs/guides/THEME_AND_COLOR_GUIDE.md`. Önceki: 1 Mart 2026 — Custom tema (Step 3) eklendi.
 
 ---
 

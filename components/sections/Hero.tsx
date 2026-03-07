@@ -30,17 +30,17 @@ export function Hero() {
 
   const decorativeElements = [
     { Icon: Star, top: "15%", left: "10%", delay: 0, size: "h-8 w-8", color: "text-yellow-400" },
-    { Icon: Heart, top: "25%", right: "15%", delay: 0.5, size: "h-10 w-10", color: "text-pink-400" },
-    { Icon: Sparkles, top: "60%", left: "8%", delay: 1, size: "h-7 w-7", color: "text-purple-400" },
+    { Icon: Heart, top: "25%", right: "15%", delay: 0.5, size: "h-10 w-10", color: "text-brand-2" },
+    { Icon: Sparkles, top: "60%", left: "8%", delay: 1, size: "h-7 w-7", color: "text-primary" },
     { Icon: BookOpen, top: "70%", right: "12%", delay: 1.5, size: "h-9 w-9", color: "text-blue-400" },
-    { Icon: Star, top: "40%", left: "5%", delay: 0.8, size: "h-6 w-6", color: "text-pink-300" },
-    { Icon: Heart, top: "80%", left: "20%", delay: 1.2, size: "h-8 w-8", color: "text-purple-300" },
+    { Icon: Star, top: "40%", left: "5%", delay: 0.8, size: "h-6 w-6", color: "text-brand-2/60" },
+    { Icon: Heart, top: "80%", left: "20%", delay: 1.2, size: "h-8 w-8", color: "text-primary/60" },
   ]
 
   return (
     <div ref={heroRef} style={{ position: "relative" }}>
       <section
-        className="relative min-h-[85vh] overflow-x-hidden overflow-y-visible bg-gradient-to-br from-purple-50 via-white to-pink-50 sm:min-h-[80vh] md:min-h-0 md:overflow-hidden lg:min-h-0 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
+        className="relative min-h-[85vh] overflow-x-hidden overflow-y-visible bg-gradient-to-br from-primary/5 via-white to-brand-2/5 sm:min-h-[80vh] md:min-h-0 md:overflow-hidden lg:min-h-0 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800"
       >
       {/* Decorative floating elements - hidden on mobile for performance */}
       <div className="pointer-events-none absolute inset-0 hidden md:block">
@@ -81,7 +81,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-100 to-pink-100 px-3 py-1.5 text-xs font-medium text-purple-700 dark:from-purple-900/40 dark:to-pink-900/40 dark:text-purple-300 sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1.5 md:text-xs lg:px-4 lg:py-2 lg:text-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary sm:px-4 sm:py-2 sm:text-sm md:px-3 md:py-1.5 md:text-xs lg:px-4 lg:py-2 lg:text-sm"
             >
               <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" />
               <span>AI-Powered Personalization</span>
@@ -95,7 +95,7 @@ export function Hero() {
               className="text-balance text-3xl font-bold leading-tight text-gray-900 dark:text-slate-50 sm:text-4xl md:text-4xl md:leading-snug lg:text-5xl xl:text-6xl 2xl:text-7xl"
             >
               Create{" "}
-              <span className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+              <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
                 Magical Stories
               </span>{" "}
               Starring Your Child
@@ -122,7 +122,7 @@ export function Hero() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
                   size="lg"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl dark:from-purple-400 dark:to-pink-400 sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
+                  className="w-full bg-gradient-to-r from-primary to-brand-2 px-6 py-5 text-sm font-semibold text-white shadow-lg transition-all hover:shadow-xl sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
                 >
                   Create Your Book
                 </Button>
@@ -132,7 +132,7 @@ export function Hero() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full border-2 border-purple-300 bg-white/50 px-6 py-5 text-sm font-semibold text-purple-700 backdrop-blur-sm transition-all hover:bg-purple-50 dark:border-purple-700 dark:bg-slate-800/50 dark:text-purple-300 dark:hover:bg-slate-700/50 sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
+                  className="w-full border-2 border-primary/30 bg-white/50 px-6 py-5 text-sm font-semibold text-primary backdrop-blur-sm transition-all hover:bg-primary/5 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 sm:w-auto sm:px-7 sm:py-5 sm:text-base md:px-5 md:py-4 md:text-sm lg:px-8 lg:py-6 lg:text-base"
                 >
                   See Examples
                 </Button>
@@ -149,7 +149,7 @@ export function Hero() {
             style={{ y: imageY }}
           >
             {/* Background Glow */}
-            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-3xl" />
+            <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-primary/20 to-brand-2/20 blur-3xl" />
             
             {/* 3D Book Transformation Component */}
             <HeroBookTransformation />
@@ -160,7 +160,7 @@ export function Hero() {
       {/* Bottom Wave Separator - Only on tablet/web */}
       <div className="hidden md:absolute md:bottom-0 md:left-0 md:block md:w-full">
         <svg
-          className="h-12 w-full text-pink-50 dark:text-slate-950 sm:h-16 md:h-20 lg:h-24"
+          className="h-12 w-full text-brand-2/10 dark:text-slate-950 sm:h-16 md:h-20 lg:h-24"
           viewBox="0 0 1440 120"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
