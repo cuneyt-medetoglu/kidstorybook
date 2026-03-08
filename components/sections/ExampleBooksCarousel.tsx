@@ -8,43 +8,72 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, ChevronLeft, ChevronRight, Eye, BookOpen } from "lucide-react"
-import { mockExampleBooks, type ExampleBook } from "@/app/[locale]/examples/types"
-import { useTranslations } from "next-intl"
+import type { ExampleBook } from "@/app/[locale]/examples/types"
+import { useTranslations, useLocale } from "next-intl"
+
+const CARDS_PER_PAGE = 3
 
 export function ExampleBooksCarousel() {
   const t = useTranslations("homeExamples")
-  const exampleBooks = mockExampleBooks.slice(0, 6)
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const locale = useLocale()
+  const [books, setBooks] = useState<ExampleBook[]>([])
+  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
   const [direction, setDirection] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
 
-  // Auto-play functionality
+  const totalPages = Math.max(1, Math.ceil(books.length / CARDS_PER_PAGE))
+  const safePage = Math.min(currentPage, totalPages - 1)
+  const pageStartIndex = safePage * CARDS_PER_PAGE
+  const pageBooks = books.slice(pageStartIndex, pageStartIndex + CARDS_PER_PAGE)
+
   useEffect(() => {
-    if (!isAutoPlaying) return
+    let cancelled = false
+    async function fetchExamples() {
+      try {
+        const res = await fetch(`/api/examples?locale=${locale}&limit=6`)
+        const json = await res.json()
+        if (cancelled) return
+        if (json.success && Array.isArray(json.data)) {
+          setBooks(json.data)
+        } else {
+          setBooks([])
+        }
+      } catch {
+        if (!cancelled) setBooks([])
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    fetchExamples()
+    return () => { cancelled = true }
+  }, [locale])
 
+  // Auto-play when we have books (page-based)
+  useEffect(() => {
+    if (!isAutoPlaying || books.length === 0) return
     const interval = setInterval(() => {
-      handleNext()
+      setDirection(1)
+      setCurrentPage((prev) => (prev + 1) % totalPages)
     }, 5000)
-
     return () => clearInterval(interval)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, isAutoPlaying])
+  }, [safePage, isAutoPlaying, books.length, totalPages])
 
-  const handleNext = () => {
+  const goToNextPage = () => {
     setDirection(1)
-    setCurrentIndex((prev) => (prev + 1) % exampleBooks.length)
+    setCurrentPage((prev) => (prev + 1) % totalPages)
   }
 
-  const handlePrev = () => {
+  const goToPrevPage = () => {
     setDirection(-1)
-    setCurrentIndex((prev) => (prev - 1 + exampleBooks.length) % exampleBooks.length)
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages)
   }
 
-  const handleDotClick = (index: number) => {
-    setDirection(index > currentIndex ? 1 : -1)
-    setCurrentIndex(index)
+  const handleDotClick = (pageIndex: number) => {
+    setDirection(pageIndex > safePage ? 1 : -1)
+    setCurrentPage(pageIndex)
   }
 
   // Touch handlers for swipe
@@ -63,14 +92,9 @@ export function ExampleBooksCarousel() {
     const isLeftSwipe = distance > 50
     const isRightSwipe = distance < -50
 
-    if (isLeftSwipe) {
-      handleNext()
-    }
-    if (isRightSwipe) {
-      handlePrev()
-    }
+    if (isLeftSwipe) goToNextPage()
+    if (isRightSwipe) goToPrevPage()
 
-    // Reset
     setTouchStart(0)
     setTouchEnd(0)
   }
@@ -110,6 +134,26 @@ export function ExampleBooksCarousel() {
       opacity: 0,
     }),
   }
+
+  if (loading) {
+    return (
+      <section className="relative overflow-hidden bg-gradient-to-b from-white via-primary/5 to-white py-16 dark:from-slate-950 dark:via-slate-900/50 dark:to-slate-950 md:py-24">
+        <div className="container relative mx-auto px-4 md:px-6">
+          <div className="mb-12 text-center">
+            <div className="mx-auto h-10 w-64 animate-pulse rounded-lg bg-muted" />
+            <div className="mx-auto mt-4 h-6 max-w-2xl animate-pulse rounded bg-muted/70" />
+          </div>
+          <div className="flex justify-center gap-6">
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="h-[420px] w-[320px] flex-shrink-0 animate-pulse rounded-3xl bg-muted/30 p-6" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (books.length === 0) return null
 
   return (
     <section
@@ -165,11 +209,11 @@ export function ExampleBooksCarousel() {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Mobile: Single card view */}
+            {/* Mobile: one card per page (first card of page) */}
             <div className="block md:hidden relative overflow-hidden" style={{ minHeight: "500px" }}>
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
-                  key={currentIndex}
+                  key={safePage}
                   custom={direction}
                   variants={mobileSlideVariants}
                   initial="enter"
@@ -181,16 +225,16 @@ export function ExampleBooksCarousel() {
                   }}
                   className="absolute inset-0 w-full px-2"
                 >
-                  <BookCard book={exampleBooks[currentIndex]} index={0} />
+                  <BookCard book={books[pageStartIndex]} index={0} />
                 </motion.div>
               </AnimatePresence>
             </div>
 
-            {/* Desktop/Tablet: Multiple cards view - Horizontal slider */}
+            {/* Desktop: 3 cards per page */}
             <div className="hidden md:block relative h-[500px] overflow-x-hidden overflow-y-visible">
               <AnimatePresence initial={false} custom={direction}>
                 <motion.div
-                  key={currentIndex}
+                  key={safePage}
                   custom={direction}
                   variants={desktopSlideVariants}
                   initial="enter"
@@ -203,17 +247,11 @@ export function ExampleBooksCarousel() {
                   className="absolute inset-0"
                 >
                   <div className="flex flex-nowrap gap-6 h-full items-start overflow-x-hidden">
-                    {exampleBooks
-                      .slice(currentIndex, currentIndex + 3)
-                      .concat(
-                        exampleBooks.slice(0, Math.max(0, currentIndex + 3 - exampleBooks.length))
-                      )
-                      .slice(0, 3)
-                      .map((book, idx) => (
-                        <div key={`${book.id}-${idx}`} className="flex-shrink-0 flex-grow-0 md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)]">
-                          <BookCard book={book} index={idx} />
-                        </div>
-                      ))}
+                    {pageBooks.map((book, idx) => (
+                      <div key={`${book.id}-${idx}`} className="flex-shrink-0 flex-grow-0 md:w-[calc((100%-24px)/2)] lg:w-[calc((100%-48px)/3)]">
+                        <BookCard book={book} index={idx} />
+                      </div>
+                    ))}
                   </div>
                 </motion.div>
               </AnimatePresence>
@@ -225,24 +263,24 @@ export function ExampleBooksCarousel() {
             <Button
               variant="outline"
               size="icon"
-              onClick={handlePrev}
+              onClick={goToPrevPage}
               className="h-12 w-12 rounded-full border-2 border-primary/20 bg-white shadow-lg transition-all hover:scale-110 hover:border-primary/40 hover:bg-primary/5 hover:shadow-xl dark:bg-slate-900 dark:hover:bg-slate-800"
             >
               <ChevronLeft className="h-6 w-6 text-primary" />
             </Button>
 
-            {/* Dots Indicator */}
+            {/* Dots: one per page (e.g. 6 books → 2 dots) */}
             <div className="flex gap-2">
-              {exampleBooks.map((_, index) => (
+              {Array.from({ length: totalPages }, (_, index) => (
                 <button
                   key={index}
                   onClick={() => handleDotClick(index)}
                   className={`h-2.5 rounded-full transition-all ${
-                    index === currentIndex
+                    index === safePage
                       ? "w-8 bg-gradient-to-r from-primary to-brand-2"
                       : "w-2.5 bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
                   }`}
-                  aria-label={`Go to slide ${index + 1}`}
+                  aria-label={`Go to page ${index + 1}`}
                 />
               ))}
             </div>
@@ -250,7 +288,7 @@ export function ExampleBooksCarousel() {
             <Button
               variant="outline"
               size="icon"
-              onClick={handleNext}
+              onClick={goToNextPage}
               className="h-12 w-12 rounded-full border-2 border-primary/20 bg-white shadow-lg transition-all hover:scale-110 hover:border-primary/40 hover:bg-primary/5 hover:shadow-xl dark:bg-slate-900 dark:hover:bg-slate-800"
             >
               <ChevronRight className="h-6 w-6 text-primary" />
@@ -270,7 +308,9 @@ interface BookCardProps {
 function BookCard({ book }: BookCardProps) {
   const t = useTranslations("homeExamples")
   const tBooks = useTranslations("examples.books")
-  const firstPhoto = book.usedPhotos[0]
+  const usedPhotos = book.usedPhotos ?? []
+  const firstPhoto = usedPhotos[0]
+  const hasMultiplePhotos = usedPhotos.length >= 2
   const title = book.localeKey ? tBooks(`${book.localeKey}.title`) : book.title
   const description = book.localeKey ? tBooks(`${book.localeKey}.description`) : book.description
 
@@ -278,30 +318,68 @@ function BookCard({ book }: BookCardProps) {
     <Card className="group relative overflow-hidden rounded-3xl bg-white p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:bg-slate-900">
       {/* Photo → Book Cover Transformation */}
       <div className="mb-6 flex items-center justify-center gap-4">
-        {/* Used Photo */}
-        <motion.div
-          className="relative h-28 w-28 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-muted"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.3 }}
-        >
-          {firstPhoto?.originalPhoto ? (
-            <Image
-              src={firstPhoto.originalPhoto}
-              alt={firstPhoto.characterName}
-              fill
-              sizes="(max-width: 768px) 80vw, 500px"
-              className="object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement
-                target.style.display = 'none'
-              }}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-              <span className="text-[10px]">📷</span>
-            </div>
-          )}
-        </motion.div>
+        {/* Used Photo(s): single large or thumbnail grid */}
+        {hasMultiplePhotos ? (
+          <motion.div
+            className="grid grid-cols-2 gap-1 rounded-2xl border-4 border-white p-1 shadow-md bg-muted"
+            style={{ width: '7rem', height: '7rem' }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            {usedPhotos.slice(0, 4).map((photo, idx) => (
+              <div key={photo.id} className="relative h-12 w-12 rounded-lg overflow-hidden bg-muted">
+                {photo.originalPhoto ? (
+                  <>
+                    <Image
+                      src={photo.originalPhoto}
+                      alt={photo.characterName}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                      unoptimized
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement
+                        target.style.display = 'none'
+                      }}
+                    />
+                    {idx === 3 && usedPhotos.length > 4 && (
+                      <span className="absolute inset-0 flex items-center justify-center bg-black/60 text-white text-xs font-bold rounded-lg">
+                        +{usedPhotos.length - 4}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">📷</div>
+                )}
+              </div>
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            className="relative h-28 w-28 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-muted"
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.3 }}
+          >
+            {firstPhoto?.originalPhoto ? (
+              <Image
+                src={firstPhoto.originalPhoto}
+                alt={firstPhoto.characterName}
+                fill
+                sizes="(max-width: 768px) 80vw, 500px"
+                className="object-cover"
+                unoptimized
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                <span className="text-[10px]">📷</span>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Arrow Icon */}
         <motion.div
@@ -330,6 +408,7 @@ function BookCard({ book }: BookCardProps) {
               fill
               sizes="(max-width: 768px) 40vw, 240px"
               className="object-cover"
+              unoptimized
               onError={(e) => {
                 const target = e.target as HTMLImageElement
                 target.style.display = 'none'
@@ -361,7 +440,7 @@ function BookCard({ book }: BookCardProps) {
         </p>
 
         {/* CTA Button */}
-        <Link href={`/examples#book-${book.id}`} className="block mt-1">
+        <Link href={`/books/${book.id}/view?example=1`} className="block mt-1">
           <Button
             className="w-full bg-gradient-to-r from-primary to-brand-2 text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
             size="sm"

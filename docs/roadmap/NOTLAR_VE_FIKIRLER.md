@@ -1,5 +1,14 @@
 ## 📝 Notlar ve Fikirler
 
+### Gizlenen Özellikler (Ödeme Sistemleri Yapılınca Açılacak)
+- **Para birimi seçici (Header)** — 8 Mart 2026
+  - **Durum:** Şu an kullanılmıyor, UI’dan gizlendi.
+  - **Neden:** Ödeme sistemleri (Stripe, İyzico) henüz tamamlanmadı; para birimi seçimi ödeme akışıyla birlikte ele alınacak.
+  - **Kod:** `components/layout/Header.tsx` — `SHOW_CURRENCY_SELECTOR = false`. Açmak için `true` yapılır.
+  - **İlgili:** `lib/currency.ts`, `contexts/CurrencyContext.tsx`, `app/api/currency/route.ts` (arka planda çalışmaya devam ediyor; sadece header’daki seçici gizli).
+
+---
+
 ### Örnek Hikaye Fikirleri Havuzu (14 Şubat 2026)
 - **Kategori:** İş mantığı / İçerik
 - **Öncelik:** 🟡 Planlandı
@@ -536,7 +545,7 @@
   - **UI Yaklaşımı:** v0.app ile yeni component çizdirmek önerilir (daha temiz UX)
   - **Detaylar:** Faz 2.4.2'ye bakın
 - [ ] **Cookie Banner** - GDPR/KVKK uyumluluk için cookie onayı
-- [ ] **Ülke/Para Birimi Seçici** - Header'da ülke ve para birimi değiştirme
+- [ ] **Ülke/Para Birimi Seçici** - Header'da ülke ve para birimi değiştirme. **Şimdilik gizlendi (8 Mart 2026):** Ödeme sistemleri yapılınca tekrar açılacak; detay: bu dosyada "Gizlenen Özellikler" bölümü.
 - [ ] **Sepet İkonu** - Header'da sepet göstergesi (shopping bag)
 - [ ] **10+ Yaş Kategorisi** - Şu an sadece 0-2, 3-5, 6-9 var, 10+ eklenmeli
 - [ ] **Kampanya Banner'ları** - "Free shipping when you buy 2+ books", "50% off 3rd book" gibi

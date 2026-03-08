@@ -65,7 +65,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="relative flex-1 w-full overflow-hidden cursor-pointer"
-              onClick={onToggleFlip}
+              onClick={(e) => { e.stopPropagation(); onToggleFlip?.(); }}
             >
               <Image
                 src={page.imageUrl || "/placeholder.svg"}
@@ -97,7 +97,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
             >
               <div 
                 className="flex flex-1 items-center justify-center p-6 md:p-8 cursor-pointer"
-                onClick={onToggleFlip}
+                onClick={(e) => { e.stopPropagation(); onToggleFlip?.(); }}
               >
                 <p className={cn("text-center text-lg leading-relaxed text-foreground", "md:text-xl lg:text-2xl")}>
                   {page.text}

@@ -269,18 +269,10 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
     fetchBook()
   }, [bookId, useExampleApi])
 
-  // Load reading progress/bookmarks once book is available
+  // Load bookmarks once book is available
   useEffect(() => {
     if (typeof window === "undefined") return
     if (!book?.id) return
-
-    const savedProgress = localStorage.getItem(`book-progress-${book.id}`)
-    if (savedProgress) {
-      const page = parseInt(savedProgress, 10)
-      if (!Number.isNaN(page) && page >= 0 && page < totalPages) {
-        setCurrentPage(page)
-      }
-    }
 
     const savedBookmarks = localStorage.getItem(`book-bookmarks-${book.id}`)
     if (savedBookmarks) {
@@ -294,13 +286,6 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
   }, [book?.id, totalPages])
 
   // All hooks must be declared before conditional returns (React Rules of Hooks)
-  // Save reading progress to localStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return
-    if (!book?.id) return
-    localStorage.setItem(`book-progress-${book.id}`, currentPage.toString())
-  }, [currentPage, book?.id])
-
   // Save bookmarks to localStorage
   useEffect(() => {
     if (typeof window === "undefined") return

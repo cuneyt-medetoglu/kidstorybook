@@ -39,6 +39,9 @@ const countries = [
   { code: "EU", flag: "🇪🇺", currency: "EUR" },
 ]
 
+/** Para birimi seçici: Ödeme sistemleri (Stripe/İyzico) yapılınca tekrar açılacak. */
+const SHOW_CURRENCY_SELECTOR = false
+
 const LOCALE_META: Record<string, { flag: string; label: string }> = {
   en: { flag: "🇬🇧", label: "EN" },
   tr: { flag: "🇹🇷", label: "TR" },
@@ -142,7 +145,8 @@ export function Header() {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
-          {/* Currency Selector */}
+          {/* Currency Selector — hidden until payment systems are in place */}
+          {SHOW_CURRENCY_SELECTOR && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -168,6 +172,7 @@ export function Header() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          )}
 
           {/* Language Selector — Desktop */}
           <DropdownMenu>
@@ -407,7 +412,8 @@ export function Header() {
                     </motion.div>
                   </Link>
 
-                  {/* Currency Selector — Mobile */}
+                  {/* Currency Selector — Mobile (hidden until payment systems are in place) */}
+                  {SHOW_CURRENCY_SELECTOR && (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -440,6 +446,7 @@ export function Header() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </motion.div>
+                  )}
 
                   {/* Language Selector — Mobile */}
                   <motion.div

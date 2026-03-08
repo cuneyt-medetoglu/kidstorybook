@@ -32,6 +32,7 @@ Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
 - **Kod:** Gereksiz log kaldır. Sıradaki iş: ROADMAP’tan tespit et.
 
 ### Konu Bazlı Referanslar (detay ilgili dokümanlarda)
+- **Gizlenen özellikler:** Para birimi seçici (Header) şu an kullanılmıyor; ödeme sistemleri (Stripe/İyzico) yapılınca açılacak. Not: `docs/roadmap/NOTLAR_VE_FIKIRLER.md` → "Gizlenen Özellikler" bölümü; kod: `components/layout/Header.tsx` içinde `SHOW_CURRENCY_SELECTOR`.
 - **Create Book / görsel–hikaye kalitesi:** `docs/prompts/STORY_PROMPT_TEMPLATE.md` (güncel: v2.6.0 — ONE STORY STEP BY STEP), `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
 - **Create Book akışı / süre / paralellik / TTS:** `docs/analysis/CREATE_BOOK_FLOW_SEQUENCE.md` (adım sırası, TTS prewarm, master→kapak→sayfa, Step 6 butonları, timing summary, Google TTS quota; optimizasyon önerileri OPT-1/2/3)
 - **Prompt optimizasyon / analiz:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
