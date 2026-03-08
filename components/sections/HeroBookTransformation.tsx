@@ -1,37 +1,40 @@
 "use client"
 
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import { Sparkles, Star, Wand2, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { heroTransformationConfig } from "@/lib/config/hero-transformation"
 
-// Floating magical particles
+// Sabit parçacık konfigürasyonu — her tema geçişinde aynı değerler, GPU/render tutarlı
+const PARTICLE_CONFIGS = Array.from({ length: 20 }, (_, i) => ({
+  x: 50 + (((i * 137.5) % 100) - 50),
+  y: 50 + (((i * 97.3) % 100) - 50),
+  delay: (i * 0.15) % 3,
+  duration: 2 + (i % 4) * 0.5,
+}))
+
+// Floating magical particles — seed tabanlı, remount’ta aynı animasyon
 function MagicalParticles({ colors }: { colors: string[] }) {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {Array.from({ length: 20 }).map((_, i) => (
+      {PARTICLE_CONFIGS.map((cfg, i) => (
         <motion.div
           key={i}
           className="absolute"
-          initial={{
-            x: "50%",
-            y: "50%",
-            opacity: 0,
-            scale: 0,
-          }}
+          initial={{ x: "50%", y: "50%", opacity: 0, scale: 0 }}
           animate={{
-            x: `${50 + (Math.random() - 0.5) * 100}%`,
-            y: `${50 + (Math.random() - 0.5) * 100}%`,
+            x: `${cfg.x}%`,
+            y: `${cfg.y}%`,
             opacity: [0, 1, 0],
             scale: [0, 1, 0],
             rotate: [0, 180, 360],
           }}
           transition={{
-            duration: 2 + Math.random() * 2,
+            duration: cfg.duration,
             repeat: Infinity,
-            delay: Math.random() * 3,
+            delay: cfg.delay,
             ease: "easeOut",
           }}
         >
@@ -51,7 +54,7 @@ function MagicalParticles({ colors }: { colors: string[] }) {
   )
 }
 
-// Transformation arrow with magic effect - tablet proportionally smaller
+// Transformation arrow with magic effect
 function MagicArrow() {
   return (
     <motion.div
@@ -80,16 +83,8 @@ function MagicArrow() {
         <motion.div
           key={i}
           className="absolute"
-          animate={{
-            scale: [0, 1, 0],
-            opacity: [0, 1, 0],
-            rotate: [0, 180],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            delay: i * 0.3,
-          }}
+          animate={{ scale: [0, 1, 0], opacity: [0, 1, 0], rotate: [0, 180] }}
+          transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
           style={{
             left: `${50 + 30 * Math.cos((i * Math.PI) / 3)}%`,
             top: `${50 + 30 * Math.sin((i * Math.PI) / 3)}%`,
@@ -105,30 +100,20 @@ function MagicArrow() {
 export function HeroBookTransformation() {
   const t = useTranslations("hero.transformation")
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [showTransformation, setShowTransformation] = useState(false)
 
   const currentItem = heroTransformationConfig[currentIndex]
   const Icon = currentItem.icon
 
-  // Auto-advance and trigger transformation
   useEffect(() => {
-    const transformTimer = setTimeout(() => setShowTransformation(true), 500)
     const interval = setInterval(() => {
-      setShowTransformation(false)
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % heroTransformationConfig.length)
-        setShowTransformation(true)
-      }, 800)
+      setCurrentIndex((prev) => (prev + 1) % heroTransformationConfig.length)
     }, 6000)
-    return () => {
-      clearTimeout(transformTimer)
-      clearInterval(interval)
-    }
+    return () => clearInterval(interval)
   }, [])
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center px-3 pb-2 sm:px-4 sm:pb-12 md:h-full md:pb-0 md:px-3 lg:px-4">
-      {/* Title - tablet proportionally smaller */}
+      {/* Title */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -152,32 +137,19 @@ export function HeroBookTransformation() {
         </motion.p>
       </motion.div>
 
-      {/* Main Transformation Container - larger on iPad/web for Real Photo & Story Character */}
+      {/* Main Transformation Container */}
       <div className="relative w-full max-w-2xl sm:max-w-3xl md:max-w-3xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-5xl">
         {/* Background glow */}
         <motion.div
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-            scale: [0.95, 1.05, 0.95],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className={`absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r ${currentItem.gradient} blur-3xl`}
+          animate={{ opacity: [0.3, 0.6, 0.3], scale: [0.95, 1.05, 0.95] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute inset-0 -z-10 rounded-3xl bg-gradient-to-r ${currentItem.gradient} blur-3xl transition-colors duration-700`}
         />
 
-        {/* Theme indicator - theme color, solid (no gradient) */}
-        <motion.div
-          key={currentItem.id}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          className="mb-2 flex items-center justify-center gap-2 sm:mb-3 md:mb-2 md:gap-1.5 lg:mb-3"
-        >
+        {/* Theme indicator — key yok, sadece transition ile; unmount/remount tetiklenmez */}
+        <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3 md:mb-2 md:gap-1.5 lg:mb-3 transition-all duration-500">
           <div
-            className="rounded-full p-1.5 shadow-lg md:p-1 lg:p-1.5"
+            className="rounded-full p-1.5 shadow-lg md:p-1 lg:p-1.5 transition-colors duration-500"
             style={{ backgroundColor: currentItem.sparkleColors[0] }}
           >
             <Icon className="h-3 w-3 text-white md:h-3 md:w-3 lg:h-4 lg:w-4" />
@@ -185,9 +157,9 @@ export function HeroBookTransformation() {
           <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 md:text-xs lg:text-sm">
             {t(`themes.${currentItem.id}`)}
           </span>
-        </motion.div>
+        </div>
 
-        {/* Transformation Grid: Photo → Character - tablet smaller gap */}
+        {/* Transformation Grid */}
         <div className="relative grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr] md:gap-4 lg:gap-6">
           {/* Left: Real Photo */}
           <motion.div
@@ -197,18 +169,10 @@ export function HeroBookTransformation() {
             className="relative"
           >
             <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-primary/20 dark:bg-slate-800 md:p-2 lg:p-3">
-              {/* Label */}
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2"
-              >
+              <div className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-gray-400" />
                 <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{t("realPhotoLabel")}</span>
-              </motion.div>
-
-              {/* Photo frame - image only (5.1: footer outside to avoid corner artifacts) */}
+              </div>
               <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
                 <Image
                   src={currentItem.realPhoto.src}
@@ -216,26 +180,22 @@ export function HeroBookTransformation() {
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, 40vw"
+                  priority
                 />
               </div>
-              {/* Footer outside image container */}
               <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
                 <p className="text-xs font-medium text-gray-700 dark:text-gray-300">{t("realPhotoName")}, {t("realPhotoAge")}</p>
               </div>
-
-              {/* Corner decoration */}
               <div className="absolute right-3 top-3 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
                 <Star className="h-3 w-3 text-primary" fill="currentColor" />
               </div>
             </div>
           </motion.div>
 
-          {/* Center: Magic Arrow (Hidden on mobile, shown on desktop) */}
+          {/* Center: Arrows */}
           <div className="hidden md:flex md:items-center md:justify-center">
             <MagicArrow />
           </div>
-
-          {/* Mobile Arrow (Shown between cards on mobile) */}
           <div className="flex items-center justify-center md:hidden">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -243,94 +203,78 @@ export function HeroBookTransformation() {
               transition={{ delay: 1 }}
               className="flex flex-col items-center gap-2"
             >
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
+              <motion.div animate={{ y: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
                 <ArrowRight className="h-8 w-8 rotate-90 text-primary" strokeWidth={3} />
               </motion.div>
               <span className="text-xs font-bold text-primary">{t("magicLabel")}</span>
             </motion.div>
           </div>
 
-          {/* Right: Character Illustration */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentItem.id}
-              initial={{ opacity: 0, x: 50, scale: 0.9 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="relative"
-            >
-              <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-brand-2/20 dark:bg-slate-800 md:p-2 lg:p-3">
-                {/* Label */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2"
-                >
-                  <Sparkles className="h-3 w-3 text-brand-2" />
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
-                    {t("storyCharacterLabel")}
-                  </span>
-                  <Sparkles className="h-3 w-3 text-brand-2" />
-                </motion.div>
-
-                {/* Character frame - image only (5.1: footer outside to avoid corner artifacts) */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: showTransformation ? 1 : 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="relative aspect-square overflow-hidden rounded-t-xl"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${currentItem.gradient}`} />
-                  <Image
-                    src={currentItem.storyCharacter.src}
-                    alt={`${t(`themes.${currentItem.id}`)} ${t("character")}`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, 40vw"
-                  />
-
-                  {/* Magical particles overlay */}
-                  <MagicalParticles colors={currentItem.sparkleColors} />
-                </motion.div>
-                {/* Footer outside image container */}
-                <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <Icon className="h-3 w-3 text-primary" />
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                      {t(`themes.${currentItem.id}`)}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Corner decoration */}
-                <div className="absolute left-3 top-3 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
-                  <Sparkles className="h-3 w-3 text-brand-2" />
-                </div>
-
-                {/* Pulsing glow effect */}
-                <motion.div
-                  animate={{
-                    opacity: [0, 0.5, 0],
-                    scale: [0.95, 1.05, 0.95],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentItem.gradient} blur-xl`}
-                />
+          {/* Right: Character Illustration — sabit kabuk, tüm görseller üst üste opacity ile */}
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="relative"
+          >
+            <div className="group relative overflow-hidden rounded-2xl bg-white p-2 shadow-2xl ring-2 ring-brand-2/20 dark:bg-slate-800 md:p-2 lg:p-3">
+              <div className="mb-1.5 flex items-center justify-center gap-2 md:mb-1 lg:mb-2">
+                <Sparkles className="h-3 w-3 text-brand-2" />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  {t("storyCharacterLabel")}
+                </span>
+                <Sparkles className="h-3 w-3 text-brand-2" />
               </div>
-            </motion.div>
-          </AnimatePresence>
+
+              {/* Tüm görsellerin üst üste bindiği sabit kutu — layout shift yok */}
+              <div className="relative aspect-square overflow-hidden rounded-t-xl bg-gray-100 dark:bg-slate-700">
+                {heroTransformationConfig.map((item, index) => {
+                  const isActive = index === currentIndex
+                  return (
+                    <div
+                      key={item.id}
+                      className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                        isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                      }`}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient}`} />
+                      <Image
+                        src={item.storyCharacter.src}
+                        alt={`${t(`themes.${item.id}`)} ${t("character")}`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        sizes="(max-width: 768px) 100vw, 40vw"
+                        priority={index === 0}
+                      />
+                      {isActive && <MagicalParticles colors={item.sparkleColors} />}
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="rounded-b-xl bg-white/95 px-2 py-1.5 text-center dark:bg-slate-800/95 md:px-2 md:py-1.5 lg:px-3 lg:py-2">
+                <div className="flex items-center justify-center gap-1.5 transition-colors duration-300">
+                  <Icon className="h-3 w-3 text-primary" />
+                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                    {t(`themes.${currentItem.id}`)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="absolute left-3 top-3 z-20 rounded-full bg-white/80 p-1.5 shadow-lg dark:bg-slate-700/80">
+                <Sparkles className="h-3 w-3 text-brand-2" />
+              </div>
+
+              <motion.div
+                animate={{ opacity: [0, 0.4, 0], scale: [0.98, 1.02, 0.98] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentItem.gradient} blur-xl transition-colors duration-700`}
+              />
+            </div>
+          </motion.div>
         </div>
 
-        {/* Theme selector dots - theme color when active, solid (no gradient) */}
+        {/* Theme selector dots */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -338,21 +282,14 @@ export function HeroBookTransformation() {
           className="mt-4 flex justify-center gap-2.5 md:mt-3 lg:mt-6"
         >
           {heroTransformationConfig.map((item, index) => (
-            <motion.button
+            <button
               key={item.id}
-              onClick={() => {
-                setShowTransformation(false)
-                setTimeout(() => {
-                  setCurrentIndex(index)
-                  setShowTransformation(true)
-                }, 300)
-              }}
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.9 }}
+              type="button"
+              onClick={() => setCurrentIndex(index)}
               style={index === currentIndex ? { backgroundColor: item.sparkleColors[0] } : undefined}
-              className={`h-3 w-3 rounded-full transition-all duration-300 ${
+              className={`h-3 w-3 rounded-full transition-all duration-300 hover:scale-125 active:scale-90 ${
                 index === currentIndex
-                  ? "shadow-md ring-2 ring-slate-800/40 dark:ring-white/50"
+                  ? "shadow-md ring-2 ring-slate-800/40 dark:ring-white/50 scale-110"
                   : "bg-slate-300 hover:bg-slate-400 dark:bg-slate-400 dark:hover:bg-slate-300"
               }`}
               aria-label={t("ariaSwitchTheme", { name: t(`themes.${item.id}`) })}
@@ -361,7 +298,7 @@ export function HeroBookTransformation() {
         </motion.div>
       </div>
 
-      {/* Stat badges - tablet proportionally smaller */}
+      {/* Stat badges */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
