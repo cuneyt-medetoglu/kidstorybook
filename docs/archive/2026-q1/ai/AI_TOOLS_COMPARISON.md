@@ -1,5 +1,5 @@
 # 🤖 AI Tools Karşılaştırması ve Seçim Rehberi
-# KidStoryBook Platform
+# HeroKidStory Platform
 
 **Doküman Versiyonu:** 1.0  
 **Tarih:** 4 Ocak 2026  

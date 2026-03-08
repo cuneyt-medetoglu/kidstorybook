@@ -1,5 +1,5 @@
 # ✨ Özellik Listesi ve Önceliklendirme
-# KidStoryBook Platform
+# HeroKidStory Platform
 
 **Doküman Versiyonu:** 2.0  
 **Tarih:** 2 Şubat 2026  

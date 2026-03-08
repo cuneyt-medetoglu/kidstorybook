@@ -568,15 +568,15 @@
   - [ ] **Localization Agent (23 Ocak 2026):** Bu işten sorumlu bir agent olmalı. Tüm düzeni bilir ve bu işleri hep onunla yaparız. Tüm localization işleri bu agent üzerinden yönetilmeli.
   - **Not:** Şu an tüm UI EN olarak geliştiriliyor, localization Faz 5 veya Post-MVP'de eklenecek
   - **Sektör Standartları ve URL Yapısı (26 Ocak 2026):**
-    - **Önerilen Yapı: Subdirectory (Alt Dizin)** - `kidstorybook.com/tr/`, `kidstorybook.com/en/`, `kidstorybook.com/de/`
+    - **Önerilen Yapı: Subdirectory (Alt Dizin)** - `herokidstory.com/tr/`, `herokidstory.com/en/`, `herokidstory.com/de/`
     - **Neden Subdirectory?**
       - SEO equity tek domain'de toplanır (daha iyi SEO performansı)
       - Daha düşük maliyet (tek SSL sertifikası, birleşik hosting)
       - Daha basit analytics ve implementasyon
       - Shopify, Stripe, Notion gibi büyük şirketler bu yöntemi kullanıyor
     - **Alternatifler (Önerilmez):**
-      - Subdomain (`tr.kidstorybook.com`): SEO'yu böler, daha karmaşık analytics
-      - ccTLD (`kidstorybook.tr`, `kidstorybook.de`): En pahalı, ayrı hosting ve SSL gerektirir
+      - Subdomain (`tr.herokidstory.com`): SEO'yu böler, daha karmaşık analytics
+      - ccTLD (`herokidstory.tr`, `herokidstory.de`): En pahalı, ayrı hosting ve SSL gerektirir
     - **Implementasyon:**
       - Next.js 14 App Router ile `app/[locale]/` yapısı kullanılabilir
       - `next-intl` veya `next-i18next` gibi kütüphaneler kullanılabilir

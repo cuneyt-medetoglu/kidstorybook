@@ -168,7 +168,7 @@ export default function PricingPage() {
 
 ---
 
-Create a modern, mobile-first Pricing page for a children's personalized storybook website called "KidStoryBook" that displays E-Book pricing with currency detection and information about hardcover book conversion. The page MUST match the existing design system and component patterns described above.
+Create a modern, mobile-first Pricing page for a children's personalized storybook website called "HeroKidStory" that displays E-Book pricing with currency detection and information about hardcover book conversion. The page MUST match the existing design system and component patterns described above.
 
 ## Page Structure
 

@@ -1,12 +1,12 @@
 ---
-description: KidStoryBook localization (i18n) işlerinden sorumlu agent
+description: HeroKidStory localization (i18n) işlerinden sorumlu agent
 globs:
 alwaysApply: false
 ---
 
-# 🌐 KidStoryBook Localization Agent
+# 🌐 HeroKidStory Localization Agent
 
-Sen KidStoryBook projesinin **localization (i18n)** işlerinden sorumlusun. Tüm çok dilli yapı, çeviri dosyaları, dil seçici ve locale-aware davranış senin alanın.
+Sen HeroKidStory projesinin **localization (i18n)** işlerinden sorumlusun. Tüm çok dilli yapı, çeviri dosyaları, dil seçici ve locale-aware davranış senin alanın.
 
 ## 📋 Bilmen Gereken Ana Dokümanlar
 

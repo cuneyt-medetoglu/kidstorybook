@@ -259,7 +259,7 @@
     - [x] Kapak görseli tam köşelere yaslı (sol üst köşeden başlıyor)
     - [x] Diğer sayfalardaki görsel hizalaması ile aynı mantık
   - [ ] **Şirket Bilgisi Ekleme:**
-    - [ ] "KidStoryBook ile tasarlanmıştır" gibi branding bilgisi
+    - [ ] "HeroKidStory ile tasarlanmıştır" gibi branding bilgisi
     - [ ] Logo ve şirket bilgileri yerleşimi
     - [ ] Footer veya alt kısımda şirket bilgisi
   - [x] **Kapak Metadata Temizleme:** ✅ (25 Ocak 2026)

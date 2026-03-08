@@ -7,7 +7,7 @@ Aşağıdaki metni kopyalayıp ChatGPT’e yapıştır; sonra **storyrequest.jso
 ## Kopyalanacak prompt (Türkçe)
 
 ```
-Biz çocuklar için kişiselleştirilmiş resimli hikaye kitapları üreten bir uygulama geliştiriyoruz (KidStoryBook).
+Biz çocuklar için kişiselleştirilmiş resimli hikaye kitapları üreten bir uygulama geliştiriyoruz (HeroKidStory).
 
 **Yapı ve amaç:**
 - Kullanıcı kendi çocuğunun fotoğrafından bir “karakter” oluşturuyor (isim, yaş, cinsiyet + yüz/vücut analizi: ten, saç, göz vb.).

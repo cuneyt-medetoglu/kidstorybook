@@ -13,7 +13,7 @@ Proje artık **NextAuth + public.users** kullandığı için **auth** schema'sı
 
 ## "must be owner of schema auth" hatası
 
-Bu hata, bağlandığın kullanıcının (örn. `kidstorybook`) **auth** schema'sının sahibi olmamasından kaynaklanır. Auth schema'nın sahibi genelde **postgres** süper kullanıcısıdır. Bu yüzden silme işlemini **postgres** ile yapman gerekir.
+Bu hata, bağlandığın kullanıcının (örn. `herokidstory`) **auth** schema'sının sahibi olmamasından kaynaklanır. Auth schema'nın sahibi genelde **postgres** süper kullanıcısıdır. Bu yüzden silme işlemini **postgres** ile yapman gerekir.
 
 ---
 
@@ -22,16 +22,16 @@ Bu hata, bağlandığın kullanıcının (örn. `kidstorybook`) **auth** schema'
 ### Seçenek 1: EC2'de postgres ile (önerilen)
 
 ```bash
-sudo -u postgres psql -d kidstorybook -c "DROP SCHEMA IF EXISTS auth CASCADE;"
+sudo -u postgres psql -d herokidstory -c "DROP SCHEMA IF EXISTS auth CASCADE;"
 ```
 
 ### Seçenek 2: DBeaver'da postgres kullanıcısı ile
 
 Username: **postgres**, sonra SQL Editor'de: `DROP SCHEMA IF EXISTS auth CASCADE;`
 
-### Seçenek 3: kidstorybook kullanıcısına yetki vermek
+### Seçenek 3: herokidstory kullanıcısına yetki vermek
 
-postgres ile: `ALTER SCHEMA auth OWNER TO kidstorybook;` sonra DBeaver'da kidstorybook ile silinebilir.
+postgres ile: `ALTER SCHEMA auth OWNER TO herokidstory;` sonra DBeaver'da herokidstory ile silinebilir.
 
 ---
 

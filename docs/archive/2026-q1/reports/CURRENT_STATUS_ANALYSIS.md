@@ -1,4 +1,4 @@
-# 📊 KidStoryBook - Mevcut Durum Analizi
+# 📊 HeroKidStory - Mevcut Durum Analizi
 
 **Tarih:** 10 Ocak 2026  
 **Durum:** 🟡 Geliştirme Devam Ediyor  

@@ -1,4 +1,4 @@
-# KidStoryBook - Cursor AI Kuralları
+# HeroKidStory - Cursor AI Kuralları
 
 ## Proje Hakkında
 Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir SaaS platformudur. Next.js App Router, Supabase, OpenAI (GPT + görsel) ve TTS/ödeme entegrasyonları kullanılır.
@@ -18,7 +18,7 @@ Bu proje, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli
 
 ## Proje Yapısı
 ```
-kidstorybook/
+herokidstory/
 ├── app/            # Sayfalar ve API routes (App Router)
 ├── components/     # UI, layout, sections
 ├── lib/            # Supabase, db, prompts, pdf, tts, config

@@ -1,4 +1,4 @@
-# 📊 KidStoryBook Database Schema
+# 📊 HeroKidStory Database Schema
 
 **Last Updated:** 29 Ocak 2026  
 **Database:** PostgreSQL (AWS)  

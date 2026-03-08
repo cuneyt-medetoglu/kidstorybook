@@ -1,4 +1,4 @@
-# 🎨 KidStoryBook Renk Paleti
+# 🎨 HeroKidStory Renk Paleti
 
 **Tarih:** 4 Ocak 2026  
 **Durum:** Aktif
@@ -7,7 +7,7 @@
 
 ## 📋 Genel Bakış
 
-KidStoryBook için çocuklara ve kitaplara uygun, dark/light mode destekli renk paleti.
+HeroKidStory için çocuklara ve kitaplara uygun, dark/light mode destekli renk paleti.
 
 ---
 

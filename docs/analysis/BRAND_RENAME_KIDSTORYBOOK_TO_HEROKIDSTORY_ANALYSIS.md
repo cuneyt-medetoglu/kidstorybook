@@ -169,6 +169,20 @@ Bu sıra, altyapıyı önce sabitlediği için tekrar ve tutarsızlık riskini a
 
 ---
 
+## 7b. Faz 2 ve S3/DB Geçiş İlerleme Logu
+
+| Tarih | Adım | Durum | Not |
+|-------|------|--------|-----|
+| 2026-03-08 | **Faz 2 kod** | ✅ Tamamlandı | next.config, metadata/sitemap/robots, localStorage key'leri, UI/i18n HeroKidStory, TraceViewerModal, package-lock |
+| 2026-03-08 | **S3 sync** | ✅ Tamamlandı | Local'de aws s3 sync s3://kidstorybook → s3://herokidstory (herokidstory IAM key ile) |
+| 2026-03-08 | **DB URL güncelleme** | ✅ Tamamlandı | scripts/update-s3-urls-to-herokidstory.sql EC2'de herokidstory DB'de çalıştırıldı (books, characters, story_data, image_edit_history) |
+| 2026-03-08 | **S3 bucket policy** | ✅ Tamamlandı | herokidstory bucket'a PublicReadGetObject policy eklendi; next/image 403 hatası giderildi |
+| | **Eski bucket silme** | ✅ Tamamlandı | S3 konsol → kidstorybook Empty + Delete yapıldı. |
+| | **Faz 3 dokümantasyon** | ✅ Tamamlandı | Ana dokümanlar (PRD, FEATURES, ARCHITECTURE, DOCUMENTATION, SCHEMA), Cursor kuralları (localization, api-manager, database-manager, prompt-manager, architecture-manager, .cursorrules), docs/ (roadmap viewer, palette-preview, guides, strategies, api, technical, ai, NOTLAR_VE_FIKIRLER, PHASE_5_LAUNCH, GIT_STRATEGY, DOCUMENTATION_MAP). |
+| | **Faz 4 arşiv** | ✅ Tamamlandı | docs/archive/ altında marka güncellemeleri (KidStoryBook/kidstorybook → HeroKidStory/herokidstory). .gitignore zaten herokidstory-key.pem (Faz 1'de yapıldı). |
+
+---
+
 ## 8. S3 veri taşıma ve eski bucket silme
 
-next.config'ten kidstorybook kaldırıldı. Yapılacaklar: (1) `aws s3 sync s3://kidstorybook s3://herokidstory --source-region eu-central-1 --region eu-central-1` ile veriyi kopyala. (2) DB'de books.cover_image_url, characters.reference_photo_url, story_data içi ve edit history kolonlarında kidstorybook.s3... REPLACE ile herokidstory.s3... yap. (3) Eski bucket'ı S3 konsoldan sil.
+next.config'ten kidstorybook kaldırıldı. **(1) S3 sync** local'de yapıldı. **(2) DB URL güncellemesi** scripts/update-s3-urls-to-herokidstory.sql ile yapıldı. **(3) herokidstory bucket policy** (PublicReadGetObject) eklendi. **(4) Eski bucket silme:** S3 konsol → kidstorybook → Empty → Delete (isteğe bağlı, test sonrası).

@@ -58,9 +58,9 @@
 
 ### Subdirectory Yaklaşımı
 ```
-kidstorybook.com/en/          → İngilizce (default)
-kidstorybook.com/tr/          → Türkçe
-kidstorybook.com/de/          → Almanca (gelecekte)
+herokidstory.com/en/          → İngilizce (default)
+herokidstory.com/tr/          → Türkçe
+herokidstory.com/de/          → Almanca (gelecekte)
 ```
 
 ### Dosya Yapısı Değişikliği

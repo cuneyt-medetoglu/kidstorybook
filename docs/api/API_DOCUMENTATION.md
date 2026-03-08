@@ -1,4 +1,4 @@
-## 🔌 KidStoryBook API Documentation
+## 🔌 HeroKidStory API Documentation
 
 **Last Updated:** 10 Ocak 2026  
 **Base URL:** `https://yourdomain.com/api` (or `http://localhost:3001/api` for development)  

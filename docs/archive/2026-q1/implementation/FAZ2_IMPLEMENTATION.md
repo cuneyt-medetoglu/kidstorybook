@@ -471,7 +471,7 @@
 **FAQ Section Özellikleri:**
 - ✅ Section title: "Frequently Asked Questions"
 - ✅ FAQ badge (gradient, "FAQ" label with HelpCircle icon)
-- ✅ Subtitle: "Everything you need to know about KidStoryBook"
+- ✅ Subtitle: "Everything you need to know about HeroKidStory"
 - ✅ 10 FAQ items (accordion/collapsible):
   1. How does it work?
   2. How long does it take to create a book?
@@ -627,7 +627,7 @@
 
 **Login Page Özellikleri:**
 - ✅ Centered form layout (max-width 400px)
-- ✅ Logo/Brand (KidStoryBook, gradient)
+- ✅ Logo/Brand (HeroKidStory, gradient)
 - ✅ Page title: "Welcome Back"
 - ✅ Subtitle: "Sign in to continue creating magical stories"
 - ✅ Email input field:
@@ -706,7 +706,7 @@
 
 **Register Page Özellikleri:**
 - ✅ Centered form layout (max-width 400px)
-- ✅ Logo/Brand (KidStoryBook, gradient)
+- ✅ Logo/Brand (HeroKidStory, gradient)
 - ✅ Page title: "Create Your Account"
 - ✅ Subtitle: "Start creating magical stories for your child"
 - ✅ Free cover benefit badge: "Get 1 free book cover when you sign up!" (gradient background, Sparkles icon)
@@ -809,7 +809,7 @@
 
 **Forgot Password Page Özellikleri:**
 - ✅ Centered form layout (max-width 400px)
-- ✅ Logo/Brand (KidStoryBook, gradient)
+- ✅ Logo/Brand (HeroKidStory, gradient)
 - ✅ Two states: Form state ve Success state
 - ✅ **Form State:**
   - Page title: "Forgot Password?"

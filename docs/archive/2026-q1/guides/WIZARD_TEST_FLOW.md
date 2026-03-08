@@ -41,12 +41,12 @@
 **Beklenen Sonuç:**
 - ✅ Step 2'ye yönlendirilmeli (`/create/step2`)
 - ✅ Console'da: `[v0] Step 1 form submitted: {...}`
-- ✅ localStorage'da `kidstorybook_wizard` kaydedilmeli
+- ✅ localStorage'da `herokidstory_wizard` kaydedilmeli
 
 **Kontrol:**
 ```javascript
 // Browser Console'da çalıştır:
-JSON.parse(localStorage.getItem("kidstorybook_wizard"))
+JSON.parse(localStorage.getItem("herokidstory_wizard"))
 // Beklenen: { step1: { name: "Arya", age: 1, ... } }
 ```
 
@@ -71,12 +71,12 @@ JSON.parse(localStorage.getItem("kidstorybook_wizard"))
   - Hair Length, Hair Style, Hair Texture
   - Face Shape, Eye Shape, Skin Tone
 - ✅ Toast bildirimi: "Character Analyzed! Character 'Arya' has been created successfully."
-- ✅ localStorage'da `kidstorybook_character_id` kaydedilmeli
+- ✅ localStorage'da `herokidstory_character_id` kaydedilmeli
 
 **Kontrol:**
 ```javascript
 // Browser Console'da çalıştır:
-localStorage.getItem("kidstorybook_character_id")
+localStorage.getItem("herokidstory_character_id")
 // Beklenen: UUID string (örn: "abc123-def456-...")
 ```
 
@@ -157,16 +157,16 @@ localStorage.getItem("kidstorybook_character_id")
 - ✅ Toast bildirimi: "Book Created! '...' is being generated. Redirecting to your library..."
 - ✅ 2 saniye sonra Dashboard'a yönlendirilmeli (`/dashboard`)
 - ✅ localStorage temizlenmeli:
-  - `kidstorybook_wizard` silinmeli
-  - `kidstorybook_character_id` silinmeli
+  - `herokidstory_wizard` silinmeli
+  - `herokidstory_character_id` silinmeli
 
 **Kontrol:**
 ```javascript
 // Browser Console'da çalıştır:
-localStorage.getItem("kidstorybook_wizard")
+localStorage.getItem("herokidstory_wizard")
 // Beklenen: null
 
-localStorage.getItem("kidstorybook_character_id")
+localStorage.getItem("herokidstory_character_id")
 // Beklenen: null
 ```
 
@@ -218,14 +218,14 @@ localStorage.getItem("kidstorybook_character_id")
 - [ ] Form dolduruldu
 - [ ] "Next" butonu çalışıyor
 - [ ] Step 2'ye yönlendirildi
-- [ ] localStorage'da `kidstorybook_wizard` kaydedildi
+- [ ] localStorage'da `herokidstory_wizard` kaydedildi
 
 ### Step 2 ✅
 - [ ] Fotoğraf yüklendi
 - [ ] "Analyze Photo" butonu çalışıyor
 - [ ] API çağrısı başarılı (`POST /api/characters/analyze`)
 - [ ] Analiz sonuçları gösterildi
-- [ ] localStorage'da `kidstorybook_character_id` kaydedildi
+- [ ] localStorage'da `herokidstory_character_id` kaydedildi
 - [ ] "Next" butonu çalışıyor
 - [ ] Step 3'e yönlendirildi
 
@@ -250,7 +250,7 @@ Eğer sadece API'leri test etmek istiyorsan:
 
 ### 1. Postman ile Test
 
-**Postman Collection:** `postman/KidStoryBook_API.postman_collection.json`
+**Postman Collection:** `postman/HeroKidStory_API.postman_collection.json`
 
 **Sıra:**
 1. **Authentication → Get Auth Token** (Login)

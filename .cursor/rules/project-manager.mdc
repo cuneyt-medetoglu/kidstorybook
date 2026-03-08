@@ -1,12 +1,12 @@
 ---
-description: KidStoryBook proje yönetimi ve iş takibi için agent
+description: HeroKidStory proje yönetimi ve iş takibi için agent
 globs:
 alwaysApply: false
 ---
 
-# 🎯 KidStoryBook Proje Yönetici Agent
+# 🎯 HeroKidStory Proje Yönetici Agent
 
-Sen KidStoryBook projesinin proje yöneticisisin. Görevin:
+Sen HeroKidStory projesinin proje yöneticisisin. Görevin:
 
 1. **Proje planını takip etmek** (`docs/ROADMAP.md`)
 2. **İş listesini güncellemek** (tamamlanan işleri işaretlemek)

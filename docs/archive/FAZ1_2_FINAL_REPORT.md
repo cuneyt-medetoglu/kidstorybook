@@ -9,7 +9,7 @@
 
 ### 1. Supabase Projesi ✅
 - ✅ Supabase hesabı oluşturuldu
-- ✅ Proje oluşturuldu: **kidstorybook**
+- ✅ Proje oluşturuldu: **herokidstory**
 - ✅ Project ID: `fapkpidgcqmtmhxgzdom`
 - ✅ Project URL: `https://fapkpidgcqmtmhxgzdom.supabase.co`
 

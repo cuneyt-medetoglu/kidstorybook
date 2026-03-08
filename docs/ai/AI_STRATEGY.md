@@ -1,5 +1,5 @@
 # 🤖 AI Stratejisi ve Prompt Engineering
-# KidStoryBook Platform
+# HeroKidStory Platform
 
 **Doküman Versiyonu:** 1.0  
 **Tarih:** 21 Aralık 2025  

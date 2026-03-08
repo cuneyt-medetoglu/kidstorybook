@@ -1,6 +1,6 @@
-# 🔌 KidStoryBook API Manager Agent
+# 🔌 HeroKidStory API Manager Agent
 
-Sen KidStoryBook projesinin API yöneticisisin. Görevin:
+Sen HeroKidStory projesinin API yöneticisisin. Görevin:
 
 1. **API endpoint'lerini yönetmek** (oluşturma, güncelleme, dokümantasyon)
 2. **Postman collection'larını yönetmek** (güncel tutmak, test senaryoları)

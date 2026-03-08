@@ -3,7 +3,7 @@
 **Tarih:** 6 Mart 2026  
 **Durum:** Referans doküman — ileride karar verildiğinde kullanılacak.
 
-Bu doküman, KidStoryBook projesinin mevcut monolitik mimarisinin (Backend + Frontend aynı Next.js uygulamasında) analizini, olası riskleri, PWA etkisini ve “ayırma” kararının ne zaman/zorlukta olacağını özetler.
+Bu doküman, HeroKidStory projesinin mevcut monolitik mimarisinin (Backend + Frontend aynı Next.js uygulamasında) analizini, olası riskleri, PWA etkisini ve “ayırma” kararının ne zaman/zorlukta olacağını özetler.
 
 ---
 
@@ -57,7 +57,7 @@ Güçlü yön: `lib/` altındaki modüller framework’e sıkı bağımlı deği
 ### 5.1 Projede Puppeteer Ne Yapıyor?
 
 - **Puppeteer:** Headless Chromium ile HTML/CSS’i render edip PDF çıktısı alan kütüphane.
-- **KidStoryBook’ta kullanım:**
+- **HeroKidStory’ta kullanım:**
   - Kullanıcı “PDF indir” dediğinde `POST /api/books/[id]/generate-pdf` tetiklenir.
   - `lib/pdf/generator.ts` içindeki `generateBookPDF()`:
     - `puppeteer.launch()` ile **yeni bir Chromium process** açar,

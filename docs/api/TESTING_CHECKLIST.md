@@ -22,11 +22,11 @@ npm run dev
 ### Adım 2: Postman Setup
 
 1. **Collection İçe Aktar:**
-   - `postman/KidStoryBook_API.postman_collection.json`
-   - `postman/KidStoryBook_Environment.postman_environment.json`
+   - `postman/HeroKidStory_API.postman_collection.json`
+   - `postman/HeroKidStory_Environment.postman_environment.json`
 
 2. **Environment Aktif Et:**
-   - Sağ üst köşe → **KidStoryBook - Local Development**
+   - Sağ üst köşe → **HeroKidStory - Local Development**
 
 3. **Environment Variables Ayarla:**
    - `base_url` → `http://localhost:3001/api` ✅ (Zaten doğru)

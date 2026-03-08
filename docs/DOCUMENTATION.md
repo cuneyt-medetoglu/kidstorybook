@@ -1,4 +1,4 @@
-# 📚 KidStoryBook - Dokümantasyon
+# 📚 HeroKidStory - Dokümantasyon
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
@@ -239,7 +239,7 @@ docs/
 19. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
 20. **archive/2026-02/analysis/** - Arşivlenen analizler
 21. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
-22. **analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md** - KidStoryBook → herokidstory marka/proje adı değişikliği; fazlama (Faz 1–4), kod/doküman/S3/DB/repo liste ve dikkat edilecekler
+22. **analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md** - KidStoryBook → herokidstory marka/proje adı değişikliği (tamamlandı); fazlama (Faz 1–4), kod/doküman/S3/DB/repo liste.
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı
@@ -271,8 +271,8 @@ docs/
 ### API
 1. **api/API_DOCUMENTATION.md** - Tüm API endpoint'leri ve kullanım örnekleri
 2. **api/POSTMAN_COLLECTION.md** - Postman collection kullanım rehberi
-3. **postman/KidStoryBook_API.postman_collection.json** - Postman collection (tüm endpoint'ler)
-4. **postman/KidStoryBook_Environment.postman_environment.json** - Postman environment (local dev)
+3. **postman/HeroKidStory_API.postman_collection.json** - Postman collection (tüm endpoint'ler)
+4. **postman/HeroKidStory_Environment.postman_environment.json** - Postman environment (local dev)
 5. **tests/api/README.md** - API test senaryoları ve rehberi
 
 **API Agent:** `@api-manager` - API endpoint'leri, Postman collection'ları ve testlerden sorumlu agent

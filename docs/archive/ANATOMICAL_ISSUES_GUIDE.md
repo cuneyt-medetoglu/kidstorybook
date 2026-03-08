@@ -1,6 +1,6 @@
 # 🖐️ Anatomik Sorunlar ve Parmak Hataları - GPT Çözüm Kılavuzu
 
-**KidStoryBook Platform - Anatomik Sorun Çözüm Dokümantasyonu**
+**HeroKidStory Platform - Anatomik Sorun Çözüm Dokümantasyonu**
 
 **Version:** 1.0.1  
 **Release Date:** 16 Ocak 2026  

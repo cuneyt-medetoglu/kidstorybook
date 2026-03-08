@@ -1,6 +1,6 @@
 # GPT'ye Gönderilecek Sorular – Trace Analizi (7 Şubat 2026)
 
-**Ekte:** `kidstorybook-trace-2026-02-07T21-54-35.json`  
+**Ekte:** `herokidstory-trace-2026-02-07T21-54-35.json`  
 Bu dosya, tek bir kitap oluşturma akışında tüm adımların (story → masters → cover → page_1 … page_N) **request** ve **response** çıktılarını içeriyor. Ekteki JSON'u inceleyerek aşağıdaki dört konuda somut öneri istiyorum.
 
 ---
@@ -8,7 +8,7 @@ Bu dosya, tek bir kitap oluşturma akışında tüm adımların (story → maste
 ## Kopyalanacak metin (GPT'ye yapıştır + dosyayı ekle)
 
 ```
-Merhaba. Çocuklar için kişiselleştirilmiş resimli hikaye kitapları üreten bir uygulama (KidStoryBook) geliştiriyoruz. Ekteki JSON dosyası, tek bir kitap oluşturma akışının tam trace'i: hikaye LLM isteği/cevabı, karakter ve entity master görselleri, kapak, ve her sayfa görseli için giden request ve gelen response. Tüm adımlar "steps" dizisinde; her eleman { step, request, response } içeriyor.
+Merhaba. Çocuklar için kişiselleştirilmiş resimli hikaye kitapları üreten bir uygulama (HeroKidStory) geliştiriyoruz. Ekteki JSON dosyası, tek bir kitap oluşturma akışının tam trace'i: hikaye LLM isteği/cevabı, karakter ve entity master görselleri, kapak, ve her sayfa görseli için giden request ve gelen response. Tüm adımlar "steps" dizisinde; her eleman { step, request, response } içeriyor.
 
 Bu trace'e bakarak aşağıdaki dört konuda somut önerilerini istiyorum (mümkünse prompt değişikliği, API kullanımı veya veri yapısı önerisi olarak).
 

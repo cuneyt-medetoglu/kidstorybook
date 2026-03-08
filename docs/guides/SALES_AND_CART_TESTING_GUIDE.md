@@ -30,7 +30,7 @@
 
 **Test 1.1.3: CartItem Type Genişletme**
 1. Browser console'u aç
-2. `localStorage.getItem('kidstorybook_cart')` çalıştır
+2. `localStorage.getItem('herokidstory_cart')` çalıştır
 3. **Beklenen:** Cart item'da `type: "ebook_plan"` olmalı
 4. **Beklenen:** `planType: "10"` olmalı
 5. **Beklenen:** `bookId` ve `coverImage` opsiyonel olmalı (yoksa undefined)
@@ -106,7 +106,7 @@
 
 **Test 3.1.1: Draft Storage Helper (LocalStorage)**
 1. Browser console'u aç
-2. `localStorage.getItem('kidstorybook_drafts')` çalıştır
+2. `localStorage.getItem('herokidstory_drafts')` çalıştır
 3. **Beklenen:** Draft'lar JSON formatında saklanmalı
 4. Draft oluştur (free cover veya normal)
 5. **Beklenen:** Yeni draft localStorage'a eklenmeli

@@ -14,7 +14,7 @@ Bu rehber, `migrations/20260204_add_nextauth_support.sql` dosyasını EC2 (veya 
 ## 2. Yöntem A: EC2'ye SSH, sonra psql
 
 ```bash
-ssh -i kidstorybook-key.pem ubuntu@<EC2_IP>
+ssh -i herokidstory-key.pem ubuntu@<EC2_IP>
 # Migration dosyası proje dizinindeyse:
 psql "$DATABASE_URL" -f migrations/20260204_add_nextauth_support.sql
 ```
@@ -25,7 +25,7 @@ SCP ile dosya kopyalama: `scp -i key.pem migrations/20260204_add_nextauth_suppor
 
 ## 3. Yöntem B: DBeaver / pgAdmin ile SSH tüneli
 
-- Host: 127.0.0.1, Port: 5433 (lokal tünel), Database: kidstorybook, User/Password: .env'deki DATABASE_URL'den.
+- Host: 127.0.0.1, Port: 5433 (lokal tünel), Database: herokidstory, User/Password: .env'deki DATABASE_URL'den.
 - SSH: EC2 public IP, port 22, user ubuntu, key: .pem dosyası.
 - Bağlandıktan sonra SQL Editor'de migration içeriğini yapıştırıp Execute.
 

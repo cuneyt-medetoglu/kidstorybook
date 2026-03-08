@@ -1,4 +1,4 @@
-# 🏗️ KidStoryBook - Mimari Kararlar ve Yapı
+# 🏗️ HeroKidStory - Mimari Kararlar ve Yapı
 
 **Tarih:** 2 Şubat 2026  
 **Durum:** AKTİF – Güncel (FAZ 5 çıktısı)
@@ -15,7 +15,7 @@
 Proje şu anda **tek bir repository** içinde hem frontend hem backend kodlarını barındırıyor:
 
 ```
-kidstorybook/
+herokidstory/
 ├── app/              # Next.js App Router (Frontend)
 ├── components/        # React Components
 ├── lib/              # Utility functions
@@ -44,9 +44,9 @@ kidstorybook/
 Eğer ayrı repo yapısı tercih edilirse:
 
 ```
-kidstorybook-frontend/   # Next.js Frontend
-kidstorybook-backend/    # Node.js/Express Backend (veya başka)
-kidstorybook-api/        # API Server
+herokidstory-frontend/   # Next.js Frontend
+herokidstory-backend/    # Node.js/Express Backend (veya başka)
+herokidstory-api/        # API Server
 ```
 
 #### Ne Zaman Ayrı Repo'ya Geçilmeli?
@@ -121,10 +121,10 @@ Docker desteği şu an yok, ama planlanıyor:
 
 ```bash
 # PostgreSQL (EC2)
-DATABASE_URL=postgresql://kidstorybook:***@localhost:5432/kidstorybook
+DATABASE_URL=postgresql://herokidstory:***@localhost:5432/herokidstory
 
 # AWS S3
-AWS_S3_BUCKET=kidstorybook
+AWS_S3_BUCKET=herokidstory
 AWS_REGION=eu-central-1
 
 # OpenAI
@@ -149,7 +149,7 @@ NODE_ENV=development
 ### Mevcut Yapı (Güncel – 2 Şubat 2026)
 
 ```
-kidstorybook/
+herokidstory/
 ├── app/                        # Next.js App Router
 │   ├── layout.tsx, page.tsx    # Root, Homepage
 │   ├── globals.css             # Global styles
@@ -321,7 +321,7 @@ Detaylı liste: [docs/api/API_DOCUMENTATION.md](api/API_DOCUMENTATION.md).
 ### Mevcut Durum: **AWS S3 (Tek Bucket + Prefix’ler)** ✅
 
 **Şubat 2026’da geçiş tamamlandı (Faz 4):**
-- ✅ **Tek bucket** (örn. `kidstorybook`), bölge: eu-central-1
+- ✅ **Tek bucket** (örn. `herokidstory`), bölge: eu-central-1
 - ✅ **Prefix’ler:** `photos/`, `books/`, `pdfs/`, `covers/` (books, pdfs, covers public read; photos private)
 - ✅ IAM role EC2’ye atandı; uygulama S3’e doğrudan erişir
 - ✅ Sıfırdan kurulum: `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md`

@@ -15,7 +15,7 @@
 | pdfs            | `pdfs/`        | Evet          |
 | covers          | `covers/`      | Evet          |
 
-- **1 bucket** adı: global benzersiz (örn. `kidstorybook` veya `kidstorybook-xxxx`).
+- **1 bucket** adı: global benzersiz (örn. `herokidstory` veya `herokidstory-xxxx`).
 - **4 prefix (klasör):** `photos/`, `books/`, `pdfs/`, `covers/`.
 - Uygulama: aynı bucket adı + ilgili prefix ile yazar/okur.
 
@@ -24,14 +24,14 @@
 ## Adım 1 – Tek bucket oluştur
 
 1. AWS Console → **S3** → **Create bucket**.
-2. **Bucket name:** `kidstorybook` dene. “Already taken” gelirse `kidstorybook-` + hesap id’nin son 8 hanesi veya rastgele suffix ekle (örn. `kidstorybook-a1b2c3d4`).
+2. **Bucket name:** `herokidstory` dene. “Already taken” gelirse `herokidstory-` + hesap id’nin son 8 hanesi veya rastgele suffix ekle (örn. `herokidstory-a1b2c3d4`).
 3. **Region:** eu-central-1 (Frankfurt) — Faz 1’deki bölge.
 4. **Block Public Access:** Şimdilik **tümünü açık bırak** (Block all). Public erişimi Adım 3’te bucket policy ile prefix bazlı açacağız.
 5. **Bucket Versioning:** İsteğe bağlı (şimdilik Kapalı yeterli).
 6. **Create bucket** ile oluştur.
 
-**Kontrol:** S3 listesinde tek bucket görünmeli. Bucket adını not et (örn. `kidstorybook-a1b2c3d4`).  
-✅ **Yapıldı:** bucket adı `kidstorybook`, bölge eu-central-1 (Frankfurt).
+**Kontrol:** S3 listesinde tek bucket görünmeli. Bucket adını not et (örn. `herokidstory-a1b2c3d4`).  
+✅ **Yapıldı:** bucket adı `herokidstory`, bölge eu-central-1 (Frankfurt).
 
 ---
 
@@ -60,7 +60,7 @@ Amaç: `books/`, `pdfs/`, `covers/` altındaki dosyalar herkese açık okunabils
 
 1. Bucket’a gir → **Permissions** sekmesi.
 2. **Block public access (bucket settings):** **Edit** → “Block all public access”i **kapat**, değişikliği **Save** et. (Bucket policy ile sadece belirli prefix’lere izin vereceğiz.)
-3. **Bucket policy** bölümünde **Edit** ile aşağıdaki policy’yi yapıştır. `BUCKET_ADI` yerine kendi bucket adını yaz (örn. `kidstorybook-a1b2c3d4`):
+3. **Bucket policy** bölümünde **Edit** ile aşağıdaki policy’yi yapıştır. `BUCKET_ADI` yerine kendi bucket adını yaz (örn. `herokidstory-a1b2c3d4`):
 
 ```json
 {
@@ -118,20 +118,20 @@ Uygulama EC2’den S3’e erişecek; bunun için EC2’ye bir IAM role bağlanı
 }
 ```
 
-3. **Next** → Policy adı: `kidstorybook-s3-policy` (veya benzeri) → **Create policy**.
+3. **Next** → Policy adı: `herokidstory-s3-policy` (veya benzeri) → **Create policy**.
 
 ### 4.2 – IAM role (EC2 için)
 
 1. **IAM** → **Roles** → **Create role**.
 2. **Trusted entity:** "AWS service" seçili kalsın. **"Service or use case"** açılır listesinden **EC2** seç (EC2’nin AWS servislerini çağırması için). Sonra **Next**.
-3. **Permissions:** Az önce oluşturduğun `kidstorybook-s3-policy`’yi seç → **Next**.
-4. **Role name:** `kidstorybook-ec2-s3` (veya benzeri) → **Create role**.
+3. **Permissions:** Az önce oluşturduğun `herokidstory-s3-policy`’yi seç → **Next**.
+4. **Role name:** `herokidstory-ec2-s3` (veya benzeri) → **Create role**.
 
 ### 4.3 – Role’ü EC2’ye ata
 
 1. **EC2** → **Instances** → instance’ını seç.
 2. **Actions** → **Security** → **Modify IAM role**.
-3. Açılan listeden `kidstorybook-ec2-s3` (veya verdiğin ad) seç → **Update IAM role**.
+3. Açılan listeden `herokidstory-ec2-s3` (veya verdiğin ad) seç → **Update IAM role**.
 
 ---
 
@@ -170,7 +170,7 @@ Hata alırsan: IAM role’ün instance’a atandığını ve policy’de bucket 
 
 ## Özet checklist
 
-- [x] Adım 1: Tek bucket oluşturuldu. Bucket adı: **kidstorybook** (eu-central-1).
+- [x] Adım 1: Tek bucket oluşturuldu. Bucket adı: **herokidstory** (eu-central-1).
 - [x] Adım 2: Prefix’ler (photos, books, pdfs, covers) oluşturuldu.
 - [x] Adım 3: Block public access Off; bucket policy (books/, pdfs/, covers/ public read) eklendi.
 - [x] Adım 4: IAM policy + EC2 role oluşturuldu, role EC2’ye atandı.

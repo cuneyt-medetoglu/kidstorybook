@@ -1,4 +1,4 @@
-# 📋 KidStoryBook - Dokümantasyon Haritası
+# 📋 HeroKidStory - Dokümantasyon Haritası
 
 **Tarih:** 2 Şubat 2026  
 **FAZ 1 Çıktısı:** Tüm MD dosyalarının kategorisi ve özeti  

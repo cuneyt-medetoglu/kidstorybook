@@ -1,5 +1,5 @@
 # 📄 Product Requirements Document (PRD)
-# KidStoryBook Platform
+# HeroKidStory Platform
 
 **Versiyon:** 1.6  
 **Tarih:** 21 Aralık 2025  
@@ -13,7 +13,7 @@
 ## 1. Executive Summary
 
 ### 1.1 Ürün Vizyonu
-KidStoryBook, ebeveynlerin çocuklarının fotoğraflarını kullanarak AI destekli, kişiselleştirilmiş çocuk hikaye kitapları oluşturduğu bir SaaS platformudur.
+HeroKidStory, ebeveynlerin çocuklarının fotoğraflarını kullanarak AI destekli, kişiselleştirilmiş çocuk hikaye kitapları oluşturduğu bir SaaS platformudur.
 
 ### 1.2 Problem
 - Ebeveynler özel ve anlamlı hediyeler arıyor; mevcut kitaplar generic.

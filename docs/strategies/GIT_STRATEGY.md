@@ -89,9 +89,9 @@ chore: next.js 14'e güncellendi
 
 | Branch | Vercel Ortamı | URL |
 |--------|---------------|-----|
-| main | Production | kidstorybook.vercel.app |
-| develop | Staging | kidstorybook-dev.vercel.app |
-| feature/* | Preview | kidstorybook-pr-{id}.vercel.app |
+| main | Production | herokidstory.vercel.app |
+| develop | Staging | herokidstory-dev.vercel.app |
+| feature/* | Preview | herokidstory-pr-{id}.vercel.app |
 
 ## Git Ignore
 

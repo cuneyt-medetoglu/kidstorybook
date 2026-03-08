@@ -46,7 +46,7 @@
 
 ### Adım 1.2 – IAM kullanıcı (konsol yerine CLI/terraform için)
 
-- [ ] **Yapılacak:** Root ile günlük iş yapma. Mümkünse bir IAM kullanıcı oluştur (örn. `kidstorybook-admin`), konsol ve programatik erişim için.
+- [ ] **Yapılacak:** Root ile günlük iş yapma. Mümkünse bir IAM kullanıcı oluştur (örn. `herokidstory-admin`), konsol ve programatik erişim için.
 - [ ] **Yapılacak:** Bu kullanıcıya EC2, S3, CloudWatch (alarm için) yetkisi ver (gerekirse “PowerUser” veya ilgili policy’leri ekle).
 - [ ] **Yapılacak:** Erişim anahtarı (Access Key) oluşturup güvenli yerde sakla; `aws configure` ile local’de kullanacaksan yapılandır.
 
@@ -81,7 +81,7 @@
 
 ### Adım 2.2 – Güvenlik grubu
 
-- [ ] **Yapılacak:** Yeni güvenlik grubu oluştur (örn. `kidstorybook-sg`).
+- [ ] **Yapılacak:** Yeni güvenlik grubu oluştur (örn. `herokidstory-sg`).
 - [ ] **Yapılacak:** Inbound kurallar:
   - SSH (22) — sadece senin IP’nden (mümkünse).
   - HTTP (80) — 0.0.0.0/0 (web).
@@ -89,7 +89,7 @@
 - [ ] **Yapılacak:** Outbound: Tüm trafik (varsayılan) kalabilir.
 
 **Bu adım sonrası bana şunu bildir:**
-- Güvenlik grubu adı veya ID’si (örn. `sg-xxxxx` veya `kidstorybook-sg`).
+- Güvenlik grubu adı veya ID’si (örn. `sg-xxxxx` veya `herokidstory-sg`).
 
 - [x] **Ben bu adımı tamamladım ve yukarıdaki bilgiyi sana bildirdim.** — Launch wizard'da New security group (SSH + HTTP + HTTPS).
 
@@ -151,14 +151,14 @@
 
 ### Adım 3.2 – Veritabanı ve kullanıcı
 
-- [x] **Yapılacak:** Uygulama için bir DB kullanıcısı ve veritabanı oluştur (örn. kullanıcı: `kidstorybook`, DB: `kidstorybook`). Şifreyi güvenli belirle.
+- [x] **Yapılacak:** Uygulama için bir DB kullanıcısı ve veritabanı oluştur (örn. kullanıcı: `herokidstory`, DB: `herokidstory`). Şifreyi güvenli belirle.
 - [x] **Yapılacak:** `pg_hba.conf` ile sadece local (127.0.0.1) veya instance içinden erişime izin ver; dışarıya 5432 açma (güvenlik).
 
 **Bu adım sonrası bana şunu bildir:**
 - Veritabanı adı ve kullanıcı adı (şifreyi **gönderme**, sadece “oluşturuldu” de).
 - Uygulama bu kullanıcı ile localhost üzerinden bağlanacak; bunu onaylıyor musun? (Evet/Hayır)
 
-- [x] **Ben bu adımı tamamladım ve yukarıdaki bilgiyi sana bildirdim.** — DB ve kullanıcı: kidstorybook, localhost.
+- [x] **Ben bu adımı tamamladım ve yukarıdaki bilgiyi sana bildirdim.** — DB ve kullanıcı: herokidstory, localhost.
 
 ---
 
@@ -187,7 +187,7 @@
 
 ### Adım 4.1 – Tek bucket + prefix'ler
 
-- [ ] **Yapılacak:** Aynı bölgede (Faz 1’deki BÖLGE) 4 bucket oluştur. İsimler global benzersiz olmalı (örn. `kidstorybook-photos-XXXX`, `kidstorybook-books-XXXX` — XXXX = hesap/randomsuffix).
+- [ ] **Yapılacak:** Aynı bölgede (Faz 1’deki BÖLGE) 4 bucket oluştur. İsimler global benzersiz olmalı (örn. `herokidstory-photos-XXXX`, `herokidstory-books-XXXX` — XXXX = hesap/randomsuffix).
 - [ ] **Yapılacak:** Public read gereken bucket’lar (books, pdfs, covers) için “Block public access” ayarlarını ihtiyaca göre kaldır veya bucket policy ile sadece belirli path’lere public read ver.
 - [ ] **Yapılacak:** photos bucket’ı private kalsın.
 
@@ -281,7 +281,7 @@
 
 **Bu adım sonrası bana şunu bildir:**
 - Nginx kuruldu mu? (Evet/Hayır)
-- Domain kullanıyor musun? (Evet/Hayır). Evet ise domain adı (örn. app.kidstorybook.com).
+- Domain kullanıyor musun? (Evet/Hayır). Evet ise domain adı (örn. app.herokidstory.com).
 - HTTPS aktif mi? (Evet/Hayır / Henüz değil)
 
 - [ ] **Ben bu adımı tamamladım ve yukarıdaki bilgiyi sana bildirdim.**

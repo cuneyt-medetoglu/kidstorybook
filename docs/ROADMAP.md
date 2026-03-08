@@ -1,10 +1,10 @@
-# 🗺️ KidStoryBook - Proje Yol Haritası
+# 🗺️ HeroKidStory - Proje Yol Haritası
 
-**Versiyon:** 2.1  
-**Tarih:** 4 Şubat 2026  
+**Versiyon:** 2.2  
+**Tarih:** 8 Mart 2026  
 **Durum:** AKTİF – Modüler yapı (detaylar `docs/roadmap/` altında)
 
-**Son güncelleme (7 Mart 2026):** Design Token renk sistemi tamamlandı (2.1.9 ✅). Hardcoded `purple/pink` → semantic `primary/brand-2` token; ~46 dosya migrate edildi; `globals.css`de 5 palet alternatifi hazır. Rehber: `docs/guides/THEME_AND_COLOR_GUIDE.md`. Önceki: 1 Mart 2026 — Custom tema (Step 3) eklendi.
+**Son güncelleme (8 Mart 2026):** Marka değişikliği KidStoryBook → herokidstory tamamlandı (repo, S3, DB, kod, UI). Detay: `docs/analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md`. Önceki: 7 Mart 2026 — Design Token renk sistemi.
 
 ---
 

@@ -270,7 +270,7 @@ const CHARACTER_OPTIONS = {
 ```typescript
 // Eski formatı yeni formata çevir
 useEffect(() => {
-  const saved = localStorage.getItem("kidstorybook_wizard")
+  const saved = localStorage.getItem("herokidstory_wizard")
   if (saved) {
     const data = JSON.parse(saved)
     
@@ -281,10 +281,10 @@ useEffect(() => {
         id: "1",
         characterType: { group: "Child", value: "Child", displayName: "Child" },
         photo: data.step2.characterPhoto,
-        characterId: localStorage.getItem("kidstorybook_character_id")
+        characterId: localStorage.getItem("herokidstory_character_id")
       }]
       delete data.step2.characterPhoto
-      localStorage.setItem("kidstorybook_wizard", JSON.stringify(data))
+      localStorage.setItem("herokidstory_wizard", JSON.stringify(data))
     }
   }
 }, [])
@@ -329,7 +329,7 @@ const handleFileUpload = async (characterId: string, file: File) => {
     const photoBase64 = dataUrl.split(",")[1]
 
     // Get step1 data
-    const saved = localStorage.getItem("kidstorybook_wizard")
+    const saved = localStorage.getItem("herokidstory_wizard")
     const wizardData = saved ? JSON.parse(saved) : {}
     const step1Data = wizardData.step1
 
@@ -379,7 +379,7 @@ const handleFileUpload = async (characterId: string, file: File) => {
             wizardData.step2.characters.push(characterData)
           }
           
-          localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+          localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
           
           toast({
             title: "Character Created!",
@@ -895,7 +895,7 @@ export async function POST(request: NextRequest) {
 const handleCreateBook = async () => {
   try {
     // localStorage'dan veriyi al
-    const saved = localStorage.getItem("kidstorybook_wizard")
+    const saved = localStorage.getItem("herokidstory_wizard")
     if (!saved) {
       toast({
         title: "Error",
@@ -922,7 +922,7 @@ const handleCreateBook = async () => {
         .map(char => char.characterId)
     } else if (step2?.characterPhoto) {
       // Eski format: tek karakterPhoto
-      const characterId = localStorage.getItem("kidstorybook_character_id")
+      const characterId = localStorage.getItem("herokidstory_character_id")
       if (characterId) {
         characterIds = [characterId]
       }
@@ -1024,7 +1024,7 @@ CREATE INDEX IF NOT EXISTS idx_characters_type ON public.characters USING GIN (c
 // app/create/step2/page.tsx
 
 useEffect(() => {
-  const saved = localStorage.getItem("kidstorybook_wizard")
+  const saved = localStorage.getItem("herokidstory_wizard")
   if (saved) {
     try {
       const data = JSON.parse(saved)
@@ -1042,14 +1042,14 @@ useEffect(() => {
             displayName: "Child",
           },
           photo: data.step2.characterPhoto,
-          characterId: localStorage.getItem("kidstorybook_character_id") || null,
+          characterId: localStorage.getItem("herokidstory_character_id") || null,
         }]
         
         // Eski alanı sil
         delete data.step2.characterPhoto
         
         // Kaydet
-        localStorage.setItem("kidstorybook_wizard", JSON.stringify(data))
+        localStorage.setItem("herokidstory_wizard", JSON.stringify(data))
         console.log('[Step 2] Migration completed')
       }
       

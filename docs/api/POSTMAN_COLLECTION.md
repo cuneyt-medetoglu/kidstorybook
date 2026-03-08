@@ -13,17 +13,17 @@
 
 ### Adım 2: Collection Dosyasını Seç
 1. **File** sekmesini seç
-2. `postman/KidStoryBook_API.postman_collection.json` dosyasını seç
+2. `postman/HeroKidStory_API.postman_collection.json` dosyasını seç
 3. **Import** butonuna tıkla
 
 ### Adım 3: Environment Dosyasını İçe Aktar
 1. Tekrar **Import** butonuna tıkla
-2. `postman/KidStoryBook_Environment.postman_environment.json` dosyasını seç
+2. `postman/HeroKidStory_Environment.postman_environment.json` dosyasını seç
 3. **Import** butonuna tıkla
 
 ### Adım 4: Environment'ı Aktif Et
 1. Sağ üst köşede **Environments** dropdown'ını aç (veya sağ üstte environment ikonuna tıkla)
-2. **KidStoryBook - Local Development** seçeneğini seç
+2. **HeroKidStory - Local Development** seçeneğini seç
 
 ### Adım 5: Environment Variables Ayarla
 
@@ -136,7 +136,7 @@ Collection'daki test script'leri otomatik olarak şu değişkenleri doldurur:
 ## 📊 Collection Yapısı
 
 ```
-KidStoryBook API
+HeroKidStory API
 ├── Authentication
 │   └── Get Auth Token (Login)
 ├── Characters
@@ -174,7 +174,7 @@ KidStoryBook API
    - Body (varsa)
    - Tests (success/error testleri ekle)
 4. Collection'ı export et
-5. `postman/KidStoryBook_API.postman_collection.json` dosyasını güncelle
+5. `postman/HeroKidStory_API.postman_collection.json` dosyasını güncelle
 
 ### Otomatik Test Script'leri
 
@@ -202,11 +202,11 @@ if (jsonData.data?.id) {
 ## 🚀 Hızlı Başlangıç
 
 ### 1. Collection'ı İçe Aktar
-- `postman/KidStoryBook_API.postman_collection.json`
-- `postman/KidStoryBook_Environment.postman_environment.json`
+- `postman/HeroKidStory_API.postman_collection.json`
+- `postman/HeroKidStory_Environment.postman_environment.json`
 
 ### 2. Environment'ı Aktif Et
-- **KidStoryBook - Local Development**
+- **HeroKidStory - Local Development**
 
 ### 3. Test Email/Password Ayarla
 - Environment variables'da `test_email` ve `test_password` güncelle

@@ -1,4 +1,4 @@
-# 🧹 KidStoryBook - Proje Temizlik ve Toparlama Planı
+# 🧹 HeroKidStory - Proje Temizlik ve Toparlama Planı
 
 **Tarih:** 2 Şubat 2026  
 **Durum:** PLANLAMA - Uygulamaya Hazır  

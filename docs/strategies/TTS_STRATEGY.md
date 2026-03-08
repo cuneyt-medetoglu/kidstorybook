@@ -21,7 +21,7 @@
 ## 🎯 Genel Bakış
 
 ### Amaç
-KidStoryBook platformunda, çocukların oluşturduğu hikaye kitaplarını sesli olarak dinleyebilmelerini sağlamak. Hikaye anlatıcı tonunda, doğal ve çocuk dostu bir ses deneyimi sunmak.
+HeroKidStory platformunda, çocukların oluşturduğu hikaye kitaplarını sesli olarak dinleyebilmelerini sağlamak. Hikaye anlatıcı tonunda, doğal ve çocuk dostu bir ses deneyimi sunmak.
 
 ### Hedef Kitle
 - **Birincil:** 3-10 yaş arası çocuklar
