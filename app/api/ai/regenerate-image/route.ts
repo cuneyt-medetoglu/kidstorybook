@@ -15,7 +15,7 @@ import { NextRequest } from "next/server"
 import { requireUser } from "@/lib/auth/api-auth"
 import { getUserRole } from "@/lib/db/users"
 import { getBookById, updateBook } from "@/lib/db/books"
-import { getCharacterById } from "@/lib/db/characters"
+import { getCharacterById, type Character } from "@/lib/db/characters"
 import { getLatestPageVersion, insertEditHistory, getEditHistory } from "@/lib/db/edit-history"
 import { uploadFile, getPublicUrl, getObjectBufferFromUrl } from "@/lib/storage/s3"
 import { buildCharacterPrompt, buildMultipleCharactersPrompt } from "@/lib/prompts/image/character"
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     }
     const characters = (
       await Promise.all(allCharacterIds.map((id) => getCharacterById(id).then((r) => r.data)))
-    ).filter(Boolean) as Awaited<ReturnType<typeof getCharacterById>>["data"][]
+    ).filter((c): c is Character => c != null)
     if (characters.length === 0) {
       return errorResponse("Could not load characters for this book", undefined, 400)
     }
