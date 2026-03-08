@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     const useMasterForClothing = pageMasterUrls.length > 0
 
     if (REGENERATE_DEBUG) {
-      const names = pageCharacters.map((id) => characters.find((c) => c.id === id)?.name || id)
+      const names = pageCharacters.map((id) => characters.find((c) => c != null && c.id === id)?.name || id)
       console.log("[Regenerate] SAYFA KARAKTERLERİ:", {
         pageCharacters: pageCharacters.length,
         names,
@@ -233,7 +233,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 9. Karakter prompt (create-book ile aynı) ──────────────────────────
-    const mainChar = characters.find((c) => c.id === pageCharacters[0]) || characters[0]
+    const mainChar = characters.find((c) => c != null && c.id === pageCharacters[0]) || characters[0]
     const pageAdditionalCharacters = pageCharacters
       .slice(1)
       .map((charId) => {
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
       totalPages,
       pageCharacters.map((id) => ({
         id,
-        name: characters.find((c) => c.id === id)?.name || "Character",
+        name: characters.find((c) => c != null && c.id === id)?.name || "Character",
       }))
     )
 
@@ -306,7 +306,7 @@ export async function POST(request: NextRequest) {
     // Her karakter için: önce master, yoksa reference_photo_url (hiç ref kalmamasın)
     const pageCharacterUrls: string[] = []
     for (const charId of pageCharacters) {
-      const url = masterIllustrations[charId] || characters.find((c) => c.id === charId)?.reference_photo_url
+      const url = masterIllustrations[charId] || characters.find((c) => c != null && c.id === charId)?.reference_photo_url
       if (url) pageCharacterUrls.push(url)
     }
     const referenceImageUrls = [
@@ -334,7 +334,7 @@ export async function POST(request: NextRequest) {
       characterSources: pageCharacterUrls.map((url, i) => {
         const charId = pageCharacters[i]
         const isMaster = characterMasterUrls.includes(url)
-        const name = characters.find((c) => c.id === charId)?.name || charId
+        const name = characters.find((c) => c != null && c.id === charId)?.name || charId
         return `${name}:${isMaster ? "master" : "photo"}`
       }),
     })
@@ -350,7 +350,7 @@ export async function POST(request: NextRequest) {
       const label = isCharRef
         ? (() => {
             const charId = pageCharacters[i] || `unknown_${i}`
-            const charName = characters.find((c) => c.id === charId)?.name || `char_${i + 1}`
+            const charName = characters.find((c) => c != null && c.id === charId)?.name || `char_${i + 1}`
             return isMaster ? `master_${charName}` : `photo_${charName}`
           })()
         : (() => {
