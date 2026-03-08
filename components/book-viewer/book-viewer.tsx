@@ -440,7 +440,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
         })
       }, 1000)
     }
-  }, [autoplayMode, totalPages, book?.pages, play, selectedVoice, ttsSpeed, ttsVolume, isMuted])
+  }, [autoplayMode, totalPages, book?.pages, book?.language, play, ttsSpeed, ttsVolume, isMuted])
 
   // Set up TTS ended callback
   useEffect(() => {
@@ -495,7 +495,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
         })
       }
     }
-  }, [isPlaying, isPaused, autoplayMode, currentPage, book?.pages, play, resume, stop, selectedVoice, ttsSpeed, ttsVolume, isMuted])
+  }, [isPlaying, isPaused, autoplayMode, currentPage, book?.pages, book?.language, play, resume, stop, ttsSpeed, ttsVolume, isMuted])
 
   // Toggle autoplay mode
   const handleAutoplayToggle = useCallback(() => {
@@ -516,7 +516,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
       setAutoplayMode("off")
       stop()
     }
-  }, [autoplayMode, currentPage, book?.pages, play, stop, selectedVoice, ttsSpeed, ttsVolume, isMuted])
+  }, [autoplayMode, currentPage, book?.pages, book?.language, play, stop, ttsSpeed, ttsVolume, isMuted])
 
   // Toggle bookmark for current page
   const toggleBookmark = useCallback(() => {
@@ -663,7 +663,7 @@ export function BookViewer({ bookId, onClose, useExampleApi = false }: BookViewe
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [currentPage, stop, autoplayMode, book?.pages, play, selectedVoice, ttsSpeed, ttsVolume, isMuted])
+  }, [currentPage, stop, autoplayMode, book?.pages, book?.language, play, ttsSpeed, ttsVolume, isMuted])
 
   // Show loading state
   if (isLoadingBook) {

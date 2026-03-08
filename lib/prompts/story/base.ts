@@ -900,8 +900,9 @@ function getLanguageName(language: string = 'en'): string {
   return languageMap[language] || 'English'
 }
 
-export default {
+const baseStoryPrompts = {
   VERSION,
   generateStoryPrompt,
 }
+export default baseStoryPrompts
 

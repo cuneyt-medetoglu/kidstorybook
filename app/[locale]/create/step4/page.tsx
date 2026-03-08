@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   Box,
@@ -327,16 +328,16 @@ export default function Step4Page() {
                       {/* Preview Image Area - 1024x1536 (2:3 aspect ratio) */}
                       <div className="relative aspect-[2/3] overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-600">
                         {/* Style Example Image */}
-                        <img
+                        <Image
                           src={`/illustration-styles/${style.id}.jpg`}
                           alt={`${style.title} style example`}
-                          className="h-full w-full object-cover"
+                          fill
+                          className="object-cover"
                           onError={(e) => {
-                            // Fallback to gradient if image not found
                             const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
+                            target.style.display = "none"
                             const fallback = target.nextElementSibling as HTMLElement
-                            if (fallback) fallback.style.display = 'block'
+                            if (fallback) fallback.style.display = "block"
                           }}
                         />
                         {/* Fallback gradient (shown if image fails to load) */}

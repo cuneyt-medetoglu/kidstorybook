@@ -103,7 +103,7 @@ function DraftPreviewContent() {
     }
 
     loadDraft()
-  }, [draftId, router, toast])
+  }, [draftId, router, toast, t])
 
   const handleBuyFullBook = () => {
     if (!draft) return

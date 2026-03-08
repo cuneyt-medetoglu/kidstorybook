@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import {
@@ -192,7 +193,7 @@ export default function Step2Page() {
     return null
   }
 
-  const handleFileUpload = async (characterId: string, file: File) => {
+  const handleFileUpload = useCallback(async (characterId: string, file: File) => {
     const error = validateFile(file)
 
     if (error) {
@@ -444,7 +445,7 @@ export default function Step2Page() {
         variant: "destructive",
       })
     }
-  }
+  }, [characters, toast, step1Data])
 
   const handleFileDrop = useCallback(
     (characterId: string, e: React.DragEvent<HTMLDivElement>) => {
@@ -460,7 +461,7 @@ export default function Step2Page() {
         handleFileUpload(characterId, file)
       }
     },
-    [step1Data], // Add step1Data as dependency
+    [handleFileUpload],
   )
 
   const handleFileInput = (characterId: string, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1322,11 +1323,13 @@ export default function Step2Page() {
                           transition={{ duration: 0.4 }}
                           className="relative mx-auto max-w-sm"
                         >
-                          <div className="relative overflow-hidden rounded-lg shadow-xl">
-                            <img
+                          <div className="relative overflow-hidden rounded-lg shadow-xl aspect-[2/3]">
+                            <Image
                               src={character.previewUrl || ""}
                               alt={`${character.characterType.displayName} preview`}
-                              className="h-auto w-full object-cover"
+                              fill
+                              className="object-cover"
+                              unoptimized
                             />
 
                             <motion.button

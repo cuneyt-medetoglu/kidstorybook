@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -129,11 +130,12 @@ export function DebugModal({
                 <div className="border rounded-lg p-4 bg-white">
                   <h3 className="text-sm font-semibold mb-2">Görsel Önizleme</h3>
                   <div className="relative w-48 h-64 bg-slate-100 rounded overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={imageUrl}
                       alt="Preview"
-                      className="w-full h-full object-contain"
+                      fill
+                      className="object-contain"
+                      unoptimized
                     />
                   </div>
                   <a

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { X, RotateCcw, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -33,11 +33,7 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
   const [quotaLimit, setQuotaLimit] = useState(3)
   const [isReverting, setIsReverting] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchEditHistory()
-  }, [bookId])
-
-  const fetchEditHistory = async () => {
+  const fetchEditHistory = useCallback(async () => {
     try {
       setIsLoading(true)
       const response = await fetch(`/api/books/${bookId}/edit-history`)
@@ -60,7 +56,11 @@ export function EditHistoryPanel({ bookId, onClose, onRevert }: EditHistoryPanel
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [bookId, toast])
+
+  useEffect(() => {
+    fetchEditHistory()
+  }, [fetchEditHistory])
 
   const handleRevert = async (pageNumber: number, version: number) => {
     try {

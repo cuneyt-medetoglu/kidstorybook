@@ -309,10 +309,11 @@ ${changes.map(change => `- ${change}`).join('\n')}
 // Export Summary
 // ============================================================================
 
-export default {
+const versionSyncConfig = {
   scanPromptVersions,
   checkSyncStatus,
   calculateNextVersion,
   suggestBumpType,
   generateChangelogEntry,
 }
+export default versionSyncConfig

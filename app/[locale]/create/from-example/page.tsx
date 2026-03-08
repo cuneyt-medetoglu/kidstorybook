@@ -3,6 +3,7 @@
 import { Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { useRouter, Link } from "@/i18n/navigation"
+import Image from "next/image"
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useTranslations } from "next-intl"
 import { motion } from "framer-motion"
@@ -146,7 +147,7 @@ function FromExampleContent() {
       }
     }
     fetchExample()
-  }, [exampleId, router, toast])
+  }, [exampleId, router, toast, t])
 
   useEffect(() => {
     if (characterCount > 0 && characters.length !== characterCount) {
@@ -190,7 +191,7 @@ function FromExampleContent() {
       return
     }
     updateCharacter(index, { photoFile: file, photoPreview: URL.createObjectURL(file), uploadError: null })
-  }, [])
+  }, [t, toast])
 
   const handleFileDrop = useCallback((index: number, e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -510,8 +511,14 @@ function FromExampleContent() {
                         </motion.div>
                       ) : (
                         <div className="relative mx-auto max-w-sm">
-                          <div className="relative overflow-hidden rounded-lg shadow-xl">
-                            <img src={char.photoPreview} alt={`Preview ${index + 1}`} className="h-auto w-full object-cover" />
+                          <div className="relative overflow-hidden rounded-lg shadow-xl aspect-square">
+                            <Image
+                              src={char.photoPreview}
+                              alt={`Preview ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
                             <motion.button
                               type="button"
                               whileHover={{ scale: 1.1 }}

@@ -1743,7 +1743,7 @@ export function getSceneDiversityDirectives(previousScene?: SceneDiversityAnalys
   return changes.length > 0 ? `DIVERSITY: Change ${changes.join(', ')}` : ''
 }
 
-export default {
+const scenePrompts = {
   VERSION,
   generateScenePrompt,
   generateFullPagePrompt,
@@ -1764,4 +1764,5 @@ export default {
   getCameraAngleDirectives,
   getCharacterEnvironmentRatio,
 }
+export default scenePrompts
 

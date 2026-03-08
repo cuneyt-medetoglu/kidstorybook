@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { X, Paintbrush, Eraser, RotateCcw, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
@@ -188,10 +189,12 @@ export function ImageEditModal({
             <div className="relative border-2 border-dashed border-border rounded-lg overflow-hidden bg-muted">
               <div className="relative w-full" style={{ aspectRatio: '1024/1536', maxWidth: '100%', maxHeight: '600px', margin: '0 auto' }}>
                 {/* Background Image - maintains original aspect ratio */}
-                <img
+                <Image
                   src={currentImageUrl}
                   alt={`Page ${pageNumber} - Original`}
-                  className="absolute inset-0 w-full h-full object-contain"
+                  fill
+                  className="object-contain"
+                  unoptimized
                 />
                 {/* Canvas Overlay - for drawing mask */}
                 <ReactSketchCanvas

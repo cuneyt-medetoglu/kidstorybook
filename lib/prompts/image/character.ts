@@ -585,7 +585,7 @@ export function getCoverQualityEmphasisPrompt(
   return parts.join('\n')
 }
 
-export default {
+const characterPrompts = {
   VERSION,
   generateCharacterAnalysisPrompt,
   buildCharacterPrompt,
@@ -599,4 +599,5 @@ export default {
   getCoverReferenceConsistencyPrompt,
   getCoverQualityEmphasisPrompt,
 }
+export default characterPrompts
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { useRouter } from "@/i18n/navigation"
 import { useTranslations } from "next-intl"
@@ -144,7 +145,7 @@ export default function LibraryPage() {
     }
     
     fetchBooks()
-  }, [router, toast, session, status])
+  }, [router, toast, session, status, t])
 
   // Filter and search (moved before early return to fix hooks order)
   const filteredBooks = useMemo(() => {
@@ -680,10 +681,11 @@ export default function LibraryPage() {
                     {/* Book Cover */}
                     <div className="relative mb-4 overflow-hidden rounded-lg aspect-[3/4] bg-muted">
                       {book.coverImage ? (
-                        <img
+                        <Image
                           src={book.coverImage}
                           alt={book.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">

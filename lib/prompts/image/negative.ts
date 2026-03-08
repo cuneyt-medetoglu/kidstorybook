@@ -417,7 +417,7 @@ export function getContentSafetyFilter(): string[] {
   ]
 }
 
-export default {
+const negativePrompts = {
   VERSION,
   UNIVERSAL_NEGATIVE,
   AGE_SPECIFIC_NEGATIVE,
@@ -433,4 +433,5 @@ export default {
   getDefaultHandStrategy,
   getHandDirectivesWhenVisible,
 }
+export default negativePrompts
 
