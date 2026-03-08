@@ -46,6 +46,7 @@ const LOCALE_META: Record<string, { flag: string; label: string }> = {
 
 export function Header() {
   const t = useTranslations("nav")
+  const tCommon = useTranslations("common")
   const locale = useLocale()
   const { theme, setTheme } = useTheme()
   const router = useRouter()
@@ -336,15 +337,16 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="right"
-              className="w-[320px] rounded-l-3xl border-l-0 bg-gradient-to-br from-white via-primary/5 to-brand-2/5 backdrop-blur-md dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900"
+              hideCloseButton
+              className="w-[320px] max-w-[calc(100vw-2rem)] rounded-l-3xl border-l-0 bg-gradient-to-br from-white via-primary/5 to-brand-2/5 backdrop-blur-md dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900"
             >
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3 }}
-                className="flex h-full flex-col"
+                className="flex h-full min-h-0 flex-col overflow-y-auto"
               >
-                <div className="mb-8 flex items-center justify-between">
+                <div className="mb-8 flex shrink-0 items-center justify-between">
                   <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
                     KidStoryBook
                   </span>
@@ -352,7 +354,8 @@ export function Header() {
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="h-8 w-8 rounded-full hover:bg-primary/10 dark:hover:bg-slate-700"
+                    aria-label={tCommon("close")}
+                    className="h-11 w-11 min-h-[44px] min-w-[44px] touch-manipulation rounded-full hover:bg-primary/10 dark:hover:bg-slate-700"
                   >
                     <X className="h-5 w-5 text-gray-800 dark:text-slate-100" />
                   </Button>
