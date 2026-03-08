@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Sparkles, Heart, BookOpen, Star } from "lucide-react"
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { HeroBookTransformation } from "./HeroBookTransformation"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
@@ -11,12 +11,22 @@ import { Link } from "@/i18n/navigation"
 export function Hero() {
   const t = useTranslations("hero")
   const heroRef = useRef<HTMLDivElement>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   })
 
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    const set = () => setIsMobile(mq.matches)
+    set()
+    mq.addEventListener("change", set)
+    return () => mq.removeEventListener("change", set)
+  }, [])
 
   const getFloatingAnimation = (i: number) => ({
     y: [0, -20, 0],
@@ -143,13 +153,13 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right Column — Book Transformation */}
+          {/* Right Column — mobilde parallax kapalı (scroll takılmasını önler), will-change-transform ile GPU katmanı */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="relative"
-            style={{ y: imageY }}
+            className="relative will-change-transform"
+            style={{ y: isMobile ? 0 : imageY }}
           >
             <div className="absolute inset-0 -z-10 rounded-3xl bg-gradient-to-br from-primary/20 to-brand-2/20 blur-3xl" />
             <HeroBookTransformation />

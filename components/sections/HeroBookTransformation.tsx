@@ -7,44 +7,42 @@ import Image from "next/image"
 import { useTranslations } from "next-intl"
 import { heroTransformationConfig } from "@/lib/config/hero-transformation"
 
-// Sabit parçacık konfigürasyonu — her tema geçişinde aynı değerler, GPU/render tutarlı
-const PARTICLE_CONFIGS = Array.from({ length: 20 }, (_, i) => ({
-  x: 50 + (((i * 137.5) % 100) - 50),
-  y: 50 + (((i * 97.3) % 100) - 50),
-  delay: (i * 0.15) % 3,
+// 12 parçacık, sabit seed — mobilde kapatılacak; rotate/Sparkles yok (GPU tasarrufu)
+const PARTICLE_DATA = Array.from({ length: 12 }, (_, i) => ({
+  xEnd: `${(i * 137.5) % 100}%`,
+  yEnd: `${(i * 97.3) % 100}%`,
   duration: 2 + (i % 4) * 0.5,
+  delay: (i * 0.4) % 3,
 }))
 
 // Floating magical particles — seed tabanlı, remount’ta aynı animasyon
-function MagicalParticles({ colors }: { colors: string[] }) {
+function MagicalParticles({ colors, enabled }: { colors: string[]; enabled: boolean }) {
+  if (!enabled) return null
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {PARTICLE_CONFIGS.map((cfg, i) => (
+      {PARTICLE_DATA.map((p, i) => (
         <motion.div
           key={i}
           className="absolute"
           initial={{ x: "50%", y: "50%", opacity: 0, scale: 0 }}
           animate={{
-            x: `${cfg.x}%`,
-            y: `${cfg.y}%`,
+            x: p.xEnd,
+            y: p.yEnd,
             opacity: [0, 1, 0],
             scale: [0, 1, 0],
-            rotate: [0, 180, 360],
           }}
           transition={{
-            duration: cfg.duration,
+            duration: p.duration,
             repeat: Infinity,
-            delay: cfg.delay,
+            delay: p.delay,
             ease: "easeOut",
           }}
         >
-          {i % 3 === 0 ? (
-            <Star className="h-3 w-3 text-yellow-400 drop-shadow-lg" fill="currentColor" />
-          ) : i % 3 === 1 ? (
-            <Sparkles className="h-4 w-4 text-white drop-shadow-lg" />
+          {i % 2 === 0 ? (
+            <Star className="h-3 w-3 text-yellow-400" fill="currentColor" />
           ) : (
             <div
-              className="h-2 w-2 rounded-full shadow-lg"
+              className="h-2 w-2 rounded-full"
               style={{ backgroundColor: colors[i % colors.length] }}
             />
           )}
@@ -100,6 +98,7 @@ function MagicArrow() {
 export function HeroBookTransformation() {
   const t = useTranslations("hero.transformation")
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
 
   const currentItem = heroTransformationConfig[currentIndex]
   const Icon = currentItem.icon
@@ -109,6 +108,14 @@ export function HeroBookTransformation() {
       setCurrentIndex((prev) => (prev + 1) % heroTransformationConfig.length)
     }, 6000)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    const set = () => setIsMobile(mq.matches)
+    set()
+    mq.addEventListener("change", set)
+    return () => mq.removeEventListener("change", set)
   }, [])
 
   return (
@@ -246,7 +253,9 @@ export function HeroBookTransformation() {
                         sizes="(max-width: 768px) 100vw, 40vw"
                         priority={index === 0}
                       />
-                      {isActive && <MagicalParticles colors={item.sparkleColors} />}
+                      {isActive && (
+                        <MagicalParticles colors={item.sparkleColors} enabled={!isMobile} />
+                      )}
                     </div>
                   )
                 })}
@@ -266,9 +275,9 @@ export function HeroBookTransformation() {
               </div>
 
               <motion.div
-                animate={{ opacity: [0, 0.4, 0], scale: [0.98, 1.02, 0.98] }}
+                animate={{ opacity: [0, 0.4, 0] }}
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentItem.gradient} blur-xl transition-colors duration-700`}
+                className={`absolute -inset-1 -z-10 rounded-2xl bg-gradient-to-r ${currentItem.gradient} blur-xl will-change-[opacity] transition-colors duration-700`}
               />
             </div>
           </motion.div>
