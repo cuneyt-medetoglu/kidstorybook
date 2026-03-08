@@ -192,7 +192,7 @@ export default function Step6Page() {
 
   // Load wizard data from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("kidstorybook_wizard")
+    const saved = localStorage.getItem("herokidstory_wizard")
     if (saved) {
       try {
         const data = JSON.parse(saved)
@@ -241,7 +241,7 @@ export default function Step6Page() {
           id: "1",
           characterType: { group: "Child", value: "Child", displayName: "Child" },
           photo: wizardData.step2.characterPhoto,
-          characterId: localStorage.getItem("kidstorybook_character_id") || null,
+          characterId: localStorage.getItem("herokidstory_character_id") || null,
         },
       ]
     }
@@ -422,7 +422,7 @@ export default function Step6Page() {
     const chars = getCharactersData()
     const characterIds = getCharacterIdsForApi(chars)
     const singleId = characterIds.length === 1 ? characterIds[0] : null
-    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("kidstorybook_character_id") : null
+    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("herokidstory_character_id") : null
     const themeKey =
       wizardData?.step3?.theme?.id ||
       (typeof wizardData?.step3?.theme === "string" ? wizardData.step3.theme : "") ||
@@ -505,7 +505,7 @@ export default function Step6Page() {
     const chars = getCharactersData()
     const characterIds = getCharacterIdsForApi(chars)
     const singleId = characterIds.length === 1 ? characterIds[0] : null
-    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("kidstorybook_character_id") : null
+    const fallbackId = typeof localStorage !== "undefined" ? localStorage.getItem("herokidstory_character_id") : null
 
     const themeKey =
       wizardData?.step3?.theme?.id ||

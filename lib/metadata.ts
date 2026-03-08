@@ -11,7 +11,7 @@ import { getTranslations } from 'next-intl/server'
 import { routing } from '@/i18n/routing'
 import type { Metadata } from 'next'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://kidstorybook.com'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://herokidstory.com'
 
 /** Build hreflang alternate links for all supported locales */
 function buildAlternates(path: string = '') {

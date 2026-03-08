@@ -36,7 +36,7 @@ export interface DraftData {
   }
 }
 
-const DRAFT_STORAGE_KEY = "kidstorybook_drafts"
+const DRAFT_STORAGE_KEY = "herokidstory_drafts"
 const DRAFT_EXPIRY_DAYS = 30
 
 /**

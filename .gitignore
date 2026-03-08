@@ -59,6 +59,8 @@ next-env.d.ts
 # API Keys (güvenlik)
 docs/API_KEYS.md
 poc/Untitled
+*accessKeys*.csv
+herokidstory_accessKeys.csv
 
 # Google Cloud Service Account Keys
 *.json
@@ -73,4 +75,4 @@ poc/Untitled
 !messages/*.json
 nul
 
-kidstorybook-key.pem
+herokidstory-key.pem

@@ -98,7 +98,7 @@ export function Footer() {
           >
             <Link href="/">
               <h3 className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-2xl font-bold text-transparent">
-                KidStoryBook
+                HeroKidStory
               </h3>
             </Link>
             <p className="text-sm text-gray-600 dark:text-slate-400">
@@ -251,7 +251,7 @@ export function Footer() {
         >
           {/* Copyright */}
           <p className="text-center text-sm text-gray-600 dark:text-slate-400">
-            © {new Date().getFullYear()} KidStoryBook. {t("allRightsReserved")}
+            © {new Date().getFullYear()} HeroKidStory. {t("allRightsReserved")}
           </p>
 
           {/* Legal Links */}

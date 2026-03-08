@@ -1,5 +1,5 @@
 {
-  "name": "kidstorybook",
+  "name": "herokidstory",
   "version": "1.0.0",
   "description": "AI destekli kişiselleştirilmiş çocuk hikaye kitapları oluşturma platformu.",
   "main": "index.js",
@@ -17,8 +17,8 @@
     "optimize-images": "node scripts/optimize-hero-images.mjs",
     "copy-examples-to-locale": "tsx scripts/copy-examples-to-locale.ts",
     "roadmap": "node scripts/generate-roadmap-csv.js",
-    "ssh:server": "ssh -i kidstorybook-key.pem ubuntu@18.184.150.1",
-    "ssh:tunnel": "ssh -i kidstorybook-key.pem -L 5432:localhost:5432 ubuntu@18.184.150.1",
+    "ssh:server": "ssh -i herokidstory-key.pem ubuntu@18.184.150.1",
+    "ssh:tunnel": "ssh -i herokidstory-key.pem -L 5432:localhost:5432 ubuntu@18.184.150.1",
     "clean": "npx rimraf .next",
     "clean:all": "npx rimraf node_modules .next",
     "build:local": "npx next build",
@@ -27,16 +27,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://cuneyt-medetoglu@github.com/cuneyt-medetoglu/kidstorybook.git"
+    "url": "git+https://cuneyt-medetoglu@github.com/cuneyt-medetoglu/herokidstory.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/cuneyt-medetoglu/kidstorybook/issues"
+    "url": "https://github.com/cuneyt-medetoglu/herokidstory/issues"
   },
-  "homepage": "https://github.com/cuneyt-medetoglu/kidstorybook#readme",
+  "homepage": "https://github.com/cuneyt-medetoglu/herokidstory#readme",
   "dependencies": {
     "@auth/pg-adapter": "^1.11.1",
     "@aws-sdk/client-s3": "^3.985.0",

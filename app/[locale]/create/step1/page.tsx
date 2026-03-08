@@ -76,7 +76,7 @@ export default function Step1Page() {
           eyeColor: data.eyeColor,
         },
       }
-      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+      localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
       
       // Navigate to Step 2
       router.push("/create/step2")

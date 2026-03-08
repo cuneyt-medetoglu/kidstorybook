@@ -177,7 +177,7 @@ export default function Step4Page() {
     
     // Save illustration style to localStorage
     try {
-      const saved = localStorage.getItem("kidstorybook_wizard")
+      const saved = localStorage.getItem("herokidstory_wizard")
       const wizardData = saved ? JSON.parse(saved) : {}
       
       // Find full illustration style object
@@ -187,7 +187,7 @@ export default function Step4Page() {
         illustrationStyle: selectedStyleObj,
       }
       
-      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+      localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
     } catch (error) {
       console.error("Error saving step 4 data:", error)
     }

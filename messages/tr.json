@@ -26,54 +26,54 @@
     "retry": "Tekrar Dene"
   },
   "metadata": {
-    "siteName": "KidStoryBook",
+    "siteName": "HeroKidStory",
     "home": {
-      "title": "KidStoryBook - AI ile Kişiselleştirilmiş Çocuk Kitapları",
+      "title": "HeroKidStory - AI ile Kişiselleştirilmiş Çocuk Kitapları",
       "description": "Çocuğunuzun fotoğrafıyla AI destekli, kişiselleştirilmiş hikaye kitapları oluşturun. Çocuğunuzun kahraman olduğu sihirli hikayeler.",
-      "ogTitle": "KidStoryBook - AI ile Kişiselleştirilmiş Çocuk Kitapları",
+      "ogTitle": "HeroKidStory - AI ile Kişiselleştirilmiş Çocuk Kitapları",
       "ogDescription": "Çocuğunuzun fotoğrafıyla sihirli kişiselleştirilmiş hikaye kitapları oluşturun. AI destekli, sevgiyle basılmış."
     },
     "examples": {
-      "title": "Örnek Kitaplar - KidStoryBook",
+      "title": "Örnek Kitaplar - HeroKidStory",
       "description": "Kişiselleştirilmiş çocuk kitabı örneklerimize göz atın ve çocuğunuzun hikayesinin nasıl görüneceğini keşfedin.",
       "ogTitle": "Kişiselleştirilmiş Çocuk Kitabı Örnekleri",
       "ogDescription": "Çocuğunuzun kişiselleştirilmiş hikaye kitabının nasıl görüneceğini görün. AI ile oluşturulmuş örnekler."
     },
     "pricing": {
-      "title": "Fiyatlandırma - KidStoryBook",
+      "title": "Fiyatlandırma - HeroKidStory",
       "description": "Kişiselleştirilmiş hikaye kitabınız için en uygun planı seçin. E-kitap veya baskı seçenekleri mevcut.",
-      "ogTitle": "KidStoryBook Fiyatlandırma Planları",
+      "ogTitle": "HeroKidStory Fiyatlandırma Planları",
       "ogDescription": "Kişiselleştirilmiş çocuk hikaye kitabınız için uygun fiyatlı planlar. E-kitap ve ciltli baskı seçenekleri."
     },
     "dashboard": {
-      "title": "Kitaplığım - KidStoryBook",
+      "title": "Kitaplığım - HeroKidStory",
       "description": "Kişiselleştirilmiş çocuk kitaplarınızı yönetin"
     },
     "cart": {
-      "title": "Sepet - KidStoryBook",
+      "title": "Sepet - HeroKidStory",
       "description": "Alışveriş sepetiniz"
     },
     "checkout": {
-      "title": "Ödeme - KidStoryBook",
+      "title": "Ödeme - HeroKidStory",
       "description": "Siparişinizi tamamlayın"
     },
     "create": {
-      "title": "Kitabınızı Oluşturun - KidStoryBook",
+      "title": "Kitabınızı Oluşturun - HeroKidStory",
       "description": "Çocuğunuz için kişiselleştirilmiş hikaye kitabı oluşturmaya başlayın",
-      "ogTitle": "Kitabınızı Oluşturun - KidStoryBook",
+      "ogTitle": "Kitabınızı Oluşturun - HeroKidStory",
       "ogDescription": "Çocuğunuz için kişiselleştirilmiş hikaye kitabı oluşturmaya başlayın. AI destekli, sihirli hikayeler."
     },
     "authLogin": {
-      "title": "Giriş Yap - KidStoryBook",
-      "description": "KidStoryBook hesabınıza giriş yapın",
-      "ogTitle": "Giriş Yap - KidStoryBook",
-      "ogDescription": "KidStoryBook hesabınıza giriş yapın"
+      "title": "Giriş Yap - HeroKidStory",
+      "description": "HeroKidStory hesabınıza giriş yapın",
+      "ogTitle": "Giriş Yap - HeroKidStory",
+      "ogDescription": "HeroKidStory hesabınıza giriş yapın"
     },
     "authRegister": {
-      "title": "Hesap Oluştur - KidStoryBook",
-      "description": "Ücretsiz KidStoryBook hesabınızı oluşturun",
-      "ogTitle": "Hesap Oluştur - KidStoryBook",
-      "ogDescription": "Ücretsiz KidStoryBook hesabınızı oluşturun"
+      "title": "Hesap Oluştur - HeroKidStory",
+      "description": "Ücretsiz HeroKidStory hesabınızı oluşturun",
+      "ogTitle": "Hesap Oluştur - HeroKidStory",
+      "ogDescription": "Ücretsiz HeroKidStory hesabınızı oluşturun"
     }
   },
   "nav": {
@@ -138,7 +138,7 @@
     "cta": "Çocuğunuz için sihirli bir hikaye oluşturmaya hazır mısınız?"
   },
   "features": {
-    "title": "Neden KidStoryBook?",
+    "title": "Neden HeroKidStory?",
     "subtitle": "Sihirli hikayeler oluşturmak için ihtiyacınız olan her şey",
     "aiPowered": {
       "title": "AI Destekli Hikayeler",
@@ -1072,7 +1072,7 @@
   },
   "faq": {
     "title": "Sıkça Sorulan Sorular",
-    "subtitle": "KidStoryBook hakkında bilmeniz gereken her şey",
+    "subtitle": "HeroKidStory hakkında bilmeniz gereken her şey",
     "stillHaveQuestions": "Hâlâ sorunuz var mı?",
     "contactUs": "Bize Ulaşın",
     "q0": "Nasıl çalışır?",

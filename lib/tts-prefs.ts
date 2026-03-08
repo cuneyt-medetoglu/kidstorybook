@@ -3,7 +3,7 @@
  * Parent Settings'ten ve BookViewer'dan kullanılır.
  */
 
-const STORAGE_KEY = "kidstorybook_tts_prefs"
+const STORAGE_KEY = "herokidstory_tts_prefs"
 
 export interface TtsPrefs {
   ttsSpeed: number

@@ -33,8 +33,8 @@ export interface WizardState {
   }
 }
 
-const WIZARD_STATE_KEY = "kidstorybook_wizard_state"
-const WIZARD_DRAFT_ID_KEY = "kidstorybook_wizard_draft_id"
+const WIZARD_STATE_KEY = "herokidstory_wizard_state"
+const WIZARD_DRAFT_ID_KEY = "herokidstory_wizard_draft_id"
 
 /**
  * Save wizard state to localStorage

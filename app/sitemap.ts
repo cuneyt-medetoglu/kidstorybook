@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { routing } from '@/i18n/routing'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://kidstorybook.com'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://herokidstory.com'
 
 /** Public routes to include in sitemap (no auth required) */
 const PUBLIC_ROUTES = [

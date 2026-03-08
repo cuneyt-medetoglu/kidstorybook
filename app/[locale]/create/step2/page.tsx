@@ -120,7 +120,7 @@ export default function Step2Page() {
 
   // Load Step 1 data from localStorage + Migration logic
   useEffect(() => {
-    const saved = localStorage.getItem("kidstorybook_wizard")
+    const saved = localStorage.getItem("herokidstory_wizard")
     if (saved) {
       try {
         const data = JSON.parse(saved)
@@ -140,7 +140,7 @@ export default function Step2Page() {
                 displayName: "Child",
               },
               photo: data.step2.characterPhoto,
-              characterId: localStorage.getItem("kidstorybook_character_id") || null,
+              characterId: localStorage.getItem("herokidstory_character_id") || null,
             },
           ]
 
@@ -148,7 +148,7 @@ export default function Step2Page() {
           delete data.step2.characterPhoto
 
           // Save migrated data
-          localStorage.setItem("kidstorybook_wizard", JSON.stringify(data))
+          localStorage.setItem("herokidstory_wizard", JSON.stringify(data))
           console.log("[Step 2] Migration completed")
         }
 
@@ -239,7 +239,7 @@ export default function Step2Page() {
         }
 
         // Save to localStorage (NEW: characters array)
-        const saved = localStorage.getItem("kidstorybook_wizard")
+        const saved = localStorage.getItem("herokidstory_wizard")
         const wizardData = saved ? JSON.parse(saved) : {}
         
         // Initialize step2.characters if not exists
@@ -296,7 +296,7 @@ export default function Step2Page() {
           wizardData.step2.characters.push(characterData)
         }
 
-        localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+        localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
         console.log("[Step 2] Saved photo to localStorage (character array):", characterData)
 
         // Create character in database (each character gets its own API call)
@@ -396,17 +396,17 @@ export default function Step2Page() {
             const createdCharacterId = createCharResult.character?.id
             if (createdCharacterId) {
               // Update characterId in the array
-              const savedAgain = localStorage.getItem("kidstorybook_wizard")
+              const savedAgain = localStorage.getItem("herokidstory_wizard")
               const wizardDataAgain = savedAgain ? JSON.parse(savedAgain) : {}
               const charIndexAgain = wizardDataAgain.step2.characters.findIndex((c: any) => c.id === characterId)
               if (charIndexAgain >= 0) {
                 wizardDataAgain.step2.characters[charIndexAgain].characterId = createdCharacterId
-                localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardDataAgain))
+                localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardDataAgain))
               }
 
               // Keep old localStorage key for backward compatibility (first character only)
               if (characterId === "1" || characters.length === 1) {
-                localStorage.setItem("kidstorybook_character_id", createdCharacterId)
+                localStorage.setItem("herokidstory_character_id", createdCharacterId)
               }
 
               console.log("[Step 2] Character created:", {
@@ -491,7 +491,7 @@ export default function Step2Page() {
     })
 
     // Remove from localStorage (NEW: characters array)
-    const saved = localStorage.getItem("kidstorybook_wizard")
+    const saved = localStorage.getItem("herokidstory_wizard")
     if (saved) {
       try {
         const wizardData = JSON.parse(saved)
@@ -504,7 +504,7 @@ export default function Step2Page() {
             delete wizardData.step2.characters[charIndex].photo
             delete wizardData.step2.characters[charIndex].characterId
             
-            localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+            localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
             console.log("[Step 2] Removed photo from character:", characterId)
           }
         }
@@ -512,7 +512,7 @@ export default function Step2Page() {
         // Backward compatibility: Remove old characterPhoto if exists
         if (wizardData.step2?.characterPhoto) {
           delete wizardData.step2.characterPhoto
-          localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+          localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
         }
       } catch (error) {
         console.error("Error updating localStorage:", error)
@@ -581,7 +581,7 @@ export default function Step2Page() {
           }
 
           // NEW: Also update localStorage immediately for character details
-          const saved = localStorage.getItem("kidstorybook_wizard")
+          const saved = localStorage.getItem("herokidstory_wizard")
           if (saved) {
             try {
               const wizardData = JSON.parse(saved)
@@ -593,7 +593,7 @@ export default function Step2Page() {
                     [field]: value,
                     characterType: updated.characterType, // Include updated characterType if name changed
                   }
-                  localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+                  localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
                   console.log("[Step 2] Updated character details in localStorage:", field, value)
                 }
               }

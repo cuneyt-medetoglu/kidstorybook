@@ -116,7 +116,7 @@ export function Header() {
             transition={{ type: "spring", stiffness: 400 }}
           >
             <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
-              KidStoryBook
+              HeroKidStory
             </span>
           </motion.div>
         </Link>
@@ -353,7 +353,7 @@ export function Header() {
               >
                 <div className="mb-8 flex shrink-0 items-center justify-between">
                   <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
-                    KidStoryBook
+                    HeroKidStory
                   </span>
                   <Button
                     variant="ghost"

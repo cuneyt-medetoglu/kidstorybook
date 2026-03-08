@@ -61,7 +61,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow, storyMode
       const language = wizardData?.step3?.language?.id || "en"
 
       const singleId = characterIds.length === 1 ? characterIds[0] : null
-      const fallbackId = localStorage.getItem("kidstorybook_character_id")
+      const fallbackId = localStorage.getItem("herokidstory_character_id")
 
       const requestBody = {
         characterId: singleId || fallbackId || characterIds[0],
@@ -140,7 +140,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow, storyMode
         "watercolor"
       const language = (wizardData?.step3?.language?.id || "en") as string
       const singleId = characterIds.length === 1 ? characterIds[0] : null
-      const fallbackId = localStorage.getItem("kidstorybook_character_id")
+      const fallbackId = localStorage.getItem("herokidstory_character_id")
       const requestBody = {
         characterId: singleId || fallbackId || characterIds[0],
         characterIds: characterIds.length > 0 ? characterIds : [singleId || fallbackId || characterIds[0]].filter(Boolean),

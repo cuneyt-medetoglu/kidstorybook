@@ -239,6 +239,7 @@ docs/
 19. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
 20. **archive/2026-02/analysis/** - Arşivlenen analizler
 21. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
+22. **analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md** - KidStoryBook → herokidstory marka/proje adı değişikliği; fazlama (Faz 1–4), kod/doküman/S3/DB/repo liste ve dikkat edilecekler
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

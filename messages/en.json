@@ -26,54 +26,54 @@
     "retry": "Try Again"
   },
   "metadata": {
-    "siteName": "KidStoryBook",
+    "siteName": "HeroKidStory",
     "home": {
-      "title": "KidStoryBook - Personalized Children's Books with AI",
+      "title": "HeroKidStory - Personalized Children's Books with AI",
       "description": "Create AI-powered personalized storybooks with your child's photo. Magical stories where your child is the hero.",
-      "ogTitle": "KidStoryBook - Personalized Children's Books with AI",
+      "ogTitle": "HeroKidStory - Personalized Children's Books with AI",
       "ogDescription": "Create magical personalized storybooks with your child's photo. Powered by AI, printed with love."
     },
     "examples": {
-      "title": "Example Books - KidStoryBook",
+      "title": "Example Books - HeroKidStory",
       "description": "Browse our example personalized children's books and see how your child's story could look.",
       "ogTitle": "Example Personalized Children's Books",
       "ogDescription": "See how your child's personalized storybook could look. Browse AI-generated examples."
     },
     "pricing": {
-      "title": "Pricing - KidStoryBook",
+      "title": "Pricing - HeroKidStory",
       "description": "Choose the perfect plan for your personalized storybook. E-book or hardcover printing available.",
-      "ogTitle": "KidStoryBook Pricing Plans",
+      "ogTitle": "HeroKidStory Pricing Plans",
       "ogDescription": "Affordable plans for your personalized children's storybook. E-book and hardcover options."
     },
     "dashboard": {
-      "title": "My Library - KidStoryBook",
+      "title": "My Library - HeroKidStory",
       "description": "Manage your personalized children's books"
     },
     "cart": {
-      "title": "Cart - KidStoryBook",
+      "title": "Cart - HeroKidStory",
       "description": "Your shopping cart"
     },
     "checkout": {
-      "title": "Checkout - KidStoryBook",
+      "title": "Checkout - HeroKidStory",
       "description": "Complete your order"
     },
     "create": {
-      "title": "Create Your Book - KidStoryBook",
+      "title": "Create Your Book - HeroKidStory",
       "description": "Start creating a personalized storybook for your child",
-      "ogTitle": "Create Your Book - KidStoryBook",
+      "ogTitle": "Create Your Book - HeroKidStory",
       "ogDescription": "Start creating a personalized storybook for your child. AI-powered, magical stories."
     },
     "authLogin": {
-      "title": "Sign In - KidStoryBook",
-      "description": "Sign in to your KidStoryBook account",
-      "ogTitle": "Sign In - KidStoryBook",
-      "ogDescription": "Sign in to your KidStoryBook account"
+      "title": "Sign In - HeroKidStory",
+      "description": "Sign in to your HeroKidStory account",
+      "ogTitle": "Sign In - HeroKidStory",
+      "ogDescription": "Sign in to your HeroKidStory account"
     },
     "authRegister": {
-      "title": "Create Account - KidStoryBook",
-      "description": "Create your free KidStoryBook account",
-      "ogTitle": "Create Account - KidStoryBook",
-      "ogDescription": "Create your free KidStoryBook account"
+      "title": "Create Account - HeroKidStory",
+      "description": "Create your free HeroKidStory account",
+      "ogTitle": "Create Account - HeroKidStory",
+      "ogDescription": "Create your free HeroKidStory account"
     }
   },
   "nav": {
@@ -138,7 +138,7 @@
     "cta": "Ready to create a magical story for your child?"
   },
   "features": {
-    "title": "Why KidStoryBook?",
+    "title": "Why HeroKidStory?",
     "subtitle": "Everything you need to create magical stories",
     "aiPowered": {
       "title": "AI-Powered Stories",
@@ -1072,7 +1072,7 @@
   },
   "faq": {
     "title": "Frequently Asked Questions",
-    "subtitle": "Everything you need to know about KidStoryBook",
+    "subtitle": "Everything you need to know about HeroKidStory",
     "stillHaveQuestions": "Still have questions?",
     "contactUs": "Contact Us",
     "q0": "How does it work?",

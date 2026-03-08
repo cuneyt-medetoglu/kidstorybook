@@ -6,10 +6,10 @@ const nextConfig = {
   // Image optimization
   images: {
     remotePatterns: [
-      // S3 / custom storage (use your bucket domain if needed)
+      // S3 – herokidstory bucket
       {
         protocol: 'https',
-        hostname: 'kidstorybook.s3.eu-central-1.amazonaws.com',
+        hostname: 'herokidstory.s3.eu-central-1.amazonaws.com',
       },
       // DALL-E 3 images
       {

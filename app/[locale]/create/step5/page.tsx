@@ -40,7 +40,7 @@ export default function Step5Page() {
   const [isCustomTheme, setIsCustomTheme] = useState<boolean>(() => {
     if (typeof window === "undefined") return false
     try {
-      const saved = localStorage.getItem("kidstorybook_wizard")
+      const saved = localStorage.getItem("herokidstory_wizard")
       const wizardData = saved ? JSON.parse(saved) : {}
       return wizardData?.step3?.theme?.id === "custom"
     } catch {
@@ -79,7 +79,7 @@ export default function Step5Page() {
     if (!valid) return
     // Save custom requests and page count to localStorage
     try {
-      const saved = localStorage.getItem("kidstorybook_wizard")
+      const saved = localStorage.getItem("herokidstory_wizard")
       const wizardData = saved ? JSON.parse(saved) : {}
       
       wizardData.step5 = {
@@ -87,7 +87,7 @@ export default function Step5Page() {
         pageCount: pageCount ?? DEFAULT_PAGE_COUNT, // Boş bırakılırsa default 12
       }
       
-      localStorage.setItem("kidstorybook_wizard", JSON.stringify(wizardData))
+      localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))
     } catch (error) {
       console.error("Error saving step 5 data:", error)
     }

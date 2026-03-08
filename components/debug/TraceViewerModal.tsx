@@ -23,7 +23,7 @@ interface TraceViewerModalProps {
 export function buildFullTraceExport(trace: DebugTraceEntry[]) {
   return {
     exportedAt: new Date().toISOString(),
-    source: "KidStoryBook create-book (debugTrace: true)",
+    source: "HeroKidStory create-book (debugTrace: true)",
     stepCount: trace.length,
     steps: trace.map((e) => ({
       step: e.step,
@@ -58,7 +58,7 @@ export function TraceViewerModal({
 
   const handleDownload = () => {
     const payload = buildFullTraceExport(trace)
-    const filename = `kidstorybook-trace-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.json`
+    const filename = `herokidstory-trace-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.json`
     downloadJson(filename, payload)
   }
 

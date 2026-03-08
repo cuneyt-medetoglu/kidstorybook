@@ -53,7 +53,7 @@ function VerifyEmailContent() {
                 <BookOpen className="h-7 w-7 text-white" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
-                KidStoryBook
+                HeroKidStory
               </span>
             </Link>
           </motion.div>
