@@ -9,13 +9,13 @@
 
 | Değişken | Beklenen (production) | Kontrol | Not |
 |----------|------------------------|--------|-----|
-| `DATABASE_URL` | `postgresql://kidstorybook:***@localhost:5432/kidstorybook` | ☐ | EC2’de DB aynı makinede; şifre güçlü ve sadece .env’de. |
+| `DATABASE_URL` | `postgresql://herokidstory:***@localhost:5432/herokidstory` | ☐ | EC2’de DB aynı makinede; şifre güçlü ve sadece .env’de. |
 | `NEXTAUTH_SECRET` | Uzun, rastgele base64 string | ☐ | Değiştirilmiş olmalı (varsayılan değil). |
 | `NEXTAUTH_URL` | `http://EC2_IP:3000` (veya https://domain.com) | ☐ | IP ile test: IP:3000; domain sonrası https. |
 | `NEXT_PUBLIC_APP_URL` | NEXTAUTH_URL ile aynı | ☐ | Build öncesi set; değişince yeniden build. |
 | `NODE_ENV` | `production` | ☐ | Sunucuda mutlaka production. |
 | `OPENAI_API_KEY` | `sk-proj-...` (geçerli key) | ☐ | Hikaye/görsel üretimi için zorunlu. |
-| `AWS_S3_BUCKET` | Bucket adı (örn. kidstorybook) | ☐ | EC2 IAM role ile erişim varsa ACCESS_KEY/SECRET opsiyonel. |
+| `AWS_S3_BUCKET` | Bucket adı (örn. herokidstory) | ☐ | EC2 IAM role ile erişim varsa ACCESS_KEY/SECRET opsiyonel. |
 | `AWS_REGION` | `eu-central-1` (veya bucket bölgesi) | ☐ | Bucket ile aynı bölge. |
 
 ---
@@ -26,8 +26,8 @@
 |----------|--------|--------|-----|
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google ile giriş için | ☐ | Placeholder (`your_google_client_id`) ise Google giriş çalışmaz. |
 | `FACEBOOK_CLIENT_ID` / `FACEBOOK_CLIENT_SECRET` | Facebook ile giriş için | ☐ | Placeholder ise Facebook giriş çalışmaz. |
-| `GOOGLE_CLOUD_PROJECT_ID` | TTS için | ☐ | Proje adı (örn. kidstorybook). |
-| `GOOGLE_APPLICATION_CREDENTIALS` | TTS JSON key dosya yolu | ☐ | Dosya EC2’de bu yolda olmalı (örn. `./kidstorybook-xxx.json`). |
+| `GOOGLE_CLOUD_PROJECT_ID` | TTS için | ☐ | Proje adı (örn. herokidstory). |
+| `GOOGLE_APPLICATION_CREDENTIALS` | TTS JSON key dosya yolu | ☐ | Dosya EC2’de bu yolda olmalı (örn. `./herokidstory-xxx.json`). |
 | `NEXT_PUBLIC_STRIPE_*` / `STRIPE_*` | Ödeme (Stripe) | ☐ | Placeholder ise Stripe ödeme çalışmaz. |
 | `IYZICO_*` | Ödeme (İyzico) | ☐ | Placeholder ise İyzico çalışmaz. |
 | `GROQ_API_KEY` / `GOOGLE_AI_API_KEY` | Alternatif AI (opsiyonel) | ☐ | Boş/placeholder kabul edilebilir. |

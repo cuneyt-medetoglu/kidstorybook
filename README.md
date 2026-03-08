@@ -1,10 +1,10 @@
-# 📚 KidStoryBook
+# 📚 HeroKidStory
 
 AI destekli kişiselleştirilmiş çocuk hikaye kitapları oluşturma platformu.
 
 ## 📖 Proje Hakkında
 
-KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir web platformudur. Ebeveynler çocuklarının özel hikayelerini yaratabilir, dijital olarak inceleyebilir, PDF indirebilir ve basılı kitap siparişi verebilir.
+HeroKidStory, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI destekli hikaye kitapları oluşturmasını sağlayan bir web platformudur. Ebeveynler çocuklarının özel hikayelerini yaratabilir, dijital olarak inceleyebilir, PDF indirebilir ve basılı kitap siparişi verebilir.
 
 ## ✨ Özellikler
 
@@ -28,8 +28,8 @@ KidStoryBook, çocukların kendi fotoğraflarıyla kişiselleştirilmiş AI dest
 ### Kurulum
 
 ```bash
-git clone https://github.com/cuneyt-medetoglu/kidstorybook.git
-cd kidstorybook
+git clone https://github.com/cuneyt-medetoglu/herokidstory.git
+cd herokidstory
 
 npm install
 cp .env.example .env
@@ -44,12 +44,12 @@ Tarayıcıda **http://localhost:3001** adresini açın.
 
 - **Local (kendi bilgisayarında prod DB’ye bağlanmak):**  
   Önce SSH tüneli aç (bir terminalde açık kalsın):  
-  `npm run ssh:tunnel` (tünel; bir terminalde açık kalsın). Manuel: `ssh -i kidstorybook-key.pem -L 5432:localhost:5432 -N ubuntu@EC2_IP`. Detay: [docs/guides/LOCAL_DB_TUNNEL.md](docs/guides/LOCAL_DB_TUNNEL.md)  
-  .env’de: `DATABASE_URL=postgresql://kidstorybook:SIFRE@localhost:5432/kidstorybook`  
+  `npm run ssh:tunnel` (tünel; bir terminalde açık kalsın). Manuel: `ssh -i herokidstory-key.pem -L 5432:localhost:5432 -N ubuntu@EC2_IP`. Detay: [docs/guides/LOCAL_DB_TUNNEL.md](docs/guides/LOCAL_DB_TUNNEL.md)  
+  .env’de: `DATABASE_URL=postgresql://herokidstory:SIFRE@localhost:5432/herokidstory`  
   Sonra `npm run dev`. DBeaver’da da aynı tüneli kullanıp Host: localhost, Port: 5432 yapabilirsin.
 
 - **Production (EC2’de çalışan uygulama):**  
-  .env’de: `DATABASE_URL=postgresql://kidstorybook:SIFRE@localhost:5432/kidstorybook`  
+  .env’de: `DATABASE_URL=postgresql://herokidstory:SIFRE@localhost:5432/herokidstory`  
   (Uygulama EC2’de olduğu için DB aynı makinede, localhost kullanılır.)
 
 ### Dokümantasyon Yapısı
@@ -80,7 +80,7 @@ Tarayıcıda **http://localhost:3001** adresini açın.
 ## 📁 Proje Yapısı
 
 ```
-kidstorybook/
+herokidstory/
 ├── app/                 # Next.js App Router (sayfalar, API routes)
 ├── components/          # React bileşenleri (ui, layout, sections)
 ├── lib/                 # Yardımcılar, DB, prompt'lar, PDF, TTS
