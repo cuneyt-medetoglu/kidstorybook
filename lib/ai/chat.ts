@@ -111,8 +111,8 @@ export async function chatWithLog(
     requestMeta: ctx.requestMeta,
     responseMeta: {
       finishReason: completion.choices[0]?.finish_reason,
-      cachedTokens: (usage as Record<string, unknown>)?.prompt_tokens_details
-        ? ((usage as Record<string, unknown>).prompt_tokens_details as Record<string, unknown>)?.cached_tokens
+      cachedTokens: (usage as unknown as Record<string, unknown>)?.prompt_tokens_details
+        ? ((usage as unknown as Record<string, unknown>).prompt_tokens_details as Record<string, unknown>)?.cached_tokens
         : undefined,
     },
   })

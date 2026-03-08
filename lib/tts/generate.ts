@@ -150,7 +150,7 @@ export async function generateTts(
 
   const client = getTTSClient()
   let ttsError: string | null = null
-  let ttsResponse: Awaited<ReturnType<typeof client.synthesizeSpeech>>[0] | null = null
+  let ttsResponse: { audioContent?: Uint8Array | string | null } | null = null
 
   try {
     const [res] = await client.synthesizeSpeech({

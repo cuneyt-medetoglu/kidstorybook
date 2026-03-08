@@ -20,6 +20,7 @@
     "ssh:tunnel": "ssh -i kidstorybook-key.pem -L 5432:localhost:5432 ubuntu@18.184.150.1",
     "clean": "npx rimraf .next",
     "clean:all": "npx rimraf node_modules .next",
+    "build:local": "npx next build",
     "deploy:build": "npm run clean:all && npm install && npm run build",
     "deploy:build:fast": "npm install && npm run build"
   },

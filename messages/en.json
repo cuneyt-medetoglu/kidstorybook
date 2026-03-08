@@ -59,15 +59,21 @@
     },
     "create": {
       "title": "Create Your Book - KidStoryBook",
-      "description": "Start creating a personalized storybook for your child"
+      "description": "Start creating a personalized storybook for your child",
+      "ogTitle": "Create Your Book - KidStoryBook",
+      "ogDescription": "Start creating a personalized storybook for your child. AI-powered, magical stories."
     },
     "authLogin": {
       "title": "Sign In - KidStoryBook",
-      "description": "Sign in to your KidStoryBook account"
+      "description": "Sign in to your KidStoryBook account",
+      "ogTitle": "Sign In - KidStoryBook",
+      "ogDescription": "Sign in to your KidStoryBook account"
     },
     "authRegister": {
       "title": "Create Account - KidStoryBook",
-      "description": "Create your free KidStoryBook account"
+      "description": "Create your free KidStoryBook account",
+      "ogTitle": "Create Account - KidStoryBook",
+      "ogDescription": "Create your free KidStoryBook account"
     }
   },
   "nav": {

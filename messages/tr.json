@@ -59,15 +59,21 @@
     },
     "create": {
       "title": "Kitabınızı Oluşturun - KidStoryBook",
-      "description": "Çocuğunuz için kişiselleştirilmiş hikaye kitabı oluşturmaya başlayın"
+      "description": "Çocuğunuz için kişiselleştirilmiş hikaye kitabı oluşturmaya başlayın",
+      "ogTitle": "Kitabınızı Oluşturun - KidStoryBook",
+      "ogDescription": "Çocuğunuz için kişiselleştirilmiş hikaye kitabı oluşturmaya başlayın. AI destekli, sihirli hikayeler."
     },
     "authLogin": {
       "title": "Giriş Yap - KidStoryBook",
-      "description": "KidStoryBook hesabınıza giriş yapın"
+      "description": "KidStoryBook hesabınıza giriş yapın",
+      "ogTitle": "Giriş Yap - KidStoryBook",
+      "ogDescription": "KidStoryBook hesabınıza giriş yapın"
     },
     "authRegister": {
       "title": "Hesap Oluştur - KidStoryBook",
-      "description": "Ücretsiz KidStoryBook hesabınızı oluşturun"
+      "description": "Ücretsiz KidStoryBook hesabınızı oluşturun",
+      "ogTitle": "Hesap Oluştur - KidStoryBook",
+      "ogDescription": "Ücretsiz KidStoryBook hesabınızı oluşturun"
     }
   },
   "nav": {
