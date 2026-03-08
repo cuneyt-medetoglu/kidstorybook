@@ -124,6 +124,8 @@ export function HeroBookTransformation() {
     const img = new window.Image()
     img.src = heroTransformationConfig[nextIndex].storyCharacter.src
   }, [currentIndex])
+
+  return (
     <div className="relative flex w-full flex-col items-center justify-center px-3 pb-2 sm:px-4 sm:pb-12 md:h-full md:pb-0 md:px-3 lg:px-4">
       {/* Title */}
       <motion.div
