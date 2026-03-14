@@ -42,6 +42,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 
+const DEFAULT_PAGE_COUNT = 12
+
 // Timeline step configuration
 const timelineSteps = [
   {
@@ -432,12 +434,15 @@ export default function Step6Page() {
       (typeof wizardData?.step4?.illustrationStyle === "string" ? wizardData.step4.illustrationStyle : "") ||
       "watercolor"
     const language = (wizardData?.step3?.language?.id || formData.language?.id || "en") as "en" | "tr" | "de" | "fr" | "es" | "zh" | "pt" | "ru"
+    const pageCount = typeof formData.pageCount === "number" && Number.isFinite(formData.pageCount) && formData.pageCount > 0
+      ? formData.pageCount
+      : DEFAULT_PAGE_COUNT
     const payload = {
       ...(characterIds.length > 0 ? { characterIds } : singleId || fallbackId ? { characterId: singleId || fallbackId } : {}),
       theme: themeKey,
       illustrationStyle: styleKey,
       customRequests: formData.customRequests || "",
-      pageCount: formData.pageCount,
+      pageCount,
       language,
       skipPayment: true,
       ...(canShowDebugQuality && debugTraceRequested && { debugTrace: true }),
@@ -517,12 +522,15 @@ export default function Step6Page() {
       "watercolor"
     const language = exampleBookLanguage
 
+    const examplePageCount = typeof formData.pageCount === "number" && Number.isFinite(formData.pageCount) && formData.pageCount > 0
+      ? formData.pageCount
+      : DEFAULT_PAGE_COUNT
     const payload = {
       ...(characterIds.length > 0 ? { characterIds } : singleId || fallbackId ? { characterId: singleId || fallbackId } : {}),
       theme: themeKey,
       illustrationStyle: styleKey,
       customRequests: formData.customRequests || "",
-      pageCount: formData.pageCount,
+      pageCount: examplePageCount,
       language,
       isExample: true,
       skipPayment: true,
@@ -1059,7 +1067,11 @@ export default function Step6Page() {
                       Page Count:
                     </span>
                     <span className="text-sm font-bold text-primary">
-                      {formData.pageCount ? `${formData.pageCount} pages` : 'Cover Only'}
+                      {typeof formData.pageCount === 'number' && Number.isFinite(formData.pageCount) && formData.pageCount > 0
+                        ? `${formData.pageCount} pages`
+                        : formData.pageCount === 0
+                        ? 'Cover Only'
+                        : `${DEFAULT_PAGE_COUNT} pages (default)`}
                     </span>
                   </div>
                 </div>

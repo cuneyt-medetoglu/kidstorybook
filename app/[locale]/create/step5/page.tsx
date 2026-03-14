@@ -77,14 +77,18 @@ export default function Step5Page() {
   const handleNext = async () => {
     const valid = await trigger()
     if (!valid) return
-    // Save custom requests and page count to localStorage
+    // Boş/NaN/undefined → 12 (valueAsNumber boş inputta NaN döner)
+    const resolvedPageCount =
+      typeof pageCount === "number" && Number.isFinite(pageCount) && pageCount > 0
+        ? pageCount
+        : DEFAULT_PAGE_COUNT
     try {
       const saved = localStorage.getItem("herokidstory_wizard")
       const wizardData = saved ? JSON.parse(saved) : {}
       
       wizardData.step5 = {
         customRequests: customRequests || undefined,
-        pageCount: pageCount ?? DEFAULT_PAGE_COUNT, // Boş bırakılırsa default 12
+        pageCount: resolvedPageCount,
       }
       
       localStorage.setItem("herokidstory_wizard", JSON.stringify(wizardData))

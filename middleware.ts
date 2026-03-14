@@ -91,6 +91,6 @@ export const config = {
      * - api/auth  (NextAuth own routes)
      * - Static files (images, fonts, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2?|html)$).*)',
   ],
 }

@@ -662,10 +662,13 @@ export async function POST(request: NextRequest) {
     // DETERMINE MODE: Cover Only, From Example, Full Book, or Debug (run up to masters/cover)
     // ====================================================================
     const isDebugRunUpTo = isDebugCoverMode || isDebugMastersMode
-    const isCoverOnlyMode = !isDebugRunUpTo && !fromExampleId && (!pageCount || pageCount === 0)
+    // Cover only: only when explicitly 0. undefined/null/NaN → default 12 (full book)
+    const hasValidPageCount = typeof pageCount === 'number' && Number.isFinite(pageCount) && pageCount > 0
+    const effectivePageCountForMode = hasValidPageCount ? pageCount! : 12
+    const isCoverOnlyMode = !isDebugRunUpTo && !fromExampleId && pageCount === 0
     const isFromExampleMode = !isDebugRunUpTo && !!fromExampleId
     // Debug: force full book path (story → masters [→ cover]) then return without keeping book
-    const effectivePageCount = isDebugRunUpTo ? (pageCount || 5) : pageCount
+    const effectivePageCount = isDebugRunUpTo ? (pageCount || 5) : effectivePageCountForMode
 
     console.log(`[Create Book] 📋 Mode: ${isDebugMastersMode ? 'Debug (run up to masters)' : isDebugCoverMode ? 'Debug (run up to cover)' : isCoverOnlyMode ? 'Cover Only' : isFromExampleMode ? 'From Example' : 'Full Book'} (pageCount: ${effectivePageCount ?? 'undefined'}, fromExampleId: ${fromExampleId || 'none'})`)
     console.log(`[Create Book] 🎯 Theme: ${themeKey}`)

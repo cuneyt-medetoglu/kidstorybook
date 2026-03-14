@@ -17,7 +17,7 @@
 Migration çalıştırmadan **önce mutlaka** yedek al.
 
 ```bash
-cd ~/kidstorybook
+cd ~/herokidstory
 ./scripts/db-backup.sh
 ```
 
@@ -31,7 +31,7 @@ Yedekler `s3://BUCKET/backups/db/` altına gider. Detay: `docs/guides/DB_BACKUP_
 
 ```bash
 # EC2'de
-cd ~/kidstorybook
+cd ~/herokidstory
 git pull
 ```
 
@@ -39,7 +39,7 @@ git pull
 
 ```bash
 # Lokal'den
-scp -i KEY_PEM migrations/018_xxx.sql ubuntu@EC2_IP:~/kidstorybook/migrations/
+scp -i KEY_PEM migrations/018_xxx.sql ubuntu@EC2_IP:~/herokidstory/migrations/
 ```
 
 ---
@@ -48,12 +48,12 @@ scp -i KEY_PEM migrations/018_xxx.sql ubuntu@EC2_IP:~/kidstorybook/migrations/
 
 **4.0 Nerede çalıştırılır?**
 - **Sadece sunucuda (EC2).** Lokal PC'de `psql` kurulu değilse migration orada çalıştırılamaz. Uygulama (hem local hem sunucu) aynı PostgreSQL'e bağlanıyorsa (local SSH tüneli ile), migration **bir kez EC2'de** çalıştırıldığında yeterlidir.
-- EC2'ye SSH ile bağlan, proje dizinine geç: `cd ~/kidstorybook`
+- EC2'ye SSH ile bağlan, proje dizinine geç: `cd ~/herokidstory`
 
 **4.1** Bağlantı: Sunucuda PostgreSQL kullanıcısı `kidstorybook` (ubuntu değil). `.env` içindeki `DATABASE_URL` ile çalıştır:
 
 ```bash
-cd ~/kidstorybook
+cd ~/herokidstory
 psql "$DATABASE_URL" -f migrations/020_ai_requests.sql
 ```
 

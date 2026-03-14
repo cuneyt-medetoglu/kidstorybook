@@ -3,6 +3,16 @@ const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Static HTML under locale prefix: /tr/story-ideas-helper.html → /story-ideas-helper.html
+  async rewrites() {
+    return [
+      {
+        source: '/:locale(en|tr)/story-ideas-helper.html',
+        destination: '/story-ideas-helper.html',
+      },
+    ]
+  },
+
   // Image optimization
   images: {
     remotePatterns: [

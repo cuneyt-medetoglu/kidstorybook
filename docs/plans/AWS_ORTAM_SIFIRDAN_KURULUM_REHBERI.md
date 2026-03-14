@@ -305,7 +305,7 @@ cd kidstorybook
 
 ## 6.4 Build ve çalıştırma (kısa)
 
-Proje dizininde (`~/kidstorybook`):
+Proje dizininde (`~/herokidstory`):
 
 ```bash
 npm ci
@@ -325,10 +325,10 @@ sudo npm install -g pm2
 pm2 -v
 ```
 
-**Uygulamayı PM2 ile ilk kez başlatma (proje dizininde ~/kidstorybook):**
+**Uygulamayı PM2 ile ilk kez başlatma (proje dizininde ~/herokidstory):**
 
 ```bash
-cd ~/kidstorybook
+cd ~/herokidstory
 pm2 start npm --name kidstorybook -- run start:prod
 pm2 save
 pm2 startup   # çıkan sudo env PATH=... komutunu kopyalayıp çalıştır

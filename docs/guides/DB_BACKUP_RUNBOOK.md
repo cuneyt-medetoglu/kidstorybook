@@ -15,7 +15,7 @@ Mevcut bucket’ta (örn. kidstorybook) `backups/db` klasörü oluşturman gerek
 ### 1.2 Script’i çalıştırılabilir yap
 
 ```bash
-cd ~/kidstorybook
+cd ~/herokidstory
 chmod +x scripts/db-backup.sh
 ```
 
@@ -53,7 +53,7 @@ EC2’de uygulama `.env`’inde zaten `AWS_S3_BUCKET` ve `AWS_REGION` varsa, sad
 ## 2. Manuel yedek alma
 
 ```bash
-cd ~/kidstorybook
+cd ~/herokidstory
 export PGPASSWORD='GERCEK_DB_SIFREN'   # veya .pgpass kullan
 ./scripts/db-backup.sh
 ```
@@ -71,16 +71,16 @@ crontab -e
 Eklenacak satır (her gün 03:00; .pgpass kullanıyorsan PGPASSWORD gerekmez):
 
 ```cron
-0 3 * * * cd /home/ubuntu/kidstorybook && PGPASSWORD='GERCEK_SIFRE' ./scripts/db-backup.sh >> /home/ubuntu/kidstorybook/logs/db-backup.log 2>&1
+0 3 * * * cd /home/ubuntu/herokidstory && PGPASSWORD='GERCEK_SIFRE' ./scripts/db-backup.sh >> /home/ubuntu/herokidstory/logs/db-backup.log 2>&1
 ```
 
 Veya .pgpass kullanıyorsan:
 
 ```cron
-0 3 * * * cd /home/ubuntu/kidstorybook && ./scripts/db-backup.sh >> /home/ubuntu/kidstorybook/logs/db-backup.log 2>&1
+0 3 * * * cd /home/ubuntu/herokidstory && ./scripts/db-backup.sh >> /home/ubuntu/herokidstory/logs/db-backup.log 2>&1
 ```
 
-Log dizini yoksa: `mkdir -p /home/ubuntu/kidstorybook/logs`.
+Log dizini yoksa: `mkdir -p /home/ubuntu/herokidstory/logs`.
 
 ---
 

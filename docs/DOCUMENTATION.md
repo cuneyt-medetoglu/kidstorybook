@@ -87,6 +87,7 @@ docs/
 │   ├── HERO_IMAGES_OPTIMIZATION_GUIDE.md # Hero görselleri build-time webp optimizasyonu; yeni görsel eklerken adımlar (script, config, npm run optimize-images)
 │   ├── HERO_TRANSFORMATION_CORNER_ARTIFACTS_ANALYSIS.md # HeroBookTransformation kartlarında köşe beyazlığı/iz analizi ve denenen çözümler
 │   ├── DB_BACKUP_RUNBOOK.md # DB yedekleme (1.2.7): script, cron, S3, restore
+│   ├── EC2_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY.md # EC2'de proje klasörü kidstorybook → herokidstory yeniden adlandırma
 │   ├── PRODUCTION_MIGRATION_RUNBOOK.md # Production şema migration (5.5.10): backup öncesi, psql -f, rollback
 │   ├── LOCAL_DB_TUNNEL.md # Local'de prod AWS DB'ye bağlanma: ssh:tunnel vs ssh:server, iki terminal, ECONNREFUSED çözümü
 │   └── ...

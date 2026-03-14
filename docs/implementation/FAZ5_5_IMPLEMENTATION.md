@@ -68,7 +68,7 @@ Checklist’i doldurup gerekli düzeltmeleri yaptıktan sonra bu maddeyi tamamla
 - **Script:** `scripts/db-backup.sh` — pg_dump (custom format), S3’e yükleme, yerel dosyayı silme, S3’te retention (varsayılan 14 gün).
 - **Runbook:** `docs/guides/DB_BACKUP_RUNBOOK.md` — kurulum, manuel/cron yedek, S3 listeleme/indirme, restore adımları.
 - **S3:** `s3://BUCKET/backups/db/` (backups prefix public değil).
-- **Cron:** EC2’de kuruldu — günlük 03:00; log: `~/kidstorybook/logs/db-backup.log`. `.pgpass` ile şifre verildi.
+- **Cron:** EC2’de kuruldu — günlük 03:00; log: `~/herokidstory/logs/db-backup.log`. `.pgpass` ile şifre verildi.
 
 EC2’de ilk kez (yapıldı): `chmod +x scripts/db-backup.sh`, `.pgpass` veya `PGPASSWORD` ayarla, bir kez `./scripts/db-backup.sh` dene, sonra crontab ekle.
 
