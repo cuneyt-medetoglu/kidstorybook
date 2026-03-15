@@ -40,8 +40,8 @@ function getTTSClient(): TextToSpeechClient {
   return ttsClient!
 }
 
-function generateCacheHash(text: string, voiceId: string, speed: number, prompt: string): string {
-  const content = `${text}|${voiceId}|${speed}|${prompt}`
+function generateCacheHash(text: string, voiceId: string, speed: number, prompt: string, languageCode: string): string {
+  const content = `${text}|${voiceId}|${speed}|${prompt}|${languageCode}`
   return crypto.createHash("sha256").update(content).digest("hex")
 }
 
@@ -124,7 +124,7 @@ export async function generateTts(
 
   const languageCode = getLanguageCode(language)
   const validSpeed = Math.max(0.25, Math.min(4.0, Number(rawSpeed)))
-  const cacheHash = generateCacheHash(text, voiceId, validSpeed, prompt)
+  const cacheHash = generateCacheHash(text, voiceId, validSpeed, prompt, languageCode)
 
   const cachedUrl = await getCachedAudio(cacheHash)
   if (cachedUrl) {

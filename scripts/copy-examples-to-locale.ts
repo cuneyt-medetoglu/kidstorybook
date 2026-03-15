@@ -11,7 +11,9 @@
  *   npx tsx scripts/copy-examples-to-locale.ts tr en
  *   npx tsx scripts/copy-examples-to-locale.ts en tr
  *
- * Gereksinimler: .env içinde DATABASE_URL ve OPENAI_API_KEY
+ * Gereksinimler: .env içinde DATABASE_URL, OPENAI_API_KEY
+ *   TTS prewarm için: GOOGLE_SERVICE_ACCOUNT_JSON (veya GOOGLE_APPLICATION_CREDENTIALS),
+ *   GOOGLE_CLOUD_PROJECT_ID, ve S3/AWS erişim değişkenleri de gereklidir.
  * @see docs/analysis/EXAMPLES_MULTILINGUAL_COPY_IMPLEMENTATION_PLAN.md
  */
 
@@ -50,6 +52,7 @@ function main() {
 async function runCopy() {
   const { pool } = await import('../lib/db/pool')
   const { createBook, updateBook } = await import('../lib/db/books')
+  const { generateTts } = await import('../lib/tts/generate')
   const OpenAI = (await import('openai')).default
 
   const apiKey = process.env.OPENAI_API_KEY
@@ -143,6 +146,27 @@ async function runCopy() {
 
       if (book.cover_image_url) {
         await updateBook(newBook.id, { cover_image_url: book.cover_image_url })
+      }
+
+      // TTS prewarm: hedef dilde tüm sayfaları önceden seslendirip cache'le
+      const ttsPages = Array.isArray(newStoryData.pages)
+        ? newStoryData.pages.filter((p: { text?: string }) => p?.text?.trim())
+        : []
+      if (ttsPages.length > 0) {
+        console.log(`   🔊 TTS prewarm başladı: ${ttsPages.length} sayfa (${targetLang})`)
+        const ttsResults = await Promise.allSettled(
+          ttsPages.map((p: { text?: string }) =>
+            generateTts(p.text!.trim(), { language: targetLang, bookId: newBook.id })
+          )
+        )
+        const ttsOk = ttsResults.filter((r) => r.status === 'fulfilled').length
+        const ttsFail = ttsResults.filter((r) => r.status === 'rejected').length
+        ttsResults.forEach((r, i) => {
+          if (r.status === 'rejected') {
+            console.warn(`   ⚠️  TTS prewarm: sayfa ${i + 1} hata:`, (r.reason as Error).message)
+          }
+        })
+        console.log(`   🔊 TTS prewarm bitti: ${ttsOk}/${ttsPages.length} başarılı${ttsFail > 0 ? `, ${ttsFail} hata` : ''}`)
       }
 
       console.log(`✅ Kopyalandı: "${book.title}" → "${translatedTitle}" (${newBook.id})`)
