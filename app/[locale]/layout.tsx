@@ -1,9 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '../globals.css'
-import { Header } from '@/components/layout/Header'
-import { Footer } from '@/components/layout/Footer'
-import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { CartProvider } from '@/contexts/CartContext'
@@ -35,7 +32,6 @@ export default async function LocaleLayout({
   children: React.ReactNode
   params: { locale: string }
 }) {
-  // Validate locale — show 404 for unsupported locales
   if (!routing.locales.includes(locale as (typeof routing.locales)[number])) {
     notFound()
   }
@@ -55,10 +51,7 @@ export default async function LocaleLayout({
             <SessionProvider>
               <CurrencyProvider>
                 <CartProvider>
-                  <Header />
-                  <main className="relative min-h-screen">{children}</main>
-                  <Footer />
-                  <CookieConsentBanner />
+                  {children}
                 </CartProvider>
               </CurrencyProvider>
             </SessionProvider>

@@ -38,6 +38,7 @@ Sen HeroKidStory projesinin proje yöneticisisin. Görevin:
 - **Prompt optimizasyon / analiz:** `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `docs/guides/PROMPT_OPTIMIZATION_GUIDE.md`
 - **PDF (limit, sıkıştırma, timeout):** `docs/guides/PDF_GENERATION_GUIDE.md`
 - **Monolit / backend–frontend ayrıştırma / PWA / Puppeteer riski:** `docs/technical/MONOLITH_VS_SPLIT_ANALYSIS.md` (ileride karar için referans; doküman dursun)
+- **Admin panel (dashboard):** Plan ve Studio Admin entegrasyonu — `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md`; sorumlu agent: @admin-panel-manager; erişim `role === 'admin'`, içerik zamanla doldurulacak
 
 ### Kritik operasyon (deployment, backup, migration)
 Agent bu bilgileri bilmeli; kullanıcı sorduğunda doğru dokümana yönlendir.
@@ -265,12 +266,14 @@ Kullanıcı şunları diyebilir:
 **Mevcut Agent'lar:**
 - **@project-manager (sen):** Proje planı, iş takibi, roadmap yönetimi
 - **@localization-agent:** Localization (i18n) — çeviriler, dil seçici, locale routing; `docs/implementation/LOCALIZATION_IMPLEMENTATION.md`, `docs/analysis/LOCALIZATION_ANALYSIS.md`
+- **@admin-panel-manager:** Admin panel (dashboard) — plan, Studio Admin entegrasyonu, 5.8.x ilerleme; `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md`, (ileride) `docs/implementation/ADMIN_PANEL_IMPLEMENTATION.md`
 - **@architecture-manager:** Mimari kararlar, teknoloji seçimleri, deployment
 - **@database-manager:** Database schema, migration'lar, RLS policies, performance
 - **@prompt-manager:** AI prompt'ları, versiyonlama, A/B testing, optimization
 - **@api-manager:** API endpoint'leri, Postman collection'ları, API testleri, dokümantasyon
 
 **İşbirliği Kuralları:**
+- **@admin-panel-manager:** Admin panel planı, Studio Admin entegrasyonu, 5.8.x detay ilerleme; ROADMAP checkbox’ları sen işaretlersin, detay @admin-panel-manager’da
 - **@architecture-manager:** Mimari değişiklikler (teknoloji, klasör yapısı, deployment)
 - **@database-manager:** Database değişiklikleri (migration'lar, schema, performance)
 - **@prompt-manager:** Prompt değişiklikleri (version'lar, A/B test, iyileştirmeler)
@@ -282,6 +285,7 @@ Kullanıcı şunları diyebilir:
   - `docs/PRD.md` - Ürün gereksinimleri dokümanı (güncel tutulmalı)
   - `docs/implementation/FAZ{X}_IMPLEMENTATION.md` - Faz bazlı implementasyon takibi
   - Faz 5.11 Localization: ROADMAP'ta 5.11.x işaretleme; detay ilerleme @localization-agent tarafından `docs/implementation/LOCALIZATION_IMPLEMENTATION.md`'de tutulur
+- Faz 5.8 Admin Panel: ROADMAP'ta 5.8.x işaretleme; detay plan ve ilerleme @admin-panel-manager tarafından `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` ve (ileride) `docs/implementation/ADMIN_PANEL_IMPLEMENTATION.md`'de tutulur
   - `docs/checklists/` - Kontrol listeleri
   - `docs/reports/` - Raporlar
   - `docs/guides/` - Rehberler

@@ -88,16 +88,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true
     },
     async jwt({ token, user }) {
-      // Add user ID to token
       if (user) {
         token.id = user.id
+        const { getUserRole } = await import('@/lib/db/users')
+        const role = await getUserRole(user.id as string)
+        token.role = role ?? 'user'
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Auth jwt] Sign-in: userId=', user.id, '| DB role=', role, '| token.role=', token.role)
+        }
+      } else if (process.env.NODE_ENV === 'development' && token.id) {
+        console.log('[Auth jwt] Request (no user): token.role=', token.role, '| token.id=', token.id)
       }
       return token
     },
     async session({ session, token }) {
-      // Add user ID to session
       if (token && session.user) {
         session.user.id = token.id as string
+        ;(session.user as { id: string; role?: string }).role = token.role as string
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Auth session] session.user.role=', (session.user as { role?: string }).role)
+        }
       }
       return session
     },

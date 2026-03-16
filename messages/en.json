@@ -87,9 +87,156 @@
     "logout": "Logout",
     "myLibrary": "My Library",
     "settings": "Settings",
+    "adminPanel": "Admin Panel",
     "shoppingCart": "Shopping Cart",
     "lightMode": "Light Mode",
     "darkMode": "Dark Mode"
+  },
+  "admin": {
+    "brand": "HeroKidStory Admin",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "bookManagement": "Book Management",
+      "jobQueue": "Job Queue",
+      "orders": "Orders",
+      "users": "Users",
+      "system": "System",
+      "comingSoon": "coming soon",
+      "backToDashboard": "Main Dashboard",
+      "expand": "Expand",
+      "collapse": "Collapse"
+    },
+    "header": {
+      "title": "Admin Panel",
+      "logout": "Log Out",
+      "ariaAdmin": "Admin"
+    },
+    "dashboard": {
+      "welcome": "Hello, {name}",
+      "subtitle": "HeroKidStory Admin Panel — Real-time statistics",
+      "badgePhase0": "Phase 0 — Skeleton completed",
+      "badgePhaseA1": "Phase A.1 — KPI live",
+      "kpi": {
+        "totalUsers": "Total Users",
+        "totalBooks": "Total Books",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue",
+        "last8Users": "Last 8 users listed",
+        "booksBreakdown": "{completed} completed · {generating} generating · {failed} failed",
+        "stripePlaceholder": "When Stripe/Iyzico integration is ready"
+      },
+      "recentBooks": "Recently Created Books",
+      "recentUsers": "Recently Registered Users",
+      "noBooks": "No books yet.",
+      "noUsers": "No users yet.",
+      "booksCount": "{count} books",
+      "phaseProgress": "Phase Progress",
+      "phaseA1": "A.1 — Main Dashboard: Real KPI data from DB",
+      "phaseA2": "A.2 — Book Management: List, filter, search, support flow",
+      "phaseA3": "A.3 — Job Queue (Bull Board): When BullMQ plan is ready"
+    },
+    "books": {
+      "title": "Book Management",
+      "subtitle": "All user books — search, filter, detail and edit",
+      "searchPlaceholder": "Book title, email or ID...",
+      "search": "Search",
+      "clear": "Clear",
+      "allStatuses": "All Statuses",
+      "status": {
+        "completed": "Completed",
+        "generating": "Generating",
+        "failed": "Failed",
+        "draft": "Draft",
+        "archived": "Archived"
+      },
+      "count": "{count} books",
+      "table": {
+        "book": "Book",
+        "user": "User",
+        "status": "Status",
+        "theme": "Theme",
+        "language": "Language",
+        "created": "Created",
+        "noBooks": "No books found"
+      },
+      "detail": {
+        "back": "Books",
+        "user": "User",
+        "createdAt": "Created",
+        "completedAt": "Completed",
+        "languageAge": "Language / Age",
+        "themeStyle": "Theme / Style",
+        "cover": "Cover",
+        "noCover": "No cover",
+        "pageCount": "Page count",
+        "viewCount": "Views",
+        "editQuota": "Edit quota",
+        "downloadPdf": "Download PDF",
+        "pageContents": "Page Contents",
+        "pageCountLabel": "{count} pages",
+        "noPageData": "No page data.",
+        "adminEdit": "Admin Edit",
+        "adminOnly": "Admin Only"
+      },
+      "edit": {
+        "bookTitle": "Book Title",
+        "bookTitlePlaceholder": "Book title...",
+        "status": "Status",
+        "saveChanges": "Save Changes",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "note": "Note: To edit page content and images, use the user's Book Edit UI or update the DB directly. Title and status can be changed here."
+      }
+    },
+    "users": {
+      "title": "User Management",
+      "subtitle": "All registered users — search, role filter, detail",
+      "searchPlaceholder": "Name, email or ID...",
+      "search": "Search",
+      "clear": "Clear",
+      "allRoles": "All Roles",
+      "roleAdmin": "Admin",
+      "roleUser": "User",
+      "count": "{count} users",
+      "table": {
+        "user": "User",
+        "role": "Role",
+        "totalBooks": "Total Books",
+        "completed": "Completed",
+        "registered": "Registered",
+        "noUsers": "No users found"
+      },
+      "detail": {
+        "back": "Users",
+        "registeredAt": "Registered",
+        "totalBooks": "Total Books",
+        "completedCount": "{count} completed",
+        "freeCover": "Free Cover",
+        "freeCoverUsed": "Used",
+        "freeCoverNotUsed": "Not used",
+        "recentBooks": "Recent Books",
+        "noBooks": "No books.",
+        "adminEdit": "Admin Edit",
+        "adminOnly": "Admin Only"
+      },
+      "edit": {
+        "selfWarning": "You are editing your own account. Changing role may sign you out.",
+        "userName": "User Name",
+        "userNamePlaceholder": "Full name...",
+        "role": "Role",
+        "save": "Save",
+        "saving": "Saving…",
+        "saved": "Saved"
+      }
+    },
+    "pagination": {
+      "pageOf": "Page {page} of {total}"
+    },
+    "timeAgo": {
+      "today": "Today",
+      "daysAgo": "{n} days ago",
+      "monthsAgo": "{n} months ago"
+    }
   },
   "hero": {
     "badge": "AI-Powered Personalization",

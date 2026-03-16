@@ -14,6 +14,9 @@ const handleI18nRouting = createMiddleware(routing)
 // Protected page paths — checked WITHOUT locale prefix
 const PROTECTED_PAGE_PATHS = ['/dashboard', '/create', '/draft-preview']
 
+// Admin-only paths — require role === 'admin'
+const ADMIN_PAGE_PATHS = ['/admin']
+
 // Protected API paths — locale-free, return 401 if unauthenticated
 const PROTECTED_API_PATHS = [
   '/api/books',
@@ -75,6 +78,27 @@ export async function middleware(request: NextRequest) {
       const loginUrl = new URL(`/${locale}/auth/login`, request.url)
       loginUrl.searchParams.set('from', pathname)
       return NextResponse.redirect(loginUrl)
+    }
+  }
+
+  // ── Admin-only pages: must be logged in AND role === 'admin' ───────────────
+  const isAdminPage = ADMIN_PAGE_PATHS.some(p => pathnameWithoutLocale.startsWith(p))
+  if (isAdminPage) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
+    const locale = detectLocale(pathname)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Admin middleware] pathnameWithoutLocale:', pathnameWithoutLocale, '| token?.role:', (token as { role?: string })?.role, '| token?.id:', (token as { id?: string })?.id)
+    }
+    if (!token) {
+      const loginUrl = new URL(`/${locale}/auth/login`, request.url)
+      loginUrl.searchParams.set('from', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    if ((token as { role?: string }).role !== 'admin') {
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
     }
   }
 

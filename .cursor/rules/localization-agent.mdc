@@ -293,7 +293,7 @@ export async function generateMetadata({ params: { locale } }) {
 - **Hikaye dili ≠ Site dili.** Site dili URL/locale (EN/TR); hikaye dili Create wizard Step 3'te seçilir. Birbirinden bağımsız.
 - **Default dil:** EN. TR'den gelen kullanıcılar tarayıcı dili ile `/tr/`'ye yönlendirilir.
 - **URL yapısı:** Her zaman prefix: `/en/`, `/tr/` (localePrefix: always).
-- **Admin/debug metinleri:** Şimdilik i18n kapsamı dışı; admin panel sonrası düşünülecek.
+- **Admin panel:** Admin arayüzü `admin` namespace ile TR/EN lokalize edildi (15 Mart 2026). Bkz. `docs/implementation/LOCALIZATION_IMPLEMENTATION.md` — "Admin Panel (i18n)".
 - **Konfigüratif işler** (karakter isim mapping UI, dil ekleme/çıkarma UI): Admin panel bekleniyor; şimdilik kod/config ile yönetiliyor.
 - **`useTranslations` yalnızca bileşen içinde çağrılabilir** — modül seviyesinde, callback içinde veya koşullu blokta çağrılmaz.
 - **messages key'leri her iki dosyada da eşit olmalı** — en.json ve tr.json'da farklı sayıda key olursa runtime hatası çıkar.

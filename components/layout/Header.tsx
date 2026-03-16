@@ -26,6 +26,7 @@ import {
   LogOut,
   Settings,
   Globe,
+  ShieldCheck,
 } from "lucide-react"
 import { useSession, signOut } from "next-auth/react"
 import { useCart } from "@/contexts/CartContext"
@@ -297,6 +298,14 @@ export function Header() {
                         {t("settings")}
                       </Link>
                     </DropdownMenuItem>
+                    {(user as { role?: string }).role === "admin" && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/admin" className="flex items-center">
+                          <ShieldCheck className="mr-2 h-4 w-4" />
+                          {t("adminPanel")}
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600 dark:text-red-400">
                       <LogOut className="mr-2 h-4 w-4" />
@@ -399,6 +408,17 @@ export function Header() {
                         <span className="font-medium">{t("settings")}</span>
                       </Button>
                     </Link>
+                    {(user as { role?: string }).role === "admin" && (
+                      <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-start bg-muted/50 hover:bg-muted dark:bg-slate-800 dark:hover:bg-slate-700"
+                        >
+                          <ShieldCheck className="mr-2 h-4 w-4" />
+                          <span className="font-medium">{t("adminPanel")}</span>
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 )}
 

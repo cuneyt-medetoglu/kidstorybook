@@ -3,7 +3,7 @@
 **İlgili faz:** Faz 5.11 (ROADMAP: `docs/roadmap/PHASE_5_LAUNCH.md`)  
 **Analiz dokümanı:** `docs/analysis/LOCALIZATION_ANALYSIS.md`  
 **Sorumlu agent:** @localization-agent (`.cursor/rules/localization-agent.mdc`)  
-**Son güncelleme:** 7 Mart 2026
+**Son güncelleme:** 15 Mart 2026
 
 ---
 
@@ -149,6 +149,23 @@
 - [x] **10.5** Middleware doğrulaması → `middleware.ts` locale-aware auth redirect (`/${locale}/auth/login`); PROTECTED_PAGE_PATHS doğru; API route'lar locale-free
 - [x] **10.6** Auth callback doğrulaması → `signOut({ callbackUrl: /${locale} })` ✅; OAuth `callbackUrl: /${locale}/dashboard` ✅; `router.push` locale-aware `@/i18n/navigation` ✅
 - [x] **10.7** `homePricing` + `homeExamples` + `authCallback` namespace'leri EN/TR mesaj dosyalarına eklendi
+
+---
+
+## ✅ Admin Panel (i18n) — TAMAMLANDI (15 Mart 2026)
+
+Admin panel arayüzü TR ve EN için lokalize edildi; `admin` namespace kullanılıyor.
+
+- [x] **admin namespace** — `messages/tr.json` ve `messages/en.json` içinde `admin` (brand, sidebar, header, dashboard, books, users, pagination, timeAgo) eklendi
+- [x] **admin-sidebar** — `useTranslations('admin')`, `Link` / `usePathname` from `@/i18n/navigation`; menü etiketleri, "Ana Dashboard", "yakında", Genişlet/Daralt
+- [x] **admin-header** — `useTranslations('admin.header')`, `useLocale()` (signOut callbackUrl); başlık, Çıkış Yap
+- [x] **admin layout** — Sidebar/Header artık locale prop almıyor (i18n içinden türetiliyor)
+- [x] **admin dashboard page** — `getTranslations('admin.dashboard')`; karşılama, KPI kartları, son kitaplar/kullanıcılar, faz ilerleme
+- [x] **admin/books** — Liste sayfası `getTranslations('admin.books')`; `BooksTable` `useTranslations('admin.books')` + `Link`/`useRouter`/`usePathname` from i18n; detay sayfası `getTranslations('admin.books.detail'/'status')`; `AdminBookEditForm` `useTranslations('admin.books.edit'/'status')`
+- [x] **admin/users** — Liste sayfası `getTranslations('admin.users')`; `UsersTable` i18n + Link; detay sayfası `getTranslations('admin.users.detail')` + `admin.timeAgo`; `UserEditForm` `useTranslations('admin.users.edit')`
+- [x] Tüm admin sayfalarında `next/link` → `@/i18n/navigation` Link, locale prefix kaldırıldı
+
+**Referans:** `.cursor/rules/localization-agent.mdc` — Admin/debug metinleri artık i18n kapsamında (admin namespace).
 
 ---
 

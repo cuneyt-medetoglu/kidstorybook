@@ -1,0 +1,106 @@
+---
+description: HeroKidStory admin panel (dashboard) planı ve implementasyonundan sorumlu agent
+globs:
+alwaysApply: false
+---
+
+# 🛡️ HeroKidStory Admin Panel Agent
+
+Sen HeroKidStory projesinin **admin panel (dashboard)** planı ve implementasyonundan sorumlusun. Tüm admin özellikleri, Studio Admin entegrasyonu, erişim kuralları ve ilerleme takibi senin alanın.
+
+## 📋 Bilmen Gereken Ana Dokümanlar
+
+| Doküman | İçerik |
+|---------|--------|
+| **`docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md`** | Tek kaynak: kapsam, özellik listesi (2.1–2.10), faz önerisi (A–D), UI kararı (Studio Admin), **Uygulama Planı (Bölüm 5)**, teknik notlar, kararlar, referanslar |
+| **`docs/implementation/ADMIN_PANEL_IMPLEMENTATION.md`** | İlerleme takibi: tamamlanan fazlar, sıradaki işler (bağımlılıklarla), devam etmek için referanslar |
+| **`docs/roadmap/PHASE_5_LAUNCH.md`** | Faz 5.8 Admin Panel / Dashboard — ROADMAP checkbox’ları; @project-manager bu checkbox’ları işaretler |
+
+## 🎯 Kararlar (Analiz Dokümanından)
+
+- **Şablon:** [Studio Admin](https://github.com/arhamkhnz/next-shadcn-admin-dashboard) — branch **`archive/next14-tailwindv3`** (Next.js 14 + Tailwind v3 uyumu).
+- **Erişim:** Sadece **`user.role === 'admin'`** olan kullanıcılar admin panele girebilir. Mevcut projede API tarafında zaten `role === 'admin'` kullanılıyor; aynı mantık admin sayfaları için layout/middleware ile uygulanacak.
+- **Route:** Admin UI `app/[locale]/admin/...` veya `app/(admin)/admin/...` altında; locale kararı implementasyon sırasında netleşecek.
+- **İçerik:** İskelet önce kurulacak; sayfalar **zamanla** doldurulacak (sipariş, finans, analytics placeholder’ları boş/örnek veri ile açılabilir).
+
+## 📁 Kod Yapısı (Hedef / Mevcut)
+
+- **Hedef:** `app/[locale]/admin/` veya `app/(admin)/admin/` — layout, sidebar, dashboard sayfaları (Studio Admin’den uyarlanacak).
+- **Koruma:** Tüm `/admin` altı için oturum + `role === 'admin'` kontrolü (middleware veya layout’ta server-side).
+- **Mevcut admin API’leri:** `app/api/tts/settings`, `app/api/debug/*`, `app/api/books` (skipPayment, isExample vb.) — hepsi `role === 'admin'` kullanıyor.
+- **Bull Board (planlı):** `app/api/admin/queues/[[...slug]]/route.ts` — `.cursor/plans/book_generation_progress_ab3e0559.plan.md` içinde tanımlı.
+
+## 🔧 Yapabileceklerin
+
+### 1. Plan ve Sıra Önerme
+- Kullanıcı “admin panelde sırada ne var?” dediğinde: `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` içindeki Faz A → B → C → D ve özellik listesine göre sıradaki adımı söyle.
+- İlk adım: Studio Admin `archive/next14-tailwindv3` branch’ini projeye entegre etmek; layout + sidebar + admin-only koruma; ardından sayfaları zamanla doldurmak.
+
+### 2. İlerleme Güncelleme
+- Admin panel ile ilgili bir iş tamamlandığında:
+  - `docs/implementation/ADMIN_PANEL_IMPLEMENTATION.md` varsa oraya tamamlanan maddeyi işaretle ve kısa not ekle.
+  - Bu kural dosyasındaki “Son durum” / “Yapılan işler” bölümünü (aşağıda) güncelle.
+- @project-manager’a ROADMAP’taki 5.8.x checkbox’larının işaretlenmesi için bilgi ver (checkbox’ları project-manager işaretler).
+
+### 3. Kendini Geliştirme (Kural Güncellemesi)
+- Her önemli implementasyon adımı tamamlandığında bu `.mdc` dosyasını güncelle:
+  - **“Yapılan işler”** listesine tarih ve kısa açıklama ekle.
+  - **“Sıradaki adımlar”** listesini güncel tut.
+- Böylece agent her zaman güncel plan ve ilerlemeden haberdar olur.
+
+### 4. Analiz Dokümanına Referans
+- Admin panel konusunda soru veya karar gerektiğinde önce `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` dosyasına bak; orada yoksa öneri yap ve gerekirse analiz dokümanına “Açık Sorular” veya yeni karar notu ekle.
+
+### 5. Diğer Agent’larla Koordinasyon
+- **@project-manager:** ROADMAP 5.8.x işaretlemesi, faz dosyaları; admin panel “iş tamamlandı” bilgisi project-manager’a iletilir.
+- **@database-manager:** Admin panel için yeni tablo/migration gerekiyorsa (ör. sipariş, aktivite log) database-manager ile uyumlu ilerle.
+- **@api-manager:** Yeni admin API endpoint’leri eklendiğinde API dokümantasyonu ve Postman güncellenmeli.
+
+## 📌 Yapılan İşler (Güncel Tutulacak)
+
+### Faz 0 — İskelet ✅ (15 Mart 2026)
+- `app/[locale]/` route group yapısına geçildi: `(public)` ve `(admin)` grupları.
+- `auth.ts`: `role` JWT token ve session'a eklendi (login sırasında DB'den `getUserRole`).
+- `types/next-auth.d.ts`: `session.user.role`, `token.role` type tanımı.
+- `middleware.ts`: `/admin` için `role === 'admin'` kontrolü; yetkisiz → dashboard.
+- `app/[locale]/(admin)/layout.tsx`: Server-side double-check + sidebar + header render.
+- `components/admin/admin-sidebar.tsx`: Collapsible sidebar (Dashboard aktif; diğerleri "yakında").
+- `components/admin/admin-header.tsx`: Avatar dropdown + çıkış.
+- `app/[locale]/(admin)/admin/page.tsx`: Placeholder dashboard.
+- URL: `/tr/admin` veya `/en/admin`
+
+### Faz B.1 — Kullanıcı Yönetimi ✅ (15 Mart 2026)
+- `lib/db/admin.ts` → `getAdminUsers()` (arama/rol filtresi/pagination) + `getAdminUserById()` (kitaplarıyla).
+- `app/api/admin/users/` → GET (liste) + GET/PATCH `/[id]` (ad + rol düzenleme), admin-only.
+- `/admin/users` — Kullanıcı listesi: isim/email/ID arama, rol filtresi, pagination.
+- `/admin/users/[id]` — Detay: istatistikler, son kitaplar (admin/kitap detay linki), ad+rol düzenleme.
+- Sidebar: "Kullanıcılar" aktif hale getirildi.
+
+### Faz A.2 — Kitap Yönetimi ✅ (15 Mart 2026)
+- `lib/db/admin.ts` → `getAdminBooks()` (pagination, arama, filtreleme) + `getAdminBookById()`.
+- `app/api/admin/books/route.ts` + `app/api/admin/books/[id]/route.ts` (GET + PATCH, admin-only).
+- `app/[locale]/(admin)/admin/books/page.tsx`: kitap listesi — arama, durum/tema/dil filtresi, pagination.
+- `app/[locale]/(admin)/admin/books/[id]/page.tsx`: kitap detay — meta, kapak, sayfa içerikleri önizleme, admin düzenleme formu (başlık + durum).
+- `components/admin/books-table.tsx`, `components/admin/book-edit-form.tsx`: ilgili bileşenler.
+- Sidebar: "Ana Dashboard'a Dön" linki eklendi; "Kitap Yönetimi" aktif hale getirildi.
+
+### Faz A.1 — Ana Dashboard ✅ (15 Mart 2026)
+- `lib/db/admin.ts` → `getAdminStats()`: toplam kullanıcı, kitap (durum bazlı), son 8 kitap, son 8 kullanıcı.
+- `app/api/admin/stats/route.ts`: admin-only API endpoint (401/403).
+- `app/[locale]/(admin)/admin/page.tsx`: gerçek KPI kartları, son kitaplar tablosu, son kullanıcılar tablosu, faz ilerleme listesi.
+
+## 📌 Sıradaki Adımlar (Bağımlılık Bekliyor — Duraklatıldı)
+
+Faz sırası: **Faz A → Faz B → Faz C → Faz D** (`docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` Bölüm 3).  
+**Durum:** Şu an kalan işler BullMQ ve Stripe/İyzico’ya bağlı; bağımlılıklar hazır olunca devam edilecek. Detay: `docs/implementation/ADMIN_PANEL_IMPLEMENTATION.md`.
+
+1. **Faz A.3:** Bull Board — BullMQ planı hayata geçince `/admin/queues` bağlanacak.
+2. **Faz B.2:** Sipariş Yönetimi — Stripe/İyzico sonrası; istenirse önce placeholder sayfa.
+3. **Faz C:** Analytics, finansal metrikler, sistem izleme — veri kaynağı kararları sonrası.
+
+---
+
+**İlgili Dokümantasyon:**
+- `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` — Ana plan ve kararlar
+- `docs/roadmap/PHASE_5_LAUNCH.md` — 5.8 Admin Panel
+- `.cursor/plans/book_generation_progress_ab3e0559.plan.md` — Bull Board / BullMQ planı

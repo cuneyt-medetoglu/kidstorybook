@@ -87,9 +87,156 @@
     "logout": "Çıkış Yap",
     "myLibrary": "Kitaplığım",
     "settings": "Ayarlar",
+    "adminPanel": "Admin Panel",
     "shoppingCart": "Alışveriş Sepeti",
     "lightMode": "Açık Tema",
     "darkMode": "Koyu Tema"
+  },
+  "admin": {
+    "brand": "HeroKidStory Admin",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "bookManagement": "Kitap Yönetimi",
+      "jobQueue": "Job Queue",
+      "orders": "Siparişler",
+      "users": "Kullanıcılar",
+      "system": "Sistem",
+      "comingSoon": "yakında",
+      "backToDashboard": "Ana Dashboard",
+      "expand": "Genişlet",
+      "collapse": "Daralt"
+    },
+    "header": {
+      "title": "Admin Panel",
+      "logout": "Çıkış Yap",
+      "ariaAdmin": "Admin"
+    },
+    "dashboard": {
+      "welcome": "Merhaba, {name}",
+      "subtitle": "HeroKidStory Admin Paneli — Gerçek zamanlı istatistikler",
+      "badgePhase0": "Faz 0 — İskelet tamamlandı",
+      "badgePhaseA1": "Faz A.1 — KPI canlı",
+      "kpi": {
+        "totalUsers": "Toplam Kullanıcı",
+        "totalBooks": "Toplam Kitap",
+        "totalOrders": "Toplam Sipariş",
+        "totalRevenue": "Toplam Gelir",
+        "last8Users": "Son 8 kullanıcı listeleniyor",
+        "booksBreakdown": "{completed} tamamlandı · {generating} üretiliyor · {failed} hatalı",
+        "stripePlaceholder": "Stripe/İyzico entegrasyonu gelince"
+      },
+      "recentBooks": "Son Oluşturulan Kitaplar",
+      "recentUsers": "Son Kayıt Olan Kullanıcılar",
+      "noBooks": "Henüz kitap yok.",
+      "noUsers": "Henüz kullanıcı yok.",
+      "booksCount": "{count} kitap",
+      "phaseProgress": "Faz İlerleme Durumu",
+      "phaseA1": "A.1 — Ana Dashboard: DB'den gerçek KPI verileri",
+      "phaseA2": "A.2 — Kitap Yönetimi: Liste, filtreleme, arama, destek akışı",
+      "phaseA3": "A.3 — Job Queue (Bull Board): BullMQ planı hazır olduğunda"
+    },
+    "books": {
+      "title": "Kitap Yönetimi",
+      "subtitle": "Tüm kullanıcı kitapları — arama, filtreleme, detay ve düzenleme",
+      "searchPlaceholder": "Kitap adı, email veya ID...",
+      "search": "Ara",
+      "clear": "Temizle",
+      "allStatuses": "Tüm Durumlar",
+      "status": {
+        "completed": "Tamamlandı",
+        "generating": "Üretiliyor",
+        "failed": "Hatalı",
+        "draft": "Taslak",
+        "archived": "Arşiv"
+      },
+      "count": "{count} kitap",
+      "table": {
+        "book": "Kitap",
+        "user": "Kullanıcı",
+        "status": "Durum",
+        "theme": "Tema",
+        "language": "Dil",
+        "created": "Oluşturulma",
+        "noBooks": "Kitap bulunamadı"
+      },
+      "detail": {
+        "back": "Kitaplar",
+        "user": "Kullanıcı",
+        "createdAt": "Oluşturulma",
+        "completedAt": "Tamamlandı",
+        "languageAge": "Dil / Yaş",
+        "themeStyle": "Tema / Stil",
+        "cover": "Kapak",
+        "noCover": "Kapak yok",
+        "pageCount": "Sayfa sayısı",
+        "viewCount": "Görüntülenme",
+        "editQuota": "Düzenleme kotası",
+        "downloadPdf": "PDF indir",
+        "pageContents": "Sayfa İçerikleri",
+        "pageCountLabel": "{count} sayfa",
+        "noPageData": "Sayfa verisi yok.",
+        "adminEdit": "Admin Düzenleme",
+        "adminOnly": "Sadece Admin"
+      },
+      "edit": {
+        "bookTitle": "Kitap Başlığı",
+        "bookTitlePlaceholder": "Kitap başlığı...",
+        "status": "Durum",
+        "saveChanges": "Değişiklikleri Kaydet",
+        "saving": "Kaydediliyor…",
+        "saved": "Kaydedildi",
+        "note": "Not: Sayfa içerikleri ve görsellerin düzenlenmesi için kullanıcının kendi Kitap Düzenleme arayüzünü kullanın veya doğrudan DB güncellemesi yapın. Burada başlık ve durum değiştirilebilir."
+      }
+    },
+    "users": {
+      "title": "Kullanıcı Yönetimi",
+      "subtitle": "Tüm kayıtlı kullanıcılar — arama, rol filtresi, detay",
+      "searchPlaceholder": "İsim, email veya ID...",
+      "search": "Ara",
+      "clear": "Temizle",
+      "allRoles": "Tüm Roller",
+      "roleAdmin": "Admin",
+      "roleUser": "Kullanıcı",
+      "count": "{count} kullanıcı",
+      "table": {
+        "user": "Kullanıcı",
+        "role": "Rol",
+        "totalBooks": "Toplam Kitap",
+        "completed": "Tamamlanan",
+        "registered": "Kayıt",
+        "noUsers": "Kullanıcı bulunamadı"
+      },
+      "detail": {
+        "back": "Kullanıcılar",
+        "registeredAt": "Kayıt Tarihi",
+        "totalBooks": "Toplam Kitap",
+        "completedCount": "{count} tamamlandı",
+        "freeCover": "Ücretsiz Kapak",
+        "freeCoverUsed": "Kullanıldı",
+        "freeCoverNotUsed": "Kullanılmadı",
+        "recentBooks": "Son Kitaplar",
+        "noBooks": "Kitap yok.",
+        "adminEdit": "Admin Düzenleme",
+        "adminOnly": "Sadece Admin"
+      },
+      "edit": {
+        "selfWarning": "Kendi hesabınızı düzenliyorsunuz. Rol değişikliği oturumdan çıkışa neden olabilir.",
+        "userName": "Kullanıcı Adı",
+        "userNamePlaceholder": "Ad Soyad...",
+        "role": "Rol",
+        "save": "Kaydet",
+        "saving": "Kaydediliyor…",
+        "saved": "Kaydedildi"
+      }
+    },
+    "pagination": {
+      "pageOf": "Sayfa {page} / {total}"
+    },
+    "timeAgo": {
+      "today": "Bugün",
+      "daysAgo": "{n} gün önce",
+      "monthsAgo": "{n} ay önce"
+    }
   },
   "hero": {
     "badge": "AI Destekli Kişiselleştirme",
