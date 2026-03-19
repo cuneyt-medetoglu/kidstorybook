@@ -58,6 +58,7 @@
   - [ ] Kullanıcı ile iletişim (email gönderme)
   - [ ] Kullanıcı istatistikleri (toplam kitap sayısı, toplam harcama, son aktivite)
 - [ ] **5.8.6** Kitap Yönetimi (Admin) - 🆕 **25 Ocak 2026**
+  - **İlerleme (Mart 2026):** Kitap listesi + detay (AI maliyet özeti, üretim süresi); tarihler `Europe/Istanbul`; DB `024_books_timestamps_timestamptz` + pool UTC — `docs/database/SCHEMA.md`, `docs/implementation/FAZ5_5_IMPLEMENTATION.md`.
   - [ ] Tüm kitaplar listesi
   - [ ] Kitap filtreleme (durum, tema, yaş grubu, oluşturulma tarihi)
   - [ ] Kitap arama (başlık, kullanıcı, ID)

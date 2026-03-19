@@ -25,6 +25,7 @@
     "deploy:build": "npm run clean:all && npm install && npm run build",
     "deploy:build:fast": "npm install && npm run build",
     "worker": "tsx worker.ts",
+    "worker:dev": "tsx watch worker.ts",
     "deploy:restart": "pm2 restart herokidstory",
     "deploy": "npm run deploy:build && npm run deploy:restart"
   },

@@ -33,6 +33,8 @@ export interface BookGenerationState {
   isError: boolean
   isLoading: boolean
   error: string | null
+  /** Worker/pipeline hatası (DB generation_metadata.lastGenerationError) */
+  lastGenerationError: string | null
   refetch: () => void
 }
 
@@ -51,6 +53,7 @@ async function fetchStatus(bookId: string) {
     status: string
     progress_percent: number
     progress_step: string
+    lastGenerationError?: string
   }>
 }
 
@@ -68,6 +71,7 @@ export function useBookGenerationStatus(
     isError: false,
     isLoading: true,
     error: null,
+    lastGenerationError: null,
   })
 
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -116,6 +120,7 @@ export function useBookGenerationStatus(
         isError,
         isLoading: false,
         error: null,
+        lastGenerationError: data.lastGenerationError?.trim() || null,
       }))
 
       if (isDone) {

@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 7 Mart 2026 (Design Token renk sistemi tamamlandı: `globals.css` → `tailwind.config.ts` → ~46 bileşen; hardcoded `purple/pink` → `primary/brand-2` semantic token; 5 hazır palet alternatifi; rehber: `docs/guides/THEME_AND_COLOR_GUIDE.md`; detay: `docs/implementation/DESIGN_TOKEN_IMPLEMENTATION.md`. Önceki: 1 Mart 2026 — Story prompt v2.6.0.)
+**Son güncelleme:** 20 Mart 2026 — `books` zaman damgaları: migration `024_books_timestamps_timestamptz.sql`, `pool` UTC oturumu, admin kitap detayında İstanbul saati + üretim süresi (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet satırları (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 
@@ -90,6 +90,7 @@ docs/
 │   ├── EC2_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY.md # EC2'de proje klasörü kidstorybook → herokidstory yeniden adlandırma
 │   ├── PRODUCTION_MIGRATION_RUNBOOK.md # Production şema migration (5.5.10): backup öncesi, psql -f, rollback
 │   ├── LOCAL_DB_TUNNEL.md # Local'de prod AWS DB'ye bağlanma: ssh:tunnel vs ssh:server, iki terminal, ECONNREFUSED çözümü
+│   ├── AI_COST_AND_USAGE_LOGGING.md # AI cost_usd: OpenAI usage + pricing; TTS Gemini; worker vs worker:dev
 │   └── ...
 │
 ├── ROADMAP_CSV_README.md       # CSV kullanım rehberi (roadmap.csv ve viewer docs/roadmap/ içinde)

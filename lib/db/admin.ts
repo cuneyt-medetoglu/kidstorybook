@@ -3,6 +3,7 @@
  */
 
 import { pool } from './pool'
+import { parseCostUsd } from '@/lib/utils/cost-usd'
 
 export interface AdminStats {
   totalUsers: number
@@ -52,6 +53,8 @@ export interface AdminBookRow {
   user_id: string
   user_name: string | null
   user_email: string
+  /** SUM(ai_requests.cost_usd) for this book; 0 if none */
+  ai_cost_usd_total: number
 }
 
 export interface AdminBooksResult {
@@ -109,9 +112,16 @@ export async function getAdminBooks(filter: AdminBooksFilter = {}): Promise<Admi
       `SELECT b.id, b.title, b.status, b.theme, b.language, b.age_group,
               b.illustration_style, b.total_pages, b.cover_image_url,
               b.created_at, b.completed_at, b.is_example,
-              u.id as user_id, u.name as user_name, u.email as user_email
+              u.id as user_id, u.name as user_name, u.email as user_email,
+              COALESCE(ar.ai_cost_usd_total, 0)::float AS ai_cost_usd_total
        FROM books b
        LEFT JOIN users u ON b.user_id = u.id
+       LEFT JOIN (
+         SELECT book_id, SUM(cost_usd) AS ai_cost_usd_total
+         FROM ai_requests
+         WHERE book_id IS NOT NULL
+         GROUP BY book_id
+       ) ar ON ar.book_id = b.id
        ${where}
        ORDER BY b.created_at DESC
        LIMIT $${idx} OFFSET $${idx + 1}`,
@@ -128,7 +138,10 @@ export async function getAdminBooks(filter: AdminBooksFilter = {}): Promise<Admi
 
   const total = parseInt(countResult.rows[0].count)
   return {
-    books: booksResult.rows,
+    books: booksResult.rows.map((r) => ({
+      ...r,
+      ai_cost_usd_total: parseCostUsd(r.ai_cost_usd_total),
+    })),
     total,
     page,
     pageSize,
@@ -153,13 +166,25 @@ export interface AdminBookDetail extends AdminBookRow {
 export async function getAdminBookById(bookId: string): Promise<AdminBookDetail | null> {
   const result = await pool.query<AdminBookDetail>(
     `SELECT b.*,
-            u.name as user_name, u.email as user_email
+            u.name as user_name, u.email as user_email,
+            COALESCE(ar.ai_cost_usd_total, 0)::float AS ai_cost_usd_total
      FROM books b
      LEFT JOIN users u ON b.user_id = u.id
+     LEFT JOIN (
+       SELECT book_id, SUM(cost_usd) AS ai_cost_usd_total
+       FROM ai_requests
+       WHERE book_id IS NOT NULL
+       GROUP BY book_id
+     ) ar ON ar.book_id = b.id
      WHERE b.id = $1`,
     [bookId]
   )
-  return result.rows[0] || null
+  const row = result.rows[0]
+  if (!row) return null
+  return {
+    ...row,
+    ai_cost_usd_total: parseCostUsd(row.ai_cost_usd_total),
+  }
 }
 
 // ============================================================================

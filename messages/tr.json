@@ -157,6 +157,7 @@
         "theme": "Tema",
         "language": "Dil",
         "created": "Oluşturulma",
+        "estimatedCost": "Tahm. AI ($)",
         "noBooks": "Kitap bulunamadı"
       },
       "detail": {
@@ -164,6 +165,9 @@
         "user": "Kullanıcı",
         "createdAt": "Oluşturulma",
         "completedAt": "Tamamlandı",
+        "generationDuration": "Üretim süresi (kayıt → tamamlandı): {duration}",
+        "generationDurationFromAiLogs": "Tahmini üretim süresi (ilk → son AI isteği): {duration}",
+        "generationDurationInvalid": "Üretim süresi hesaplanamıyor (tamamlanma zamanı, oluşturulmadan önce görünüyor — eski veri). Yeni tamamlanan kitaplarda düzelir.",
         "languageAge": "Dil / Yaş",
         "themeStyle": "Tema / Stil",
         "cover": "Kapak",
@@ -176,7 +180,29 @@
         "pageCountLabel": "{count} sayfa",
         "noPageData": "Sayfa verisi yok.",
         "adminEdit": "Admin Düzenleme",
-        "adminOnly": "Sadece Admin"
+        "adminOnly": "Sadece Admin",
+        "aiCostTitle": "Tahmini AI maliyeti",
+        "aiCostSubtitle": "OpenAI yanıtındaki token kullanımı ve resmi birim fiyatlarla; TTS için Google Cloud Gemini-TTS fiyatlarıyla hesaplanan tahmini USD (fatura değil).",
+        "aiCostTotal": "Toplam",
+        "aiCostBreakdown": "İşlem tipine göre",
+        "aiCostNoRequests": "Bu kitap için henüz AI isteği kaydı yok.",
+        "aiCostPartialNote": "Eski üretimlerde bazı adımlar loglanmamış olabilir; toplam eksik görünebilir.",
+        "aiCostScope": "Her satırın tutarı, ilgili API yanıtındaki usage (veya TTS’te model + metin/ses tahmini) ile güncel resmi fiyat tablolarından türetilir. Eski kitaplarda bazı adımlar hiç loglanmamış olabilir.",
+        "aiCostTotalCalls": "Toplam {count} API kaydı (satır)",
+        "aiCostColOperation": "İşlem",
+        "aiCostColCalls": "Adet",
+        "aiCostColAmount": "Tutar",
+        "operationType": {
+          "story_generation": "Hikaye",
+          "image_cover": "Kapak görseli",
+          "image_page": "Sayfa görseli",
+          "image_master": "Master illüstrasyon",
+          "image_entity": "Varlık görseli",
+          "image_edit": "Görsel düzenleme",
+          "image_regenerate": "Görsel yenileme",
+          "character_analysis": "Karakter analizi",
+          "tts": "Ses (TTS)"
+        }
       },
       "edit": {
         "bookTitle": "Kitap Başlığı",

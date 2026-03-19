@@ -1,40 +1,17 @@
 /**
- * @file OpenAI Images API wrappers with automatic request logging.
- *
- * Covers both image edits (/v1/images/edits) and generations (/v1/images/generations).
- * Logging is fire-and-forget — a logging failure never throws or blocks the caller.
- *
- * Usage (edit):
- *   const result = await imageEditWithLog(formData, {
- *     userId: user.id, bookId: book.id,
- *     operationType: 'image_cover',
- *     model: 'gpt-image-1.5', quality: 'low', size: '1024x1536',
- *     refImageCount: 2,
- *   })
- *
- * Usage (generate):
- *   const result = await imageGenerateWithLog(body, {
- *     userId: user.id, bookId: book.id,
- *     operationType: 'image_page', pageIndex: 3,
- *     model: 'gpt-image-1.5', quality: 'low', size: '1024x1536',
- *   })
+ * OpenAI Images API (edits + generations) — yanıttaki `usage` token’ları + resmi fiyatlarla maliyet.
  */
 
 import { insertAIRequest, type AIOperationType } from '@/lib/db/ai-requests'
+import {
+  imageCostUsdFromUsage,
+  type OpenAIImageUsage,
+} from '@/lib/pricing/openai-usage-cost'
 
-// ============================================================================
-// Pricing
-// ============================================================================
-
-/** Cost per image (1024×1536 portrait). Adjust if size/model changes. */
-const IMAGE_COST_PER_IMAGE: Record<string, Record<string, number>> = {
-  'gpt-image-1.5': { low: 0.011, medium: 0.040, high: 0.070 },
-}
-
-function calcImageCost(model: string, quality: string, count = 1): number {
-  const qualityMap = IMAGE_COST_PER_IMAGE[model]
-  if (!qualityMap) return 0
-  return (qualityMap[quality] ?? qualityMap['low']) * count
+function throwHttpError(prefix: string, status: number, errorText: string): never {
+  const err = new Error(`${prefix}: ${status} - ${errorText}`) as Error & { status: number }
+  err.status = status
+  throw err
 }
 
 // ============================================================================
@@ -54,10 +31,12 @@ export interface ImageLogContext {
   refImageCount?: number
 }
 
-type ImageAPIResult = {
+export type ImageAPIResult = {
   data: Array<{ url?: string; b64_json?: string; revised_prompt?: string }>
-  /** Some API variants return a top-level URL instead of data[].url */
   url?: string
+  output_format?: string
+  /** gpt-image: token kullanımı (maliyet buradan hesaplanır) */
+  usage?: OpenAIImageUsage
 }
 
 // ============================================================================
@@ -109,12 +88,12 @@ export async function imageEditWithLog(
       durationMs,
       requestMeta: buildRequestMeta(ctx),
     })
-    throw new Error(`GPT-image API error: ${response.status} - ${errorText}`)
+    throwHttpError('GPT-image API error', response.status, errorText)
   }
 
   const result: ImageAPIResult = await response.json()
   const imageCount = result.data?.length ?? 1
-  const costUsd = calcImageCost(ctx.model, ctx.quality ?? 'low', imageCount)
+  const costUsd = imageCostUsdFromUsage(ctx.model, result.usage, { kind: 'edit' })
 
   void insertAIRequest({
     userId: ctx.userId, bookId: ctx.bookId, characterId: ctx.characterId,
@@ -122,6 +101,7 @@ export async function imageEditWithLog(
     promptVersion: ctx.promptVersion, pageIndex: ctx.pageIndex,
     status: 'success', imageCount, costUsd, durationMs,
     requestMeta: buildRequestMeta(ctx),
+    responseMeta: { usage: result.usage ?? null },
   })
 
   return result
@@ -188,12 +168,12 @@ export async function imageGenerateWithLog(
       durationMs,
       requestMeta: buildRequestMeta(ctx),
     })
-    throw new Error(`GPT-image API error: ${response.status} - ${errorText}`)
+    throwHttpError('GPT-image API error', response.status, errorText)
   }
 
   const result: ImageAPIResult = await response.json()
   const imageCount = result.data?.length ?? (body.n ?? 1)
-  const costUsd = calcImageCost(ctx.model, ctx.quality ?? body.quality ?? 'low', imageCount)
+  const costUsd = imageCostUsdFromUsage(ctx.model, result.usage, { kind: 'generate' })
 
   void insertAIRequest({
     userId: ctx.userId, bookId: ctx.bookId, characterId: ctx.characterId,
@@ -201,6 +181,7 @@ export async function imageGenerateWithLog(
     promptVersion: ctx.promptVersion, pageIndex: ctx.pageIndex,
     status: 'success', imageCount, costUsd, durationMs,
     requestMeta: buildRequestMeta(ctx),
+    responseMeta: { usage: result.usage ?? null },
   })
 
   return result

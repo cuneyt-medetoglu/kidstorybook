@@ -15,6 +15,7 @@ import OpenAI from 'openai'
 import { uploadFile, getPublicUrl, getObjectBuffer } from '@/lib/storage/s3'
 import { updateBook, updateBookProgressAtLeast } from '@/lib/db/books'
 import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import type { StoryGenerationInput } from '@/lib/prompts/types'
 import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import {
   generateFullPagePrompt,
@@ -539,7 +540,7 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
         finalDescription: character.description,
         confidence: character.analysis_confidence || 0.8,
       },
-      language,
+      language: language as NonNullable<StoryGenerationInput['language']>,
       characters: characters.map((char) => ({
         id: char.id,
         name: char.name,

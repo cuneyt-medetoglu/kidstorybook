@@ -4,6 +4,7 @@
  */
 
 import { pool } from './pool'
+import { parseCostUsd } from '@/lib/utils/cost-usd'
 
 // ============================================================================
 // Types
@@ -126,7 +127,10 @@ export async function getAICostSummary(
      ORDER BY "totalCostUsd" DESC`,
     [fromDate, toDate]
   )
-  return result.rows
+  return result.rows.map((r) => ({
+    ...r,
+    totalCostUsd: parseCostUsd(r.totalCostUsd),
+  }))
 }
 
 /** Per-user cost summary (top spenders). */
@@ -147,7 +151,10 @@ export async function getAICostByUser(
      LIMIT $3`,
     [fromDate, toDate, limit]
   )
-  return result.rows
+  return result.rows.map((r) => ({
+    ...r,
+    totalCostUsd: parseCostUsd(r.totalCostUsd),
+  }))
 }
 
 /** All AI requests for a single book with totals. */
@@ -156,7 +163,7 @@ export async function getAIRequestsByBook(bookId: string): Promise<{
     operationType: AIOperationType
     model: string
     status: AIRequestStatus
-    costUsd: number | null
+    costUsd: number
     durationMs: number | null
     pageIndex: number | null
     createdAt: Date
@@ -177,9 +184,10 @@ export async function getAIRequestsByBook(bookId: string): Promise<{
      ORDER BY created_at ASC`,
     [bookId]
   )
-  const totalCostUsd = result.rows.reduce(
-    (sum: number, r: { costUsd: number | null }) => sum + (r.costUsd ?? 0),
-    0
-  )
-  return { rows: result.rows, totalCostUsd }
+  const rows = result.rows.map((r) => ({
+    ...r,
+    costUsd: parseCostUsd(r.costUsd),
+  }))
+  const totalCostUsd = rows.reduce((sum, r) => sum + (r.costUsd ?? 0), 0)
+  return { rows, totalCostUsd }
 }

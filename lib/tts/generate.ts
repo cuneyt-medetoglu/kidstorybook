@@ -9,9 +9,7 @@ import { getLanguageCode, getPromptForLanguage } from "@/lib/prompts/tts/v1.0.0"
 import { uploadFile, getSignedObjectUrl, fileExists } from "@/lib/storage/s3"
 import { getTtsSettings } from "@/lib/db/tts-settings"
 import { insertAIRequest } from "@/lib/db/ai-requests"
-
-/** Gemini Flash TTS pricing: $0.40 / 1M characters */
-const GEMINI_FLASH_TTS_COST_PER_CHAR = 0.40 / 1_000_000
+import { geminiTtsCostUsdEstimate } from "@/lib/pricing/google-gemini-tts-cost"
 
 const TTS_CACHE_PREFIX = "tts-cache"
 
@@ -189,7 +187,8 @@ export async function generateTts(
   }
 
   const durationMs = Date.now() - ttsStartedAt
-  const costUsd = text.length * GEMINI_FLASH_TTS_COST_PER_CHAR
+  const audioBuffer = Buffer.from(response.audioContent)
+  const costUsd = geminiTtsCostUsdEstimate(modelName, text, audioBuffer)
   if (options.userId && options.userId !== 'unknown') {
     void insertAIRequest({
       userId: options.userId,
@@ -202,10 +201,12 @@ export async function generateTts(
       costUsd,
       durationMs,
       requestMeta: { language, voiceId, speed: validSpeed },
+      responseMeta: {
+        pricing: 'cloud.google.com/text-to-speech/pricing (Gemini-TTS token rates; süre MP3 boyutundan tahmin)',
+      },
     })
   }
 
-  const audioBuffer = Buffer.from(response.audioContent)
   const savedUrl = await saveCachedAudio(cacheHash, audioBuffer)
 
   if (savedUrl) {

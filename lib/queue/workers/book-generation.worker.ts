@@ -84,14 +84,43 @@ export function startBookGenerationWorker(): Worker {
     console.log(`[Worker] ✅ Job ${job.id} completed`)
   })
 
-  worker.on('failed', (job, err) => {
+  worker.on('failed', async (job, err) => {
     const bookId = job?.data?.bookId
-    console.error(`[Worker] ❌ Job ${job?.id} failed (bookId=${bookId}):`, err?.message)
-    // Book status'u 'failed' olarak güncelle
-    if (bookId) {
-      updateBook(bookId, { status: 'failed', progress_step: 'failed' }).catch((dbErr) => {
-        console.error(`[Worker] DB update failed for ${bookId}:`, dbErr)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(`[Worker] ❌ Job ${job?.id} failed (bookId=${bookId}):`, msg)
+    if (err instanceof Error && err.stack) {
+      console.error('[Worker] Stack:', err.stack)
+    }
+    if (!bookId) return
+    try {
+      const { data: book } = await getBookById(bookId)
+      let prevMeta: Record<string, unknown> = {}
+      const raw = book?.generation_metadata
+      if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+        prevMeta = raw as Record<string, unknown>
+      } else if (typeof raw === 'string') {
+        try {
+          const parsed = JSON.parse(raw) as unknown
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            prevMeta = parsed as Record<string, unknown>
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+      const updatedMeta = {
+        ...prevMeta,
+        lastGenerationError: msg.slice(0, 2000),
+        lastGenerationFailedAt: new Date().toISOString(),
+      }
+      await updateBook(bookId, {
+        status: 'failed',
+        progress_step: 'failed',
+        generation_metadata: updatedMeta,
       })
+    } catch (dbErr) {
+      console.error(`[Worker] DB update failed for ${bookId}:`, dbErr)
+      await updateBook(bookId, { status: 'failed', progress_step: 'failed' }).catch(() => {})
     }
   })
 

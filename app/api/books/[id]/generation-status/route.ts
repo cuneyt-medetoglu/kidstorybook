@@ -43,6 +43,21 @@ export async function GET(
       )
     }
 
+    let lastGenerationError: string | undefined
+    const rawMeta = book.generation_metadata
+    if (rawMeta && typeof rawMeta === 'object' && !Array.isArray(rawMeta)) {
+      const e = (rawMeta as Record<string, unknown>).lastGenerationError
+      if (typeof e === 'string' && e.trim()) lastGenerationError = e
+    } else if (typeof rawMeta === 'string') {
+      try {
+        const parsed = JSON.parse(rawMeta) as Record<string, unknown>
+        const e = parsed?.lastGenerationError
+        if (typeof e === 'string' && e.trim()) lastGenerationError = e
+      } catch {
+        /* ignore */
+      }
+    }
+
     return NextResponse.json({
       success: true,
       bookId: book.id,
@@ -50,6 +65,7 @@ export async function GET(
       status: book.status,
       progress_percent: book.progress_percent ?? 0,
       progress_step: book.progress_step ?? '',
+      lastGenerationError,
     })
   } catch (error) {
     if (error instanceof Error && error.message === 'Unauthorized') {

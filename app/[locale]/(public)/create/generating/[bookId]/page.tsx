@@ -77,7 +77,7 @@ export default function GeneratingPage({ params }: PageProps) {
   const { bookId } = params
   const locale = useLocale()
   const router = useRouter()
-  const { title, status, progress, step, isDone, isError, isLoading } =
+  const { title, progress, step, isDone, isError, isLoading, lastGenerationError } =
     useBookGenerationStatus(bookId, 1500)
   const [displayProgress, setDisplayProgress] = useState(0)
 
@@ -222,10 +222,17 @@ export default function GeneratingPage({ params }: PageProps) {
           {/* Error state */}
           {isError && (
             <div className="space-y-3">
-              <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700">
-                {isLang(
-                  'Kitap oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin veya destek ile iletişime geçin.',
-                  'Something went wrong while creating your book. Please try again or contact support.'
+              <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700 space-y-2">
+                <p>
+                  {isLang(
+                    'Kitap oluşturulurken bir sorun oluştu. Lütfen tekrar deneyin veya destek ile iletişime geçin.',
+                    'Something went wrong while creating your book. Please try again or contact support.'
+                  )}
+                </p>
+                {lastGenerationError && (
+                  <pre className="mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded bg-red-100/80 p-2 text-xs text-red-900 font-mono">
+                    {lastGenerationError}
+                  </pre>
                 )}
               </div>
               <Button

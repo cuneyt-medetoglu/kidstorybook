@@ -157,6 +157,7 @@
         "theme": "Theme",
         "language": "Language",
         "created": "Created",
+        "estimatedCost": "Est. AI ($)",
         "noBooks": "No books found"
       },
       "detail": {
@@ -164,6 +165,9 @@
         "user": "User",
         "createdAt": "Created",
         "completedAt": "Completed",
+        "generationDuration": "Generation time (created → completed): {duration}",
+        "generationDurationFromAiLogs": "Approx. generation time (first → last AI request): {duration}",
+        "generationDurationInvalid": "Cannot compute duration (completed time appears before created — legacy row). New completions will show correctly.",
         "languageAge": "Language / Age",
         "themeStyle": "Theme / Style",
         "cover": "Cover",
@@ -176,7 +180,29 @@
         "pageCountLabel": "{count} pages",
         "noPageData": "No page data.",
         "adminEdit": "Admin Edit",
-        "adminOnly": "Admin Only"
+        "adminOnly": "Admin Only",
+        "aiCostTitle": "Estimated AI cost",
+        "aiCostSubtitle": "Estimated USD from OpenAI usage tokens and published rates; TTS from Google Cloud Gemini-TTS pricing (not your invoice).",
+        "aiCostTotal": "Total",
+        "aiCostBreakdown": "By operation type",
+        "aiCostNoRequests": "No AI request logs for this book yet.",
+        "aiCostPartialNote": "Some older runs may not have logged every step; totals can be incomplete.",
+        "aiCostScope": "Each row’s amount is derived from API usage in the response (or TTS model + text/audio estimate) and current published rate tables. Older books may be missing some steps.",
+        "aiCostTotalCalls": "{count} logged API request(s)",
+        "aiCostColOperation": "Operation",
+        "aiCostColCalls": "Count",
+        "aiCostColAmount": "Amount",
+        "operationType": {
+          "story_generation": "Story",
+          "image_cover": "Cover image",
+          "image_page": "Page image",
+          "image_master": "Master illustration",
+          "image_entity": "Entity image",
+          "image_edit": "Image edit",
+          "image_regenerate": "Image regenerate",
+          "character_analysis": "Character analysis",
+          "tts": "TTS audio"
+        }
       },
       "edit": {
         "bookTitle": "Book Title",

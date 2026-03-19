@@ -10,6 +10,7 @@
 - ✅ Migration 003: Books table enhance - **Uygulandı (10 Ocak 2026)**
 - ⏳ Migration 004: Storage buckets policies - **Sırada**
 - ✅ Migration 015: public.users role column (admin/user) - **Debug/Feature Flags (29 Ocak 2026)**
+- ✅ Migration 024: `books` `created_at` / `updated_at` / `completed_at` → `TIMESTAMPTZ` (UTC naive → doğru anlık)
 
 ---
 

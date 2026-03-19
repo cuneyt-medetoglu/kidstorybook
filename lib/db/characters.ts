@@ -322,7 +322,6 @@ export async function updateCharacterLastUsed(
       [characterId]
     )
 
-    console.log('[Character] Updated last_used_at for character:', characterId)
     return { success: true, error: null }
   } catch (error) {
     console.error('[Character] Error updating last_used_at:', error)

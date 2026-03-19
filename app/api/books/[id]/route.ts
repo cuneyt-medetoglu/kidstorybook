@@ -41,29 +41,6 @@ export async function GET(
       return CommonErrors.notFound('Book')
     }
 
-    // DEBUG: Log database data
-    console.log('[GET /api/books/:id] 📦 Database Book Data:')
-    console.log('[GET /api/books/:id]   - Book ID:', book.id)
-    console.log('[GET /api/books/:id]   - Title:', book.title)
-    console.log('[GET /api/books/:id]   - Status:', book.status)
-    console.log('[GET /api/books/:id]   - Total Pages:', book.total_pages)
-    console.log('[GET /api/books/:id]   - Has story_data:', !!book.story_data)
-    console.log('[GET /api/books/:id]   - Has images_data:', !!book.images_data)
-    console.log('[GET /api/books/:id]   - images_data type:', Array.isArray(book.images_data) ? 'array' : typeof book.images_data)
-    console.log('[GET /api/books/:id]   - images_data length:', Array.isArray(book.images_data) ? book.images_data.length : 'N/A')
-    console.log('[GET /api/books/:id]   - Has cover_image_url:', !!book.cover_image_url)
-    console.log('[GET /api/books/:id]   - cover_image_url:', book.cover_image_url || 'MISSING')
-    
-    if (book.story_data && book.story_data.pages) {
-      console.log('[GET /api/books/:id]   - story_data.pages length:', book.story_data.pages.length)
-      console.log('[GET /api/books/:id]   - First page structure:', {
-        pageNumber: book.story_data.pages[0]?.pageNumber,
-        hasText: !!book.story_data.pages[0]?.text,
-        hasImageUrl: !!book.story_data.pages[0]?.imageUrl,
-        imageUrl: book.story_data.pages[0]?.imageUrl || 'MISSING',
-      })
-    }
-
     // Verify ownership (RLS should handle this, but double-check for security)
     if (book.user_id !== user.id) {
       return CommonErrors.forbidden('You do not own this book')

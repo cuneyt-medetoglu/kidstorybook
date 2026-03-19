@@ -1,7 +1,8 @@
 # AI Request Logging — Implementasyon Takibi
 
 **Başlangıç:** 2026-02-28  
-**Kaynak Analiz:** `docs/analysis/AI_REQUEST_LOGGING_ANALYSIS.md`
+**Kaynak Analiz:** `docs/analysis/AI_REQUEST_LOGGING_ANALYSIS.md`  
+**Maliyet (`cost_usd`) ve kullanım:** `docs/guides/AI_COST_AND_USAGE_LOGGING.md` (API `usage` + resmi fiyat tabloları; TTS tahmini).
 
 ---
 

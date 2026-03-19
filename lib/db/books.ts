@@ -237,6 +237,12 @@ export async function updateBook(
     if (input.status !== undefined) {
       fields.push(`status = $${paramCount++}`)
       values.push(input.status)
+      // Yalnızca gerçekten pipeline bittiğinde (step completed); ara adımlarda status=completed yazılan eski satırlar için completed_at dokunulmaz.
+      if (input.status === 'completed' && input.progress_step === 'completed') {
+        fields.push(`completed_at = NOW()`)
+      } else if (input.status === 'generating' || input.status === 'failed') {
+        fields.push(`completed_at = NULL`)
+      }
     }
     if (input.story_data !== undefined) {
       fields.push(`story_data = $${paramCount++}`)

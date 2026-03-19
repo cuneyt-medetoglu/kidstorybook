@@ -1,7 +1,7 @@
 # Faz 5.5: Deployment (AWS EC2) – İmplementasyon Takibi
 
 **Tarih:** 10 Şubat 2026  
-**Son Güncelleme:** 13 Şubat 2026  
+**Son Güncelleme:** 20 Mart 2026  
 **Durum:** 🟢 Faz 5.5 şimdilik tamamlandı (5.5.1, 1.2.7, 5.5.10). Kalan maddeler (5.5.4, 5.5.5, 5.5.6 eksikler, 5.5.8, 5.5.2, 5.5.3) daha sonra bakılacak.  
 **Kaynak:** `docs/roadmap/PHASE_5_LAUNCH.md` (5.5), `docs/analysis/DEPLOYMENT_SERVER_ANALYSIS.md`
 
@@ -32,6 +32,7 @@
 - **13 Şubat 2026:** 5.5.10 Production migration runbook eklendi. `docs/guides/PRODUCTION_MIGRATION_RUNBOOK.md` — migration öncesi backup, prod’da psql -f, rollback/restore.
 - **13 Şubat 2026:** Faz 5.5 şimdilik tamamlandı kabul edildi. Kalan maddeler (5.5.4, 5.5.5, 5.5.6 eksikler, 5.5.8, 5.5.2, 5.5.3) daha sonra bakılacak.
 - **13 Şubat 2026:** Local'de prod AWS DB'ye bağlanma netleştirildi. `npm run ssh:tunnel` (tünel) ile `npm run ssh:server` (sadece shell) ayrımı README'ye yazıldı; `package.json`'a `ssh:tunnel` script'i eklendi. Tünel açılmadan local'de DB istekleri ECONNREFUSED (localhost:5432) veriyordu; iki terminalde sırayla tünel + dev kullanımı dokümante edildi.
+- **20 Mart 2026:** `migrations/024_books_timestamps_timestamptz.sql` — `books.created_at` / `updated_at` / `completed_at` için `TIMESTAMP` → `TIMESTAMPTZ` (UTC naive → doğru anlık). `lib/db/pool.ts` oturum `timezone=UTC`. Admin kitap detayında tarihler `Europe/Istanbul`, üretim süresi; tutarsız satırlarda AI istek zaman aralığından tahmini süre. Prod’da migration: `docs/guides/PRODUCTION_MIGRATION_RUNBOOK.md`.
 
 ---
 

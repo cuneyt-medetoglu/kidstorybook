@@ -55,6 +55,7 @@ scp -i KEY_PEM migrations/018_xxx.sql ubuntu@EC2_IP:~/herokidstory/migrations/
 ```bash
 cd ~/herokidstory
 psql "$DATABASE_URL" -f migrations/020_ai_requests.sql
+# Örnek (Mart 2026): books tarih alanları → TIMESTAMPTZ — migrations/024_books_timestamps_timestamptz.sql
 ```
 
 Eğer `DATABASE_URL` shell'de yüklü değilse (direkt vermek için):

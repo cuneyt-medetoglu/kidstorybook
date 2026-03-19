@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { getAdminBookById } from '@/lib/db/admin'
+import { getAIRequestsByBook } from '@/lib/db/ai-requests'
+import { parseCostUsd } from '@/lib/utils/cost-usd'
 import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +20,7 @@ import {
   AlertCircle,
   Loader2,
   Clock,
+  DollarSign,
 } from 'lucide-react'
 
 const STATUS_ICON: Record<string, React.ReactNode> = {
@@ -36,9 +39,21 @@ const STATUS_COLOR: Record<string, string> = {
   archived: '',
 }
 
+function formatUsd(value: number) {
+  if (!Number.isFinite(value)) return '—'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }).format(value)
+}
+
+/** Admin kitap zamanları: sunucu TZ’den bağımsız, Türkiye saati */
 function formatDate(date: Date | null, locale: string) {
   if (!date) return '—'
   return new Date(date).toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US', {
+    timeZone: 'Europe/Istanbul',
     day: '2-digit',
     month: 'short',
     year: 'numeric',
@@ -47,16 +62,81 @@ function formatDate(date: Date | null, locale: string) {
   })
 }
 
+function formatDurationLabel(ms: number, locale: string): string {
+  const sec = Math.floor(ms / 1000)
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+  const h = Math.floor(m / 60)
+  const min = m % 60
+  if (locale === 'tr') {
+    return h > 0 ? `${h} sa ${min} dk ${s} sn` : `${m} dk ${s} sn`
+  }
+  return h > 0 ? `${h}h ${min}m ${s}s` : `${m}m ${s}s`
+}
+
+/** Önce kitap satırı (completed_at − created_at); tutarsızsa AI istek zaman aralığı */
+function formatGenerationDuration(
+  createdAt: Date | null,
+  completedAt: Date | null,
+  locale: string,
+  aiFirstAt: Date | null | undefined,
+  aiLastAt: Date | null | undefined
+):
+  | { kind: 'book'; label: string }
+  | { kind: 'ai'; label: string }
+  | { kind: 'invalid' }
+  | null {
+  const bookStart = createdAt ? new Date(createdAt).getTime() : NaN
+  const bookEnd = completedAt ? new Date(completedAt).getTime() : NaN
+  if (
+    Number.isFinite(bookStart) &&
+    Number.isFinite(bookEnd) &&
+    bookEnd >= bookStart
+  ) {
+    return { kind: 'book', label: formatDurationLabel(bookEnd - bookStart, locale) }
+  }
+
+  const aiStart = aiFirstAt ? new Date(aiFirstAt).getTime() : NaN
+  const aiEnd = aiLastAt ? new Date(aiLastAt).getTime() : NaN
+  if (Number.isFinite(aiStart) && Number.isFinite(aiEnd) && aiEnd >= aiStart) {
+    return { kind: 'ai', label: formatDurationLabel(aiEnd - aiStart, locale) }
+  }
+
+  if (!createdAt || !completedAt) return null
+  return { kind: 'invalid' }
+}
+
 interface PageProps {
   params: { locale: string; id: string }
 }
 
 export default async function AdminBookDetailPage({ params }: PageProps) {
   const { locale, id } = params
-  const book = await getAdminBookById(id)
+  const [book, aiBook] = await Promise.all([getAdminBookById(id), getAIRequestsByBook(id)])
   if (!book) notFound()
 
+  const { rows: aiRows, totalCostUsd } = aiBook
+  const breakdownMap = new Map<string, { usd: number; count: number }>()
+  for (const r of aiRows) {
+    const add = parseCostUsd(r.costUsd)
+    const cur = breakdownMap.get(r.operationType) ?? { usd: 0, count: 0 }
+    cur.usd += add
+    cur.count += 1
+    breakdownMap.set(r.operationType, cur)
+  }
+  const breakdownSorted = [...breakdownMap.entries()].sort((a, b) => b[1].usd - a[1].usd)
+
+  const aiFirstAt = aiRows[0]?.createdAt ?? null
+  const aiLastAt = aiRows.length ? aiRows[aiRows.length - 1]!.createdAt : null
+
   const t = await getTranslations({ locale, namespace: 'admin.books.detail' })
+  const genDuration = formatGenerationDuration(
+    book.created_at,
+    book.completed_at,
+    locale,
+    aiFirstAt,
+    aiLastAt
+  )
   const tStatus = await getTranslations({ locale, namespace: 'admin.books.status' })
   const statusLabel = tStatus(book.status as any)
   const statusIcon = STATUS_ICON[book.status] ?? STATUS_ICON['draft']
@@ -110,6 +190,18 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
                 {t('completedAt')}: {formatDate(book.completed_at, locale)}
               </p>
             )}
+            {book.status === 'completed' && genDuration && (
+              <p
+                className={`text-xs mt-1 ${
+                  genDuration.kind === 'invalid' ? 'text-amber-700' : 'text-muted-foreground'
+                }`}
+              >
+                {genDuration.kind === 'book' && t('generationDuration', { duration: genDuration.label })}
+                {genDuration.kind === 'ai' &&
+                  t('generationDurationFromAiLogs', { duration: genDuration.label })}
+                {genDuration.kind === 'invalid' && t('generationDurationInvalid')}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -137,6 +229,53 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-1.5">
+            <DollarSign className="h-4 w-4" />
+            {t('aiCostTitle')}
+          </CardTitle>
+          <p className="text-xs text-muted-foreground font-normal leading-relaxed">{t('aiCostSubtitle')}</p>
+          <p className="text-xs text-muted-foreground font-normal leading-relaxed mt-2 border-l-2 border-muted pl-3">
+            {t('aiCostScope')}
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {aiRows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t('aiCostNoRequests')}</p>
+          ) : (
+            <>
+              <div>
+                <p className="text-xs text-muted-foreground">{t('aiCostTotal')}</p>
+                <p className="text-2xl font-semibold tabular-nums">{formatUsd(totalCostUsd)}</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('aiCostTotalCalls', { count: aiRows.length })}</p>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-2">{t('aiCostBreakdown')}</p>
+                <div className="rounded-md border bg-muted/20 overflow-hidden text-sm">
+                  <div className="grid grid-cols-[1fr_auto_auto] gap-x-3 gap-y-0 px-3 py-2 border-b bg-muted/50 text-xs font-medium text-muted-foreground">
+                    <span>{t('aiCostColOperation')}</span>
+                    <span className="text-right tabular-nums">{t('aiCostColCalls')}</span>
+                    <span className="text-right tabular-nums min-w-[5.5rem]">{t('aiCostColAmount')}</span>
+                  </div>
+                  {breakdownSorted.map(([op, { usd, count }]) => (
+                    <div
+                      key={op}
+                      className="grid grid-cols-[1fr_auto_auto] gap-x-3 items-center px-3 py-2 border-b last:border-0"
+                    >
+                      <span>{t(`operationType.${op}` as never)}</span>
+                      <span className="text-right tabular-nums text-muted-foreground">{count}</span>
+                      <span className="text-right font-mono tabular-nums text-muted-foreground">{formatUsd(usd)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">{t('aiCostPartialNote')}</p>
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">

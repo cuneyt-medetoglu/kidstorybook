@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useCallback, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import type { AdminBookRow } from '@/lib/db/admin'
+import { parseCostUsd } from '@/lib/utils/cost-usd'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,6 +43,17 @@ const STATUS_ICON: Record<string, React.ReactNode> = {
   failed: <AlertCircle className="h-3.5 w-3.5 text-red-500" />,
   draft: <Clock className="h-3.5 w-3.5 text-muted-foreground" />,
   archived: <Clock className="h-3.5 w-3.5 text-muted-foreground" />,
+}
+
+function formatEstimatedUsd(value: number | string | null | undefined): string {
+  const n = parseCostUsd(value)
+  if (n <= 0) return '—'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }).format(n)
 }
 
 function timeAgo(date: Date): string {
@@ -156,6 +168,7 @@ export function BooksTable({
               <th className="px-4 py-3 font-medium">{t('table.status')}</th>
               <th className="px-4 py-3 font-medium">{t('table.theme')}</th>
               <th className="px-4 py-3 font-medium">{t('table.language')}</th>
+              <th className="px-4 py-3 font-medium text-right">{t('table.estimatedCost')}</th>
               <th className="px-4 py-3 font-medium">{t('table.created')}</th>
               <th className="px-4 py-3 font-medium w-10" />
             </tr>
@@ -163,7 +176,7 @@ export function BooksTable({
           <tbody>
             {books.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
+                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
                   <BookOpen className="mx-auto h-8 w-8 mb-2 opacity-30" />
                   {t('table.noBooks')}
                 </td>
@@ -204,6 +217,9 @@ export function BooksTable({
                 </td>
                 <td className="px-4 py-3 text-muted-foreground capitalize">{book.theme}</td>
                 <td className="px-4 py-3 text-muted-foreground uppercase">{book.language}</td>
+                <td className="px-4 py-3 text-right font-mono text-muted-foreground whitespace-nowrap">
+                  {formatEstimatedUsd(book.ai_cost_usd_total)}
+                </td>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
                   {timeAgo(book.created_at)}
                 </td>

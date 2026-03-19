@@ -16,22 +16,7 @@
 
 import type OpenAI from 'openai'
 import { insertAIRequest, type AIOperationType } from '@/lib/db/ai-requests'
-
-// ============================================================================
-// Pricing
-// ============================================================================
-
-const CHAT_COST_PER_1M: Record<string, { input: number; output: number }> = {
-  'gpt-4o-mini': { input: 0.15, output: 0.60 },
-  'gpt-4o':      { input: 2.50, output: 10.00 },
-  'o1-mini':     { input: 1.10, output: 4.40 },
-}
-
-function calcChatCost(model: string, inputTokens: number, outputTokens: number): number {
-  const pricing = CHAT_COST_PER_1M[model]
-  if (!pricing) return 0
-  return (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000
-}
+import { chatCostUsdFromUsage } from '@/lib/pricing/openai-usage-cost'
 
 // ============================================================================
 // Context
@@ -92,7 +77,7 @@ export async function chatWithLog(
   const usage = completion.usage
   const inputTokens = usage?.prompt_tokens ?? 0
   const outputTokens = usage?.completion_tokens ?? 0
-  const costUsd = calcChatCost(params.model, inputTokens, outputTokens)
+  const costUsd = chatCostUsdFromUsage(params.model, usage)
 
   void insertAIRequest({
     userId: ctx.userId,
@@ -109,12 +94,7 @@ export async function chatWithLog(
     costUsd,
     durationMs,
     requestMeta: ctx.requestMeta,
-    responseMeta: {
-      finishReason: completion.choices[0]?.finish_reason,
-      cachedTokens: (usage as unknown as Record<string, unknown>)?.prompt_tokens_details
-        ? ((usage as unknown as Record<string, unknown>).prompt_tokens_details as Record<string, unknown>)?.cached_tokens
-        : undefined,
-    },
+    responseMeta: { usage, finishReason: completion.choices[0]?.finish_reason },
   })
 
   return completion
