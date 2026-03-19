@@ -8,6 +8,7 @@
 
 import { NextRequest } from 'next/server'
 import { getBookById } from '@/lib/db/books'
+import { getCharacterTypesByIds } from '@/lib/db/characters'
 import { successResponse, CommonErrors } from '@/lib/api/response'
 
 export async function GET(
@@ -35,6 +36,23 @@ export async function GET(
       return CommonErrors.badRequest('Example book is not yet completed')
     }
 
+    // Collect character IDs in story slot order for type lookup
+    const pages: any[] = book.story_data?.pages ?? []
+    const seenIds = new Set<string>()
+    const characterSlotIds: string[] = []
+    for (const page of pages) {
+      for (const cid of (page.characterIds ?? [])) {
+        if (!seenIds.has(cid)) {
+          seenIds.add(cid)
+          characterSlotIds.push(cid)
+        }
+      }
+    }
+    const typeMap = await getCharacterTypesByIds(characterSlotIds)
+    const characterSlotTypes = characterSlotIds.map(
+      (id) => typeMap[id] ?? { group: 'Child', value: 'Child', displayName: 'Child' }
+    )
+
     return successResponse(
       {
         id: book.id,
@@ -47,6 +65,7 @@ export async function GET(
         story_data: book.story_data,
         cover_image_url: book.cover_image_url,
         images_data: book.images_data,
+        characterSlotTypes,
       },
       'Example book fetched'
     )

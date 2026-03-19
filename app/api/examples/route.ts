@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { pool } from '@/lib/db/pool'
 import { getSignedObjectUrl, getKeyFromOurS3Url } from '@/lib/storage/s3'
 import { routing } from '@/i18n/routing'
+import { getUser } from '@/lib/auth/api-auth'
+import { getUserRole } from '@/lib/db/users'
 
 export const dynamic = 'force-dynamic'
 
 // 24 hours – long enough for any browser session; bucket stays private
 const PRESIGN_EXPIRY_SECONDS = 24 * 60 * 60
+
+function urlPrefixForLog(url: string, max = 96): string {
+  if (!url) return '(empty)'
+  return url.length <= max ? url : `${url.slice(0, max)}…`
+}
 
 /**
  * Returns a presigned GET URL for S3 objects; passes through non-S3 URLs unchanged.
@@ -23,6 +30,26 @@ async function presignPhotoUrl(url: string): Promise<string | null> {
   }
 }
 
+/** Presign + sunucu logu (§11 — usedPhotos boş kalma nedenini izlemek için). */
+async function presignPhotoUrlLogged(
+  url: string,
+  ctx: { bookId: string; kind: 'metadata_usedPhotos' | 'character_reference'; refId: string }
+): Promise<string | null> {
+  const signed = await presignPhotoUrl(url)
+  if (!signed) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(
+        `[examples/presign] failed bookId=${ctx.bookId} kind=${ctx.kind} refId=${ctx.refId} urlPrefix=${urlPrefixForLog(url)}`
+      )
+    } else {
+      console.warn(
+        `[examples/presign] failed bookId=${ctx.bookId} kind=${ctx.kind} refId=${ctx.refId}`
+      )
+    }
+  }
+  return signed
+}
+
 /**
  * GET /api/examples
  * 
@@ -35,6 +62,7 @@ async function presignPhotoUrl(url: string): Promise<string | null> {
  * - theme?: string (e.g., "adventure")
  * - limit?: number (default: 20)
  * - offset?: number (default: 0)
+ * - debug=1: yalnızca oturum açık **admin** için her kitapta `_debugUsedPhotos` (usedPhotos çözüm özeti)
  * 
  * usedPhotos resolution order:
  *   1. generation_metadata.usedPhotos (explicitly stored array) → presign each originalPhoto
@@ -55,6 +83,18 @@ export async function GET(request: NextRequest) {
     const theme = searchParams.get('theme') || undefined
     const limit = parseInt(searchParams.get('limit') || '20', 10)
     const offset = parseInt(searchParams.get('offset') || '0', 10)
+    const debugUsedPhotos = searchParams.get('debug') === '1'
+
+    let includeUsedPhotosDebug = false
+    if (debugUsedPhotos) {
+      const user = await getUser()
+      if (user) {
+        const role = await getUserRole(user.id)
+        if (role === 'admin') {
+          includeUsedPhotosDebug = true
+        }
+      }
+    }
 
     // Build query
     let query = 'SELECT * FROM books WHERE is_example = true AND status = $1 AND language = $2'
@@ -117,7 +157,11 @@ export async function GET(request: NextRequest) {
         usedPhotos = (
           await Promise.all(
             book.generation_metadata.usedPhotos.map(async (p: PhotoEntry) => {
-              const signed = await presignPhotoUrl(p.originalPhoto)
+              const signed = await presignPhotoUrlLogged(p.originalPhoto, {
+                bookId: book.id,
+                kind: 'metadata_usedPhotos',
+                refId: p.id || 'entry',
+              })
               if (!signed) return null
               return { ...p, originalPhoto: signed }
             })
@@ -130,8 +174,19 @@ export async function GET(request: NextRequest) {
           await Promise.all(
             charIds.map(async (charId: string) => {
               const char = charactersMap.get(charId)
-              if (!char) return null
-              const signed = await presignPhotoUrl(char.reference_photo_url)
+              if (!char) {
+                if (process.env.NODE_ENV === 'development') {
+                  console.warn(
+                    `[examples/usedPhotos] character missing or no photo URL bookId=${book.id} charId=${charId}`
+                  )
+                }
+                return null
+              }
+              const signed = await presignPhotoUrlLogged(char.reference_photo_url, {
+                bookId: book.id,
+                kind: 'character_reference',
+                refId: charId,
+              })
               if (!signed) return null
               return {
                 id: `${book.id}-${charId}`,
@@ -143,7 +198,18 @@ export async function GET(request: NextRequest) {
         ).filter((p): p is PhotoEntry => p !== null)
       }
 
-      return {
+      if (process.env.NODE_ENV === 'development' && usedPhotos.length === 0) {
+        const cids: string[] = book.generation_metadata?.characterIds || []
+        console.warn('[examples/usedPhotos] empty after resolve', {
+          bookId: book.id,
+          charIdsCount: cids.length,
+          hadMetadataUsedPhotosArray:
+            Array.isArray(book.generation_metadata?.usedPhotos) &&
+            book.generation_metadata.usedPhotos.length > 0,
+        })
+      }
+
+      const base = {
         id: book.id,
         title: book.title,
         description: book.story_data?.metadata?.description || book.story_data?.pages?.[0]?.text?.slice(0, 150) + '...' || 'A wonderful story',
@@ -157,6 +223,25 @@ export async function GET(request: NextRequest) {
           characterCount: book.generation_metadata?.characterIds?.length || 1,
         },
       }
+
+      if (includeUsedPhotosDebug) {
+        const charIds: string[] = book.generation_metadata?.characterIds || []
+        const resolvedWithUrl = charIds.filter((id) => charactersMap.has(id)).length
+        return {
+          ...base,
+          _debugUsedPhotos: {
+            bookId: book.id,
+            characterIdsFromMetadata: charIds,
+            charactersResolvedWithPhotoUrl: resolvedWithUrl,
+            usedPhotosCount: usedPhotos.length,
+            hadExplicitUsedPhotosInMetadata:
+              Array.isArray(book.generation_metadata?.usedPhotos) &&
+              book.generation_metadata.usedPhotos.length > 0,
+          },
+        }
+      }
+
+      return base
     }))
 
     return NextResponse.json({

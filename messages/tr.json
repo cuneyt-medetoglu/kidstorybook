@@ -601,7 +601,7 @@
       "debugPageCountHelp": "Test için: Varsayılan sayfa sayısını geçersiz kıl (2-20 sayfa). Boş bırakırsan varsayılan (12 sayfa) kullanılır.",
       "ariaCustomRequests": "Özel hikaye istekleri",
       "validationMinLength": "Lütfen hikaye fikrini kısaca anlat",
-      "validationMaxLength": "Özel istekler en fazla 500 karakter olabilir",
+      "validationMaxLength": "Özel istekler en fazla 1000 karakter olabilir",
       "pageCountLabel": "Sayfa Sayısı (İsteğe Bağlı)",
       "placeholder": "Örn. Emma gizli bir kapı keşfediyor...",
       "pageCountPlaceholder": "Boş bırakın (varsayılan: 12 sayfa)"
@@ -638,6 +638,15 @@
         "exampleCreatedDesc": "Örnek kitabınız oluşturuluyor. Hazır olduğunda Örnekler sayfasında görünecek.",
         "exampleCreateError": "Örnek kitap oluşturulamadı",
         "errorTitle": "Hata"
+      },
+      "storyGenerating": {
+        "title": "Hikayeniz yazılıyor…",
+        "hint": "Bu adım yaklaşık bir dakika sürebilir. Lütfen bu sayfayı kapatmayın.",
+        "sub": "Yapay zeka kitabınızın metnini oluşturuyor; bittikten sonra görseller sıraya alınır ve ilerleme ekranına geçilir."
+      },
+      "starting": {
+        "title": "Kitap oluşturma başlatılıyor...",
+        "hint": "Lütfen bekleyin, ilerleme ekranına yönlendiriliyorsunuz."
       }
     },
     "fromExample": {
@@ -683,6 +692,7 @@
     "selectBooksShort": "Seç",
     "createBookShort": "Kitap Oluştur",
     "read": "Oku",
+    "continue": "Oluşturuluyor...",
     "edit": "Düzenle",
     "addToCartHardcopy": "Sepete Ekle (Basılı)",
     "createdOn": "Oluşturuldu",

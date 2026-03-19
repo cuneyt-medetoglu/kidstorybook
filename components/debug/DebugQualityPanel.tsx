@@ -166,7 +166,7 @@ export function DebugQualityPanel({ wizardData, characterIds, canShow, storyMode
         description: result.data?.id ? `Kitap ID: ${result.data.id}` : "Hikayeden kitap oluşturuldu.",
       })
       if (result.data?.id) {
-        window.open(`/books/${result.data.id}`, "_blank")
+        window.open(`/books/${result.data.id}/view`, "_blank")
       }
     } catch (error: any) {
       toast({

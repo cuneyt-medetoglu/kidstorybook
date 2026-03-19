@@ -1,7 +1,7 @@
 # Faz 3: Backend ve AI Entegrasyonu - İmplementasyon Takibi
 
 **Tarih:** 15 Ocak 2026  
-**Son Güncelleme:** 1 Mart 2026  
+**Son Güncelleme:** 20 Mart 2026  
 **Durum:** ✅ Tamamlandı (96% - MVP için %100)  
 **Öncelik:** 🔴 Kritik
 
@@ -12,6 +12,16 @@
 **14 Şubat 2026 – Story model seçimi (admin):** Tek dropdown (Step 6) Create without payment, Example book ve Debug Kalite Paneli "Sadece Hikaye" testini kontrol eder; varsayılan gpt-4o-mini. Example book artık gpt-4o zorlaması yok; seçilen model kullanılır. `POST /api/ai/generate-story`: `storyModel` parametresi (admin whitelist), model-aware maliyet (input/output token). DebugQualityPanel `storyModel` prop ile API'ye iletir.
 
 **9 Şubat 2026 – TTS ve E-book Viewer:** TTS S3 signed URL ile düzeltildi; admin TTS config (tts_settings), kitap tamamlanınca TTS prewarm; Parent Settings sesli okuma (hız, volume, localStorage); BookViewer mute, prefs, Audio badge (dashboard), çocuk UX (44px dokunmatik, active:scale-95). Ref: docs/analysis/TTS_GOOGLE_GEMINI_ANALYSIS.md
+
+**20 Mart 2026 – Book Generation stabilizasyonu (Queue + Progress + UX):**
+- Story generation worker zincirine alındı; `POST /api/books` hızlı `bookId` döndürüyor, kullanıcı doğrudan generating sayfasına gidiyor.
+- `%90` aşamasında erken `completed` sorunu düzeltildi; `completed` yalnızca TTS sonrası finalde set ediliyor.
+- TTS ilerleme güncellemeleri monotonic hale getirildi (`93 → 97 → 100`).
+- `from-example` akışında karakter tipi korunuyor; tüm karakterlerin yanlışlıkla `Child` olması düzeltildi.
+- `Pets` için master prompt ayrıştırıldı (insan/çocuk anatomi direktiflerinden ayrık).
+- Dashboard in-progress kitaplar generating sayfasına doğru resume ediyor.
+- Log gürültüsü azaltıldı: auth debug logları env bayrağına bağlandı (`AUTH_DEBUG_LOGS=1`), generation polling serialized + görünmeyen sekmede bekletmeli hale getirildi.
+- Progress UI akışkanlığı artırıldı: polling aralığı optimize edildi + görsel progress smoothing eklendi.
 
 ---
 
@@ -406,6 +416,13 @@ Faz 3, backend API'lerinin ve AI entegrasyonunun implementasyonunu kapsar.
 - **Word count repair:** İkinci kitapta AI sayfa metinleri 26, 28, 25 kelime döndü; min 30 hedefi için repair devreye girdi, sayfalar 53, 59, 58 kelimeye genişletildi.
 - **Supporting entity:** İkinci kitapta "Shimmering Fox" için entity master üretildi; kapakta 2 referans görsel (master + entity) kullanıldı.
 - **Trace:** `kidstorybook-trace-2026-02-08T22-07-24.json` (debug export; .gitignore ile `*.json` hariç tutulabilir).
+
+## 🧪 Son Create Book E2E Test (20 Mart 2026)
+
+- **Akış:** Step 1–6 → `POST /api/books` (hızlı yanıt) → `/create/generating/{bookId}` → worker: story → master → cover → pages → tts → completed.
+- **Doğrulamalar:** `%90` aşamasında `completed` olmuyor; TTS tamamlanmadan final yok. Finalde `100% + completed` ile `/books/{id}/view` açılıyor.
+- **Karakter doğruluğu:** Pet karakter (`Pets/Dog`) ile üretim başarılı; master prompt ayrımı aktif.
+- **Durum:** ✅ Başarılı (kritik regresyon gözlenmedi).
 
 ---
 

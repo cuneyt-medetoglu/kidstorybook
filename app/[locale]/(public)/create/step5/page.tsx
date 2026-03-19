@@ -13,6 +13,7 @@ import { useState, useMemo } from "react"
 
 // Default page count when debug field is left empty
 const DEFAULT_PAGE_COUNT = 12
+const STORY_IDEA_MAX_LENGTH = 1000
 
 // Build schema based on whether custom theme is selected (Step 5 requires customRequests when theme is custom)
 function getFormSchema(
@@ -21,8 +22,8 @@ function getFormSchema(
 ) {
   return z.object({
     customRequests: isCustomTheme
-      ? z.string().min(10, messages.minLength).max(500, messages.maxLength)
-      : z.string().max(500, messages.maxLength).optional().or(z.literal("")),
+      ? z.string().min(10, messages.minLength).max(STORY_IDEA_MAX_LENGTH, messages.maxLength)
+      : z.string().max(STORY_IDEA_MAX_LENGTH, messages.maxLength).optional().or(z.literal("")),
     // Boş/NaN = undefined kabul et; sayı ise 0–20 arası. Boş bırakılınca default 12 kullanılacak.
     pageCount: z.preprocess(
       (val) => (val === "" || val === undefined || Number.isNaN(val) ? undefined : Number(val)),
@@ -72,7 +73,7 @@ export default function Step5Page() {
 
   const customRequests = watch("customRequests") || ""
   const pageCount = watch("pageCount")
-  const remainingChars = 500 - customRequests.length
+  const remainingChars = STORY_IDEA_MAX_LENGTH - customRequests.length
 
   const handleNext = async () => {
     const valid = await trigger()
@@ -236,6 +237,7 @@ export default function Step5Page() {
                 <textarea
                   id="customRequests"
                   {...register("customRequests")}
+                  maxLength={STORY_IDEA_MAX_LENGTH}
                   placeholder={t("placeholder")}
                   className="min-h-[200px] w-full resize-y rounded-lg border-2 border-gray-300 bg-white p-4 text-gray-900 transition-all placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50 dark:placeholder:text-slate-500 dark:focus:border-primary md:min-h-[250px]"
                   aria-label={t("ariaCustomRequests")}

@@ -16,6 +16,8 @@ import FacebookProvider from 'next-auth/providers/facebook'
 import { getUserByEmail, createUser } from '@/lib/db/users'
 import bcrypt from 'bcryptjs'
 
+const AUTH_DEBUG_LOGS = process.env.AUTH_DEBUG_LOGS === '1'
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true, // IP veya domain ile erişimde UntrustedHost hatasını önler (EC2, proxy)
   providers: [
@@ -93,10 +95,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const { getUserRole } = await import('@/lib/db/users')
         const role = await getUserRole(user.id as string)
         token.role = role ?? 'user'
-        if (process.env.NODE_ENV === 'development') {
+        if (AUTH_DEBUG_LOGS) {
           console.log('[Auth jwt] Sign-in: userId=', user.id, '| DB role=', role, '| token.role=', token.role)
         }
-      } else if (process.env.NODE_ENV === 'development' && token.id) {
+      } else if (AUTH_DEBUG_LOGS && token.id) {
         console.log('[Auth jwt] Request (no user): token.role=', token.role, '| token.id=', token.id)
       }
       return token
@@ -105,7 +107,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.id = token.id as string
         ;(session.user as { id: string; role?: string }).role = token.role as string
-        if (process.env.NODE_ENV === 'development') {
+        if (AUTH_DEBUG_LOGS) {
           console.log('[Auth session] session.user.role=', (session.user as { role?: string }).role)
         }
       }

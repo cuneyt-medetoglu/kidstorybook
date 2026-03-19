@@ -195,6 +195,11 @@ export default function LibraryPage() {
   }
 
   const handleReadBook = (bookId: string) => {
+    const targetBook = books.find((b) => b.id === bookId)
+    if (targetBook?.status === "in-progress") {
+      router.push(`/create/generating/${bookId}`)
+      return
+    }
     router.push(`/books/${bookId}/view`)
   }
 
@@ -731,7 +736,7 @@ export default function LibraryPage() {
                         onClick={() => handleReadBook(book.id)}
                         className="flex-1 bg-gradient-to-r from-primary to-brand-2 hover:opacity-90 transition-opacity text-white"
                       >
-                        {t("read")}
+                        {book.status === "in-progress" ? t("continue") : t("read")}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleEditBook(book.id)} className="flex-1">
                         <Edit className="mr-1 h-4 w-4" />

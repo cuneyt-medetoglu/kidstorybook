@@ -126,6 +126,28 @@ export async function getCharacterById(
   }
 }
 
+/** Returns character_type JSONB for the given IDs, preserving input order. */
+export async function getCharacterTypesByIds(
+  characterIds: string[]
+): Promise<Record<string, any>> {
+  if (!characterIds.length) return {}
+  try {
+    const placeholders = characterIds.map((_, i) => `$${i + 1}`).join(', ')
+    const result = await pool.query(
+      `SELECT id, character_type FROM characters WHERE id IN (${placeholders})`,
+      characterIds
+    )
+    const map: Record<string, any> = {}
+    for (const row of result.rows) {
+      map[row.id] = row.character_type ?? null
+    }
+    return map
+  } catch (error) {
+    console.error('Error fetching character types:', error)
+    return {}
+  }
+}
+
 export async function getUserCharacters(
   userId: string
 ): Promise<{ data: Character[] | null; error: Error | null }> {

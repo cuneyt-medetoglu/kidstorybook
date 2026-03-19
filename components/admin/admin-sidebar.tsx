@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 const NAV_ITEMS: { key: string; href: string; icon: React.ElementType; available: boolean }[] = [
   { key: 'dashboard', href: '/admin', icon: LayoutDashboard, available: true },
   { key: 'bookManagement', href: '/admin/books', icon: BookOpen, available: true },
-  { key: 'jobQueue', href: '/admin/queues', icon: Activity, available: false },
+  { key: 'jobQueue', href: '/admin/queues', icon: Activity, available: true },
   { key: 'orders', href: '/admin/orders', icon: ShoppingCart, available: false },
   { key: 'users', href: '/admin/users', icon: Users, available: true },
   { key: 'system', href: '/admin/settings', icon: Settings, available: false },

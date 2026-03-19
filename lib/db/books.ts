@@ -37,6 +37,8 @@ export interface Book {
   edit_quota_used?: number
   edit_quota_limit?: number
   source_example_book_id?: string
+  progress_percent?: number
+  progress_step?: string
 }
 
 export interface CreateBookInput {
@@ -69,6 +71,8 @@ export interface UpdateBookInput {
   generation_metadata?: any
   edit_quota_used?: number
   edit_quota_limit?: number
+  progress_percent?: number
+  progress_step?: string
 }
 
 // ============================================================================
@@ -274,6 +278,14 @@ export async function updateBook(
       fields.push(`edit_quota_limit = $${paramCount++}`)
       values.push(input.edit_quota_limit)
     }
+    if (input.progress_percent !== undefined) {
+      fields.push(`progress_percent = $${paramCount++}`)
+      values.push(input.progress_percent)
+    }
+    if (input.progress_step !== undefined) {
+      fields.push(`progress_step = $${paramCount++}`)
+      values.push(input.progress_step)
+    }
 
     if (fields.length === 0) {
       return getBookById(bookId)
@@ -291,6 +303,32 @@ export async function updateBook(
   } catch (error) {
     console.error('Error updating book:', error)
     return { data: null, error: error as Error }
+  }
+}
+
+/**
+ * Sayfa görselleri paralel üretilirken her tamamlanan sayfa için ayrı UPDATE atılıyor;
+ * tamamlanma sırası rastgele olduğundan düşük yüzde son yazılırsa UI'da "geri atlama" olur.
+ * Bu fonksiyon progress_percent'i yalnızca artırır (PostgreSQL GREATEST).
+ */
+export async function updateBookProgressAtLeast(
+  bookId: string,
+  minPercent: number,
+  step: string
+): Promise<{ error: Error | null }> {
+  try {
+    await pool.query(
+      `UPDATE books SET
+        progress_percent = GREATEST(COALESCE(progress_percent, 0), $2::integer),
+        progress_step = $3,
+        updated_at = NOW()
+      WHERE id = $1::uuid`,
+      [bookId, minPercent, step]
+    )
+    return { error: null }
+  } catch (error) {
+    console.error('Error updating book progress (monotonic):', error)
+    return { error: error as Error }
   }
 }
 

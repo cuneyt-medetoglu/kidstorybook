@@ -22,6 +22,7 @@ import { generateTts } from '@/lib/tts/generate'
 import { chatWithLog } from '@/lib/ai/chat'
 import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
 import OpenAI from 'openai'
+import { enqueueBookGeneration } from '@/lib/queue/client'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -41,6 +42,9 @@ type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
 
 /** Maximum number of characters (main + additional) per book. Must match create flow (Step 2). */
 const MAX_CHARACTERS = 5
+
+/** Max length for customRequests (story idea). Must match create Step 5. */
+const STORY_IDEA_MAX_LENGTH = 1000
 
 function normalizeThemeKey(theme: string): string {
   const t = (theme || '').toString().trim().toLowerCase()
@@ -613,6 +617,9 @@ export async function POST(request: NextRequest) {
     if (themeKey === 'custom' && (!customRequests || !String(customRequests).trim())) {
       return CommonErrors.badRequest('customRequests is required when theme is custom')
     }
+    if (customRequests != null && String(customRequests).length > STORY_IDEA_MAX_LENGTH) {
+      return CommonErrors.badRequest(`customRequests must not exceed ${STORY_IDEA_MAX_LENGTH} characters`)
+    }
 
     // Get Characters (NEW: Support both single and multiple characters)
     let characters: any[] = []
@@ -831,6 +838,85 @@ export async function POST(request: NextRequest) {
     // FULL BOOK MODE: Generate story (or use pre-generated story_data)
     // ====================================================================
     else {
+      // ==================================================================
+      // FAST PATH (P3 §10/C): Normal full-book, debug kapalı, pre-generated yok.
+      // Kitap kaydı hemen oluşturulur (story_generating), worker hikayeyi üretir.
+      // API ~1sn'de bookId döndürür → kullanıcı anında generating sayfasına geçer.
+      // ==================================================================
+      if (!isDebugRunUpTo && !preGeneratedStoryData) {
+        const placeholderTitleByLanguage: Record<string, string> = {
+          tr: character.name ? `${character.name} için kitap oluşturuluyor` : 'Kitap oluşturuluyor...',
+          en: character.name ? `Creating a book for ${character.name}` : 'Creating book...',
+          de: character.name ? `Buch für ${character.name} wird erstellt` : 'Buch wird erstellt...',
+          fr: character.name ? `Création du livre pour ${character.name}` : 'Création du livre...',
+          es: character.name ? `Creando libro para ${character.name}` : 'Creando libro...',
+          zh: character.name ? `正在为${character.name}创建图书` : '正在创建图书...',
+          pt: character.name ? `Criando livro para ${character.name}` : 'Criando livro...',
+          ru: character.name ? `Создается книга для ${character.name}` : 'Создается книга...',
+        }
+        const placeholderTitle = placeholderTitleByLanguage[language] || placeholderTitleByLanguage.en
+
+        const { data: createdBook, error: bookError } = await createBook(user.id, {
+          character_id: character.id,
+          title: placeholderTitle,
+          theme,
+          illustration_style: illustrationStyle,
+          language,
+          age_group: 'preschool',
+          total_pages: effectivePageCount,
+          story_data: null,
+          status: 'generating',
+          custom_requests: customRequests,
+          images_data: [],
+          ...(isExample === true && { is_example: true }),
+          generation_metadata: {
+            model: effectiveStoryModel,
+            imageModel,
+            imageSize,
+            promptVersion: '1.0.0',
+            tokensUsed: 0,
+            generationTime: 0,
+            mode: 'full-book',
+            characterIds: characters.map((c) => c.id),
+            additionalCharacters: characters.slice(1).map((c) => c.character_type || {
+              group: 'Child', value: 'Child', displayName: c.name,
+            }),
+          },
+        })
+
+        if (bookError || !createdBook) {
+          console.error('[Create Book] DB error (fast path):', bookError)
+          throw new Error('Failed to save book to database')
+        }
+
+        await updateBook(createdBook.id, { progress_percent: 0, progress_step: 'story_generating' })
+
+        const effectiveCharacterIds = characterIds ?? characters.map((c: { id: string }) => c.id)
+        await enqueueBookGeneration({
+          bookId: createdBook.id,
+          userId: user.id,
+          themeKey,
+          illustrationStyle,
+          language,
+          customRequests,
+          isFromExampleMode: false,
+          isCoverOnlyMode: false,
+          characterIds: effectiveCharacterIds,
+          storyModel: effectiveStoryModel,
+          pageCount: effectivePageCount,
+        })
+
+        console.log(`[Create Book] ✅ Book ${createdBook.id} created → story_generating in worker`)
+
+        return successResponse(
+          { id: createdBook.id, title: placeholderTitle, status: 'queued', bookId: createdBook.id },
+          'Book creation started — story generating in background'
+        )
+      }
+
+      // ==================================================================
+      // YAVAŞ / DEBUG YOLU: Mevcut senkron hikaye üretimi (debug veya pre-generated story)
+      // ==================================================================
       const usePreGeneratedStory =
         preGeneratedStoryData &&
         Array.isArray(preGeneratedStoryData.pages) &&
@@ -1129,8 +1215,39 @@ export async function POST(request: NextRequest) {
     }
 
     // ====================================================================
-    // FROM-EXAMPLE: master generation; cover/page use same pipeline below
+    // ASYNC MODE: Kuyruğa ekle ve hemen bookId döndür (debug modlar hariç)
     // ====================================================================
+    if (!isDebugRunUpTo) {
+      const effectiveCharacterIds = characterIds ?? characters.map((c: { id: string }) => c.id)
+      await enqueueBookGeneration({
+        bookId: book.id,
+        userId: user.id,
+        themeKey,
+        illustrationStyle: book.illustration_style || illustrationStyle,
+        language: book.language || language,
+        customRequests,
+        isFromExampleMode,
+        isCoverOnlyMode,
+        characterIds: effectiveCharacterIds,
+        fromExampleId,
+      })
+      console.log(`[Create Book] 📥 Book ${book.id} enqueued for image generation`)
+      return successResponse(
+        {
+          id: book.id,
+          title: book.title,
+          status: 'queued',
+          bookId: book.id,
+        },
+        'Book creation started — generating in background'
+      )
+    }
+
+    // ====================================================================
+    // DEBUG/SYNC MODE: Admin debug modlarında (debugRunUpTo) mevcut pipeline devam eder
+    // ====================================================================
+
+    // FROM-EXAMPLE: master generation; cover/page use same pipeline below
     if (isFromExampleMode && exampleBook) {
       await updateBook(book.id, { status: 'generating' })
 

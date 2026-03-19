@@ -57,16 +57,21 @@ export async function POST(request: NextRequest) {
     // Calculate page count (planType: "10" = 10 pages, "15" = 15 pages, "20" = 20 pages)
     const pageCount = parseInt(planType)
 
-    // ROADMAP: 3.6 - call book generation API for remaining pages; for now return order ID
+    // ROADMAP: Gerçek ödeme entegrasyonu tamamlanınca:
+    // 1. Ödemeyi doğrula (Stripe/iyzico)
+    // 2. POST /api/books ile kitabı oluştur (enqueueBookGeneration)
+    // 3. { bookId } ile /create/generating/{bookId} sayfasına yönlendir
+    // Şimdilik mock: orderId döner, frontend progress sayfasına yönlendirilmez
     const orderId = `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
     return NextResponse.json({
       success: true,
       orderId,
-      message: "Purchase successful (mock). Book generation will start shortly.",
+      message: "Purchase successful (mock). Real payment + book generation pending Faz 4.1/4.2.",
       draftId,
       planType,
       pageCount,
+      // TODO Faz 4.1: bookId ekle, frontend /create/generating/{bookId} sayfasına yönlendirsin
     })
   } catch (error) {
     logger.error("[Purchase From Draft] Error:", error)

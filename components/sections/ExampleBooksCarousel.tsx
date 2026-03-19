@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, ChevronLeft, ChevronRight, Eye, BookOpen } from "lucide-react"
-import type { ExampleBook } from "@/app/[locale]/examples/types"
+import type { ExampleBook } from "@/app/[locale]/(public)/examples/types"
 import { useTranslations, useLocale } from "next-intl"
 
 const CARDS_PER_PAGE = 3

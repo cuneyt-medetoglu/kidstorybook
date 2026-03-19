@@ -456,6 +456,7 @@ export default function Step6Page() {
       })
       return
     }
+    let willNavigate = false
     setIsCreating(true)
     try {
       const response = await fetch("/api/books", {
@@ -467,7 +468,7 @@ export default function Step6Page() {
       if (!response.ok) {
         throw new Error(result.error || result.message || "Create book failed")
       }
-      const bookId = result.data?.id ?? result.id
+      const bookId = result.data?.id ?? result.data?.bookId ?? result.id
       if (result.data?.debugTrace?.length) {
         setTraceData(result.data.debugTrace)
         setTraceModalOpen(true)
@@ -475,7 +476,11 @@ export default function Step6Page() {
           title: "Kitap oluşturuldu",
           description: "Tüm adımların request/response'ı aşağıda. İnceleyip kapatabilirsiniz.",
         })
+      } else if (bookId) {
+        willNavigate = true
+        router.push(`/create/generating/${bookId}`)
       } else {
+        willNavigate = true
         toast({
           title: t("toasts.bookStarted"),
           description: t("toasts.bookStartedDesc"),
@@ -490,7 +495,9 @@ export default function Step6Page() {
         variant: "destructive",
       })
     } finally {
-      setIsCreating(false)
+      // Navigation başlandıysa overlay'i kapat­ma — component unmount olunca kaybolur.
+      // Kapatmak step6'nın kısa süre flash görünmesine neden olur.
+      if (!willNavigate) setIsCreating(false)
     }
   }
 
@@ -546,6 +553,7 @@ export default function Step6Page() {
       return
     }
 
+    let willNavigate = false
     setIsCreating(true)
     try {
       const response = await fetch("/api/books", {
@@ -562,12 +570,18 @@ export default function Step6Page() {
         throw new Error(result.error || "Failed to create example book")
       }
 
+      const bookId = result.data?.id ?? result.data?.bookId ?? result.id
       toast({
         title: t("toasts.exampleCreated"),
         description: t("toasts.exampleCreatedDesc"),
       })
 
-      router.push(`/dashboard`)
+      willNavigate = true
+      if (bookId) {
+        router.push(`/create/generating/${bookId}`)
+      } else {
+        router.push(`/dashboard`)
+      }
     } catch (error) {
       console.error("Error creating example book:", error)
       toast({
@@ -579,7 +593,7 @@ export default function Step6Page() {
         variant: "destructive",
       })
     } finally {
-      setIsCreating(false)
+      if (!willNavigate) setIsCreating(false)
     }
   }
 
@@ -1459,6 +1473,26 @@ export default function Step6Page() {
           )}
         </DialogContent>
       </Dialog>
+
+      {isCreating && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4"
+          role="alertdialog"
+          aria-busy="true"
+          aria-live="polite"
+        >
+          <div className="max-w-md rounded-2xl border bg-card p-8 shadow-xl text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" aria-hidden />
+            <h2 className="text-lg font-semibold text-foreground">
+              {t("starting.title")}
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {t("starting.hint")}
+            </p>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

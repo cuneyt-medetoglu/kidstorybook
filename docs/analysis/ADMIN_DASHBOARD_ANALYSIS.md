@@ -1,8 +1,8 @@
 # Admin Dashboard — Analiz Dokümanı
 
 **Tarih:** 15 Mart 2026  
-**Son güncelleme:** 15 Mart 2026 — **Faz 0 tamamlandı.** İskelet canlı: route groups, admin layout, sidebar, middleware koruması.  
-**Durum:** AKTIF — Faz A devam ediyor.  
+**Son güncelleme:** 18 Mart 2026 — **Faz A.3 tamamlandı.** Job Queue Monitor ve Progress Sayfası canlı. Tüm Faz A adımları tamamlandı.  
+**Durum:** AKTIF — Faz B devam ediyor (Kullanıcı Yönetimi ✅, Sipariş bekliyor).  
 **Roadmap Referansı:** 5.8.x (Admin Panel / Dashboard)  
 **Agent:** Admin panel planı ve ilerlemeden sorumlu agent: **@admin-panel-manager** (`.cursor/rules/admin-panel-manager.mdc`)
 
@@ -127,8 +127,8 @@ Fazlar, **altyapı → temel içerik → yönetim → analytics → ileri** mant
 | Faz | İçerik | Bağımlılık / Not |
 |-----|--------|-------------------|
 | **Faz 0 — İskelet** ✅ | Route groups, auth.ts role, middleware, admin layout, sidebar, placeholder dashboard | **TAMAMLANDI — 15 Mart 2026** |
-| **Faz A — Temel İçerik** | 2.1 Ana Dashboard, 2.4 Kitap Yönetimi, 2.5 Bull Board (queue izleme) | Faz 0 biter; 2.5 için BullMQ planının hayata geçmesi gerekir |
-| **Faz B — Yönetim** | 2.2 Sipariş, 2.3 Kullanıcı, 2.8 kısmi (Sistem Ayarları) | E-ticaret / sipariş verisi anlamlı olduktan sonra; 2.8 kısmi (TTS, ayarlar) daha erken de eklenebilir |
+| **Faz A — Temel İçerik** ✅ | 2.1 Ana Dashboard, 2.4 Kitap Yönetimi, 2.3 Kullanıcı Yönetimi, 2.5 Job Queue Monitor, BullMQ Progress Sayfası | **TAMAMLANDI — 18 Mart 2026** |
+| **Faz B — Yönetim** | 2.2 Sipariş Yönetimi, 2.8 kısmi (TTS ayarları, sistem logları) | Stripe/İyzico entegrasyonu; 2.8 kısmi bağımsız eklenebilir |
 | **Faz C — Analytics** | 2.6 Gerçek zamanlı analytics, 2.7 Finansal metrikler, 2.8 tam | Stripe/İyzico ve veri kaynağı kararları sonrası |
 | **Faz D — İleri** | 2.9 Prompt Yönetimi, 2.10 Alert Sistemi | Post-MVP |
 
@@ -142,7 +142,7 @@ Fazlar, **altyapı → temel içerik → yönetim → analytics → ileri** mant
 - `app/[locale]/(admin)/admin/page.tsx`: Placeholder dashboard (KPI, badge, sıradaki adımlar).  
 - **URL:** `/tr/admin` — sadece `role === admin` olan kullanıcılar erişebilir.  
 
-**Faz A — Temel İçerik (Sırayla)**  
+**Faz A — Temel İçerik** ✅ **TAMAMLANDI — 18 Mart 2026 (tüm A adımları bitti)**  
 1. **A.1 Ana Dashboard (2.1)** ✅ **TAMAMLANDI — 15 Mart 2026**
    - `lib/db/admin.ts` → `getAdminStats()` — toplam kullanıcı, kitap, son 8 kitap, son 8 kullanıcı.  
    - `app/api/admin/stats/route.ts` → admin-only API endpoint (401/403 korumalı).  
@@ -154,13 +154,24 @@ Fazlar, **altyapı → temel içerik → yönetim → analytics → ileri** mant
    - `/admin/books` — Kitap listesi: başlık/email/ID arama, durum filtresi, pagination.  
    - `/admin/books/[id]` — Detay: meta, kapak, sayfa ön izleme, başlık+durum düzenleme.  
    - Sidebar: “Ana Dashboard’a Dön” linki eklendi.  
-3. **A.3 Job Queue / Bull Board (2.5)**  
-   - BullMQ ve worker planı (`.cursor/plans/book_generation_progress_ab3e0559.plan.md`) hayata geçtiğinde: `/admin/queues` ekranı (Waiting, Active, Completed, Failed, retry).  
+3. **A.3 Kullanıcı Yönetimi (2.3)** ✅ **TAMAMLANDI — 15 Mart 2026**
+   - `lib/db/admin.ts` → `getAdminUsers()` (arama/rol filtresi/pagination) + `getAdminUserById()`.  
+   - `app/api/admin/users/` → GET (liste) + GET/PATCH `/[id]` (ad + rol düzenleme), admin-only.  
+   - `/admin/users` — Kullanıcı listesi: isim/email/ID arama, rol filtresi, pagination.  
+   - `/admin/users/[id]` — Detay: istatistikler, son kitaplar (admin/kitap detay linki), ad+rol düzenleme.  
+   - Sidebar: “Kullanıcılar” aktif hale getirildi.  
+4. **A.4 Job Queue Monitor / BullMQ (2.5)** ✅ **TAMAMLANDI — 18 Mart 2026**  
+   - `app/api/admin/queues/route.ts` → GET (istatistik + job listesi), POST (retry), DELETE (job sil), admin-only.  
+   - `app/[locale]/(admin)/admin/queues/page.tsx` → Canlı monitoring UI; 5s auto-refresh; aktif joblar için progress bar.  
+   - `components/admin/admin-sidebar.tsx` → “Job Queue Monitor” linki aktif edildi.  
+   - `hooks/useBookGenerationStatus.ts` → Frontend polling hook (4s aralıklı, tamamlanınca otomatik duran).  
+   - `app/[locale]/(public)/create/generating/[bookId]/page.tsx` → Kullanıcıya yönelik progress sayfası (kapatılabilir, arka planda devam).  
+   - BullMQ worker `lib/queue/workers/book-generation.worker.ts` tam implemente edildi; PM2 ile yönetiliyor.  
+   - **Gereksinimler:** Redis (localhost:6379) + PM2 worker (`herokidstory-worker`) çalışır olmalı.  
 
-**Faz B — Yönetim**  
-- **2.2 Sipariş Yönetimi:** Sipariş listesi, filtreleme, arama, detay, durum güncelleme, export (Stripe/İyzico verisi gelince anlamlı).  
-- **2.3 Kullanıcı Yönetimi:** Kullanıcı listesi, detay (kitaplar, siparişler, aktivite), durum (aktif/pasif/ban), notlar.  
-- **2.8 kısmi:** TTS konfigürasyonu (zaten API var), feature flags / fiyatlandırma placeholder’ları, log görüntüleme (hata logları).  
+**Faz B — Yönetim** *(Sipariş Yönetimi bekliyor)*  
+- **B.1 Sipariş Yönetimi (2.2):** Sipariş listesi, filtreleme, arama, detay, durum güncelleme, export — **Stripe/İyzico entegrasyonu sonrası** anlamlı hale gelir.  
+- **B.2 TTS + Sistem Ayarları (2.8 kısmi):** TTS konfigürasyonu (zaten API var), feature flags, log görüntüleme (hata logları) — bağımsız eklenebilir, Stripe beklemiyor.  
 
 **Faz C — Analytics ve Sistem Tam**  
 - **2.6 Gerçek zamanlı analytics:** Yer bırakılacak; veri kaynağı kararı sonrası doldurulacak.  

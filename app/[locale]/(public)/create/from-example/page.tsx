@@ -37,6 +37,8 @@ type ExampleBook = {
   story_data: any
   cover_image_url: string | null
   images_data: any[]
+  /** Slot sırasına göre her karakterin orijinal tipi */
+  characterSlotTypes?: Array<{ group: string; value: string; displayName: string }>
 }
 
 type CharacterSlot = {
@@ -225,6 +227,10 @@ function FromExampleContent() {
         reader.onerror = reject
         reader.readAsDataURL(c.photoFile!)
       })
+      const slotType = example.characterSlotTypes?.[i]
+      const characterType = slotType
+        ? { ...slotType, displayName: c.name.trim() }
+        : { group: "Child", value: "Child", displayName: c.name.trim() }
       const createCharRes = await fetch("/api/characters", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -235,7 +241,7 @@ function FromExampleContent() {
           hairColor: (c.hairColor || "").trim() || "brown",
           eyeColor: (c.eyeColor || "").trim() || "brown",
           photoBase64: base64,
-          characterType: { group: "Child", value: "Child", displayName: c.name.trim() },
+          characterType,
         }),
       })
       const charData = await createCharRes.json()
@@ -264,8 +270,13 @@ function FromExampleContent() {
     if (!bookRes.ok || !bookResult.success) {
       throw new Error(bookResult.error || bookResult.message || "Failed to create book")
     }
-    toast({ title: t("toasts.bookStartedTitle"), description: t("toasts.bookStartedDesc") })
-    router.push("/dashboard")
+    const newBookId = bookResult.data?.id ?? bookResult.data?.bookId ?? bookResult.id
+    if (newBookId) {
+      router.push(`/create/generating/${newBookId}`)
+    } else {
+      toast({ title: t("toasts.bookStartedTitle"), description: t("toasts.bookStartedDesc") })
+      router.push("/dashboard")
+    }
   }
 
   const handleContinue = () => {

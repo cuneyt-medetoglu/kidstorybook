@@ -169,13 +169,13 @@
   - [x] Cover-only mode desteği (pageCount = 0) ✅ (11 Ocak 2026)
   - **Implementasyon:** `app/api/books/route.ts` - Status workflow tam olarak implement edildi
   - **Detaylar:** `docs/reports/MISSING_IMPLEMENTATIONS_ANALYSIS.md`
-- [ ] **3.5.12** Queue sistemi (uzun işlemler için) (23 Ocak 2026)
-  - Aynı anda birden çok kullanıcı kitap oluşturmak isterse API alt yapımız bu durumda ne yapıyor?
-  - Nasıl bir queue yapısı var?
-  - Mevcut durum analizi gerekli
-  - Queue sistemi tasarımı ve implementasyonu
-  - Priority queue (ücretli kullanıcılar öncelikli)
-  - Rate limiting ve throttling
+- [x] **3.5.12** Queue sistemi (uzun işlemler için) ✅ (20 Mart 2026)
+  - BullMQ + Redis worker akışı aktif (`book-generation` queue)
+  - `POST /api/books` hızlı döner, kitap worker'da asenkron üretilir
+  - Progress adımları: `story_generating` → `master_generating` → `cover_generating` → `pages_generating` → `tts_generating` → `completed`
+  - Generating sayfası + polling ile canlı durum takibi var
+  - Status yönetimi düzeltildi: `%90` aşamasında erken `completed` yok; finalde `100%` ile `completed`
+  - Not: Priority queue / ücretli öncelik ayrı ürün kararı olarak sonraya bırakıldı
 - [ ] **3.5.13** Retry ve hata yönetimi - ⏸️ **Ertelendi (daha sonra)**
 - [ ] **3.5.16** Prompt Güncelleme Sistemi (23 Ocak 2026)
   - Hem story hem image için prompt'lar sürekli güncellemeye açık ve geliştirmeye açık yaşayan bir halde olmalı
