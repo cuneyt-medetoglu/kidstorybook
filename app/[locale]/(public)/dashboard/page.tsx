@@ -671,18 +671,19 @@ export default function LibraryPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
+                className="h-full"
               >
-                <Card className={`group relative hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
+                <Card className={`group relative h-full hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
                   selectedBooks.includes(book.id) ? "ring-2 ring-primary" : ""
                 }`}>
-                  <CardContent className="p-4">
+                  <CardContent className="flex h-full flex-col p-4">
                     {/* Checkbox (when in select mode) */}
                     {(isSelectMode || selectedBooks.length > 0) && (
                       <div className="absolute top-4 left-4 z-10">
                         <Checkbox
                           checked={selectedBooks.includes(book.id)}
                           onCheckedChange={() => handleBookSelect(book.id)}
-                          className="h-5 w-5 bg-white dark:bg-slate-800 border-2"
+                          className="h-5 w-5 border-2 border-primary/60 bg-background dark:bg-slate-900/90 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary"
                         />
                       </div>
                     )}
@@ -705,36 +706,41 @@ export default function LibraryPage() {
                     </div>
 
                     {/* Book Info */}
-                    <div className="space-y-2 mb-4">
+                    <div className="mb-4 min-h-[7rem] space-y-2">
                       <h3 className="font-semibold text-lg line-clamp-2 text-foreground">{book.title}</h3>
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <p className="text-xs text-muted-foreground">{t("createdOn")} {book.createdDate}</p>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {book.status === "completed" && (
-                            <>
-                              <Badge variant="outline" className="bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800">
-                                E-Book
-                              </Badge>
-                              <Badge variant="outline" className="bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border-amber-200 dark:border-amber-800 gap-1" title={t("tooltips.audio")}>
-                                <Volume2 className="h-3 w-3" />
-                                {t("tooltips.audio")}
-                              </Badge>
-                            </>
-                          )}
-                          {book.illustrationStyle && (
-                            <Badge variant="outline" className="bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400 border-violet-200 dark:border-violet-800">
-                              {getIllustrationStyleLabel(book.illustrationStyle)}
-                            </Badge>
-                          )}
-                          <Badge variant="secondary" className={statusColors[book.status]}>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="min-w-0 truncate text-xs text-muted-foreground">{t("createdOn")} {book.createdDate}</p>
+                          <Badge variant="secondary" className={`shrink-0 px-2 py-0.5 text-[11px] sm:text-xs ${statusColors[book.status]}`}>
                             {book.status === "completed" ? t("status.completed") : book.status === "in-progress" ? t("status.inProgress") : t("status.draft")}
                           </Badge>
+                        </div>
+
+                        <div className="h-6 overflow-hidden">
+                          <div className="flex items-center gap-1.5 whitespace-nowrap">
+                            {book.status === "completed" && (
+                              <>
+                                <Badge variant="outline" className="shrink-0 bg-blue-50 px-2 py-0.5 text-[11px] text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-200 dark:border-blue-800 sm:text-xs">
+                                  E-Book
+                                </Badge>
+                                <Badge variant="outline" className="hidden shrink-0 bg-amber-50 px-2 py-0.5 text-[11px] text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border-amber-200 dark:border-amber-800 gap-1 sm:inline-flex sm:text-xs" title={t("tooltips.audio")}>
+                                  <Volume2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                                  {t("tooltips.audio")}
+                                </Badge>
+                              </>
+                            )}
+                            {book.illustrationStyle && (
+                              <Badge variant="outline" className="shrink-0 max-w-[130px] truncate bg-violet-50 px-2 py-0.5 text-[11px] text-violet-700 dark:bg-violet-900/20 dark:text-violet-400 border-violet-200 dark:border-violet-800 sm:text-xs">
+                                {getIllustrationStyleLabel(book.illustrationStyle)}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2">
+                    <div className="mt-auto flex items-center gap-2">
                       <Button
                         size="sm"
                         onClick={() => handleReadBook(book.id)}
