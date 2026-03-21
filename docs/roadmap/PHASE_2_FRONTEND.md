@@ -17,6 +17,7 @@
 - [x] **2.1.7** "Create a children's book" butonu header'da - ✅ Gradient CTA button eklendi
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
 - [x] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi ✅ Tamamlandı (7 Mart 2026)
+- [x] **2.1.11** Logo görseli (Header, Footer, mobil drawer) + favicon/manifest/OG görseli entegrasyonu — ✅ 21 Mart 2026 — `docs/analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md`
   - ✅ Design Token sistemi kuruldu (`globals.css` → `tailwind.config.ts` → tüm bileşenler)
   - ✅ Hardcoded `purple-X / pink-X` → Semantic token (`primary`, `brand-2`, `accent`) — ~46 dosya, ~400+ referans
   - ✅ Aktif palet: Teal→Cyan (çocuk dostu, macera/deniz teması)

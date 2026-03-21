@@ -4,7 +4,7 @@
 **Tarih:** 8 Mart 2026  
 **Durum:** AKTİF – Modüler yapı (detaylar `docs/roadmap/` altında)
 
-**Son güncelleme (8 Mart 2026):** Marka değişikliği KidStoryBook → herokidstory tamamlandı (repo, S3, DB, kod, UI). Detay: `docs/analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md`. Önceki: 7 Mart 2026 — Design Token renk sistemi.
+**Son güncelleme (21 Mart 2026):** Logo/favicon/manifest + Header/Footer/mobil logo + varsayılan OG/Twitter görseli (`brand.png`) — `docs/analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md`. Önceki (8 Mart 2026): Marka değişikliği KidStoryBook → herokidstory tamamlandı — `docs/analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md`.
 
 ---
 

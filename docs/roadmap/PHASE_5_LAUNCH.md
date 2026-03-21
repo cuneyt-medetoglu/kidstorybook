@@ -2,7 +2,8 @@
 **Öncelik:** 🟡 Önemli
 
 ### 5.1 SEO Optimizasyonu
-- [ ] **5.1.1** Meta tags ve Open Graph
+- [x] **5.1.0** Logo, favicon, `site.webmanifest`, varsayılan OG/Twitter görseli (`/brand.png`), `metadata.icons` — ✅ 21 Mart 2026 — `docs/analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md`
+- [ ] **5.1.1** Meta tags ve Open Graph (kalan: JSON-LD, Lighthouse, sayfa bazlı OG ince ayarı vb.)
 - [ ] **5.1.2** Sitemap.xml
 - [ ] **5.1.3** robots.txt
 - [ ] **5.1.4** Structured data (JSON-LD)

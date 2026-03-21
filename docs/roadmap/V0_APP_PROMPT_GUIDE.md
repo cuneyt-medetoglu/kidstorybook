@@ -146,3 +146,37 @@ Mobile-first design with touch-friendly interactions.
 
 ---
 
+### Marka alanı — Header + Footer logo lockup (HeroKidStory)
+
+Ana sayfa shell’inde logo + wordmark birlikte daha “premium” ve dengeli dursun diye v0’dan varyasyon üretmek için:
+
+```
+Design a polished brand lockup block for the marketing header and footer of "HeroKidStory" — an AI app for personalized children’s storybooks.
+
+Brand & tech:
+- Product name: HeroKidStory (single wordmark; can split visual emphasis: Hero / Kid / Story with color).
+- Color system: teal primary #14b8a6, cyan accent #06b6d4, soft off-white backgrounds; support light + dark mode (dark: slate-900 header/footer, keep teal/cyan readable).
+- Stack: React, Tailwind CSS, shadcn/ui, Framer Motion subtle hover on the whole lockup (scale 1.02, ease-out).
+
+Logo asset:
+- Assume a square PNG mark at /logo.png (book + sparkle motif). The mark must feel visually balanced next to the wordmark — same cap-height alignment, no tiny icon: icon height ≈ 0.9–1.0× the wordmark cap height on desktop.
+
+Layout:
+- Header row: left-aligned lockup (icon + text), plenty of whitespace, no clutter.
+- Optional subtle pill or soft gradient underline under wordmark only (not cheesy).
+- Footer variant: smaller but same proportions; optional single-line tagline under lockup in muted gray.
+
+Typography:
+- Friendly modern sans (e.g. similar to Inter/SF); wordmark can use gradient text from-primary to-brand-2 OR flat teal with "Kid" in cyan — pick one cohesive style.
+
+Deliver:
+- Two components: <SiteHeaderBrand /> and <SiteFooterBrand />
+- Responsive: on mobile, slightly reduce text size but keep icon readable (min touch target for logo link 44px height).
+- Accessibility: logo link has aria-label "HeroKidStory home", image has alt text.
+- No lorem marketing copy in header; footer may use one short tagline placeholder.
+```
+
+**Not:** Çıkan kodu projeye alırken `components/layout/Header.tsx` ve `Footer.tsx` ile birleştir; `next/image` `src="/logo.png"` kalsın, className’leri v0 çıktısından uyarla.
+
+---
+

@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -97,9 +98,18 @@ export function Footer() {
             className="space-y-4"
           >
             <Link href="/">
-              <h3 className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-2xl font-bold text-transparent">
-                HeroKidStory
-              </h3>
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <Image
+                  src="/logo.png"
+                  alt="HeroKidStory"
+                  width={56}
+                  height={56}
+                  className="h-11 w-11 shrink-0 sm:h-12 sm:w-12"
+                />
+                <h3 className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-2xl font-bold leading-none text-transparent sm:text-[1.75rem]">
+                  HeroKidStory
+                </h3>
+              </div>
             </Link>
             <p className="text-sm text-gray-600 dark:text-slate-400">
               {t("tagline")}

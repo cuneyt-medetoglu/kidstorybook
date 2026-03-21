@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 21 Mart 2026 — `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları: migration `024_books_timestamps_timestamptz.sql`, `pool` UTC oturumu, admin kitap detayında İstanbul saati + üretim süresi (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet satırları (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
+**Son güncelleme:** 21 Mart 2026 — `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1 logo/favicon/OG; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları: migration `024_books_timestamps_timestamptz.sql`, `pool` UTC oturumu, admin kitap detayında İstanbul saati + üretim süresi (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet satırları (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 
@@ -249,6 +249,7 @@ docs/
 25. **analysis/PROMPT_ANALIZ_VE_IYILESTIRME.md** — Pipeline önerileri (Ö1–Ö11), log karşılaştırmaları; güncel başlık sürümü dokümanda
 26. **analysis/LOG_YAPRAK_SORUNU_20_MART_2026.md** — Salon/yaprak/sky log analizi; `route.ts` batch hizası notları
 27. **analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md** — Yerel Docker Redis vs EC2 systemd; `db-backup.sh` + S3 `backups/db/`, cron; migration öncesi yedek; PG kullanıcı adı uyumu
+28. **analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md** — Logo/favicon/manifest/Header-Footer/OG entegrasyonu (P0–P1); faz 5–7 beklemede; favicon şeffaflık notu
 28. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
 
 ### Strateji Dokümanları

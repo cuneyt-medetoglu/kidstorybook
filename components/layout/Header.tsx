@@ -31,6 +31,7 @@ import {
 import { useSession, signOut } from "next-auth/react"
 import { useCart } from "@/contexts/CartContext"
 import { useTranslations, useLocale } from "next-intl"
+import Image from "next/image"
 import { Link, useRouter, usePathname } from "@/i18n/navigation"
 
 const countries = [
@@ -112,11 +113,19 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <motion.div
-            className="text-xl font-bold sm:text-2xl md:text-3xl"
+            className="flex items-center gap-2.5 md:gap-3"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-transparent">
+            <Image
+              src="/logo.png"
+              alt="HeroKidStory"
+              width={64}
+              height={64}
+              className="h-10 w-10 shrink-0 sm:h-11 sm:w-11 md:h-12 md:w-12 lg:h-[3.25rem] lg:w-[3.25rem]"
+              priority
+            />
+            <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold leading-none text-transparent sm:text-2xl md:text-3xl">
               HeroKidStory
             </span>
           </motion.div>
@@ -362,9 +371,18 @@ export function Header() {
               >
                 {/* 1. Üst: Logo + Kapat */}
                 <div className="mb-6 flex shrink-0 items-center justify-between">
-                  <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
-                    HeroKidStory
-                  </span>
+                  <div className="flex items-center gap-2.5">
+                    <Image
+                      src="/logo.png"
+                      alt="HeroKidStory"
+                      width={48}
+                      height={48}
+                      className="h-11 w-11 shrink-0"
+                    />
+                    <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
+                      HeroKidStory
+                    </span>
+                  </div>
                   <Button
                     variant="ghost"
                     size="icon"

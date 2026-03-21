@@ -80,11 +80,20 @@ export async function buildPageMetadata(
       alternateLocale: [ogLocaleAlternate],
       type: 'website',
       url: `${BASE_URL}/${locale}${path}`,
+      images: [
+        {
+          url: `${BASE_URL}/brand.png`,
+          width: 2816,
+          height: 1536,
+          alt: 'HeroKidStory',
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: ogTitle,
       description: ogDescription,
+      images: [`${BASE_URL}/brand.png`],
     },
   }
 }
