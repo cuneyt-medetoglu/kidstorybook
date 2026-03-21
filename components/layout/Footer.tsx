@@ -103,7 +103,7 @@ export function Footer() {
             <Link href="/" className="inline-block max-w-full min-w-0 rounded-lg outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
               <div className="flex min-w-0 flex-col items-start gap-2.5 xl:flex-row xl:items-center xl:gap-3.5">
                 <Image
-                  src="/logo.png"
+                  src="/brand/logo.png"
                   alt="HeroKidStory"
                   width={80}
                   height={80}

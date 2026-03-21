@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Önizleme Test — HeroKidStory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       KONTROL PANELİ & SAYFA ÇERÇEVE — Sadece ekran görünümü
+       ========================================================= */
+
+    :root {
+      --scale: 0.48;          /* Ekran ölçek faktörü — değiştir */
+      --a5-w: 148.5mm;
+      --a5-h: 210mm;
+      --a4-w: 297mm;
+      --a4-h: 210mm;
+      --bg-cream: #fef9f3;
+      --brand-teal: #29b5a8;
+      --brand-blue: #1ba8e0;
+      --text-dark: #1a1a1a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background: #2a2a2a;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* ---- Üst Bar ---- */
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #111;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid #444;
+    }
+    .toolbar h1 { font-size: 16px; color: #fff; white-space: nowrap; }
+    .toolbar label { font-size: 12px; color: #aaa; }
+    .toolbar input[type=range] { width: 120px; cursor: pointer; }
+    .toolbar span { font-size: 12px; color: #29b5a8; min-width: 32px; }
+    .toolbar button {
+      padding: 6px 14px;
+      background: #29b5a8;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .toolbar button:hover { background: #23a095; }
+    .toolbar .separator { width: 1px; height: 24px; background: #444; }
+    /* ---- Ana Konteyner ---- */
+    .preview-area {
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* ---- Sayfa Etiketi ---- */
+    .page-label {
+      color: #888;
+      font-size: 12px;
+      text-align: center;
+      margin-bottom: -16px;
+      font-family: monospace;
+    }
+
+    /* ---- Sayfa Sarmalayıcı (ölçekleme için) ---- */
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-frame {
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+      transform-origin: top center;
+      transform: scale(var(--scale));
+      /* Görsel yerden tasarruf için negatif margin ekleniyor (JS ile hesaplanır) */
+    }
+
+    /* =========================================================
+       GERÇEK SAYFA BOYUTLARI — PDF'e gönderilecek içerik
+       ========================================================= */
+
+    /* ---- Ön Kapak & Arka Kapak: A5 Portrait ---- */
+    .page-cover {
+      width: var(--a5-w);
+      height: var(--a5-h);
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-cream);
+    }
+
+    /* ---- İç Sayfalar: A4 Landscape ---- */
+    .page-spread {
+      width: var(--a4-w);
+      height: var(--a4-h);
+      position: relative;
+      overflow: hidden;
+      background: var(--bg-cream);
+    }
+
+    /* =========================================================
+       ÖN KAPAK — Full bleed + alt gradient + başlık + logo + herokidstory
+       ========================================================= */
+
+    .cover-a .cover-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    /* Placeholder görsel (gerçek görsel olmadığında) */
+    .cover-a .cover-image-placeholder {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #7ec8e3 0%, #a8e6cf 40%, #ffd3b6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cover-a .cover-image-placeholder svg { opacity: 0.3; }
+
+    /* Alt gradient overlay */
+    .cover-a .cover-gradient {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 55%;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 60%, transparent 100%);
+      z-index: 2;
+    }
+
+    /* Başlık alanı */
+    .cover-a .cover-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      padding: 0 8mm 4mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cover-a .cover-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 28pt;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.2;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.5);
+      margin-bottom: 5mm;
+    }
+
+    /* Kapak altı: küçük logo + herokidstory (renkli 3 parçalı wordmark değil) */
+    .cover-a .cover-branding {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 4px 12px 5px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+      margin-bottom: 3mm;
+    }
+    .cover-a .cover-branding .cover-logo {
+      height: 7mm;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .cover-a .cover-branding .cover-site-url {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 8.5pt;
+      font-weight: 600;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: 0.03em;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+    }
+
+    /* =========================================================
+       SPREAD SAYFA — A4 Landscape (mevcut sistem)
+       ========================================================= */
+
+    .page-spread .spread-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: relative;
+    }
+
+    /* Orta ayırıcı çizgi */
+    .page-spread .spread-container::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; width: 0; height: 100%;
+      border-left: 1px dashed rgba(232, 213, 192, 0.5);
+      z-index: 10;
+    }
+
+    .half-page {
+      width: 50%;
+      height: 100%;
+      position: relative;
+    }
+
+    /* Görsel yarısı */
+    .half-image {
+      overflow: hidden;
+      background: var(--bg-cream);
+    }
+    .half-image img,
+    .half-image .img-placeholder {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .half-image .img-placeholder {
+      background: linear-gradient(160deg, #b8e4f0 0%, #d4f0d0 50%, #f0e0c0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .half-image.img-right img { object-position: right center; }
+    .half-image.img-left  img { object-position: left center; }
+
+    /* Metin yarısı */
+    .half-text {
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10mm;
+    }
+
+    .text-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .page-text {
+      font-family: 'Alegreya', serif;
+      font-size: 18pt;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-dark);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 6mm;
+    }
+    .page-text p { margin-bottom: 0.8em; }
+
+    .page-number {
+      position: absolute;
+      bottom: 2mm;
+      right: 3mm;
+      font-size: 10pt;
+      color: #bbb;
+    }
+
+    /* 4 Köşe deseni */
+    .corner-pattern {
+      position: absolute;
+      width: 40mm;
+      height: 40mm;
+      background: radial-gradient(circle at 30% 30%, rgba(41,181,168,0.12) 20%, transparent 70%),
+                  radial-gradient(circle at 70% 70%, rgba(27,168,224,0.10) 20%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .corner-tl { top: 0; left: 0; }
+    .corner-tr { top: 0; right: 0; transform: rotate(90deg); }
+    .corner-bl { bottom: 0; left: 0; transform: rotate(-90deg); }
+    .corner-br { bottom: 0; right: 0; transform: rotate(180deg); }
+
+    /* =========================================================
+       ARKA KAPAK — A5 Portrait
+       ========================================================= */
+
+    .back-cover {
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6mm;
+      padding: 14mm 10mm;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Büyük köşe desenleri */
+    .back-cover .bc-corner {
+      position: absolute;
+      width: 55mm;
+      height: 55mm;
+      border-radius: 0;
+      opacity: 0.3;
+    }
+    .back-cover .bc-corner.tl {
+      top: -5mm; left: -5mm;
+      background: radial-gradient(circle at 30% 30%, rgba(41,181,168,0.5) 30%, transparent 70%);
+    }
+    .back-cover .bc-corner.tr {
+      top: -5mm; right: -5mm;
+      background: radial-gradient(circle at 70% 30%, rgba(27,168,224,0.5) 30%, transparent 70%);
+    }
+    .back-cover .bc-corner.bl {
+      bottom: -5mm; left: -5mm;
+      background: radial-gradient(circle at 30% 70%, rgba(27,168,224,0.5) 30%, transparent 70%);
+    }
+    .back-cover .bc-corner.br {
+      bottom: -5mm; right: -5mm;
+      background: radial-gradient(circle at 70% 70%, rgba(41,181,168,0.5) 30%, transparent 70%);
+    }
+
+    /* Arka kapak: Header ile aynı mantık — logo + renkli HeroKidStory */
+    .back-cover .bc-brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3.5mm;
+      z-index: 1;
+    }
+    .back-cover .bc-brand-row .bc-logo-img {
+      height: 16mm;
+      width: auto;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .back-cover .bc-wordmark {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 22pt;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .back-cover .bc-wordmark .h { color: var(--brand-teal); }
+    .back-cover .bc-wordmark .k { color: var(--brand-blue); }
+
+    .back-cover .bc-divider {
+      width: 24mm;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--brand-teal), transparent);
+      z-index: 1;
+    }
+
+    .back-cover .bc-tagline {
+      font-family: 'Alegreya', serif;
+      font-size: 12pt;
+      color: #555;
+      text-align: center;
+      line-height: 1.5;
+      max-width: 110mm;
+      z-index: 1;
+    }
+
+    .back-cover .bc-url {
+      margin-top: auto;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 9pt;
+      color: #999;
+      z-index: 1;
+    }
+
+    /* =========================================================
+       @MEDIA PRINT — Tarayıcı Print Preview testi için
+       ========================================================= */
+
+    @media print {
+      body { background: white; }
+      .toolbar, .page-label, .page-frame-label { display: none !important; }
+      .preview-area { padding: 0; gap: 0; }
+      .page-frame { transform: none !important; box-shadow: none; }
+      .page-wrapper { break-inside: avoid; }
+
+      /* CSS Named Pages ile mixed page sizes */
+      @page cover-a5 {
+        size: 148.5mm 210mm;
+        margin: 0;
+      }
+      @page spread-a4 {
+        size: 297mm 210mm;
+        margin: 0;
+      }
+
+      .page-cover { page: cover-a5; page-break-after: always; }
+      .page-spread { page: spread-a4; page-break-after: always; }
+      .page-spread:last-of-type { page-break-after: auto; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     KONTROL PANELİ
+     ============================================================ -->
+<div class="toolbar">
+  <h1>📖 PDF Önizleme Test</h1>
+  <div class="separator"></div>
+  <label>Ölçek:</label>
+  <input type="range" id="scaleSlider" min="20" max="80" value="48">
+  <span id="scaleValue">48%</span>
+  <div class="separator"></div>
+  <button onclick="window.print()">🖨️ Print Preview</button>
+</div>
+
+
+<!-- ============================================================
+     SAYFA AKIŞI
+     ============================================================ -->
+<div class="preview-area" id="previewArea">
+
+  <!-- ─── ÖN KAPAK ─── -->
+  <div class="page-wrapper">
+    <div class="page-label">📄 ÖN KAPAK — A5 Portrait (148.5 × 210 mm)</div>
+    <div class="page-frame" id="coverFrame">
+
+      <div class="page-cover cover-a">
+        <div class="cover-image-placeholder">
+          <svg width="200" height="280" viewBox="0 0 200 280" fill="none">
+            <ellipse cx="100" cy="160" rx="60" ry="80" fill="rgba(255,200,150,0.4)"/>
+            <circle cx="100" cy="90" r="35" fill="rgba(255,220,180,0.5)"/>
+            <rect x="60" y="180" width="80" height="10" rx="5" fill="rgba(150,120,80,0.3)"/>
+            <text x="100" y="240" text-anchor="middle" font-size="11" fill="rgba(100,80,60,0.5)" font-family="sans-serif">[ kapak görseli ]</text>
+          </svg>
+        </div>
+        <div class="cover-gradient"></div>
+        <div class="cover-content">
+          <div class="cover-title" id="coverTitle">Arya ve Gizemli Kitap</div>
+          <div class="cover-branding">
+            <img src="/brand/logo.png" alt="" class="cover-logo" />
+            <span class="cover-site-url">herokidstory</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── SPREAD 1: [Görsel Sol | Metin Sağ] ─── -->
+  <div class="page-wrapper">
+    <div class="page-label">📄 SPREAD 1 — A4 Landscape (297 × 210 mm)</div>
+    <div class="page-frame">
+      <div class="page-spread">
+        <div class="spread-container">
+          <!-- Sol: Görsel -->
+          <div class="half-page half-image img-left">
+            <div class="img-placeholder">
+              <svg width="160" height="220" viewBox="0 0 160 220" fill="none">
+                <rect x="20" y="30" width="120" height="160" rx="8" fill="rgba(180,220,200,0.4)"/>
+                <circle cx="80" cy="90" r="28" fill="rgba(255,200,150,0.5)"/>
+                <text x="80" y="170" text-anchor="middle" font-size="9" fill="rgba(80,80,80,0.4)" font-family="sans-serif">sayfa görseli</text>
+              </svg>
+            </div>
+          </div>
+          <!-- Sağ: Metin -->
+          <div class="half-page half-text">
+            <span class="corner-pattern corner-tl"></span>
+            <span class="corner-pattern corner-tr"></span>
+            <span class="corner-pattern corner-bl"></span>
+            <span class="corner-pattern corner-br"></span>
+            <div class="text-content">
+              <div class="page-text">
+                <p>Arya çalına bakıyor. Yeşil çalılar! Büyük çalılar!</p>
+                <p>Baba Cüneyt gülümsüyor. "Burası bizim evimiz" diyor.</p>
+                <p>Bal herşeyin. Hem hare! Bal mutlu.</p>
+                <p>Arya el çırpıyor. Kamp çok güzel!</p>
+              </div>
+              <span class="page-number">1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── SPREAD 2: [Metin Sol | Görsel Sağ] ─── -->
+  <div class="page-wrapper">
+    <div class="page-label">📄 SPREAD 2 — A4 Landscape (297 × 210 mm)</div>
+    <div class="page-frame">
+      <div class="page-spread">
+        <div class="spread-container">
+          <!-- Sol: Metin -->
+          <div class="half-page half-text">
+            <span class="corner-pattern corner-tl"></span>
+            <span class="corner-pattern corner-tr"></span>
+            <span class="corner-pattern corner-bl"></span>
+            <span class="corner-pattern corner-br"></span>
+            <div class="text-content">
+              <div class="page-text">
+                <p>Sabah oldu. Güneş doğdu parıl parıl.</p>
+                <p>Arya çadırdan başını çıkardı. Kuşlar cıvıl cıvıl ötüyor.</p>
+                <p>"Baba, kelebek!" diye bağırdı Arya.</p>
+              </div>
+              <span class="page-number">2</span>
+            </div>
+          </div>
+          <!-- Sağ: Görsel -->
+          <div class="half-page half-image img-right">
+            <div class="img-placeholder">
+              <svg width="160" height="220" viewBox="0 0 160 220" fill="none">
+                <rect x="20" y="30" width="120" height="160" rx="8" fill="rgba(220,200,180,0.4)"/>
+                <circle cx="80" cy="90" r="28" fill="rgba(200,180,255,0.5)"/>
+                <text x="80" y="170" text-anchor="middle" font-size="9" fill="rgba(80,80,80,0.4)" font-family="sans-serif">sayfa görseli</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── SPREAD 3: [Görsel Sol | Metin Sağ] ─── -->
+  <div class="page-wrapper">
+    <div class="page-label">📄 SPREAD 3 — A4 Landscape (297 × 210 mm)</div>
+    <div class="page-frame">
+      <div class="page-spread">
+        <div class="spread-container">
+          <div class="half-page half-image img-left">
+            <div class="img-placeholder">
+              <svg width="160" height="220" viewBox="0 0 160 220" fill="none">
+                <rect x="20" y="30" width="120" height="160" rx="8" fill="rgba(180,200,240,0.4)"/>
+                <circle cx="80" cy="90" r="28" fill="rgba(255,240,180,0.5)"/>
+                <text x="80" y="170" text-anchor="middle" font-size="9" fill="rgba(80,80,80,0.4)" font-family="sans-serif">sayfa görseli</text>
+              </svg>
+            </div>
+          </div>
+          <div class="half-page half-text">
+            <span class="corner-pattern corner-tl"></span>
+            <span class="corner-pattern corner-tr"></span>
+            <span class="corner-pattern corner-bl"></span>
+            <span class="corner-pattern corner-br"></span>
+            <div class="text-content">
+              <div class="page-text">
+                <p>Akşam oldu. Ateş yaktılar. Kıvılcımlar havaya uçtu.</p>
+                <p>Arya babasının kucağına oturdu. Gökyüzü yıldızlarla doluydu.</p>
+                <p>"Bir daha gelelim mi?" diye sordu Arya.</p>
+                <p>"Her zaman" dedi babası, gülümseyerek.</p>
+              </div>
+              <span class="page-number">3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ─── ARKA KAPAK ─── -->
+  <div class="page-wrapper">
+    <div class="page-label">📄 ARKA KAPAK — A5 Portrait (148.5 × 210 mm)</div>
+    <div class="page-frame">
+      <div class="page-cover back-cover">
+        <!-- Köşe süslemeleri -->
+        <div class="bc-corner tl"></div>
+        <div class="bc-corner tr"></div>
+        <div class="bc-corner bl"></div>
+        <div class="bc-corner br"></div>
+
+        <div class="bc-brand-row">
+          <img src="/brand/logo.png" alt="" class="bc-logo-img" />
+          <span class="bc-wordmark"><span class="h">Hero</span><span class="k">Kid</span><span class="h">Story</span></span>
+        </div>
+
+        <!-- Ayırıcı -->
+        <div class="bc-divider"></div>
+
+        <!-- Tagline -->
+        <div class="bc-tagline">
+          Çocuğunuzun kendi hikayesinin kahramanı olduğu, AI ile oluşturulmuş kişisel kitaplar.
+        </div>
+
+        <!-- URL -->
+        <div class="bc-url">herokidstory.com</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /preview-area -->
+
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+  // ── Ölçek slider ──
+  const slider = document.getElementById('scaleSlider')
+  const scaleVal = document.getElementById('scaleValue')
+
+  function applyScale(v) {
+    const scale = v / 100
+    document.documentElement.style.setProperty('--scale', scale)
+    scaleVal.textContent = v + '%'
+
+    // Negatif margin hesapla (kaydırma boşluğunu azalt)
+    document.querySelectorAll('.page-frame').forEach(el => {
+      const rect = el.getBoundingClientRect()
+      // Gerçek rendered boyutu
+      const child = el.firstElementChild
+      if (!child) return
+      const h = child.offsetHeight
+      const marginVal = -h * (1 - scale) / 2
+      el.style.marginTop = marginVal + 'px'
+      el.style.marginBottom = marginVal + 'px'
+    })
+  }
+
+  slider.addEventListener('input', e => applyScale(parseInt(e.target.value)))
+
+  // İlk yükleme
+  window.addEventListener('load', () => {
+    setTimeout(() => applyScale(parseInt(slider.value)), 100)
+  })
+
+  // ── Başlık düzenleme (hızlı test) ──
+  const coverTitleEl = document.getElementById('coverTitle')
+  if (coverTitleEl) {
+    coverTitleEl.title = 'Başlığı düzenlemek için tıkla'
+    coverTitleEl.style.cursor = 'pointer'
+    coverTitleEl.addEventListener('click', () => {
+      const val = prompt('Kitap başlığını gir:', coverTitleEl.textContent)
+      if (val !== null) coverTitleEl.textContent = val
+    })
+  }
+</script>
+
+</body>
+</html>

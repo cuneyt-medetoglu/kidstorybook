@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { getIllustrationStyleLabel } from "@/lib/illustration-styles"
-import { mockExampleBooks, type ExampleBook, type UsedPhoto, type AgeGroup } from "./types"
+import { type ExampleBook, type UsedPhoto, type AgeGroup } from "./types"
 import {
   Pagination,
   PaginationContent,

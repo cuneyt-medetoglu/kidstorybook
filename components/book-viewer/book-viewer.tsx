@@ -49,65 +49,6 @@ import { useSwipeGesture } from "@/hooks/use-swipe-gesture"
 import { useTTS } from "@/hooks/useTTS"
 import { getTtsPrefs } from "@/lib/tts-prefs"
 
-// Mock data - Faz 3'te API'den gelecek
-const mockBook = {
-  id: "book-123",
-  title: "Arya's Adventure",
-  pages: [
-    {
-      pageNumber: 1,
-      imageUrl: "/magical-forest-entrance-with-glowing-pathway-child.jpg",
-      text: "Once upon a time, there was a little girl named Arya who lived at the edge of a magical forest. Every night, she would look out her window and wonder what secrets lay hidden among the trees.",
-    },
-    {
-      pageNumber: 2,
-      imageUrl: "/little-girl-with-backpack-exploring-enchanted-fore.jpg",
-      text: "One sunny morning, Arya decided to explore the forest. She packed her favorite snacks, put on her adventure boots, and stepped onto the winding path that led into the woods.",
-    },
-    {
-      pageNumber: 3,
-      imageUrl: "/talking-rabbit-with-colorful-vest-in-forest-cleari.jpg",
-      text: "Deep in the forest, she met a friendly rabbit named Oliver. He wore a tiny vest and spoke in riddles. 'To find the treasure you seek, follow the butterflies to the creek!'",
-    },
-    {
-      pageNumber: 4,
-      imageUrl: "/colorful-butterflies-leading-path-through-magical-.jpg",
-      text: "Arya followed the butterflies through meadows of wildflowers. They shimmered in shades of purple, pink, and gold, leaving trails of sparkles in the air.",
-    },
-    {
-      pageNumber: 5,
-      imageUrl: "/sparkling-creek-with-stepping-stones-and-fireflies.jpg",
-      text: "At last, she reached the crystal creek. Stepping stones led across the water, and fireflies danced above the surface like tiny floating lanterns.",
-    },
-    {
-      pageNumber: 6,
-      imageUrl: "/ancient-tree-with-door-carved-into-trunk-magical-f.jpg",
-      text: "On the other side, Arya discovered an ancient tree with a door carved into its trunk. It was covered in glowing runes and seemed to hum with magic.",
-    },
-    {
-      pageNumber: 7,
-      imageUrl: "/cozy-room-inside-tree-with-tiny-furniture-and-book.jpg",
-      text: "Inside the tree was a cozy room filled with books, soft cushions, and a warm fireplace. This was the forest library, where all the woodland creatures came to share stories.",
-    },
-    {
-      pageNumber: 8,
-      imageUrl: "/wise-owl-with-glasses-reading-book-to-forest-anima.jpg",
-      text: "A wise owl named Professor Hoot welcomed her. 'Every adventurer finds this place when they need it most,' he said, adjusting his tiny spectacles.",
-    },
-    {
-      pageNumber: 9,
-      imageUrl: "/little-girl-reading-glowing-book-surrounded-by-for.jpg",
-      text: "Professor Hoot gave Arya a special book that glowed with her name on the cover. 'This book will fill with your own adventures,' he explained with a knowing smile.",
-    },
-    {
-      pageNumber: 10,
-      imageUrl: "/little-girl-walking-home-at-sunset-with-magical-bo.jpg",
-      text: "As the sun began to set, Arya made her way home with her magical book. She knew this was just the beginning of many wonderful adventures to come. The End.",
-    },
-  ],
-  totalPages: 10,
-}
-
 type AnimationType = "flip" | "slide" | "fade" | "curl" | "zoom" | "none"
 type AnimationSpeed = "slow" | "normal" | "fast"
 type MobileLayoutMode = "stacked" | "flip"

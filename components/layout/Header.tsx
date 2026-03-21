@@ -124,7 +124,7 @@ export function Header() {
             transition={{ type: "spring", stiffness: 400 }}
           >
             <Image
-              src="/logo.png"
+              src="/brand/logo.png"
               alt="HeroKidStory"
               width={96}
               height={96}
@@ -383,7 +383,7 @@ export function Header() {
                 <div className="mb-6 flex min-w-0 shrink-0 items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3 sm:gap-3.5">
                     <Image
-                      src="/logo.png"
+                      src="/brand/logo.png"
                       alt="HeroKidStory"
                       width={80}
                       height={80}

@@ -68,7 +68,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
               onClick={(e) => { e.stopPropagation(); onToggleFlip?.(); }}
             >
               <Image
-                src={page.imageUrl || "/placeholder.svg"}
+                src={page.imageUrl || "/ui/placeholder.svg"}
                 alt={`Page ${page.pageNumber} illustration`}
                 fill
                 sizes="100vw"
@@ -126,7 +126,7 @@ export function BookPage({ page, isLandscape, mobileLayoutMode = "stacked", show
       {/* Image */}
       <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden">
         <Image
-          src={page.imageUrl || "/placeholder.svg"}
+          src={page.imageUrl || "/ui/placeholder.svg"}
           alt={`Page ${page.pageNumber} illustration`}
           fill
           sizes="(max-width: 768px) 100vw, 800px"

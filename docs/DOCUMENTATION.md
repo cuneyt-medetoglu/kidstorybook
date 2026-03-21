@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
+**Son güncelleme:** 22 Mart 2026 — PDF çıktı iyileştirme planı: `analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/pdf-preview-test.html`, Cursor agent `.cursor/rules/pdf-generation-manager.mdc`. Önceki: 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 
@@ -250,6 +250,7 @@ docs/
 26. **analysis/LOG_YAPRAK_SORUNU_20_MART_2026.md** — Salon/yaprak/sky log analizi; `route.ts` batch hizası notları
 27. **analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md** — Yerel Docker Redis vs EC2 systemd; `db-backup.sh` + S3 `backups/db/`, cron; migration öncesi yedek; PG kullanıcı adı uyumu
 28. **analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md** — Logo/favicon/manifest/Header-Footer/OG entegrasyonu (P0–P1); faz 5–7 beklemede; favicon şeffaflık notu
+29. **analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md** — PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka kuralları; önizleme `public/pdf-preview-test.html`; sorumlu agent: `@pdf-generation-manager` (`.cursor/rules/pdf-generation-manager.mdc`)
 28. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
 
 ### Strateji Dokümanları

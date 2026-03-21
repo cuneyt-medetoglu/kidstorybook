@@ -82,7 +82,7 @@ export async function buildPageMetadata(
       url: `${BASE_URL}/${locale}${path}`,
       images: [
         {
-          url: `${BASE_URL}/brand.png`,
+          url: `${BASE_URL}/brand/brand.png`,
           width: 2816,
           height: 1536,
           alt: 'HeroKidStory',
@@ -93,7 +93,7 @@ export async function buildPageMetadata(
       card: 'summary_large_image',
       title: ogTitle,
       description: ogDescription,
-      images: [`${BASE_URL}/brand.png`],
+      images: [`${BASE_URL}/brand/brand.png`],
     },
   }
 }
