@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Link } from "@/i18n/navigation"
+import { BrandWordmark } from "@/components/brand/BrandWordmark"
 
 const socialLinks = [
   { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
@@ -35,7 +36,6 @@ export function Footer() {
 
   // link arrays inside component so translations work
   const quickLinks = [
-    { labelKey: "home" as const, href: "/" },
     { labelKey: "examples" as const, href: "/examples" },
     { labelKey: "pricing" as const, href: "/pricing" },
   ]
@@ -86,28 +86,31 @@ export function Footer() {
       transition={{ duration: 0.6 }}
       className="relative bg-gradient-to-b from-white via-primary/5 to-brand-2/5 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
     >
-      <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4 md:gap-12">
+      <div className="container mx-auto px-4 py-10 md:px-6 md:py-14">
+        {/*
+          xl öncesi 4 dar sütun yerine 2×2: tablet/web ara genişliklerde nefes.
+          Marka: xl altında ikon üstü + wordmark altı (yatay sıkışmayı önler).
+        */}
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 xl:grid-cols-4 xl:gap-x-8 xl:gap-y-10">
           {/* Column 1: Company Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="space-y-4"
+            className="min-w-0 space-y-4 sm:max-xl:pr-2"
           >
-            <Link href="/">
-              <div className="flex items-center gap-2.5 sm:gap-3">
+            <Link href="/" className="inline-block max-w-full min-w-0 rounded-lg outline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+              <div className="flex min-w-0 flex-col items-start gap-2.5 xl:flex-row xl:items-center xl:gap-3.5">
                 <Image
                   src="/logo.png"
                   alt="HeroKidStory"
-                  width={56}
-                  height={56}
-                  className="h-11 w-11 shrink-0 sm:h-12 sm:w-12"
+                  width={80}
+                  height={80}
+                  className="h-12 w-12 shrink-0 sm:h-[3.25rem] sm:w-[3.25rem] xl:h-12 xl:w-12"
                 />
-                <h3 className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-2xl font-bold leading-none text-transparent sm:text-[1.75rem]">
-                  HeroKidStory
+                <h3 className="m-0 min-w-0 max-w-full font-normal leading-none">
+                  <BrandWordmark size="footer" />
                 </h3>
               </div>
             </Link>
@@ -146,7 +149,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="space-y-4"
+            className="min-w-0 space-y-4 sm:max-xl:pl-2"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               {t("quickLinks")}
@@ -178,7 +181,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="space-y-4"
+            className="min-w-0 space-y-4"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               {t("support")}
@@ -210,7 +213,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4 }}
-            className="space-y-4"
+            className="min-w-0 space-y-4"
           >
             <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
               {t("newsletter")}

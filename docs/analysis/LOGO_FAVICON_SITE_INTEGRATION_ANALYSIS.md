@@ -1,8 +1,8 @@
 # Logo & Favicon — Site Entegrasyonu Analizi
 
-**Tarih:** 21 Mart 2026 (güncelleme: P0–P1 uygulandı; favicon şeffaflık notu)  
+**Tarih:** 21 Mart 2026 (güncelleme: P0–P1 uygulandı; favicon şeffaflık notu; manifest `metadataBase` + middleware)  
 **Amaç:** Marka görsellerinin `public/` ve `app/favicon.ico` üzerinden servis edilmesi, favicon/manifest/metadata ve UI’da tutarlı kullanım. *(Kaynak klasör `logo-favIcon/` repo’dan kaldırıldı — 2026; dosyalar `public/` içinde.)*  
-**Not:** Aşağıdaki **Geliştirme fazları** bölümü implementasyon sırası için referanstır; **Faz 1–4** tamamlandı (21 Mart 2026).
+**Not:** Aşağıdaki **Geliştirme fazları** bölümü implementasyon sırası için referanstır; **Faz 1–4** tamamlandı (21 Mart 2026). **Manifest:** `[locale]/layout.tsx` içinde `metadataBase` (köke göre mutlak URL); `middleware.ts` matcher’da `.webmanifest` uzantısı locale middleware’ine girmesin (aksi halde `/tr/site.webmanifest` 404).
 
 ---
 
@@ -12,7 +12,7 @@
 |-----|--------|------|
 | **Faz 1** | ✅ | `favicon.ico` → `app/favicon.ico`. `logo.png` / `brand.png` + `apple-touch` + `android-chrome` + favicon PNG’leri → `public/`. (v2/v3 geçişleri geçmişte `logo-favIcon/` kaynağından kopyalandı; klasör silindi.) |
 | **Faz 2** | ✅ | [app/[locale]/layout.tsx](../../app/[locale]/layout.tsx): `metadata.icons` (SVG + ICO + 96×96 + Apple) ve `manifest: '/site.webmanifest'`. [public/site.webmanifest](../../public/site.webmanifest): `name` / `short_name` = HeroKidStory, `theme_color` = `#14b8a6`, ikon yolları. |
-| **Faz 3** | ✅ | [Header.tsx](../../components/layout/Header.tsx) ve [Footer.tsx](../../components/layout/Footer.tsx): `next/image` ile `/logo.png` + mevcut gradient “HeroKidStory” metni; mobil drawer aynı kilit. |
+| **Faz 3** | ✅ | [Header.tsx](../../components/layout/Header.tsx) ve [Footer.tsx](../../components/layout/Footer.tsx): `next/image` ile `/logo.png` + [BrandWordmark](../../components/brand/BrandWordmark.tsx) (üç parça metin renkleri); mobil drawer; üst nav’da “Ana Sayfa” yok; `xl` altı hamburger. |
 | **Faz 4** | ✅ | [lib/metadata.ts](../../lib/metadata.ts): `openGraph.images` ve `twitter.images` → mutlak URL ile `/brand.png` (2816×1536). |
 
 **Güncelleme — `logo-favIcon/v2/` (şeffaf, sonra küçük görünüm):** SVG + ICO + 96×96; büyük SVG kaldırıldı.

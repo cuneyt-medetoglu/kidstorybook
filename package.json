@@ -26,8 +26,9 @@
     "deploy:build:fast": "npm install && npm run build",
     "worker": "tsx worker.ts",
     "worker:dev": "tsx watch worker.ts",
-    "deploy:restart": "pm2 restart herokidstory",
-    "deploy": "npm run deploy:build && npm run deploy:restart"
+    "deploy:restart": "pm2 restart herokidstory herokidstory-worker",
+    "deploy": "npm run deploy:build && npm run deploy:restart",
+    "deploy:fast": "npm run deploy:build:fast && npm run deploy:restart"
   },
   "repository": {
     "type": "git",

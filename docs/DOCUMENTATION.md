@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 21 Mart 2026 — `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1 logo/favicon/OG; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları: migration `024_books_timestamps_timestamptz.sql`, `pool` UTC oturumu, admin kitap detayında İstanbul saati + üretim süresi (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet satırları (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
+**Son güncelleme:** 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 

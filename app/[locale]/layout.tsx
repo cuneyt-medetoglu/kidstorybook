@@ -14,6 +14,11 @@ import { buildPageMetadata } from '@/lib/metadata'
 
 const inter = Inter({ subsets: ['latin'] })
 
+/** Mutlak metadata URL’leri (manifest, OG) — locale path’e göre çözülmesin */
+const METADATA_BASE = new URL(
+  process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+)
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
 }
@@ -24,6 +29,7 @@ export async function generateMetadata({
   params: { locale: string }
 }): Promise<Metadata> {
   return {
+    metadataBase: METADATA_BASE,
     ...await buildPageMetadata(locale, 'home', ''),
     icons: {
       icon: [

@@ -18,6 +18,7 @@
 - [x] **2.1.8** Dark/Light mode toggle butonu (header'da) - ✅ next-themes entegre edildi, toggle butonu eklendi
 - [x] **2.1.9** Renk Teması ve Tema Gözden Geçirmesi ✅ Tamamlandı (7 Mart 2026)
 - [x] **2.1.11** Logo görseli (Header, Footer, mobil drawer) + favicon/manifest/OG görseli entegrasyonu — ✅ 21 Mart 2026 — `docs/analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md`
+  - ✅ **Aynı gün (devam — shell marka + responsive):** `BrandWordmark` (`components/brand/BrandWordmark.tsx`); Header üç bölgeli flex + esnek boşluk, **yatay nav yalnız `xl` (1280px)+**, altında hamburger (tablet/iPad’de nav–logo çakışması önlendi); Footer `xl` öncesi 2 sütunlu grid, marka `xl` altında ikon üstü / wordmark altı; `[locale]/layout.tsx` `metadataBase` + `middleware` içinde `.webmanifest` statik istisnası (`/tr/site.webmanifest` 404); üst/alt nav ve footer “Hızlı bağlantılar”dan **Ana Sayfa** linki kaldırıldı (logo = ana sayfa). Prototip kararı: `docs/analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md`.
   - ✅ Design Token sistemi kuruldu (`globals.css` → `tailwind.config.ts` → tüm bileşenler)
   - ✅ Hardcoded `purple-X / pink-X` → Semantic token (`primary`, `brand-2`, `accent`) — ~46 dosya, ~400+ referans
   - ✅ Aktif palet: Teal→Cyan (çocuk dostu, macera/deniz teması)

@@ -16,7 +16,6 @@ import {
   Menu,
   ShoppingCart,
   ChevronDown,
-  Home,
   BookOpen,
   Tag,
   X,
@@ -33,6 +32,7 @@ import { useCart } from "@/contexts/CartContext"
 import { useTranslations, useLocale } from "next-intl"
 import Image from "next/image"
 import { Link, useRouter, usePathname } from "@/i18n/navigation"
+import { BrandWordmark } from "@/components/brand/BrandWordmark"
 
 const countries = [
   { code: "US", flag: "🇺🇸", currency: "USD" },
@@ -68,7 +68,6 @@ export function Header() {
 
   // nav links defined here so translations work
   const navLinks = [
-    { labelKey: "home" as const, href: "/", icon: Home },
     { labelKey: "examples" as const, href: "/examples", icon: BookOpen },
     { labelKey: "pricing" as const, href: "/pricing", icon: Tag },
   ]
@@ -109,30 +108,35 @@ export function Header() {
           : "bg-white dark:bg-slate-900"
       }`}
     >
-      <nav className="container mx-auto flex h-20 items-center justify-between gap-2 px-4 md:px-6 max-w-full overflow-hidden">
-        {/* Logo */}
-        <Link href="/" className="shrink-0">
+      {/*
+        Üç bölgeli flex: logo (asla ezilmesin) | ara nav (yalnız xl+) | esnek boşluk | aksiyonlar.
+        justify-between + ortada shrink-0 nav, dar ekranda (iPad) nav ile logo çakışıyordu.
+        xl (1280px) altında yatay linkler kapatılıp hamburger — tablet/profesyonel kalıbı.
+      */}
+      <nav className="container mx-auto flex h-20 min-h-[5rem] w-full max-w-full min-w-0 items-center gap-2 px-3 sm:gap-3 sm:px-4 md:px-6">
+        <Link
+          href="/"
+          className="shrink-0 pr-1 sm:pr-2"
+        >
           <motion.div
-            className="flex items-center gap-2.5 md:gap-3"
-            whileHover={{ scale: 1.05 }}
+            className="flex items-center gap-3 sm:gap-3.5 md:gap-4"
+            whileHover={{ scale: 1.03 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
             <Image
               src="/logo.png"
               alt="HeroKidStory"
-              width={64}
-              height={64}
-              className="h-10 w-10 shrink-0 sm:h-11 sm:w-11 md:h-12 md:w-12 lg:h-[3.25rem] lg:w-[3.25rem]"
+              width={96}
+              height={96}
+              className="h-12 w-12 shrink-0 sm:h-[3.25rem] sm:w-[3.25rem] md:h-14 md:w-14 lg:h-[3.625rem] lg:w-[3.625rem]"
               priority
             />
-            <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold leading-none text-transparent sm:text-2xl md:text-3xl">
-              HeroKidStory
-            </span>
+            <BrandWordmark size="header" />
           </motion.div>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden items-center gap-4 lg:gap-8 md:flex shrink-0">
+        {/* Yalnız geniş masaüstü: yan yana linkler; altında çakışma riski yok */}
+        <div className="hidden shrink-0 items-center gap-6 pl-2 xl:flex 2xl:gap-8">
           {navLinks.map((link, index) => (
             <motion.div
               key={link.href}
@@ -140,9 +144,9 @@ export function Header() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link href={link.href}>
+              <Link href={link.href} className="block">
                 <motion.span
-                  className="text-sm font-medium text-gray-800 transition-colors hover:text-primary dark:text-slate-100 lg:text-base"
+                  className="whitespace-nowrap text-sm font-medium text-gray-800 transition-colors hover:text-primary dark:text-slate-100 lg:text-base"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 400 }}
                 >
@@ -153,8 +157,11 @@ export function Header() {
           ))}
         </div>
 
+        {/* Logo ile sağ blok arasında kalan alan — nav bu satırda yer kaplamaz, sağa iter */}
+        <div className="min-w-0 flex-1 shrink" aria-hidden="true" />
+
         {/* Right Side Actions */}
-        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4 shrink-0">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3 lg:gap-4">
           {/* Currency Selector — hidden until payment systems are in place */}
           {SHOW_CURRENCY_SELECTOR && (
           <DropdownMenu>
@@ -351,10 +358,10 @@ export function Header() {
             )}
           </div>
 
-          {/* Mobile Menu */}
+          {/* Mobil + tablet + iPad (xl altı): tam genişlikte nav sheet */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="xl:hidden" aria-label={t("openMenu")}>
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -370,18 +377,16 @@ export function Header() {
                 className="flex h-full min-h-0 flex-col overflow-y-auto"
               >
                 {/* 1. Üst: Logo + Kapat */}
-                <div className="mb-6 flex shrink-0 items-center justify-between">
-                  <div className="flex items-center gap-2.5">
+                <div className="mb-6 flex min-w-0 shrink-0 items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3 sm:gap-3.5">
                     <Image
                       src="/logo.png"
                       alt="HeroKidStory"
-                      width={48}
-                      height={48}
-                      className="h-11 w-11 shrink-0"
+                      width={80}
+                      height={80}
+                      className="h-12 w-12 shrink-0 sm:h-[3.25rem] sm:w-[3.25rem]"
                     />
-                    <span className="bg-gradient-to-r from-primary to-brand-2 bg-clip-text text-xl font-bold text-transparent">
-                      HeroKidStory
-                    </span>
+                    <BrandWordmark size="drawer" />
                   </div>
                   <Button
                     variant="ghost"

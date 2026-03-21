@@ -146,37 +146,51 @@ Mobile-first design with touch-friendly interactions.
 
 ---
 
-### Marka alanı — Header + Footer logo lockup (HeroKidStory)
+### Marka alanı — Header + Footer (`logo.png` + `brand.png`, v0 prompt)
 
-Ana sayfa shell’inde logo + wordmark birlikte daha “premium” ve dengeli dursun diye v0’dan varyasyon üretmek için:
+**Türkçe özet:** Hem **`/logo.png`** (ikon) hem **`/brand.png`** (wordmark görseli) **birlikte**: solda logo, sağda brand; tek satırda hizalı, aralıklı, “kilit” gibi dursun. HTML ile ayrıca “HeroKidStory” metni **yok** — yazı `brand.png` içinde. Ortak çerçeve/hover; header büyük, footer küçük. Repoyu taramasın; çıktı: `SiteHeaderBrand`, `SiteFooterBrand`, `index.ts`.
+
+---
+
+**Ne kopyalanır?** v0’a **yalnızca** aşağıdaki kod bloğunun **içindeki İngilizce metni** yapıştır (` ``` ` satırlarını kopyalama). **Satır aralığı (güncel):** **160–190** (üçlü backtick satırları hariç). Bu dosyanın üst kısımlarındaki diğer prompt’lar v0’a gitmez.
+
+**v0’a yapıştırılacak (İngilizce, tek mesaj):**
 
 ```
-Design a polished brand lockup block for the marketing header and footer of "HeroKidStory" — an AI app for personalized children’s storybooks.
+You are generating UI code ONLY for HeroKidStory brand lockup components. Do NOT explore the repository, do NOT open or search files, do NOT list directories, do NOT claim assets are missing.
 
-Brand & tech:
-- Product name: HeroKidStory (single wordmark; can split visual emphasis: Hero / Kid / Story with color).
-- Color system: teal primary #14b8a6, cyan accent #06b6d4, soft off-white backgrounds; support light + dark mode (dark: slate-900 header/footer, keep teal/cyan readable).
-- Stack: React, Tailwind CSS, shadcn/ui, Framer Motion subtle hover on the whole lockup (scale 1.02, ease-out).
+**Sandbox note:** Assume `/public/logo.png` and `/public/brand.png` **already exist** in the real project. Never say the public folder is empty; never ask to add these files later. Output components that reference these paths as-is.
 
-Logo asset:
-- Assume a square PNG mark at /logo.png (book + sparkle motif). The mark must feel visually balanced next to the wordmark — same cap-height alignment, no tiny icon: icon height ≈ 0.9–1.0× the wordmark cap height on desktop.
+## Goal
+Create a polished **two-asset** brand lockup for header and footer. Always use BOTH files from `/public`:
+1. `/logo.png` — square mark (icon/emblem).
+2. `/brand.png` — horizontal wordmark (graphic already includes styled “HeroKidStory”; no duplicate HTML text).
 
-Layout:
-- Header row: left-aligned lockup (icon + text), plenty of whitespace, no clutter.
-- Optional subtle pill or soft gradient underline under wordmark only (not cheesy).
-- Footer variant: smaller but same proportions; optional single-line tagline under lockup in muted gray.
+Do NOT render the product name as separate HTML/CSS text (no `<span>HeroKidStory</span>`, no gradient typography). Wordmark = `brand.png` only.
 
-Typography:
-- Friendly modern sans (e.g. similar to Inter/SF); wordmark can use gradient text from-primary to-brand-2 OR flat teal with "Kid" in cyan — pick one cohesive style.
+## Layout (required)
+- One row: **`logo.png` LEFT**, **`brand.png` RIGHT**, `flex items-center gap-3` (tune gap). Vertically align; balance icon size with wordmark height (`object-contain`, sensible `h-*` on each).
+- One `<Link href="/">` wrapping the whole lockup.
+- Optional: rounded-xl container, soft `border-primary/20`, `bg-gradient-to-r from-primary/5 to-brand-2/5`, dark mode variants. Framer Motion: hover scale ~1.02–1.04 on the whole link.
 
-Deliver:
-- Two components: <SiteHeaderBrand /> and <SiteFooterBrand />
-- Responsive: on mobile, slightly reduce text size but keep icon readable (min touch target for logo link 44px height).
-- Accessibility: logo link has aria-label "HeroKidStory home", image has alt text.
-- No lorem marketing copy in header; footer may use one short tagline placeholder.
+## Sizing
+- Header: logo e.g. `h-10 w-10 sm:h-11 md:h-12`; brand `h-8 sm:h-10 md:h-11` + `w-auto max-w-[min(100%,280px)] md:max-w-[320px]` `object-contain object-left`.
+- Footer: same layout, ~15–25% smaller. No horizontal overflow on mobile.
+
+## Components
+1. `SiteHeaderBrand` — logo + brand, link home.
+2. `SiteFooterBrand` — same, smaller; optional `tagline?: string` below.
+
+## Technical
+- Next.js App Router, TypeScript, Tailwind, Framer Motion.
+- Two `next/image` tags; `priority` in header. `alt`: logo `"HeroKidStory mark"`, brand `"HeroKidStory"`; link `aria-label="HeroKidStory — home"`.
+- `next/link` for now (replace with locale Link later).
+
+## Output
+Full code: `SiteHeaderBrand`, `SiteFooterBrand`, `components/brand/index.ts`. Nothing else.
 ```
 
-**Not:** Çıkan kodu projeye alırken `components/layout/Header.tsx` ve `Footer.tsx` ile birleştir; `next/image` `src="/logo.png"` kalsın, className’leri v0 çıktısından uyarla.
+**Entegrasyon notu (projede):** `Link` → `@/i18n/navigation` ile değiştir; `Header.tsx` / `Footer.tsx` içinde mevcut logo satırını bu bileşenlerle değiştir.
 
 ---
 
