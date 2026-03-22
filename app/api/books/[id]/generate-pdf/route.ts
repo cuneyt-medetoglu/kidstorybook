@@ -78,8 +78,8 @@ export async function POST(
     if (book.pdf_path && !pdfExistsInBucket && !forceRegenerate) {
       console.log('[PDF Generation] PDF missing from S3, clearing database records')
       await updateBook(bookId, {
-        pdf_url: undefined,
-        pdf_path: undefined,
+        pdf_url: null,
+        pdf_path: null,
       })
     }
     

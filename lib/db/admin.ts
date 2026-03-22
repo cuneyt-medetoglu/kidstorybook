@@ -160,6 +160,7 @@ export interface AdminBookDetail extends AdminBookRow {
   edit_quota_used: number
   edit_quota_limit: number | null
   pdf_url: string | null
+  pdf_path: string | null
   view_count: number
 }
 

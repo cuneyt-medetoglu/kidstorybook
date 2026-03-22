@@ -1,60 +1,54 @@
 # PDF Çıktı İyileştirme Planı
 
-**Tarih:** 22 Mart 2026 · **Durum:** Analiz + HTML önizleme · **Faz:** 5.7 · **Kod:** henüz yok (sadece plan + `public/pdf-preview-test.html`)
+**Son güncelleme:** 22 Mart 2026 · **Faz:** 5.7
 
 ---
 
-## Kısa özet (30 saniye)
+## Özet
 
-| Ne istiyoruz? | Şu an | Hedef |
-|---------------|--------|--------|
-| Kapak | A4 yatay spread (sol görsel \| sağ başlık) | **Tek sayfa A5 dikey**, full-bleed görsel + altta başlık + **küçük logo + `herokidstory`** |
-| İçerik | A4 yatay spread | **Aynı** (değişmeyecek) |
-| Arka kapak | Yok | **Tek sayfa A5 dikey** — Header’daki gibi **`logo.png` + renkli HeroKidStory** + tagline + URL |
-| Deneme | — | **`/pdf-preview-test.html`** ile önce görsel onay, sonra kod |
-
-**Marka kuralı:** Kapakta üç renkli “Hero / Kid / Story” wordmark **yok**; sadece **küçük logo + `herokidstory`** metni. Arka kapakta ana sayfa gibi **logo + HeroKidStory** (wordmark renkleri `BrandWordmark.tsx` ile uyumlu).
+| Alan | Durum |
+|------|--------|
+| Ön kapak A5 | Kurumsal wordmark + altında logo; full-bleed + başlık |
+| İçerik | A4 spread, metin ortalı / cümle paragrafları |
+| Arka kapak | Logo + wordmark, tagline, **QR** (`NEXT_PUBLIC_APP_URL` veya herokidstory.com), footer “ile oluşturuldu” |
+| PDF önbellek | **Admin:** `POST /api/admin/books/[id]/clear-pdf` + kitap detayında buton |
+| **İleride** | İçerik/kapak değişince otomatik cache invalidation |
 
 ---
 
 ## Referanslar
 
-- **Rehber:** `docs/guides/PDF_GENERATION_GUIDE.md`, `docs/guides/PDF_GENERATION_TEST_GUIDE.md`
-- **Kod:** `lib/pdf/generator.ts`, `lib/pdf/templates/book-styles.css`, `lib/pdf/image-compress.ts`, `app/api/books/[id]/generate-pdf/route.ts`
-- **Önizleme:** `public/pdf-preview-test.html`
-- **Marka:** `components/brand/BrandWordmark.tsx`, `components/layout/Header.tsx`, `public/logo.png`
-- **Agent:** `.cursor/rules/pdf-generation-manager.mdc` — PDF işlerinde tek yönlendirici
-- **Bağlam:** `docs/technical/MONOLITH_VS_SPLIT_ANALYSIS.md` (Puppeteer yükü)
+- **Kod:** `lib/pdf/generator.ts` (QR: `qrcode`), `lib/pdf/templates/book-styles.css`
+- **API:** `generate-pdf`, `admin/.../clear-pdf`, `lib/pdf/image-compress.ts`
+- **Önizleme:** `public/dev/pdf-preview-test.html` → `/dev/pdf-preview-test.html`
+- **Agent:** `.cursor/rules/pdf-generation-manager.mdc`
 
 ---
 
-## Hedef sayfa sırası
+## İlerleme (özet)
 
-1. **Ön kapak** — A5 portrait (148.5 × 210 mm): görsel tam sayfa, başlık gradient üzerinde, en altta logo + `herokidstory`.
-2. **Spread’ler** — A4 landscape (297 × 210 mm): mevcut [görsel \| metin] alternansı.
-3. **Arka kapak** — A5 portrait: logo + HeroKidStory wordmark (Header ile aynı mantık), kısa metin, `herokidstory.com`.
-
----
-
-## Teknik not (mixed page size)
-
-Farklı sayfa boyutları için CSS **named `@page`** + `page: ...` ataması planlanıyor; Puppeteer/Chrome davranışı **HTML önizleme + gerçek PDF** ile doğrulanmalı. Sorun çıkarsa yedek: iki PDF + `pdf-lib` ile birleştirme (planda detay).
+| Konu | Durum |
+|------|--------|
+| Layout A5 kapak + A4 spread + arka kapak | ✅ |
+| Admin PDF cache temizleme | ✅ |
+| Arka kapak QR | ✅ |
+| `PDF_GENERATION_GUIDE.md` | ⏳ |
+| Otomatik cache (story/images değişince) | 📋 sonra |
 
 ---
 
-## Sonraki adımlar
+## Gelecek fikirler (backlog)
 
-1. `pdf-preview-test.html` ile kapak + arka kapak onayı  
-2. `generator.ts` + `book-styles.css` entegrasyonu  
-3. `PDF_GENERATION_GUIDE.md` güncellemesi  
-4. Gerçek export + isteğe bağlı baskı testi  
+| # | Konu |
+|---|------|
+| **Cache** | `story_data` / `images_data` / `cover_image_url` güncellenince `pdf_url` & `pdf_path` temizle veya hash ile “yeniden üret gerekli” bayrağı |
+| **Arka kapak** | Aynı çocuk/kullanıcıya ait **diğer kitapların kapak küçük görseli** (örn. 2 adet) + derin link veya QR ile oluşturma/mağaza — **veri + UI ayrı iş** |
+| **Diğer** | Baskı bleed; uygulama içi PDF önizleme (5.7.2); şablon seçenekleri (5.7.3); hukuk satırı, sosyal link |
 
 ---
 
-## Kaybedilmemesi için detaylar (kısa)
+## Teknik not
 
-- **Sıkıştırma / limit:** 50 MB; `image-compress.ts` + route içi akış — `PDF_GENERATION_GUIDE.md`.
-- **Timeout:** Büyük base64 içerikte navigation timeout; `generator.ts` ayarı.
-- **Hard copy:** İleride bleed (~3 mm) eklenebilir.
-
-**Son güncelleme:** 22 Mart 2026
+- Mixed `@page` + `preferCSSPageSize: true`
+- 50 MB limit — `image-compress.ts`
+- QR URL: `NEXT_PUBLIC_APP_URL` yoksa `https://herokidstory.com`

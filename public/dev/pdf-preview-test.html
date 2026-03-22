@@ -176,31 +176,31 @@
       margin-bottom: 5mm;
     }
 
-    /* Kapak altı: küçük logo + herokidstory (renkli 3 parçalı wordmark değil) */
     .cover-a .cover-branding {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 5px;
-      padding: 4px 12px 5px;
-      background: rgba(255,255,255,0.12);
-      border-radius: 999px;
-      backdrop-filter: blur(4px);
+      gap: 2.5mm;
       margin-bottom: 3mm;
+      padding: 4mm 5mm 3mm;
+      background: rgba(0,0,0,0.35);
+      border-radius: 12px;
     }
-    .cover-a .cover-branding .cover-logo {
-      height: 7mm;
-      width: auto;
-      display: block;
-      object-fit: contain;
-    }
-    .cover-a .cover-branding .cover-site-url {
+    .cover-a .cover-wordmark {
       font-family: 'Fredoka', sans-serif;
-      font-size: 8.5pt;
-      font-weight: 600;
-      color: rgba(255,255,255,0.95);
-      letter-spacing: 0.03em;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.45);
+      font-size: 15pt;
+      font-weight: 700;
+      line-height: 1.1;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+    .cover-a .cover-wordmark .cw-hero,
+    .cover-a .cover-wordmark .cw-story { color: #29b5a8; }
+    .cover-a .cover-wordmark .cw-kid   { color: #1ba8e0; }
+    .cover-a .cover-logo-below {
+      height: 9mm;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 1px 4px rgba(0,0,0,0.4));
     }
 
     /* =========================================================
@@ -271,17 +271,24 @@
 
     .page-text {
       font-family: 'Alegreya', serif;
-      font-size: 18pt;
+      font-size: 17pt;
       font-weight: 400;
-      line-height: 1.8;
+      line-height: 1.85;
       color: var(--text-dark);
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 6mm;
+      align-items: center;
+      padding: 12mm 14mm;
+      text-align: center;
     }
-    .page-text p { margin-bottom: 0.8em; }
+    .page-text p {
+      margin: 0 0 1.15em 0;
+      max-width: 38ch;
+      text-align: center;
+    }
+    .page-text p:last-child { margin-bottom: 0; }
 
     .page-number {
       position: absolute;
@@ -314,87 +321,78 @@
       background: var(--bg-cream);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6mm;
-      padding: 14mm 10mm;
+      justify-content: space-between;
+      padding: 12mm 10mm 8mm;
       position: relative;
       overflow: hidden;
     }
-
-    /* Büyük köşe desenleri */
     .back-cover .bc-corner {
       position: absolute;
       width: 55mm;
       height: 55mm;
-      border-radius: 0;
-      opacity: 0.3;
+      opacity: 0.25;
     }
-    .back-cover .bc-corner.tl {
-      top: -5mm; left: -5mm;
-      background: radial-gradient(circle at 30% 30%, rgba(41,181,168,0.5) 30%, transparent 70%);
-    }
-    .back-cover .bc-corner.tr {
-      top: -5mm; right: -5mm;
-      background: radial-gradient(circle at 70% 30%, rgba(27,168,224,0.5) 30%, transparent 70%);
-    }
-    .back-cover .bc-corner.bl {
-      bottom: -5mm; left: -5mm;
-      background: radial-gradient(circle at 30% 70%, rgba(27,168,224,0.5) 30%, transparent 70%);
-    }
-    .back-cover .bc-corner.br {
-      bottom: -5mm; right: -5mm;
-      background: radial-gradient(circle at 70% 70%, rgba(41,181,168,0.5) 30%, transparent 70%);
-    }
+    .back-cover .bc-corner-tl { top: 0; left: 0; background: radial-gradient(circle at 30% 30%, rgba(41,181,168,0.45) 30%, transparent 70%); }
+    .back-cover .bc-corner-tr { top: 0; right: 0; background: radial-gradient(circle at 70% 30%, rgba(27,168,224,0.45) 30%, transparent 70%); }
+    .back-cover .bc-corner-bl { bottom: 0; left: 0; background: radial-gradient(circle at 30% 70%, rgba(27,168,224,0.45) 30%, transparent 70%); }
+    .back-cover .bc-corner-br { bottom: 0; right: 0; background: radial-gradient(circle at 70% 70%, rgba(41,181,168,0.45) 30%, transparent 70%); }
 
-    /* Arka kapak: Header ile aynı mantık — logo + renkli HeroKidStory */
-    .back-cover .bc-brand-row {
+    .back-cover .bc-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4mm;
+      z-index: 1;
+    }
+    .back-cover .bc-logo-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3mm;
+    }
+    .back-cover .bc-logo-main { height: 18mm; width: auto; }
+    .back-cover .bc-wordmark { font-family: 'Fredoka', sans-serif; font-size: 22pt; font-weight: 700; line-height: 1; }
+    .back-cover .bc-wordmark .bc-hero,
+    .back-cover .bc-wordmark .bc-story { color: var(--brand-teal); }
+    .back-cover .bc-wordmark .bc-kid   { color: var(--brand-blue); }
+    .back-cover .bc-divider {
+      width: 28mm;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--brand-teal), transparent);
+    }
+    .back-cover .bc-tagline {
+      font-family: 'Alegreya', serif;
+      font-size: 11pt;
+      color: #555;
+      text-align: center;
+      line-height: 1.55;
+      max-width: 110mm;
+      margin: 0;
+    }
+    .back-cover .bc-footer {
+      margin-top: 4mm;
+      padding-top: 5mm;
+      border-top: 1px solid rgba(41, 181, 168, 0.2);
+      text-align: center;
+      z-index: 1;
+    }
+    .back-cover .bc-created-line {
+      font-family: 'Alegreya', serif;
+      font-size: 9pt;
+      font-style: italic;
+      color: #666;
+      margin: 0 0 3mm;
+    }
+    .back-cover .bc-footer-brand {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 3.5mm;
-      z-index: 1;
+      gap: 2.5mm;
     }
-    .back-cover .bc-brand-row .bc-logo-img {
-      height: 16mm;
-      width: auto;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-    .back-cover .bc-wordmark {
-      font-family: 'Fredoka', sans-serif;
-      font-size: 22pt;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-    .back-cover .bc-wordmark .h { color: var(--brand-teal); }
-    .back-cover .bc-wordmark .k { color: var(--brand-blue); }
-
-    .back-cover .bc-divider {
-      width: 24mm;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--brand-teal), transparent);
-      z-index: 1;
-    }
-
-    .back-cover .bc-tagline {
-      font-family: 'Alegreya', serif;
-      font-size: 12pt;
-      color: #555;
-      text-align: center;
-      line-height: 1.5;
-      max-width: 110mm;
-      z-index: 1;
-    }
-
-    .back-cover .bc-url {
-      margin-top: auto;
-      font-family: 'Fredoka', sans-serif;
-      font-size: 9pt;
-      color: #999;
-      z-index: 1;
-    }
+    .back-cover .bc-logo-footer { height: 8mm; width: auto; }
+    .back-cover .bc-footer-brand .bc-wordmark { font-size: 13pt; }
 
     /* =========================================================
        @MEDIA PRINT — Tarayıcı Print Preview testi için
@@ -463,8 +461,10 @@
         <div class="cover-content">
           <div class="cover-title" id="coverTitle">Arya ve Gizemli Kitap</div>
           <div class="cover-branding">
-            <img src="/brand/logo.png" alt="" class="cover-logo" />
-            <span class="cover-site-url">herokidstory</span>
+            <div class="cover-wordmark">
+              <span class="cw-hero">Hero</span><span class="cw-kid">Kid</span><span class="cw-story">Story</span>
+            </div>
+            <img src="/logo.png" alt="" class="cover-logo-below" />
           </div>
         </div>
       </div>
@@ -589,27 +589,25 @@
     <div class="page-label">📄 ARKA KAPAK — A5 Portrait (148.5 × 210 mm)</div>
     <div class="page-frame">
       <div class="page-cover back-cover">
-        <!-- Köşe süslemeleri -->
-        <div class="bc-corner tl"></div>
-        <div class="bc-corner tr"></div>
-        <div class="bc-corner bl"></div>
-        <div class="bc-corner br"></div>
-
-        <div class="bc-brand-row">
-          <img src="/brand/logo.png" alt="" class="bc-logo-img" />
-          <span class="bc-wordmark"><span class="h">Hero</span><span class="k">Kid</span><span class="h">Story</span></span>
+        <span class="bc-corner bc-corner-tl"></span>
+        <span class="bc-corner bc-corner-tr"></span>
+        <span class="bc-corner bc-corner-bl"></span>
+        <span class="bc-corner bc-corner-br"></span>
+        <div class="bc-main">
+          <div class="bc-logo-stack">
+            <img src="/logo.png" alt="" class="bc-logo-main" />
+            <span class="bc-wordmark"><span class="bc-hero">Hero</span><span class="bc-kid">Kid</span><span class="bc-story">Story</span></span>
+          </div>
+          <div class="bc-divider"></div>
+          <p class="bc-tagline">Çocuğunuzun kendi hikayesinin kahramanı olduğu, AI ile oluşturulmuş kişisel kitaplar.</p>
         </div>
-
-        <!-- Ayırıcı -->
-        <div class="bc-divider"></div>
-
-        <!-- Tagline -->
-        <div class="bc-tagline">
-          Çocuğunuzun kendi hikayesinin kahramanı olduğu, AI ile oluşturulmuş kişisel kitaplar.
-        </div>
-
-        <!-- URL -->
-        <div class="bc-url">herokidstory.com</div>
+        <footer class="bc-footer">
+          <p class="bc-created-line">herokidstory.com ile oluşturuldu</p>
+          <div class="bc-footer-brand">
+            <img src="/logo.png" alt="" class="bc-logo-footer" />
+            <span class="bc-wordmark"><span class="bc-hero">Hero</span><span class="bc-kid">Kid</span><span class="bc-story">Story</span></span>
+          </div>
+        </footer>
       </div>
     </div>
   </div>

@@ -71,7 +71,7 @@
 | CREATE_YOUR_OWN_FROM_EXAMPLE.md | ✅ AKTİF | - | Create Your Own from Example: akış, characterIds, kapak Vision. |
 | DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md | ✅ AKTİF | 7 Şubat 2026 | Debug kalite butonları (admin, trace export). |
 | STORY_PROMPT_ACTION_PLAN.md | ✅ AKTİF | 7 Şubat 2026 | Hikaye + görsel kalite aksiyon planı. |
-| PDF_OUTPUT_IMPROVEMENT_PLAN.md | ✅ AKTİF | 22 Mart 2026 | PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka; önizleme `public/pdf-preview-test.html`; @pdf-generation-manager. |
+| PDF_OUTPUT_IMPROVEMENT_PLAN.md | ✅ AKTİF | 22 Mart 2026 | PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka; önizleme `public/dev/pdf-preview-test.html`; @pdf-generation-manager. |
 | (7 dosya) | → archive/2026-02/analysis/ | 7 Şubat 2026 | CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07. |
 
 ---

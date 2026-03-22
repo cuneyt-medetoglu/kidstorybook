@@ -65,8 +65,9 @@ export interface UpdateBookInput {
   images_data?: any[]
   cover_image_url?: string
   cover_image_path?: string
-  pdf_url?: string
-  pdf_path?: string
+  /** `null` ile alanları DB’de temizle (ör. PDF cache silme) */
+  pdf_url?: string | null
+  pdf_path?: string | null
   is_favorite?: boolean
   generation_metadata?: any
   edit_quota_used?: number

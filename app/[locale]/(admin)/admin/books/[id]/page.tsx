@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { AdminBookEditForm } from '@/components/admin/book-edit-form'
+import { AdminClearPdfButton } from '@/components/admin/admin-clear-pdf-button'
 import {
   ArrowLeft,
   BookOpen,
@@ -324,6 +325,17 @@ export default async function AdminBookDetailPage({ params }: PageProps) {
                 >
                   <FileText className="h-3.5 w-3.5" /> {t('downloadPdf')}
                 </a>
+              )}
+              {(book.pdf_url || book.pdf_path) && (
+                <div className="pt-2">
+                  <AdminClearPdfButton
+                    bookId={book.id}
+                    hasPdf={Boolean(book.pdf_url || book.pdf_path)}
+                  />
+                </div>
+              )}
+              {!book.pdf_url && !book.pdf_path && (
+                <p className="text-xs text-muted-foreground pt-1">{t('noPdfCached')}</p>
               )}
             </div>
           </CardContent>

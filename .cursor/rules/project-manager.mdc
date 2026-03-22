@@ -280,7 +280,7 @@ Kullanıcı şunları diyebilir:
 - **@database-manager:** Database schema, migration'lar, RLS policies, performance
 - **@prompt-manager:** AI prompt'ları, versiyonlama, A/B testing, optimization
 - **@api-manager:** API endpoint'leri, Postman collection'ları, API testleri, dokümantasyon
-- **@pdf-generation-manager:** PDF export (Puppeteer, HTML/CSS, kapak/spread/arka kapak), `generate-pdf` API, sıkıştırma/limitler; rehber `docs/guides/PDF_GENERATION_GUIDE.md`, plan `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/pdf-preview-test.html`
+- **@pdf-generation-manager:** PDF export (Puppeteer, HTML/CSS, kapak/spread/arka kapak), `generate-pdf` API, sıkıştırma/limitler; rehber `docs/guides/PDF_GENERATION_GUIDE.md`, plan `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/dev/pdf-preview-test.html`
 
 **İşbirliği Kuralları:**
 - **@admin-panel-manager:** Admin panel planı, Studio Admin entegrasyonu, 5.8.x detay ilerleme; ROADMAP checkbox’ları sen işaretlersin, detay @admin-panel-manager’da
@@ -310,7 +310,7 @@ Kullanıcı şunları diyebilir:
   - **Sorumluluk:** Prompt'ların sürekli geliştirilmesi, kalite iyileştirmeleri, feedback'lerin prompt'lara yansıtılması
   - Prompt'lar sürekli gelişen dokümanlardır ve @prompt-manager bu gelişimin sorumlusudur
 - **@api-manager:** `app/api/`, `docs/api/API_DOCUMENTATION.md`, `postman/`, `docs/api/POSTMAN_COLLECTION.md`
-- **@pdf-generation-manager:** `lib/pdf/`, `app/api/books/[id]/generate-pdf/`, `docs/guides/PDF_GENERATION_GUIDE.md`, `docs/guides/PDF_GENERATION_TEST_GUIDE.md`, `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, `public/pdf-preview-test.html`
+- **@pdf-generation-manager:** `lib/pdf/`, `app/api/books/[id]/generate-pdf/`, `docs/guides/PDF_GENERATION_GUIDE.md`, `docs/guides/PDF_GENERATION_TEST_GUIDE.md`, `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, `public/dev/pdf-preview-test.html`
 
 ### Dokümantasyon Yapısı Kuralları
 

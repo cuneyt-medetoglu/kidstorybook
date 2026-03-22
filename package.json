@@ -66,6 +66,7 @@
     "bullmq": "^5.34.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.6.1",
     "eslint-config-next": "14.2.35",
     "framer-motion": "^12.23.26",
     "ioredis": "^5.4.2",
@@ -80,6 +81,7 @@
     "pg": "^8.18.0",
     "postcss": "^8.5.6",
     "puppeteer": "^24.35.0",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.70.0",
@@ -88,12 +90,12 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.3",
-    "zod": "^4.3.5",
-    "dotenv": "^16.6.1"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/pg": "^8.16.0",
+    "@types/qrcode": "^1.5.6",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.7.4",
