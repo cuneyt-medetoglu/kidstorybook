@@ -28,9 +28,10 @@ import {
 import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import { generateTts } from '@/lib/tts/generate'
-import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
+import { imageEditWithLog, imageGenerateWithLog, type ImageLogContext } from '@/lib/ai/images'
 import { chatWithLog } from '@/lib/ai/chat'
 import { appendAiDebugLog, sanitizeForDebugLog, summarizeFormData } from '@/lib/debug/ai-debug-log'
+import { formDataToDebugRecord, sanitizeForStepRunnerDebug } from '@/lib/debug/step-runner-sanitize'
 
 // ============================================================================
 // Types
@@ -174,6 +175,9 @@ export async function retryFetch(
     userId: string
     bookId?: string | null
     pageIndex?: number | null
+    /** Step-runner: tam HTTP istek/yanıtı debugTrace dizisine ekler */
+    traceCollector?: DebugTraceEntry[] | null
+    traceStepLabel?: string
   }
 ): Promise<Response> {
   return retryWithBackoff(async () => {
@@ -215,6 +219,8 @@ async function fetchWithAiDebug(
     userId: string
     bookId?: string | null
     pageIndex?: number | null
+    traceCollector?: DebugTraceEntry[] | null
+    traceStepLabel?: string
   }
 ): Promise<Response> {
   const startedAt = Date.now()
@@ -242,9 +248,13 @@ async function fetchWithAiDebug(
   const durationMs = Date.now() - startedAt
   const clone = response.clone()
   const contentType = response.headers.get('content-type') || ''
-  const responsePayload = contentType.includes('application/json')
-    ? sanitizeForDebugLog(await clone.json().catch(() => null))
-    : sanitizeForDebugLog(await clone.text().catch(() => ''))
+  let rawForTrace: unknown
+  if (contentType.includes('application/json')) {
+    rawForTrace = await clone.json().catch(() => null)
+  } else {
+    rawForTrace = await clone.text().catch(() => '')
+  }
+  const responsePayload = sanitizeForDebugLog(rawForTrace)
 
   void appendAiDebugLog({
     stage: response.ok ? 'response' : 'error',
@@ -259,6 +269,54 @@ async function fetchWithAiDebug(
     durationMs,
     payload: responsePayload,
   })
+
+  if (context.traceCollector) {
+    const reqBodyRaw: unknown =
+      options.body instanceof FormData
+        ? formDataToDebugRecord(options.body)
+        : typeof options.body === 'string'
+        ? (() => {
+            try {
+              return JSON.parse(options.body) as unknown
+            } catch {
+              return { _rawString: options.body }
+            }
+          })()
+        : options.body ?? null
+
+    const safeHeaders: Record<string, string> = {}
+    if (options.headers instanceof Headers) {
+      options.headers.forEach((v, k) => {
+        safeHeaders[k] = k.toLowerCase() === 'authorization' ? '[Bearer omitted]' : v
+      })
+    } else if (options.headers && typeof options.headers === 'object') {
+      for (const [k, v] of Object.entries(options.headers as Record<string, string>)) {
+        safeHeaders[k] = k.toLowerCase() === 'authorization' ? '[Bearer omitted]' : String(v)
+      }
+    }
+    if (!Object.keys(safeHeaders).some((k) => k.toLowerCase() === 'authorization')) {
+      safeHeaders.Authorization = '[Bearer omitted]'
+    }
+
+    const stepLabel = context.traceStepLabel || `${context.operationType} ${endpoint}`
+
+    context.traceCollector.push({
+      step: stepLabel,
+      request: {
+        method: options.method || 'POST',
+        url,
+        endpoint,
+        headers: safeHeaders,
+        body: sanitizeForStepRunnerDebug(reqBodyRaw),
+      },
+      response: {
+        status: response.status,
+        ok: response.ok,
+        durationMs,
+        body: sanitizeForStepRunnerDebug(rawForTrace),
+      },
+    })
+  }
 
   return response
 }
@@ -396,7 +454,9 @@ export async function generateMasterCharacterIllustration(
   debugTracePush?: (entry: DebugTraceEntry) => void,
   debugStep?: string,
   bookId?: string,
-  characterType?: { group: string; value: string; displayName?: string }
+  characterType?: { group: string; value: string; displayName?: string },
+  /** Admin step-runner: imageEditWithLog tam HTTP izi bu diziye eklenir */
+  stepRunnerTrace?: DebugTraceEntry[]
 ): Promise<string> {
   const isPet = characterType?.group === 'Pets'
   const animalKind = isPet ? (characterType?.value || 'animal').toLowerCase() : null
@@ -484,15 +544,16 @@ export async function generateMasterCharacterIllustration(
     return fd
   }
 
-  const logCtx = {
+  const logCtx: ImageLogContext = {
     userId,
     bookId,
     characterId,
-    operationType: 'image_master' as const,
+    operationType: 'image_master',
     model: IMAGE_MODEL,
     quality: IMAGE_QUALITY,
     size: IMAGE_SIZE,
     refImageCount: 1,
+    ...(stepRunnerTrace ? { stepRunnerTrace } : {}),
   }
 
   let result
@@ -528,7 +589,12 @@ export async function generateMasterCharacterIllustration(
     debugTracePush({
       step: debugStep || `master_character_${characterId}`,
       request: { model: IMAGE_MODEL, prompt: usedPrompt, size: IMAGE_SIZE, quality: IMAGE_QUALITY, characterId },
-      response: { url: masterUrl, b64Length: (b64Image as string).length, rawResponse: result },
+      response: stepRunnerTrace
+        ? {
+            note: 'OpenAI tam HTTP isteği/yanıtı aiLog içinde image_master POST /v1/images/edits kaydında.',
+            uploadBytes: masterImageBuffer.length,
+          }
+        : { url: masterUrl, b64Length: (b64Image as string).length, rawResponse: result },
     })
   }
   return masterUrl
@@ -543,7 +609,8 @@ export async function generateSupportingEntityMaster(
   userId: string,
   debugTracePush?: (entry: DebugTraceEntry) => void,
   debugStep?: string,
-  bookId?: string
+  bookId?: string,
+  stepRunnerTrace?: DebugTraceEntry[]
 ): Promise<string> {
   const styleDirective = getStyleDescription(illustrationStyle)
   const cinematicPack = getCinematicPack()
@@ -560,7 +627,15 @@ export async function generateSupportingEntityMaster(
 
   const result = await imageGenerateWithLog(
     { model: IMAGE_MODEL, prompt: entityPrompt, size: IMAGE_SIZE, quality: IMAGE_QUALITY },
-    { userId, bookId, operationType: 'image_entity', model: IMAGE_MODEL, quality: IMAGE_QUALITY, size: IMAGE_SIZE }
+    {
+      userId,
+      bookId,
+      operationType: 'image_entity',
+      model: IMAGE_MODEL,
+      quality: IMAGE_QUALITY,
+      size: IMAGE_SIZE,
+      ...(stepRunnerTrace ? { stepRunnerTrace } : {}),
+    }
   )
   const b64Image = result.data?.[0]?.b64_json
   if (!b64Image || typeof b64Image !== 'string') {
@@ -584,7 +659,12 @@ export async function generateSupportingEntityMaster(
         entityType,
         entityName,
       },
-      response: { url: entityUrl, b64Length: (b64Image as string).length, rawResponse: result },
+      response: stepRunnerTrace
+        ? {
+            note: 'OpenAI tam HTTP isteği/yanıtı aiLog içinde image_entity POST /v1/images/generations kaydında.',
+            uploadBytes: imageBuffer.length,
+          }
+        : { url: entityUrl, b64Length: (b64Image as string).length, rawResponse: result },
     })
   }
   return entityUrl
@@ -1164,6 +1244,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
                 model: IMAGE_MODEL,
                 userId,
                 bookId,
+                ...(debugTrace
+                  ? { traceCollector: debugTrace, traceStepLabel: 'image_cover POST /v1/images/edits' }
+                  : {}),
               }
             )
           } catch (error: any) {
@@ -1186,6 +1269,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
                 model: IMAGE_MODEL,
                 userId,
                 bookId,
+                ...(debugTrace
+                  ? { traceCollector: debugTrace, traceStepLabel: 'image_cover POST /v1/images/edits (moderation retry)' }
+                  : {}),
               })
               if (!res.ok) {
                 const errText = await res.text()
@@ -1239,6 +1325,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
         model: IMAGE_MODEL,
         userId,
         bookId,
+        ...(debugTrace
+          ? { traceCollector: debugTrace, traceStepLabel: 'image_cover POST /v1/images/generations' }
+          : {}),
       })
 
       if (!genResponse.ok) {
@@ -1566,6 +1655,12 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
                       userId,
                       bookId,
                       pageIndex: pageNumber,
+                      ...(debugTrace
+                        ? {
+                            traceCollector: debugTrace,
+                            traceStepLabel: `image_page page ${pageNumber} POST /v1/images/edits`,
+                          }
+                        : {}),
                     }
                   )
                 } catch (error: any) {
@@ -1593,6 +1688,12 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
                   userId,
                   bookId,
                   pageIndex: pageNumber,
+                  ...(debugTrace
+                    ? {
+                        traceCollector: debugTrace,
+                        traceStepLabel: `image_page page ${pageNumber} POST /v1/images/generations (no refs)`,
+                      }
+                    : {}),
                 })
                 if (!genResponse.ok) return null
                 const genResult = await genResponse.json()
@@ -1612,6 +1713,12 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
                 userId,
                 bookId,
                 pageIndex: pageNumber,
+                ...(debugTrace
+                  ? {
+                      traceCollector: debugTrace,
+                      traceStepLabel: `image_page page ${pageNumber} POST /v1/images/generations`,
+                    }
+                  : {}),
               })
               if (!genResponse.ok) return null
               const genResult = await genResponse.json()

@@ -12,6 +12,7 @@ import {
   sanitizeForDebugLog,
   summarizeFormData,
 } from '@/lib/debug/ai-debug-log'
+import { formDataToDebugRecord, sanitizeForStepRunnerDebug } from '@/lib/debug/step-runner-sanitize'
 
 function throwHttpError(prefix: string, status: number, errorText: string): never {
   const err = new Error(`${prefix}: ${status} - ${errorText}`) as Error & { status: number }
@@ -34,6 +35,10 @@ export interface ImageLogContext {
   quality?: string
   size?: string
   refImageCount?: number
+  /**
+   * Admin step-runner: tam FormData / JSON istek + API yanıtı (base64 alanları sanitize).
+   */
+  stepRunnerTrace?: Array<{ step: string; request: unknown; response: unknown }> | null
 }
 
 export type ImageAPIResult = {
@@ -171,6 +176,23 @@ export async function imageEditWithLog(
     durationMs,
     payload: sanitizeForDebugLog(result),
   })
+
+  if (ctx.stepRunnerTrace) {
+    ctx.stepRunnerTrace.push({
+      step: `${ctx.operationType} POST ${endpoint}`,
+      request: {
+        method: 'POST',
+        url: `https://api.openai.com${endpoint}`,
+        headers: { Authorization: '[Bearer omitted]' },
+        body: sanitizeForStepRunnerDebug(formDataToDebugRecord(formData)),
+      },
+      response: {
+        status: response.status,
+        durationMs,
+        body: sanitizeForStepRunnerDebug(result),
+      },
+    })
+  }
 
   return result
 }
@@ -314,6 +336,23 @@ export async function imageGenerateWithLog(
     durationMs,
     payload: sanitizeForDebugLog(result),
   })
+
+  if (ctx.stepRunnerTrace) {
+    ctx.stepRunnerTrace.push({
+      step: `${ctx.operationType} POST ${endpoint}`,
+      request: {
+        method: 'POST',
+        url: `https://api.openai.com${endpoint}`,
+        headers: { Authorization: '[Bearer omitted]', 'Content-Type': 'application/json' },
+        body: sanitizeForStepRunnerDebug(body),
+      },
+      response: {
+        status: response.status,
+        durationMs,
+        body: sanitizeForStepRunnerDebug(result),
+      },
+    })
+  }
 
   return result
 }

@@ -30,6 +30,7 @@ import {
 } from '@/lib/book-generation/image-pipeline'
 import { generateTts } from '@/lib/tts/generate'
 import { chatWithLog } from '@/lib/ai/chat'
+import { sanitizeDebugTraceEntries, toPlainJson } from '@/lib/debug/step-runner-sanitize'
 
 export const maxDuration = 300
 
@@ -249,21 +250,16 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
     {
       step: 'story_generation',
       request: {
-        model: effectiveStoryModel,
-        systemPrompt: storyRequestBody.messages[0].content,
-        userPromptLength: storyPrompt.length,
-        userPromptPreview: storyPrompt.slice(0, 500) + (storyPrompt.length > 500 ? '...' : ''),
-        temperature: 0.8,
-        maxTokens: 8000,
-        language,
-        pageCount: effectivePageCount,
+        model: storyRequestBody.model,
+        messages: storyRequestBody.messages,
+        response_format: storyRequestBody.response_format,
+        temperature: storyRequestBody.temperature,
+        max_tokens: storyRequestBody.max_tokens,
       },
       response: {
-        title: storyData.title,
-        pageCount: storyData.pages.length,
-        pages: storyData.pages.map((p: any) => ({ pageNumber: p.pageNumber, textPreview: (p.text || '').slice(0, 100) })),
-        usage: completion.usage,
-        durationMs,
+        openaiChatCompletion: toPlainJson(completion),
+        parsedStoryJson: storyData,
+        requestDurationMs: durationMs,
       },
     },
   ]
@@ -273,7 +269,7 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
     operationType: 'story_generation',
     sessionBookId: newBook?.id,
     statePatch: { storyData },
-    aiLog,
+    aiLog: sanitizeDebugTraceEntries(aiLog),
     durationMs: Date.now() - startedAt,
   })
 }
@@ -323,7 +319,8 @@ async function handleImageMaster({ user, characters, themeKey, illustrationStyle
       (entry) => aiLog.push(entry),
       `master_character_${char.name || char.id}`,
       sessionBookId,
-      char.character_type ?? undefined
+      char.character_type ?? undefined,
+      aiLog
     )
     masterIllustrations[char.id] = masterUrl
   }
@@ -339,7 +336,7 @@ async function handleImageMaster({ user, characters, themeKey, illustrationStyle
     operationType: 'image_master',
     sessionBookId,
     statePatch: { masterIllustrations },
-    aiLog,
+    aiLog: sanitizeDebugTraceEntries(aiLog),
     durationMs: Date.now() - startedAt,
   })
 }
@@ -358,7 +355,7 @@ async function handleImageEntity({ user, characters, illustrationStyle, state, s
       operationType: 'image_entity',
       sessionBookId,
       statePatch: { entityMasterIllustrations: {} },
-      aiLog: [],
+      aiLog: sanitizeDebugTraceEntries([]),
       durationMs: Date.now() - startedAt,
       message: 'No supporting entities in storyData',
     })
@@ -379,7 +376,8 @@ async function handleImageEntity({ user, characters, illustrationStyle, state, s
           user.id,
           (entry) => aiLog.push(entry),
           `entity_master_${entity.name}`,
-          sessionBookId
+          sessionBookId,
+          aiLog
         )
         entityMasterIllustrations[entity.id] = url
       } catch (err: any) {
@@ -399,7 +397,7 @@ async function handleImageEntity({ user, characters, illustrationStyle, state, s
     operationType: 'image_entity',
     sessionBookId,
     statePatch: { entityMasterIllustrations },
-    aiLog,
+    aiLog: sanitizeDebugTraceEntries(aiLog),
     durationMs: Date.now() - startedAt,
   })
 }
@@ -444,7 +442,7 @@ async function handleImageCover({ user, characters, themeKey, illustrationStyle,
     operationType: 'image_cover',
     sessionBookId,
     statePatch: { coverUrl },
-    aiLog: debugTrace,
+    aiLog: sanitizeDebugTraceEntries(debugTrace),
     durationMs: Date.now() - startedAt,
   })
 }
@@ -506,7 +504,7 @@ async function handleImagePage({ user, characters, themeKey, illustrationStyle, 
     operationType: 'image_page',
     sessionBookId,
     statePatch: { pageImages },
-    aiLog: debugTrace,
+    aiLog: sanitizeDebugTraceEntries(debugTrace),
     durationMs: Date.now() - startedAt,
   })
 }
@@ -525,7 +523,7 @@ async function handleTts({ user, language, state, sessionBookId, startedAt }: an
       operationType: 'tts',
       sessionBookId,
       statePatch: { audioUrls: {} },
-      aiLog: [],
+      aiLog: sanitizeDebugTraceEntries([]),
       durationMs: Date.now() - startedAt,
       message: 'No pages with text found',
     })
@@ -552,15 +550,26 @@ async function handleTts({ user, language, state, sessionBookId, startedAt }: an
           success++
           ttsLog.push({
             step: `tts_page_${pageNumber}`,
-            request: { text: p.text.trim().slice(0, 200), language: bookLanguage, pageNumber },
-            response: { audioUrl: ttsResult.audioUrl, cached: ttsResult.cached, voiceId: ttsResult.voiceId, durationMs: Date.now() - reqStart },
+            request: {
+              text: p.text.trim(),
+              language: bookLanguage,
+              pageNumber,
+            },
+            response: {
+              ...ttsResult,
+              durationMs: Date.now() - reqStart,
+            },
           })
         }
       } catch (err: any) {
         fail++
         ttsLog.push({
           step: `tts_page_${pageNumber}`,
-          request: { text: p.text.trim().slice(0, 200), language: bookLanguage, pageNumber },
+          request: {
+            text: p.text.trim(),
+            language: bookLanguage,
+            pageNumber,
+          },
           response: { error: err?.message || 'TTS failed', durationMs: Date.now() - reqStart },
         })
       }
@@ -572,7 +581,7 @@ async function handleTts({ user, language, state, sessionBookId, startedAt }: an
     operationType: 'tts',
     sessionBookId,
     statePatch: { audioUrls },
-    aiLog: ttsLog,
+    aiLog: sanitizeDebugTraceEntries(ttsLog),
     durationMs: Date.now() - startedAt,
     summary: { success, fail, total: ttsPages.length },
   })
