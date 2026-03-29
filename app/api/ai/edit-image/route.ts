@@ -14,6 +14,7 @@ import { insertEditHistory, getLatestPageVersion, getEditHistory } from '@/lib/d
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { getNegativePrompt, getAnatomicalCorrectnessDirectives } from '@/lib/prompts/image/negative'
 import { imageEditWithLog } from '@/lib/ai/images'
+import { DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_QUALITY } from '@/lib/ai/openai-models'
 
 export interface ImageEditRequest {
   bookId: string
@@ -194,10 +195,9 @@ export async function POST(request: NextRequest) {
     formData.append('image', imageBlob, 'original.png')
     formData.append('mask', maskBlob, 'mask.png')
     formData.append('prompt', finalPrompt)
-    // Use same model as image generation (gpt-image-1.5)
-    formData.append('model', 'gpt-image-1.5')
-    formData.append('size', '1024x1536') // Portrait orientation (same as generation)
-    formData.append('quality', 'low') // Same quality as generation
+    formData.append('model', DEFAULT_IMAGE_MODEL)
+    formData.append('size', DEFAULT_IMAGE_SIZE)
+    formData.append('quality', DEFAULT_IMAGE_QUALITY)
     formData.append('input_fidelity', 'high')
 
     // ====================================================================
@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       bookId,
       operationType: 'image_edit',
       pageIndex: pageNumber,
-      model: 'gpt-image-1.5',
+      model: DEFAULT_IMAGE_MODEL,
       quality: 'low',
       size: '1024x1536',
     })

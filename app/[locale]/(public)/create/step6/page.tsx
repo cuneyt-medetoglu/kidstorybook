@@ -40,7 +40,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { readWizardLocal } from "@/lib/herokid-wizard-storage"
+import {
+  readingBracketWordRangeLine,
+  resolveReadingAgeBracketFromWizard,
+} from "@/lib/wizard/reading-age-from-wizard"
 import { StepRunnerPanel } from "@/components/debug/StepRunnerPanel"
+import { ALLOWED_STORY_MODELS, DEFAULT_STORY_MODEL } from "@/lib/ai/openai-models"
 
 const DEFAULT_PAGE_COUNT = 12
 
@@ -85,8 +90,7 @@ const OPTION_VALUE_TO_LABEL_KEY: Record<string, string> = {
   "Other Toy": "otherToy",
 }
 
-/** /api/books ALLOWED_STORY_MODELS ile uyumlu (admin/debug seçici). */
-type DebugStoryModel = 'gpt-4.1-mini' | 'gpt-4.1' | 'gpt-4o-mini' | 'gpt-4o' | 'o1-mini'
+type DebugStoryModel = typeof ALLOWED_STORY_MODELS[number]
 
 export default function Step6Page() {
   const t = useTranslations("create.step6")
@@ -151,7 +155,7 @@ export default function Step6Page() {
 
 
   /** Create without payment / örnek kitap / debug panel — body'de storyModel olarak gider. Ücretli satın alma bu alanı göndermez → API varsayılanı. */
-  const [debugStoryModel, setDebugStoryModel] = useState<DebugStoryModel>('gpt-4.1-mini')
+  const [debugStoryModel, setDebugStoryModel] = useState<DebugStoryModel>(DEFAULT_STORY_MODEL)
 
   // Currency from context (tek seferlik fetch)
   const { currencyConfig, isLoading: isLoadingCurrency } = useCurrency()
@@ -287,6 +291,20 @@ export default function Step6Page() {
 
   const charactersData = getCharactersData()
 
+  const readingBracket = resolveReadingAgeBracketFromWizard(
+    wizardData?.step1 as Record<string, unknown> | undefined,
+    wizardData?.step3?.ageGroup
+  )
+  const wordRangeLine = readingBracketWordRangeLine(readingBracket)
+  const ageBandLabel =
+    readingBracket === "6+"
+      ? t1("readingAge.sixPlus")
+      : readingBracket === "0-1"
+        ? t1("readingAge.0-1")
+        : readingBracket === "1-3"
+          ? t1("readingAge.1-3")
+          : t1("readingAge.3-5")
+
   const formData = {
       character: {
       name: wizardData?.step1?.name || "Child",
@@ -319,21 +337,12 @@ export default function Step6Page() {
           icon: "🗺️",
           color: "from-blue-400 to-cyan-500",
         },
-    ageGroup: wizardData?.step3?.ageGroup
-      ? {
-          name: wizardData.step3.ageGroup.title || wizardData.step3.ageGroup.name || "3-5 Years",
-          description: wizardData.step3.ageGroup.description || "Picture books with simple stories",
-          icon: wizardData.step3.ageGroup.icon || "📚",
-          features: typeof wizardData.step3.ageGroup.features === 'string' 
-            ? [wizardData.step3.ageGroup.features] 
-            : wizardData.step3.ageGroup.features || ["10 pages", "Simple story", "Large illustrations"],
-        }
-      : {
-          name: "3-5 Years",
-          description: "Picture books with simple stories",
-          icon: "📚",
-          features: ["10 pages", "Simple story", "Large illustrations"],
-        },
+    ageGroup: {
+      name: ageBandLabel,
+      description: t1("ageWordRangeHint", { range: wordRangeLine }),
+      icon: "📚",
+      features: [] as string[],
+    },
     language: wizardData?.step3?.language
       ? {
           id: wizardData.step3.language.id || "en",
@@ -1035,16 +1044,18 @@ export default function Step6Page() {
                         <p className="mt-1 text-sm text-gray-600 dark:text-slate-400">
                           {formData.ageGroup.description}
                         </p>
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {formData.ageGroup.features.map((feature: string, index: number) => (
-                            <span
-                              key={index}
-                              className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary"
-                            >
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
+                        {formData.ageGroup.features.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {formData.ageGroup.features.map((feature: string, index: number) => (
+                              <span
+                                key={index}
+                                className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary"
+                              >
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1379,11 +1390,11 @@ export default function Step6Page() {
                       onChange={(e) => setDebugStoryModel(e.target.value as DebugStoryModel)}
                       className="flex-1 rounded border border-amber-300/60 bg-white dark:bg-slate-800 px-2 py-1 text-xs text-amber-900 dark:text-amber-100 focus:outline-none"
                     >
-                      <option value="gpt-4.1-mini">{t("debug.modelGpt41Mini")}</option>
-                      <option value="gpt-4.1">{t("debug.modelGpt41")}</option>
-                      <option value="gpt-4o-mini">{t("debug.modelGpt4oMini")}</option>
-                      <option value="gpt-4o">{t("debug.modelGpt4o")}</option>
-                      <option value="o1-mini">{t("debug.modelO1Mini")}</option>
+                      {ALLOWED_STORY_MODELS.map((m) => (
+                        <option key={m} value={m}>
+                          {m}{m === DEFAULT_STORY_MODEL ? " (default)" : ""}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <p className="text-xs text-amber-700/80 dark:text-amber-300/80 -mt-1">

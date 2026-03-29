@@ -14,6 +14,13 @@ import {
   readWizardFormMirror,
   readWizardLocal,
 } from "@/lib/herokid-wizard-storage"
+import {
+  READING_AGE_BRACKET_IDS,
+  type ReadingAgeBracketId,
+  getReadingAgeBracketConfig,
+  inferReadingAgeBracketFromNumericAge,
+  parseReadingAgeBracket,
+} from "@/lib/config/reading-age-brackets"
 import { useWizardNavigate } from "@/hooks/use-wizard-navigate"
 import { useForm, type Resolver, type SubmitHandler } from "react-hook-form"
 import { useTranslations } from "next-intl"
@@ -23,13 +30,19 @@ import * as z from "zod"
 // Form validation schema
 const characterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
-  age: z.coerce.number().min(0, "Age must be at least 0").max(12, "Age must be at most 12"),
+  readingAgeBracket: z.enum(READING_AGE_BRACKET_IDS),
   gender: z.enum(["boy", "girl"], { message: "Please select a gender" }),
   hairColor: z.string().min(1, "Please select a hair color"),
   eyeColor: z.string().min(1, "Please select an eye color"),
 })
 
-type CharacterFormData = { name: string; age: number; gender: "boy" | "girl"; hairColor: string; eyeColor: string }
+type CharacterFormData = {
+  name: string
+  readingAgeBracket: ReadingAgeBracketId
+  gender: "boy" | "girl"
+  hairColor: string
+  eyeColor: string
+}
 
 export default function Step1Page() {
   const t = useTranslations("create.step1")
@@ -76,22 +89,32 @@ export default function Step1Page() {
   } = useForm<CharacterFormData>({
     resolver: zodResolver(characterSchema) as Resolver<CharacterFormData>,
     mode: "onChange",
+    defaultValues: {
+      readingAgeBracket: "3-5",
+    },
   })
 
   useEffect(() => {
     try {
-      const wizardData = readWizardFormMirror() as { step1?: Partial<CharacterFormData> } | null
+      const wizardData = readWizardFormMirror() as { step1?: Record<string, unknown> } | null
       if (!wizardData) return
       const s1 = wizardData.step1
-      if (!s1?.name || s1.age === undefined || s1.age === null) return
+      if (!s1?.name) return
       if (s1.gender !== "boy" && s1.gender !== "girl") return
       if (!s1.hairColor || !s1.eyeColor) return
+
+      const fromSaved = parseReadingAgeBracket(s1.readingAgeBracket)
+      const legacyAge = typeof s1.age === "number" ? s1.age : Number(s1.age)
+      const bracket: ReadingAgeBracketId | undefined =
+        fromSaved ?? (Number.isFinite(legacyAge) ? inferReadingAgeBracketFromNumericAge(legacyAge) : undefined)
+      if (!bracket) return
+
       reset({
-        name: s1.name,
-        age: Number(s1.age),
+        name: String(s1.name),
+        readingAgeBracket: bracket,
         gender: s1.gender,
-        hairColor: s1.hairColor,
-        eyeColor: s1.eyeColor,
+        hairColor: String(s1.hairColor),
+        eyeColor: String(s1.eyeColor),
       })
     } catch {
       /* ignore */
@@ -106,9 +129,11 @@ export default function Step1Page() {
     navigate("/create/step2", () => {
       try {
         const wizardData = readWizardLocal()
+        const repAge = getReadingAgeBracketConfig(data.readingAgeBracket, 5).representativeAge
         wizardData.step1 = {
           name: data.name,
-          age: data.age,
+          readingAgeBracket: data.readingAgeBracket,
+          age: repAge,
           gender: data.gender,
           hairColor: data.hairColor,
           eyeColor: data.eyeColor,
@@ -253,42 +278,46 @@ export default function Step1Page() {
                 )}
               </motion.div>
 
-              {/* Age Input */}
+              {/* Age range (reading bracket) — same options as story word targets; list select */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5, duration: 0.4 }}
                 className="space-y-2"
               >
-                <Label htmlFor="age" className="text-sm font-semibold text-gray-700 dark:text-slate-300">
+                <Label htmlFor="readingAgeBracket" className="text-sm font-semibold text-gray-700 dark:text-slate-300">
                   {t("ageLabel")}
                 </Label>
                 <div className="relative">
                   <Heart className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
-                  <Input
-                    id="age"
-                    type="number"
-                    min="0"
-                    max="12"
-                    placeholder={t("agePlaceholder")}
-                    {...register("age")}
-                    className={`pl-10 ${
-                      errors.age
-                        ? "border-red-500 ring-red-500 focus-visible:ring-red-500"
-                        : "border-gray-300 focus-visible:ring-primary dark:border-slate-600"
+                  <select
+                    id="readingAgeBracket"
+                    {...register("readingAgeBracket")}
+                    className={`w-full rounded-md border py-2 pl-10 pr-4 text-sm transition-colors focus:outline-none focus:ring-2 ${
+                      errors.readingAgeBracket
+                        ? "border-red-500 ring-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
                     }`}
-                    aria-invalid={errors.age ? "true" : "false"}
-                    aria-describedby={errors.age ? "age-error" : undefined}
-                  />
+                    aria-invalid={errors.readingAgeBracket ? "true" : "false"}
+                  >
+                    <option value="">{t("ageSelect")}</option>
+                    {READING_AGE_BRACKET_IDS.map((id) => {
+                      const labelKey = id === "6+" ? "readingAge.sixPlus" : `readingAge.${id}`
+                      return (
+                        <option key={id} value={id}>
+                          {t(labelKey)}
+                        </option>
+                      )
+                    })}
+                  </select>
                 </div>
-                {errors.age && (
+                {errors.readingAgeBracket && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    id="age-error"
                     className="text-sm text-red-500"
                   >
-                    {errors.age.message}
+                    {errors.readingAgeBracket.message}
                   </motion.p>
                 )}
               </motion.div>

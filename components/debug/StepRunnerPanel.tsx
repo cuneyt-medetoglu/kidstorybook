@@ -7,6 +7,7 @@
  */
 
 import { useState, useCallback } from "react"
+import { ALLOWED_STORY_MODELS, DEFAULT_STORY_MODEL } from "@/lib/ai/openai-models"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -23,6 +24,11 @@ import {
   Layers,
   Mic,
 } from "lucide-react"
+import {
+  inferReadingAgeBracketFromNumericAge,
+  parseReadingAgeBracket,
+  type ReadingAgeBracketId,
+} from "@/lib/config/reading-age-brackets"
 
 // ============================================================================
 // Types
@@ -68,8 +74,49 @@ const STEPS: { id: OperationType; label: string; icon: React.ReactNode; prereqs:
 ]
 
 // ============================================================================
-// Helpers
+// Helpers — wizard localStorage shape: step3.language / step3.theme (objects with .id)
 // ============================================================================
+
+function getWizardLanguageCode(w: Record<string, unknown> | null | undefined): string {
+  const s3 = w?.step3 as Record<string, unknown> | undefined
+  const lang = s3?.language ?? w?.language
+  if (lang && typeof lang === "object" && lang !== null && "id" in lang) {
+    return String((lang as { id: string }).id)
+  }
+  if (typeof lang === "string") return lang
+  return "en"
+}
+
+function getWizardThemeKey(w: Record<string, unknown> | null | undefined): string {
+  const s3 = w?.step3 as Record<string, unknown> | undefined
+  const theme = s3?.theme ?? w?.theme
+  if (theme && typeof theme === "object" && theme !== null && "id" in theme) {
+    return String((theme as { id: string }).id)
+  }
+  if (typeof theme === "string") return theme
+  return "adventure"
+}
+
+function getWizardIllustrationStyleId(w: Record<string, unknown> | null | undefined): string {
+  const s4 = w?.step4 as Record<string, unknown> | undefined
+  const style = s4?.illustrationStyle ?? w?.illustrationStyle
+  if (style && typeof style === "object" && style !== null && "id" in style) {
+    return String((style as { id: string }).id)
+  }
+  if (typeof style === "string") return style
+  return "cartoon"
+}
+
+function getWizardReadingBracket(w: Record<string, unknown> | null | undefined): ReadingAgeBracketId | undefined {
+  const s1 = w?.step1 as Record<string, unknown> | undefined
+  const fromField = parseReadingAgeBracket(s1?.readingAgeBracket)
+  if (fromField) return fromField
+  const age = s1?.age
+  if (typeof age === "number" && !Number.isNaN(age)) {
+    return inferReadingAgeBracketFromNumericAge(age)
+  }
+  return undefined
+}
 
 function JsonViewer({ data, label }: { data: any; label: string }) {
   const [open, setOpen] = useState(false)
@@ -117,7 +164,7 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
   const [stepStates, setStepStates] = useState<Record<OperationType, StepState>>(
     Object.fromEntries(STEPS.map((s) => [s.id, { status: "idle" }])) as Record<OperationType, StepState>
   )
-  const [storyModel, setStoryModel] = useState("gpt-4.1-mini")
+  const [storyModel, setStoryModel] = useState(DEFAULT_STORY_MODEL)
   const [pageCount, setPageCount] = useState(4)
   const [targetPageNumber, setTargetPageNumber] = useState<number | null>(null)
   const [expandedLogStep, setExpandedLogStep] = useState<OperationType | null>(null)
@@ -150,9 +197,10 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
       const body: any = {
         operationType,
         characterIds,
-        themeKey: wizardData?.theme || "adventure",
-        illustrationStyle: wizardData?.illustrationStyle?.id || "cartoon",
-        language: wizardData?.language || "en",
+        themeKey: getWizardThemeKey(wizardData),
+        illustrationStyle: getWizardIllustrationStyleId(wizardData),
+        language: getWizardLanguageCode(wizardData),
+        readingAgeBracket: getWizardReadingBracket(wizardData as Record<string, unknown>),
         customRequests: wizardData?.customRequests || undefined,
         pageCount,
         storyModel,
@@ -269,14 +317,14 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
           <label className="block text-[11px] text-purple-300/70 mb-1">Story model</label>
           <select
             value={storyModel}
-            onChange={(e) => setStoryModel(e.target.value)}
+            onChange={(e) => setStoryModel(e.target.value as typeof ALLOWED_STORY_MODELS[number])}
             className="w-full text-xs rounded border border-purple-500/30 bg-zinc-900 text-zinc-200 px-2 py-1 focus:outline-none focus:border-purple-400"
           >
-            <option value="gpt-4.1-mini">gpt-4.1-mini (default)</option>
-            <option value="gpt-4.1">gpt-4.1</option>
-            <option value="gpt-4o-mini">gpt-4o-mini</option>
-            <option value="gpt-4o">gpt-4o</option>
-            <option value="o1-mini">o1-mini</option>
+            {ALLOWED_STORY_MODELS.map((m) => (
+              <option key={m} value={m}>
+                {m}{m === DEFAULT_STORY_MODEL ? " (default)" : ""}
+              </option>
+            ))}
           </select>
         </div>
         <div>

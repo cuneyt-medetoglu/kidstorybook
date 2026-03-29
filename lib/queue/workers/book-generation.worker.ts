@@ -11,6 +11,7 @@ import { connection, BOOK_GENERATION_QUEUE_NAME, type BookGenerationJobData } fr
 import { runImagePipeline } from '@/lib/book-generation/image-pipeline'
 import { getBookById, updateBook } from '@/lib/db/books'
 import { getCharacterById } from '@/lib/db/characters'
+import { DEFAULT_STORY_MODEL } from '@/lib/ai/openai-models'
 
 async function processBookGeneration(job: Job<BookGenerationJobData>): Promise<void> {
   const { bookId, userId, characterIds, illustrationStyle, themeKey, language, customRequests, isFromExampleMode, isCoverOnlyMode, fromExampleId, storyModel, pageCount } = job.data
@@ -58,7 +59,7 @@ async function processBookGeneration(job: Job<BookGenerationJobData>): Promise<v
     isFromExampleMode,
     isCoverOnlyMode,
     exampleBook,
-    storyModel: storyModel || 'gpt-4o-mini',
+    storyModel: storyModel || DEFAULT_STORY_MODEL,
     pageCount: pageCount || 4,
     onProgress: async (percent, step) => {
       await job.updateProgress(percent)

@@ -12,6 +12,20 @@ const GPT_4O_MINI = {
   outputPer1M: 0.6,
 }
 
+/** GPT-4.1 mini */
+const GPT_4_1_MINI = {
+  inputPer1M: 0.4,
+  cachedInputPer1M: 0.1,
+  outputPer1M: 1.6,
+}
+
+/** GPT-4.1 */
+const GPT_4_1 = {
+  inputPer1M: 2.0,
+  cachedInputPer1M: 0.5,
+  outputPer1M: 8.0,
+}
+
 /** GPT-4o */
 const GPT_4O = {
   inputPer1M: 2.5,
@@ -32,6 +46,8 @@ function textModelRates(model: string): {
   outputPer1M: number
 } | null {
   const m = model.toLowerCase()
+  if (m.includes('gpt-4.1-mini')) return GPT_4_1_MINI
+  if (m.includes('gpt-4.1') && !m.includes('mini') && !m.includes('nano')) return GPT_4_1
   if (m.includes('gpt-4o-mini')) return GPT_4O_MINI
   if (m.includes('gpt-4o') && !m.includes('mini')) return GPT_4O
   if (m.includes('o1-mini')) return O1_MINI

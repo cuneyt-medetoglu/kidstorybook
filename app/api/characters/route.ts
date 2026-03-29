@@ -12,6 +12,11 @@ import { createCharacter } from '@/lib/db/characters'
 import { uploadFile, getPublicUrl } from '@/lib/storage/s3'
 import { getUser } from '@/lib/auth/api-auth'
 import type { CharacterDescription } from '@/lib/prompts/types'
+import {
+  READING_AGE_BRACKETS,
+  inferReadingAgeBracketFromNumericAge,
+  parseReadingAgeBracket,
+} from '@/lib/config/reading-age-brackets'
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,6 +36,7 @@ export async function POST(request: NextRequest) {
       eyeColor,
       photoBase64, // Base64 encoded photo (data URL without prefix)
       characterType, // NEW: Character type info {group, value, displayName}
+      readingAgeBracket: readingAgeBracketRaw,
     } = body
 
     // FIX: Gender validation based on characterType (25 Ocak 2026)
@@ -83,15 +89,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const numericAge = parseInt(age) || 5
+    const bracketFromClient = parseReadingAgeBracket(readingAgeBracketRaw)
+    const resolvedReadingBracket =
+      bracketFromClient ?? inferReadingAgeBracketFromNumericAge(numericAge)
+    const storedAge =
+      bracketFromClient != null
+        ? READING_AGE_BRACKETS[bracketFromClient].representativeAge
+        : numericAge
+
     // Build character description from form data (same for all types: Child, Family, Pets).
     // No OpenAI Vision — reference photo is used directly in image generation.
     const characterDescription: CharacterDescription = {
-      age: parseInt(age) || 5,
+      age: storedAge,
       gender: validatedGender || 'other',
       skinTone: 'fair',
       hairColor: hairColor || 'brown',
       hairStyle: 'natural',
-      hairLength: parseInt(age) <= 3 ? 'short' : parseInt(age) <= 7 ? 'medium' : 'long',
+      hairLength: storedAge <= 3 ? 'short' : storedAge <= 7 ? 'medium' : 'long',
       eyeColor: eyeColor || 'brown',
       eyeShape: 'round',
       faceShape: 'round',
@@ -100,6 +115,7 @@ export async function POST(request: NextRequest) {
       clothingStyle: 'casual',
       clothingColors: ['blue', 'red'],
       uniqueFeatures: [],
+      readingAgeBracket: resolvedReadingBracket,
       typicalExpression: 'happy',
       personalityTraits: ['curious', 'friendly'],
     }
@@ -156,7 +172,7 @@ export async function POST(request: NextRequest) {
       userId,
       {
         name,
-        age: parseInt(age) || 5,
+        age: storedAge,
         gender: (validatedGender as 'boy' | 'girl' | 'other'), // FIX: Use validatedGender (25 Ocak 2026)
         character_type: characterType || { group: 'Child', value: 'Child', displayName: name }, // NEW: Character type info
         hair_color: hairColor || 'brown',

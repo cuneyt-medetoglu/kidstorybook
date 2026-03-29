@@ -9,9 +9,6 @@ import {
   Trees,
   Rocket,
   Trophy,
-  Baby,
-  Smile,
-  GraduationCap,
   ArrowRight,
   ArrowLeft,
   Star,
@@ -35,7 +32,6 @@ import {
 // Validation schema
 const formSchema = z.object({
   theme: z.enum(["adventure", "fairy_tale", "educational", "nature", "sports", "custom"], { message: "Please select a theme for your story" }),
-  ageGroup: z.enum(["0-2", "3-5", "6-9"], { message: "Please select an age group" }),
   language: z.enum(["en", "tr", "de", "fr", "es", "zh", "pt", "ru"], { message: "Please select a language for your story" }),
 })
 
@@ -46,17 +42,6 @@ type Theme = {
   Icon: typeof Mountain
   title: string
   description: string
-  gradientFrom: string
-  gradientTo: string
-  borderColor: string
-}
-
-type AgeGroup = {
-  id: "0-2" | "3-5" | "6-9"
-  Icon: typeof Baby
-  title: string
-  description: string
-  features: string
   gradientFrom: string
   gradientTo: string
   borderColor: string
@@ -79,12 +64,6 @@ const themes: Theme[] = [
   { id: "nature", Icon: Trees, title: "nature", description: "nature", gradientFrom: "from-green-500", gradientTo: "to-emerald-500", borderColor: "border-green-500" },
   { id: "sports", Icon: Trophy, title: "sports", description: "sports", gradientFrom: "from-red-500", gradientTo: "to-rose-500", borderColor: "border-red-500" },
   { id: "custom", Icon: Wand2, title: "custom", description: "custom", gradientFrom: "from-fuchsia-500", gradientTo: "to-violet-500", borderColor: "border-fuchsia-500" },
-]
-
-const ageGroups: AgeGroup[] = [
-  { id: "0-2", Icon: Baby, title: "0-2", description: "0-2", features: "0-2", gradientFrom: "from-brand-2", gradientTo: "to-rose-500", borderColor: "border-brand-2" },
-  { id: "3-5", Icon: Smile, title: "3-5", description: "3-5", features: "3-5", gradientFrom: "from-yellow-500", gradientTo: "to-amber-500", borderColor: "border-yellow-500" },
-  { id: "6-9", Icon: GraduationCap, title: "6-9", description: "6-9", features: "6-9", gradientFrom: "from-blue-500", gradientTo: "to-cyan-500", borderColor: "border-blue-500" },
 ]
 
 const languages: Language[] = [
@@ -168,7 +147,6 @@ export default function Step3Page() {
   const router = useRouter()
   const { isPending, navigate } = useWizardNavigate()
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null)
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | null>(null)
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null)
 
   const {
@@ -180,17 +158,11 @@ export default function Step3Page() {
   })
 
   const theme = watch("theme")
-  const ageGroup = watch("ageGroup")
   const language = watch("language")
 
   const handleThemeSelect = (themeId: string) => {
     setSelectedTheme(themeId)
     setValue("theme", themeId as FormData["theme"], { shouldValidate: true })
-  }
-
-  const handleAgeGroupSelect = (ageGroupId: string) => {
-    setSelectedAgeGroup(ageGroupId)
-    setValue("ageGroup", ageGroupId as FormData["ageGroup"], { shouldValidate: true })
   }
 
   const handleLanguageSelect = (languageId: string) => {
@@ -210,11 +182,6 @@ export default function Step3Page() {
           ? (s3.theme as { id: string }).id
           : null) ||
         (typeof s3.theme === "string" ? s3.theme : null)
-      const ageGroupId =
-        (typeof s3.ageGroup === "object" && s3.ageGroup && s3.ageGroup !== null && "id" in s3.ageGroup
-          ? (s3.ageGroup as { id: string }).id
-          : null) ||
-        (typeof s3.ageGroup === "string" ? s3.ageGroup : null)
       const languageId =
         (typeof s3.language === "object" && s3.language && s3.language !== null && "id" in s3.language
           ? (s3.language as { id: string }).id
@@ -224,10 +191,6 @@ export default function Step3Page() {
       if (themeId && themes.some((th) => th.id === themeId)) {
         setSelectedTheme(themeId)
         setValue("theme", themeId as FormData["theme"], { shouldValidate: true })
-      }
-      if (ageGroupId && ageGroups.some((ag) => ag.id === ageGroupId)) {
-        setSelectedAgeGroup(ageGroupId)
-        setValue("ageGroup", ageGroupId as FormData["ageGroup"], { shouldValidate: true })
       }
       if (languageId && languages.some((l) => l.id === languageId)) {
         setSelectedLanguage(languageId)
@@ -243,19 +206,18 @@ export default function Step3Page() {
   }, [router])
 
   const handleNext = () => {
-    if (!theme || !ageGroup || !language) return
+    if (!theme || !language) return
 
     navigate("/create/step4", () => {
       try {
         const wizardData = readWizardLocal()
 
         const selectedThemeObj = themes.find((th) => th.id === theme)
-        const selectedAgeGroupObj = ageGroups.find((ag) => ag.id === ageGroup)
         const selectedLanguageObj = languages.find((l) => l.id === language)
 
+        // Yaş aralığı yalnızca Step 1 (readingAgeBracket); Step 3 tekrarlamaz.
         wizardData.step3 = {
           theme: selectedThemeObj,
-          ageGroup: selectedAgeGroupObj,
           language: selectedLanguageObj,
         }
 
@@ -267,7 +229,7 @@ export default function Step3Page() {
     })
   }
 
-  const isFormValid = theme && ageGroup && language
+  const isFormValid = theme && language
 
   // Floating animations for decorative elements
   const floatingVariants = {
@@ -440,97 +402,6 @@ export default function Step3Page() {
                   className="mt-2 text-sm text-red-600 dark:text-red-400"
                 >
                   {errors.theme.message}
-                </motion.p>
-              )}
-            </div>
-
-            {/* Age Group Selection Section */}
-            <div className="mb-8">
-              <motion.h2
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6, duration: 0.4 }}
-                className="mb-4 text-xl font-semibold text-gray-900 dark:text-slate-50"
-              >
-                {t("ageGroupTitle")}
-              </motion.h2>
-
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                {ageGroups.map((ageGroupItem, index) => {
-                  const Icon = ageGroupItem.Icon
-                  const isSelected = selectedAgeGroup === ageGroupItem.id
-
-                  return (
-                    <motion.button
-                      key={ageGroupItem.id}
-                      type="button"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 + 0.1 * index, duration: 0.4 }}
-                      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleAgeGroupSelect(ageGroupItem.id)}
-                      className={`group relative overflow-hidden rounded-xl border-2 p-6 text-left transition-all ${
-                        isSelected
-                          ? `border-transparent bg-gradient-to-br ${ageGroupItem.gradientFrom} ${ageGroupItem.gradientTo} shadow-xl`
-                          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-lg dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600"
-                      }`}
-                    >
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white/30 backdrop-blur-sm"
-                        >
-                          <div className="h-4 w-4 rounded-full bg-white" />
-                        </motion.div>
-                      )}
-
-                      <div
-                        className={`mb-4 flex h-10 w-10 items-center justify-center rounded-full transition-all ${
-                          isSelected
-                            ? "bg-white/20 backdrop-blur-sm"
-                            : `bg-gradient-to-br ${ageGroupItem.gradientFrom} ${ageGroupItem.gradientTo}`
-                        }`}
-                      >
-                        <Icon className={`h-5 w-5 ${isSelected ? "text-white" : "text-white"}`} />
-                      </div>
-
-                      <h3
-                        className={`mb-2 text-base font-bold transition-colors ${
-                          isSelected ? "text-white" : "text-gray-900 dark:text-slate-50"
-                        }`}
-                      >
-                        {t(`ageGroups.${ageGroupItem.title}`)}
-                      </h3>
-
-                      <p
-                        className={`mb-2 text-sm transition-colors ${
-                          isSelected ? "text-white/90" : "text-gray-600 dark:text-slate-400"
-                        }`}
-                      >
-                        {t(`ageGroupDescriptions.${ageGroupItem.description}`)}
-                      </p>
-
-                      <p
-                        className={`text-xs italic transition-colors ${
-                          isSelected ? "text-white/80" : "text-gray-500 dark:text-slate-500"
-                        }`}
-                      >
-                        {t(`ageGroupFeatures.${ageGroupItem.features}`)}
-                      </p>
-                    </motion.button>
-                  )
-                })}
-              </div>
-
-              {errors.ageGroup && (
-                <motion.p
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-2 text-sm text-red-600 dark:text-red-400"
-                >
-                  {errors.ageGroup.message}
                 </motion.p>
               )}
             </div>

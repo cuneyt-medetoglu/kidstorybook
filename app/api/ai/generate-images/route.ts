@@ -14,12 +14,13 @@ import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/promp
 import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternative } from '@/lib/prompts/image/scene'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { imageEditWithLog } from '@/lib/ai/images'
+import { DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_QUALITY } from '@/lib/ai/openai-models'
 
 export interface ImageGenerationRequest {
   bookId: string
   startPage?: number // For resuming failed generations
   endPage?: number   // For partial generation
-  // NOTE: model, size, quality removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
+  // NOTE: model, size, quality removed - single source: lib/ai/openai-models.ts
 }
 
 export interface ImageGenerationResponse {
@@ -52,10 +53,9 @@ export async function POST(request: NextRequest) {
     const body: ImageGenerationRequest = await request.json()
     const { bookId, startPage = 1, endPage } = body
 
-    // Image generation defaults (hardcoded - no override)
-    const model = 'gpt-image-1.5'
-    const size = '1024x1536' // Portrait orientation
-    const quality = 'low'
+    const model = DEFAULT_IMAGE_MODEL
+    const size = DEFAULT_IMAGE_SIZE
+    const quality = DEFAULT_IMAGE_QUALITY
 
     if (!bookId) {
       return errorResponse('Missing required field: bookId', undefined, 400)

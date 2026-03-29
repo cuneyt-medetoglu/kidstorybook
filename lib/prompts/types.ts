@@ -2,6 +2,8 @@
  * Type definitions for prompt system
  */
 
+import type { ReadingAgeBracketId } from '@/lib/config/reading-age-brackets'
+
 // ============================================================================
 // Version Management
 // ============================================================================
@@ -23,6 +25,8 @@ export interface StoryGenerationInput {
   characterName: string
   characterAge: number
   characterGender: 'boy' | 'girl' | 'other'
+  /** Step 1 okuma yaşı bandı — kelime hedefleri için (yoksa characterAge’dan çıkarılır). */
+  readingAgeBracket?: ReadingAgeBracketId
   theme: string
   illustrationStyle: string
   customRequests?: string
@@ -60,16 +64,24 @@ export interface StoryGenerationOutput {
    * Primary input for cover generation when set; pipeline prepends fixed layout + identity. Do not duplicate full character appearance.
    */
   coverImagePrompt?: string
+  sceneMap: StoryScenePlan[]
   pages: StoryPage[]
-  totalPages: number
   /** NEW: Supporting entities (animals, objects) in the story - for master generation */
-  supportingEntities?: SupportingEntity[]
+  supportingEntities: SupportingEntity[]
+  suggestedOutfits: Record<string, string>
   metadata: {
     ageGroup: string
-    readingTime: number
+    theme: string
     educationalThemes: string[]
     safetyChecked: boolean
   }
+}
+
+export interface StoryScenePlan {
+  pageNumber: number
+  location: string
+  timeOfDay: string
+  setting: string
 }
 
 /**
@@ -99,21 +111,12 @@ export interface StoryPage {
   text: string
   imagePrompt: string
   sceneDescription: string
+  environmentDescription: string
+  cameraDistance: 'close' | 'medium' | 'wide' | 'establishing'
   characterIds: string[] // NEW: Which character(s) appear on this page (character IDs) - REQUIRED
-  /** Story-driven clothing per page (e.g. astronaut suit, swimwear). Plan: Kapak/Close-up/Kıyafet. */
-  clothing?: string
-  /** A5: Optional shot plan from LLM; when set, image prompt uses these for SHOT PLAN block. */
-  shotPlan?: ShotPlan
-  /**
-   * Story-specific environment/background description for this page.
-   * Replaces hardcoded atmosphere templates. Filled by story LLM from the page narrative.
-   */
-  environmentDescription?: string
-  /**
-   * Camera distance hint from story LLM.
-   * Used to reinforce character scale in generated images.
-   */
-  cameraDistance?: 'close' | 'medium' | 'wide' | 'establishing'
+  characterExpressions: Record<string, string>
+  /** A5: Shot plan from LLM; image prompt uses these for SHOT PLAN block. */
+  shotPlan: ShotPlan
 }
 
 export interface AgeGroupRules {
@@ -189,6 +192,9 @@ export interface CharacterDescription {
   
   // Unique features
   uniqueFeatures: string[]
+
+  /** Step 1 — story sayfa kelime hedefleri; yoksa yaş sayısından türetilir. */
+  readingAgeBracket?: ReadingAgeBracketId
   
   // Expression and personality
   typicalExpression: string

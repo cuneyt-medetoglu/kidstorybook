@@ -7,6 +7,7 @@ import { createDraft } from "@/lib/db/drafts"
 import { buildDetailedCharacterPrompt } from "@/lib/prompts/image/character"
 import type { CharacterDescription } from "@/lib/prompts/types"
 import type { CharacterFormData } from "@/lib/draft-storage"
+import { DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_QUALITY } from "@/lib/ai/openai-models"
 import OpenAI from "openai"
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -138,10 +139,10 @@ export async function POST(request: NextRequest) {
       const characterPrompt = buildDetailedCharacterPrompt(desc, style, scene)
 
       const coverRes = await openai.images.generate({
-        model: "gpt-image-1.5",
+        model: DEFAULT_IMAGE_MODEL,
         prompt: characterPrompt,
-        size: "1024x1536",
-        quality: "low",
+        size: DEFAULT_IMAGE_SIZE,
+        quality: DEFAULT_IMAGE_QUALITY,
         n: 1,
       })
       const coverImageUrl = coverRes.data?.[0]?.url
@@ -208,10 +209,10 @@ export async function POST(request: NextRequest) {
     const characterPrompt = buildDetailedCharacterPrompt(desc, style, scene)
 
     const coverRes = await openai.images.generate({
-      model: "gpt-image-1.5",
+      model: DEFAULT_IMAGE_MODEL,
       prompt: characterPrompt,
-      size: "1024x1536",
-      quality: "low",
+      size: DEFAULT_IMAGE_SIZE,
+      quality: DEFAULT_IMAGE_QUALITY,
       n: 1,
     })
     const coverImageUrl = coverRes.data?.[0]?.url

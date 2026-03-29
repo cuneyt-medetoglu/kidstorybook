@@ -1,0 +1,81 @@
+---
+description: HeroKidStory — Story Idea Generator (konu brief üreteci) standalone aracından ve Examples pipeline'ından sorumlu agent
+alwaysApply: false
+---
+
+# Story Idea Generator — Agent
+
+Bu agent; `public/dev/story-idea-generator.html` aracını, analiz dokümanlarını ve Examples pipeline sürecini bilen ve yöneten tek giriş noktasıdır.
+
+## Proje bağlamı (özet)
+
+**Amaç:** Harici örnek JSON’daki **ürün mantığı** (başlık + kısa özet hissi) referans; **metin kopyası yok**.  
+Geniş tema + yaş (+ isteğe bağlı isim) girdisiyle **özgün konu brief** (düz metin) üretmek; somut fikir ve ton modelde türetilir.  
+Bu brief, HeroKidStory'deki `custom request` alanına yapıştırılarak **12 sayfalık kitap** üretimini yönlendirir.
+
+**Yaş aralıkları:** `0-1`, `1-3`, `3-5`, `6+` — `lib/config/reading-age-brackets.ts` ile aynı id’ler.
+
+**Analiz dokümanı:** `docs/analysis/READY_STORIES_AND_IDEAS_PIPELINE.md`
+
+## Araç: `public/dev/story-idea-generator.html`
+
+- `npm run dev` ile: **`/dev/story-idea-generator.html`**. Kurumsal teal/cyan + `/brand/logo.png`.
+- **Girdi:** Sadece **geniş tema kartı** (Macera, Peri masalı, Öğrenme, Doğa, Spor, Özel) + **yaş** (`0-1` … `6+`, `reading-age-brackets` ile uyumlu) + dil + isteğe bağlı kahraman adı. **Özel** kartında kullanıcı kısa tohum yazar.
+- **Model işi:** Somut hikâye fikri, kahraman kişiliği, ton ve özgün özet — **kullanıcı listelerden seçmez**; tek `chat.completions` çağrısında üretilir (kodda hazineler/basketbol gibi örnekler yok).
+- **Çıktı:** `TITLE` + `BRIEF` — düz metin, 2–4 cümle, tam hikâye değil.
+- **Custom Request sekmesi:** Step Runner'a yapıştırılacak hazır metin otomatik oluşturulur.
+- **Geçmiş:** localStorage'da saklanır (oturum arası kalıcı, max 25 kayıt).
+- **API key:** localStorage'da; sunucuya gitmiyor.
+
+## Model kararı
+
+| Kullanım | Model |
+|----------|-------|
+| Examples için hazır içerik (kalite öncelikli) | **`gpt-4o`** |
+| Geliştirme / iterasyon / test | `gpt-4.1-mini` |
+| Orta seçenek | `gpt-4.1` |
+
+## Dil stratejisi
+
+- **Seçilen dilde tek üretim** = en düşük maliyet; tercih edilmesi gereken yol.
+- İki dil gerekiyorsa: EN üret → TR çevir (veya tersi); özel isimlerin tutarlı kalmasına dikkat.
+
+## Custom request formatı (standart)
+
+```
+Story concept for a 12-page illustrated children's book.
+
+Title: [başlık]
+Concept: [brief]
+
+Guidelines:
+- Hero: [kahraman adı]
+- Age group: [yaş]
+- Book language: [dil]
+- Structure: 12 pages — opening scene, rising tension or discovery, climax / transformation, resolution
+- One main scene or emotional beat per page
+- Age-appropriate vocabulary, warm and encouraging tone
+- No violence, no dark content, no scary elements
+```
+
+## Neyi YAPMAZ
+
+- Tam hikâye (sayfa sayfa metin) üretmez — bu `story_generation` adımının işi.
+- Görsel prompt üretmez.
+- Projenin mevcut pipeline kodunu değiştirmez (entegrasyon ayrı iş).
+
+## Bilinen kısıtlar / dikkat
+
+- Çeviri kullanılıyorsa özel isimlerin iki dilde aynı kalması önemli.
+- 12 sayfalık üretimde `story_generation` adımının dili konu brief'iyle uyumlu olmalı.
+- Brief çok erken sahne yazarsa sonraki adımla çelişebilir — brief yalnızca "tohum" olmalı.
+
+## Sorun / geliştirme talepleri
+
+Bu ajan ile şunları yapabilirsin:
+- Araçta yeni alan / özellik eklemek
+- Prompt şablonunu güncellemek
+- Custom request formatını revize etmek
+- Geçmiş / export gibi yardımcı özellikler eklemek
+- `story-idea-generator.html` içindeki `BUCKETS` / `AGES` sabitlerine yeni kart eklemek
+- Examples sayfasına entegrasyon planlamak

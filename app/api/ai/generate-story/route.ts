@@ -3,7 +3,7 @@
  *
  * POST /api/ai/generate-story
  * Body: characterId, theme, illustrationStyle, customRequests?, language?
- * Generates a complete children's story with image prompts (GPT-4o).
+ * Generates a complete children's story with image prompts.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -11,18 +11,26 @@ import { requireUser } from '@/lib/auth/api-auth'
 import { getCharacterById } from '@/lib/db/characters'
 import { createBook, getBookById } from '@/lib/db/books'
 import { getUserRole } from '@/lib/db/users'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import { generateStoryPrompt, buildStorySystemPrompt, buildStoryResponseSchema } from '@/lib/prompts/story/base'
 import type { ShotPlan } from '@/lib/prompts/types'
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { chatWithLog } from '@/lib/ai/chat'
+import {
+  ALLOWED_STORY_MODELS,
+  DEFAULT_STORY_MODEL,
+  STORY_GENERATION_MAX_OUTPUT_TOKENS,
+  STORY_GENERATION_PROMPT_VERSION,
+  type AllowedStoryModel,
+} from '@/lib/ai/story-generation-config'
+import { prepareStoryResponseForUse } from '@/lib/ai/story-response-validator'
+import { parseReadingAgeBracket } from '@/lib/config/reading-age-brackets'
 import OpenAI from 'openai'
-
-const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4o', 'o1-mini'] as const
-type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
 
 /** Per-model pricing (USD / 1M tokens). Approximate blended input+output. */
 const MODEL_COST_PER_1M: Record<AllowedStoryModel, { input: number; output: number }> = {
   'gpt-4o-mini': { input: 0.15, output: 0.60 },
+  'gpt-4.1-mini': { input: 0.40, output: 1.60 },
+  'gpt-4.1': { input: 2.00, output: 8.00 },
   'gpt-4o':      { input: 2.50, output: 10.00 },
   'o1-mini':     { input: 1.10, output: 4.40 },
 }
@@ -35,9 +43,6 @@ function formatStoryCost(model: AllowedStoryModel, inputTokens: number, outputTo
   return `~$${cost.toFixed(4)}`
 }
 
-/** Current story prompt version — update when lib/prompts/story/base.ts changelog advances. */
-const STORY_PROMPT_VERSION = 'v2.6.0'
-
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -48,7 +53,7 @@ export interface StoryGenerationRequest {
   illustrationStyle: string
   customRequests?: string
   language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
-  /** Sayfa sayısı (2–20). Verilmezse prompt varsayılanı kullanılır (şu an 10). */
+  /** Sayfa sayısı (2–20). Verilmezse prompt varsayılanı kullanılır (şu an 12). */
   pageCount?: number
   /** Debug: return apiRequest, characterResolved, aiRequest in response metadata.debug */
   debug?: boolean
@@ -105,6 +110,10 @@ export async function POST(request: NextRequest) {
       debug: debugMode = false,
       storyModel: requestedModel,
     } = body
+    const expectedPageCount =
+      typeof pageCountOverride === 'number' && pageCountOverride >= 2 && pageCountOverride <= 20
+        ? pageCountOverride
+        : 12
 
     // Admin/debug only model override (mirrors books/route.ts logic)
     const userRole = await getUserRole(user.id)
@@ -115,9 +124,9 @@ export async function POST(request: NextRequest) {
       requestedModel &&
       (ALLOWED_STORY_MODELS as readonly string[]).includes(requestedModel)
         ? (requestedModel as AllowedStoryModel)
-        : 'gpt-4o-mini'
+        : DEFAULT_STORY_MODEL
 
-    if (effectiveStoryModel !== 'gpt-4o-mini') {
+    if (effectiveStoryModel !== DEFAULT_STORY_MODEL) {
       console.log(`[generate-story] 🔧 Model override: ${effectiveStoryModel} (admin=${isAdmin})`)
     }
 
@@ -166,6 +175,7 @@ export async function POST(request: NextRequest) {
     const storyPrompt = generateStoryPrompt({
       characterName: character.name,
       characterAge: character.age,
+      readingAgeBracket: parseReadingAgeBracket(character.description?.readingAgeBracket),
       characterGender: character.gender,
       theme,
       illustrationStyle,
@@ -194,41 +204,27 @@ export async function POST(request: NextRequest) {
     // ====================================================================
     // 5. Call OpenAI
     // ====================================================================
-    // Get language name for system message
-    const languageNames: Record<string, string> = {
-      'en': 'English',
-      'tr': 'Turkish',
-      'de': 'German',
-      'fr': 'French',
-      'es': 'Spanish',
-      'zh': 'Chinese (Mandarin)',
-      'pt': 'Portuguese',
-      'ru': 'Russian',
-    }
-    const languageName = languageNames[language] || 'English'
-    const systemMessage =
-      `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts.
-
-LANGUAGE: Only the "text" field of each page (the story narrative) must be in ${languageName}. The fields imagePrompt, sceneDescription, sceneContext, and characterExpressions must be in English (used for image generation APIs).`
-
     const completion = await chatWithLog(
       openai,
       {
         model: effectiveStoryModel,
         messages: [
-          { role: 'system', content: systemMessage },
+          { role: 'system', content: buildStorySystemPrompt(language) },
           { role: 'user', content: storyPrompt },
         ],
-        response_format: { type: 'json_object' },
+        response_format: {
+          type: 'json_schema' as const,
+          json_schema: { name: 'story_output', strict: false, schema: buildStoryResponseSchema() },
+        },
         temperature: 0.8,
-        max_tokens: 4000,
+        max_completion_tokens: STORY_GENERATION_MAX_OUTPUT_TOKENS,
       },
       {
         userId: user.id,
         characterId,
         operationType: 'story_generation',
-        promptVersion: STORY_PROMPT_VERSION,
-        requestMeta: { language, temperature: 0.8, maxTokens: 4000 },
+        promptVersion: STORY_GENERATION_PROMPT_VERSION,
+        requestMeta: { language, temperature: 0.8 },
       }
     )
 
@@ -237,74 +233,33 @@ LANGUAGE: Only the "text" field of each page (the story narrative) must be in ${
       throw new Error('No story content generated')
     }
 
-    // Parse JSON response
-    const storyData = JSON.parse(storyContent)
-
-    // ====================================================================
-    // 6. Validate Story Structure
-    // ====================================================================
-    if (!storyData.title || !storyData.pages || !Array.isArray(storyData.pages)) {
-      throw new Error('Invalid story structure from AI')
-    }
-
-    // ====================================================================
-    // 6.0. Validator + repair pass: supportingEntities, suggestedOutfits (aksiyon planı 2.1)
-    // ====================================================================
-    const needsSupportingEntities = !Array.isArray(storyData.supportingEntities) || storyData.supportingEntities.length === 0
-    const characterIdsFromPages = new Set<string>()
-    storyData.pages?.forEach((p: { characterIds?: string[] }) => {
-      (p.characterIds || []).forEach((id: string) => characterIdsFromPages.add(id))
+    const preparedStory = await prepareStoryResponseForUse({
+      openai,
+      model: effectiveStoryModel,
+      userId: user.id,
+      characterId,
+      promptVersion: STORY_GENERATION_PROMPT_VERSION,
+      requestMeta: { language, temperature: 0.8, source: 'generate-story-route' },
+      storyData: JSON.parse(storyContent),
+      expectedPageCount,
+      characters: charactersForPrompt.map((character) => ({ id: character.id, name: character.name })),
     })
-    const needsSuggestedOutfits =
-      !storyData.suggestedOutfits ||
-      typeof storyData.suggestedOutfits !== 'object' ||
-      [...characterIdsFromPages].some((id) => !storyData.suggestedOutfits[id])
+    const storyData = preparedStory.storyData
 
-    if (needsSupportingEntities || needsSuggestedOutfits) {
-      try {
-        const repairPrompt = `The following story JSON is missing required fields. Return ONLY a valid JSON object containing the missing field(s). Do not repeat or change the story content.
+    console.log('[Story Generation] storyRepair:', {
+      repaired: preparedStory.repaired,
+      repairFieldsRequested: preparedStory.repairFieldsRequested,
+      issues: preparedStory.issues,
+    })
 
-Missing: ${needsSupportingEntities ? 'supportingEntities (array of { id, type: "animal"|"object", name, description, appearsOnPages: number[] }) - list ALL animals and important objects in the story.' : ''}${needsSuggestedOutfits ? (needsSupportingEntities ? ' ' : '') + 'suggestedOutfits (object: character UUID -> one line English outfit per character). Character IDs to include: ' + [...characterIdsFromPages].join(', ') + '.' : ''}
-
-Story title: ${storyData.title}
-Pages count: ${storyData.pages?.length || 0}
-Theme: ${theme}
-
-Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', needsSuggestedOutfits && 'suggestedOutfits'].filter(Boolean).join(', ')}.`
-
-        const repairCompletion = await chatWithLog(
-          openai,
-          {
-            model: effectiveStoryModel,
-            messages: [{ role: 'user', content: repairPrompt }],
-            response_format: { type: 'json_object' },
-            temperature: 0.3,
-            max_tokens: 1500,
-          },
-          {
-            userId: user.id,
-            characterId,
-            operationType: 'story_generation',
-            promptVersion: STORY_PROMPT_VERSION,
-            requestMeta: { repairType: 'entities_outfits', temperature: 0.3 },
-          }
-        )
-        const repairContent = repairCompletion.choices[0]?.message?.content
-        if (repairContent) {
-          const repairData = JSON.parse(repairContent)
-          if (Array.isArray(repairData.supportingEntities)) {
-            storyData.supportingEntities = repairData.supportingEntities
-            console.log('[Story Generation] Repair: added supportingEntities', storyData.supportingEntities.length)
-          }
-          if (repairData.suggestedOutfits && typeof repairData.suggestedOutfits === 'object') {
-            storyData.suggestedOutfits = { ...storyData.suggestedOutfits, ...repairData.suggestedOutfits }
-            console.log('[Story Generation] Repair: added/updated suggestedOutfits')
-          }
-        }
-      } catch (repairErr) {
-        console.warn('[Story Generation] Repair pass failed (non-fatal):', repairErr)
-      }
-    }
+    const usageStory = completion.usage
+    const usageRepair = preparedStory.repairUsage
+    const promptTokensTotal =
+      (usageStory?.prompt_tokens ?? 0) + (usageRepair?.prompt_tokens ?? 0)
+    const completionTokensTotal =
+      (usageStory?.completion_tokens ?? 0) + (usageRepair?.completion_tokens ?? 0)
+    const totalTokensAll =
+      (usageStory?.total_tokens ?? 0) + (usageRepair?.total_tokens ?? 0)
 
     // ====================================================================
     // 6.2. LOG: Theme & Clothing Style (NEW: 15 Ocak 2026 - Quality Check)
@@ -340,8 +295,14 @@ Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', 
       custom_requests: customRequests,
       generation_metadata: {
         model: effectiveStoryModel,
-        promptVersion: '1.0.0',
-        tokensUsed: completion.usage?.total_tokens || 0,
+        promptVersion: STORY_GENERATION_PROMPT_VERSION,
+        tokensUsed: totalTokensAll || usageStory?.total_tokens || 0,
+        tokensStory: usageStory,
+        tokensRepair: usageRepair ?? null,
+        repairCalls: preparedStory.repairCalls,
+        repaired: preparedStory.repaired,
+        repairFieldsRequested: preparedStory.repairFieldsRequested,
+        storyRepairIssues: preparedStory.issues,
         generationTime: Date.now() - startTime,
       },
     })
@@ -355,9 +316,11 @@ Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', 
     // 8. Prepare Response
     // ====================================================================
     const generationTime = Date.now() - startTime
-    const tokensUsed = completion.usage?.total_tokens || 0
+    const tokensUsed = totalTokensAll || completion.usage?.total_tokens || 0
 
-    console.log(`Story generated successfully in ${generationTime}ms, ${tokensUsed} tokens`)
+    console.log(
+      `Story generated successfully in ${generationTime}ms, ${tokensUsed} tokens (story + repair)`
+    )
 
     const response: StoryGenerationResponse = {
       storyId: book.id,
@@ -379,13 +342,17 @@ Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', 
     }
 
     const metadata: Record<string, unknown> = {
-      cost: formatStoryCost(
-        effectiveStoryModel,
-        completion.usage?.prompt_tokens || 0,
-        completion.usage?.completion_tokens || 0
-      ),
+      cost: formatStoryCost(effectiveStoryModel, promptTokensTotal, completionTokensTotal),
       model: effectiveStoryModel,
       characterUsage: character.total_books + 1,
+      openaiUsage: {
+        story: usageStory ?? null,
+        repair: usageRepair ?? null,
+        repairCalls: preparedStory.repairCalls,
+        repaired: preparedStory.repaired,
+        repairFieldsRequested: preparedStory.repairFieldsRequested,
+        issues: preparedStory.issues,
+      },
     }
     if (debugMode) {
       metadata.debug = {
@@ -404,8 +371,8 @@ Return only JSON with keys: ${[needsSupportingEntities && 'supportingEntities', 
           gender: character.gender,
         },
         aiRequest: {
-          model: 'gpt-4o-mini',
-          systemMessage,
+          model: effectiveStoryModel,
+          systemMessage: buildStorySystemPrompt(language),
           userMessage: storyPrompt,
         },
       }

@@ -1,0 +1,511 @@
+import type OpenAI from 'openai'
+import { chatWithLog, type ChatLogContext } from '@/lib/ai/chat'
+
+type StoryCharacterRef = {
+  id: string
+  name?: string
+}
+
+export type RepairableField =
+  | 'supportingEntities'
+  | 'suggestedOutfits'
+  | 'sceneMap'
+  | 'coverDescription'
+  | 'coverImagePrompt'
+
+/**
+ * Story repair: eksik/bozuk alanlar için en fazla bu kadar **ek** Chat Completions çağrısı.
+ * Sonsuz döngü yok; `prepareStoryResponseForUse` içinde tek tur.
+ */
+export const STORY_RESPONSE_MAX_REPAIR_CALLS = 1
+
+type PrepareStoryResponseParams = {
+  openai: OpenAI
+  model: string
+  userId: string
+  characterId?: string | null
+  bookId?: string | null
+  promptVersion?: string | null
+  requestMeta?: Record<string, unknown>
+  storyData: any
+  expectedPageCount: number
+  characters: StoryCharacterRef[]
+}
+
+export interface PreparedStoryResponse {
+  storyData: any
+  repaired: boolean
+  issues: string[]
+  /** İlk model cevabında eksik/bozuk bulunan alanlar; repair tetikleme nedeni (boş = repair yok). */
+  repairFieldsRequested: RepairableField[]
+  /** Repair çağrısı yapıldıysa (0 veya 1); `STORY_RESPONSE_MAX_REPAIR_CALLS` ile sınırlı. */
+  repairCalls: number
+  /** İlk story cevabından sonra yapılan repair isteğinin token kullanımı (OpenAI `usage`). */
+  repairUsage?: {
+    prompt_tokens?: number
+    completion_tokens?: number
+    total_tokens?: number
+  }
+}
+
+function normalizePositiveInt(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0
+}
+
+function normalizeStoryShape(storyData: any, expectedPageCount: number): any {
+  const normalized = typeof storyData === 'object' && storyData !== null ? structuredClone(storyData) : {}
+
+  if (Array.isArray(normalized.pages)) {
+    normalized.pages = normalized.pages.slice(0, expectedPageCount).map((page: any, index: number) => ({
+      ...page,
+      pageNumber: index + 1,
+    }))
+  }
+
+  if (Array.isArray(normalized.sceneMap)) {
+    normalized.sceneMap = normalized.sceneMap.slice(0, expectedPageCount).map((entry: any, index: number) => ({
+      ...entry,
+      pageNumber: index + 1,
+    }))
+  }
+
+  return normalized
+}
+
+function isSupportingEntitiesEntryValid(entity: unknown): boolean {
+  if (!entity || typeof entity !== 'object') return false
+  const e = entity as Record<string, unknown>
+  return (
+    isNonEmptyString(e.id) &&
+    (e.type === 'animal' || e.type === 'object') &&
+    isNonEmptyString(e.name) &&
+    isNonEmptyString(e.description) &&
+    Array.isArray(e.appearsOnPages)
+  )
+}
+
+function findRepairableFields(
+  storyData: any,
+  expectedPageCount: number,
+  characterIds: string[]
+): RepairableField[] {
+  const repairFields = new Set<RepairableField>()
+
+  if (!isNonEmptyString(storyData?.coverDescription)) {
+    repairFields.add('coverDescription')
+  }
+
+  if (!isNonEmptyString(storyData?.coverImagePrompt)) {
+    repairFields.add('coverImagePrompt')
+  }
+
+  const supportingEntities = storyData?.supportingEntities
+  const needsSupportingEntitiesRepair =
+    !Array.isArray(supportingEntities) ||
+    supportingEntities.length === 0 ||
+    supportingEntities.some((entry: unknown) => !isSupportingEntitiesEntryValid(entry))
+  if (needsSupportingEntitiesRepair) {
+    repairFields.add('supportingEntities')
+  }
+
+  const outfits = storyData?.suggestedOutfits
+  const missingOutfit =
+    !outfits ||
+    typeof outfits !== 'object' ||
+    characterIds.some((id) => !isNonEmptyString(outfits[id]))
+  if (missingOutfit) {
+    repairFields.add('suggestedOutfits')
+  }
+
+  const sceneMap = storyData?.sceneMap
+  const invalidSceneMap =
+    !Array.isArray(sceneMap) ||
+    sceneMap.length !== expectedPageCount ||
+    sceneMap.some(
+      (entry: any, index: number) =>
+        normalizePositiveInt(entry?.pageNumber) !== index + 1 ||
+        !isNonEmptyString(entry?.location) ||
+        !isNonEmptyString(entry?.timeOfDay) ||
+        !isNonEmptyString(entry?.setting)
+    )
+  if (invalidSceneMap) {
+    repairFields.add('sceneMap')
+  }
+
+  return [...repairFields]
+}
+
+function buildRepairSchema(fields: RepairableField[]) {
+  const properties: Record<string, unknown> = {}
+  const required: string[] = []
+
+  if (fields.includes('coverDescription')) {
+    properties.coverDescription = { type: 'string' }
+    required.push('coverDescription')
+  }
+
+  if (fields.includes('coverImagePrompt')) {
+    properties.coverImagePrompt = { type: 'string' }
+    required.push('coverImagePrompt')
+  }
+
+  if (fields.includes('sceneMap')) {
+    properties.sceneMap = {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          pageNumber: { type: 'integer' },
+          location: { type: 'string' },
+          timeOfDay: { type: 'string' },
+          setting: { type: 'string' },
+        },
+        required: ['pageNumber', 'location', 'timeOfDay', 'setting'],
+      },
+    }
+    required.push('sceneMap')
+  }
+
+  if (fields.includes('supportingEntities')) {
+    properties.supportingEntities = {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string', enum: ['animal', 'object'] },
+          name: { type: 'string' },
+          description: { type: 'string' },
+          appearsOnPages: { type: 'array', items: { type: 'integer' } },
+        },
+        required: ['id', 'type', 'name', 'description', 'appearsOnPages'],
+      },
+    }
+    required.push('supportingEntities')
+  }
+
+  if (fields.includes('suggestedOutfits')) {
+    properties.suggestedOutfits = {
+      type: 'object',
+      description: 'Keys are character UUIDs, values are one-line English outfits.',
+    }
+    required.push('suggestedOutfits')
+  }
+
+  return {
+    type: 'object',
+    properties,
+    required,
+  }
+}
+
+/**
+ * Repair prompt için storyData'yı sadeleştirir.
+ * - supportingEntities/suggestedOutfits/coverDescription/coverImagePrompt → sadece page text'leri ve başlık yeterli
+ * - sceneMap → page text + environmentDescription da faydalı
+ * Gereksiz alanları (imagePrompt, shotPlan, characterExpressions, sceneDescription…) göndermez; input token tasarrufu sağlar.
+ */
+function buildRepairStoryContext(fields: RepairableField[], storyData: any): string {
+  const needsSceneDetails =
+    fields.includes('sceneMap') || fields.includes('coverDescription') || fields.includes('coverImagePrompt')
+
+  const pages = Array.isArray(storyData?.pages) ? storyData.pages : []
+  const pageContext = pages.map((page: any) => {
+    const base: Record<string, unknown> = {
+      pageNumber: page.pageNumber,
+      text: page.text,
+      characterIds: page.characterIds,
+    }
+    if (needsSceneDetails) {
+      if (page.environmentDescription) base.environmentDescription = page.environmentDescription
+      if (page.sceneDescription) base.sceneDescription = page.sceneDescription
+    }
+    return base
+  })
+
+  const condensed: Record<string, unknown> = {
+    title: storyData?.title,
+    pages: pageContext,
+  }
+
+  if (storyData?.coverDescription) condensed.coverDescription = storyData.coverDescription
+  if (storyData?.coverImagePrompt) condensed.coverImagePrompt = storyData.coverImagePrompt
+  if (storyData?.suggestedOutfits) condensed.suggestedOutfits = storyData.suggestedOutfits
+  if (storyData?.metadata) condensed.metadata = storyData.metadata
+
+  return JSON.stringify(condensed)
+}
+
+function buildRepairPrompt(
+  fields: RepairableField[],
+  storyData: any,
+  expectedPageCount: number,
+  characters: StoryCharacterRef[]
+): string {
+  const fieldNotes = fields.map((field) => {
+    switch (field) {
+      case 'coverDescription':
+        return '- coverDescription: 2-4 English sentences, reader-facing summary of the cover scene.'
+      case 'coverImagePrompt':
+        return '- coverImagePrompt: 4-8 English sentences, cinematic movie-poster cover brief; not page 1.'
+      case 'sceneMap':
+        return '- sceneMap: exactly one entry per page; pageNumber/location/timeOfDay/setting must match the existing story beats. location, timeOfDay, setting — English only (image pipeline).'
+      case 'supportingEntities':
+        return '- supportingEntities: include recurring or central non-character animals/objects (teddy bear, ball, map, kite, lantern, boat, toy, pond, log…). Return [] only if none exist. name and description — English only (image master API). appearsOnPages = page numbers where the object appears.'
+      case 'suggestedOutfits':
+        return '- suggestedOutfits: one English outfit line per character UUID. Same outfit for the whole book unless the story text explicitly changes wardrobe (e.g. pajamas, swimwear).'
+      default:
+        return ''
+    }
+  })
+
+  const characterMap = Object.fromEntries(characters.map((character) => [character.id, character.name ?? character.id]))
+
+  return `Repair the children story JSON below.
+
+Return ONLY a JSON object with these keys: ${fields.join(', ')}.
+Do not rewrite the story, do not change page texts, and do not invent a new plot.
+Use the existing story content as the source of truth.
+
+**Language:** All strings you output must be **English** (cover fields, sceneMap, supportingEntities, suggestedOutfits, etc.).
+
+Requirements:
+${fieldNotes.join('\n')}
+- Expected page count: ${expectedPageCount}
+- Character map (do NOT add these to supportingEntities): ${JSON.stringify(characterMap)}
+- sceneMap must follow the actual current pages in order, pageNumber = 1..${expectedPageCount}.
+
+Story context:
+${buildRepairStoryContext(fields, storyData)}`
+}
+
+async function repairStoryFields(
+  params: PrepareStoryResponseParams,
+  fields: RepairableField[]
+): Promise<{ data: any; usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } }> {
+  const repairPrompt = buildRepairPrompt(
+    fields,
+    params.storyData,
+    params.expectedPageCount,
+    params.characters
+  )
+
+  const repairContext: ChatLogContext = {
+    userId: params.userId,
+    characterId: params.characterId ?? null,
+    bookId: params.bookId ?? null,
+    operationType: 'story_generation',
+    promptVersion: params.promptVersion ?? null,
+    requestMeta: {
+      ...(params.requestMeta ?? {}),
+      repairFields: fields,
+      repairKind: 'story_response',
+    },
+  }
+
+  const completion = await chatWithLog(
+    params.openai,
+    {
+      model: params.model,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You repair missing or invalid fields in a children story JSON response. Return only valid JSON matching the requested schema. Every string you output must be English (image/API pipeline). You never return or rewrite pages[].text.',
+        },
+        { role: 'user', content: repairPrompt },
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'story_response_repair',
+          strict: false,
+          schema: buildRepairSchema(fields),
+        },
+      },
+      temperature: 0.2,
+      max_completion_tokens: 2500,
+    },
+    repairContext
+  )
+
+  const content = completion.choices[0]?.message?.content
+  if (!content) {
+    throw new Error('Story repair returned empty content')
+  }
+
+  return {
+    data: JSON.parse(content),
+    usage: completion.usage ?? undefined,
+  }
+}
+
+function assertStoryResponseValid(
+  storyData: any,
+  expectedPageCount: number,
+  characters: StoryCharacterRef[]
+) {
+  if (!isNonEmptyString(storyData?.title)) {
+    throw new Error('Invalid story structure: missing title')
+  }
+
+  if (!Array.isArray(storyData?.pages)) {
+    throw new Error('Invalid story structure: missing pages array')
+  }
+
+  if (storyData.pages.length !== expectedPageCount) {
+    throw new Error(`Invalid story structure: expected ${expectedPageCount} pages, got ${storyData.pages.length}`)
+  }
+
+  if (!Array.isArray(storyData?.sceneMap) || storyData.sceneMap.length !== expectedPageCount) {
+    throw new Error(`Invalid story structure: sceneMap must contain exactly ${expectedPageCount} entries`)
+  }
+
+  if (!isNonEmptyString(storyData?.coverDescription)) {
+    throw new Error('Story is missing required "coverDescription"')
+  }
+
+  if (!isNonEmptyString(storyData?.coverImagePrompt)) {
+    throw new Error('Story is missing required "coverImagePrompt"')
+  }
+
+  const characterIds = characters.map((character) => character.id)
+
+  for (const [index, entry] of storyData.sceneMap.entries()) {
+    if (
+      normalizePositiveInt(entry?.pageNumber) !== index + 1 ||
+      !isNonEmptyString(entry?.location) ||
+      !isNonEmptyString(entry?.timeOfDay) ||
+      !isNonEmptyString(entry?.setting)
+    ) {
+      throw new Error(`sceneMap entry ${index + 1} is invalid`)
+    }
+  }
+
+  for (const [index, page] of storyData.pages.entries()) {
+    if (normalizePositiveInt(page?.pageNumber) !== index + 1) {
+      throw new Error(`Page ${index + 1} has invalid pageNumber`)
+    }
+    if (!isNonEmptyString(page?.text)) {
+      throw new Error(`Page ${index + 1} is missing "text"`)
+    }
+    if (!isNonEmptyString(page?.imagePrompt)) {
+      throw new Error(`Page ${index + 1} is missing "imagePrompt"`)
+    }
+    if (!isNonEmptyString(page?.sceneDescription)) {
+      throw new Error(`Page ${index + 1} is missing "sceneDescription"`)
+    }
+    if (!isNonEmptyString(page?.environmentDescription)) {
+      throw new Error(`Page ${index + 1} is missing "environmentDescription"`)
+    }
+    if (!['close', 'medium', 'wide', 'establishing'].includes(page?.cameraDistance)) {
+      throw new Error(`Page ${index + 1} has invalid "cameraDistance"`)
+    }
+    if (!Array.isArray(page?.characterIds) || page.characterIds.length === 0) {
+      throw new Error(`Page ${index + 1} is missing required "characterIds" field`)
+    }
+    if (!page.characterIds.every((id: unknown) => typeof id === 'string')) {
+      throw new Error(`Page ${index + 1} has invalid "characterIds"`)
+    }
+    if (!page.characterIds.every((id: string) => characterIds.includes(id))) {
+      throw new Error(`Page ${index + 1} contains unknown character ID`)
+    }
+    if (!page.characterExpressions || typeof page.characterExpressions !== 'object') {
+      throw new Error(`Page ${index + 1} is missing required "characterExpressions" object`)
+    }
+    for (const characterId of page.characterIds) {
+      if (!isNonEmptyString(page.characterExpressions[characterId])) {
+        throw new Error(`Page ${index + 1} characterExpressions is missing "${characterId}"`)
+      }
+    }
+    if (!page.shotPlan || typeof page.shotPlan !== 'object') {
+      throw new Error(`Page ${index + 1} is missing required "shotPlan"`)
+    }
+    const shotPlanKeys = ['shotType', 'lens', 'cameraAngle', 'placement', 'timeOfDay', 'mood'] as const
+    for (const key of shotPlanKeys) {
+      if (!isNonEmptyString(page.shotPlan[key])) {
+        throw new Error(`Page ${index + 1} shotPlan is missing "${key}"`)
+      }
+    }
+  }
+
+  if (!Array.isArray(storyData?.supportingEntities)) {
+    throw new Error('Story is missing required "supportingEntities" array')
+  }
+
+  for (const entity of storyData.supportingEntities) {
+    if (
+      !isNonEmptyString(entity?.id) ||
+      !['animal', 'object'].includes(entity?.type) ||
+      !isNonEmptyString(entity?.name) ||
+      !isNonEmptyString(entity?.description) ||
+      !Array.isArray(entity?.appearsOnPages)
+    ) {
+      throw new Error('supportingEntities contains an invalid entry')
+    }
+  }
+
+  if (!storyData?.suggestedOutfits || typeof storyData.suggestedOutfits !== 'object') {
+    throw new Error('Story is missing required "suggestedOutfits" object')
+  }
+
+  for (const characterId of characterIds) {
+    if (!isNonEmptyString(storyData.suggestedOutfits[characterId])) {
+      throw new Error(`suggestedOutfits is missing or empty for character ${characterId}`)
+    }
+  }
+
+  if (!storyData?.metadata || typeof storyData.metadata !== 'object') {
+    throw new Error('Story is missing required "metadata" object')
+  }
+
+  if (
+    !isNonEmptyString(storyData.metadata.ageGroup) ||
+    !isNonEmptyString(storyData.metadata.theme) ||
+    !Array.isArray(storyData.metadata.educationalThemes) ||
+    typeof storyData.metadata.safetyChecked !== 'boolean'
+  ) {
+    throw new Error('Story metadata is invalid')
+  }
+}
+
+export async function prepareStoryResponseForUse(
+  params: PrepareStoryResponseParams
+): Promise<PreparedStoryResponse> {
+  const issues: string[] = []
+  let storyData = normalizeStoryShape(params.storyData, params.expectedPageCount)
+
+  const repairFields = findRepairableFields(
+    storyData,
+    params.expectedPageCount,
+    params.characters.map((character) => character.id)
+  )
+
+  let repaired = false
+  let repairCalls = 0
+  let repairUsage: PreparedStoryResponse['repairUsage']
+
+  if (repairFields.length > 0) {
+    issues.push(`repair requested: ${repairFields.join(', ')}`)
+    const { data: repairedFields, usage } = await repairStoryFields({ ...params, storyData }, repairFields)
+    storyData = normalizeStoryShape({ ...storyData, ...repairedFields }, params.expectedPageCount)
+    repaired = true
+    repairCalls = STORY_RESPONSE_MAX_REPAIR_CALLS
+    repairUsage = usage
+  }
+
+  assertStoryResponseValid(storyData, params.expectedPageCount, params.characters)
+
+  return {
+    storyData,
+    repaired,
+    issues,
+    repairFieldsRequested: repairFields,
+    repairCalls,
+    repairUsage,
+  }
+}

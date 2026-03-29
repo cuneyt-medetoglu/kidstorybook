@@ -489,8 +489,18 @@
       "eyeLabel": "Göz Rengi",
       "hairSelect": "Saç rengi seçin",
       "eyeSelect": "Göz rengi seçin",
+      "ageSelect": "Yaş aralığı seçin",
+      "ageWordRangeHint": "Hikâye uzunluğu: sayfa başı yaklaşık {range} kelime.",
       "namePlaceholder": "Çocuğun adını girin",
       "agePlaceholder": "Yaşı girin (0-12)",
+      "readingAgeLabel": "Dinleme / okuma yaşı",
+      "readingAgeHint": "Hikâyenin uzunluğunu ve kelime zenginliğini (sayfa başı kelime) belirler. Kitabı dinleyecek veya okuyacak çocuğa uygun aralığı seçin.",
+      "readingAge": {
+        "0-1": "0–1 yaş (karton kitap, çok az metin)",
+        "1-3": "1–3 yaş",
+        "3-5": "3–5 yaş",
+        "sixPlus": "6 yaş ve üzeri"
+      },
       "genderBoy": "Erkek",
       "genderGirl": "Kız",
       "hairColors": {

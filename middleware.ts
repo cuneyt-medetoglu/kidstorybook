@@ -47,6 +47,12 @@ function detectLocale(pathname: string): string {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ── public/dev/* — statik HTML/JS araçları; locale routing uygulanmaz.
+  // (.html matcher’da hariç olsa da .data.js hariç değil; next-intl isteği /tr/dev/... yapıp 404 üretiyordu.)
+  if (pathname.startsWith('/dev/')) {
+    return NextResponse.next()
+  }
+
   // ── API routes: auth only, no locale handling ──────────────────────────────
   if (pathname.startsWith('/api/')) {
     const isProtected = PROTECTED_API_PATHS.some(p => pathname.startsWith(p))

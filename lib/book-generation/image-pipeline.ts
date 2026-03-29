@@ -13,8 +13,18 @@
 
 import OpenAI from 'openai'
 import { uploadFile, getPublicUrl, getObjectBuffer } from '@/lib/storage/s3'
-import { updateBook, updateBookProgressAtLeast } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import { getBookById, updateBook, updateBookProgressAtLeast } from '@/lib/db/books'
+import { generateStoryPrompt, buildStorySystemPrompt, buildStoryResponseSchema } from '@/lib/prompts/story/base'
+import {
+  DEFAULT_STORY_MODEL,
+  DEFAULT_IMAGE_MODEL,
+  DEFAULT_IMAGE_SIZE,
+  DEFAULT_IMAGE_QUALITY,
+  DEFAULT_VISION_MODEL,
+  STORY_GENERATION_MAX_OUTPUT_TOKENS,
+  STORY_GENERATION_PROMPT_VERSION,
+} from '@/lib/ai/openai-models'
+import { parseReadingAgeBracket } from '@/lib/config/reading-age-brackets'
 import type { StoryGenerationInput } from '@/lib/prompts/types'
 import { buildCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import {
@@ -30,6 +40,7 @@ import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import { generateTts } from '@/lib/tts/generate'
 import { imageEditWithLog, imageGenerateWithLog, type ImageLogContext } from '@/lib/ai/images'
 import { chatWithLog } from '@/lib/ai/chat'
+import { prepareStoryResponseForUse } from '@/lib/ai/story-response-validator'
 import { appendAiDebugLog, sanitizeForDebugLog, summarizeFormData } from '@/lib/debug/ai-debug-log'
 import { formDataToDebugRecord, sanitizeForStepRunnerDebug } from '@/lib/debug/step-runner-sanitize'
 
@@ -61,7 +72,7 @@ export interface PipelineContext {
   debugTrace?: DebugTraceEntry[] | null
   /**
    * Hikaye üretiminde kullanılacak model (storyData null ise zorunlu).
-   * Varsayılan: gpt-4o-mini
+   * Varsayılan: gpt-4.1-mini
    */
   storyModel?: string
   /** İstenen sayfa sayısı (storyData null ise hikaye üretimi için kullanılır) */
@@ -93,9 +104,9 @@ export interface PipelineContext {
 // Sabitler
 // ============================================================================
 
-const IMAGE_MODEL = 'gpt-image-1.5'
-const IMAGE_SIZE = '1024x1536'
-const IMAGE_QUALITY = 'low'
+const IMAGE_MODEL = DEFAULT_IMAGE_MODEL
+const IMAGE_SIZE = DEFAULT_IMAGE_SIZE
+const IMAGE_QUALITY = DEFAULT_IMAGE_QUALITY
 
 // ============================================================================
 // Yardımcı fonksiyonlar (route.ts'den taşındı)
@@ -106,6 +117,34 @@ export function stopAfter(step: string): void {
     console.log(`[Pipeline] ⏸️ STOP_AFTER=${step}`)
     throw new Error(`STOP_AFTER ${step}`)
   }
+}
+
+function parseBookGenerationMetadata(book: { generation_metadata?: unknown } | null): Record<string, unknown> {
+  const raw = book?.generation_metadata
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    return { ...(raw as Record<string, unknown>) }
+  }
+  if (typeof raw === 'string') {
+    try {
+      const p = JSON.parse(raw) as unknown
+      if (p && typeof p === 'object' && !Array.isArray(p)) return { ...(p as Record<string, unknown>) }
+    } catch {
+      /* ignore */
+    }
+  }
+  return {}
+}
+
+/** Mevcut `generation_metadata` ile birleştirir (tek alan güncellemesi tüm JSON'u silmesin). */
+export async function mergeBookGenerationMetadata(
+  bookId: string,
+  patch: Record<string, unknown>
+): Promise<void> {
+  const { data: book } = await getBookById(bookId)
+  const prev = parseBookGenerationMetadata(book)
+  await updateBook(bookId, {
+    generation_metadata: { ...prev, ...patch },
+  })
 }
 
 export function isRetryableError(status: number): boolean {
@@ -394,7 +433,7 @@ async function describeCoverSceneForPrompt(
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   try {
     const visionParams = {
-      model: 'gpt-4o-mini' as const,
+      model: DEFAULT_VISION_MODEL,
       messages: [{
         role: 'user' as const,
         content: [
@@ -721,18 +760,17 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
   // Bu sayede API route anında bookId döndürür, kullanıcı hemen generating page'e gider.
   // ----------------------------------------------------------------
   if (needsStoryGeneration) {
-    const effectiveStoryModel = ctx.storyModel || 'gpt-4.1-mini'
+    const effectiveStoryModel = ctx.storyModel || DEFAULT_STORY_MODEL
     const effectivePageCount = ctx.pageCount || 4
-
-    const languageNames: Record<string, string> = {
-      en: 'English', tr: 'Turkish', de: 'German', fr: 'French',
-      es: 'Spanish', zh: 'Chinese (Mandarin)', pt: 'Portuguese', ru: 'Russian',
-    }
-    const languageName = languageNames[language] || 'English'
 
     const storyPrompt = generateStoryPrompt({
       characterName: character.name,
       characterAge: character.age,
+      readingAgeBracket: parseReadingAgeBracket(
+        character.description && typeof character.description === 'object'
+          ? (character.description as { readingAgeBracket?: unknown }).readingAgeBracket
+          : undefined
+      ),
       characterGender: character.gender,
       theme: themeKey,
       illustrationStyle,
@@ -755,15 +793,15 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
     const storyRequestBody = {
       model: effectiveStoryModel,
       messages: [
-        {
-          role: 'system' as const,
-          content: `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. Return exactly the requested number of pages. Write the entire story in ${languageName} only; do not use words from other languages.`,
-        },
+        { role: 'system' as const, content: buildStorySystemPrompt(language) },
         { role: 'user' as const, content: storyPrompt },
       ],
-      response_format: { type: 'json_object' as const },
+      response_format: {
+        type: 'json_schema' as const,
+        json_schema: { name: 'story_output', strict: false, schema: buildStoryResponseSchema() },
+      },
       temperature: 0.8,
-      max_tokens: 8000,
+      max_completion_tokens: STORY_GENERATION_MAX_OUTPUT_TOKENS,
     }
 
     console.log(`[Pipeline] 📖 Generating story (model: ${effectiveStoryModel}, pages: ${effectivePageCount})...`)
@@ -772,6 +810,8 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
     const MAX_RETRIES = 3
     let generatedStoryData: any = null
     let lastStoryError: Error | null = null
+    /** Worker hikâye adımı: DB `generation_metadata` içine yazılacak denetim alanları (Examples / yeniden üretilebilirlik). */
+    let storyGenerationAudit: Record<string, unknown> | null = null
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
@@ -780,51 +820,43 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
           userId,
           bookId,
           operationType: 'story_generation',
+          promptVersion: STORY_GENERATION_PROMPT_VERSION,
         })
         const storyMs = Date.now() - storyStart
 
         const storyContent = completion.choices[0].message.content
         if (!storyContent) throw new Error('No story content generated')
 
-        generatedStoryData = JSON.parse(storyContent)
+        const preparedStory = await prepareStoryResponseForUse({
+          openai: openaiForStory,
+          model: effectiveStoryModel,
+          userId,
+          bookId,
+          promptVersion: STORY_GENERATION_PROMPT_VERSION,
+          requestMeta: { language, temperature: 0.8, source: 'image-pipeline' },
+          storyData: JSON.parse(storyContent),
+          expectedPageCount: effectivePageCount,
+          characters: characters.map((char) => ({ id: char.id, name: char.name })),
+        })
+
+        generatedStoryData = preparedStory.storyData
+        storyGenerationAudit = {
+          storyPromptVersion: STORY_GENERATION_PROMPT_VERSION,
+          storyModel: effectiveStoryModel,
+          tokensStory: completion.usage ?? null,
+          tokensRepair: preparedStory.repairUsage ?? null,
+          storyRepairCalls: preparedStory.repairCalls,
+          storyRepaired: preparedStory.repaired,
+          storyRepairFieldsRequested: preparedStory.repairFieldsRequested,
+          storyRepairIssues: preparedStory.issues,
+          storyGenerationMs: storyMs,
+        }
         console.log(`[Pipeline] 📥 Story received (title: ${generatedStoryData?.title}, pages: ${generatedStoryData?.pages?.length}) in ${storyMs}ms`)
-
-        if (!generatedStoryData.title || !generatedStoryData.pages || !Array.isArray(generatedStoryData.pages)) {
-          throw new Error('Invalid story structure from AI')
-        }
-        for (const page of generatedStoryData.pages) {
-          if (!page.characterIds || !Array.isArray(page.characterIds) || page.characterIds.length === 0) {
-            throw new Error(`Page ${page.pageNumber} is missing required "characterIds" field`)
-          }
-        }
-        const suggestedOutfits = generatedStoryData.suggestedOutfits
-        if (!suggestedOutfits || typeof suggestedOutfits !== 'object') {
-          throw new Error('Story is missing required "suggestedOutfits" object')
-        }
-        for (const char of characters) {
-          const outfit = suggestedOutfits[char.id]
-          if (typeof outfit !== 'string' || !outfit.trim()) {
-            throw new Error(`suggestedOutfits is missing or empty for character ${char.id}`)
-          }
-        }
-
-        const returnedPages = generatedStoryData.pages.length
-        if (returnedPages !== effectivePageCount) {
-          if (returnedPages > effectivePageCount) {
-            generatedStoryData.pages = generatedStoryData.pages.slice(0, effectivePageCount)
-          } else if (attempt < MAX_RETRIES) {
-            lastStoryError = new Error(`AI returned fewer pages (${returnedPages}/${effectivePageCount})`)
-            console.warn(`[Pipeline] ⚠️  Story: ${returnedPages}/${effectivePageCount} pages, retrying...`)
-            continue
-          } else {
-            throw new Error(`AI returned fewer pages (${returnedPages}/${effectivePageCount}) after ${MAX_RETRIES} attempts`)
-          }
-        }
-
-        generatedStoryData.pages = generatedStoryData.pages.map((page: any, idx: number) => ({
-          ...page,
-          pageNumber: idx + 1,
-        }))
+        console.log('[Pipeline] storyRepair:', {
+          repaired: preparedStory.repaired,
+          repairFieldsRequested: preparedStory.repairFieldsRequested,
+          issues: preparedStory.issues,
+        })
         break
       } catch (error: any) {
         lastStoryError = error
@@ -851,6 +883,10 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
       story_data: storyData,
       ...(storyData.metadata?.ageGroup && { age_group: storyData.metadata.ageGroup }),
     })
+
+    if (storyGenerationAudit) {
+      await mergeBookGenerationMetadata(bookId, storyGenerationAudit)
+    }
 
     // story_generating %0 → %15 geçişi; master adımına hazır
     await reportProgress(15, 'master_generating')
@@ -918,12 +954,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
     }
 
     if (Object.keys(masterIllustrations).length > 0) {
-      const currentMeta = {} // Will be merged in DB
-      await updateBook(bookId, {
-        generation_metadata: {
-          masterIllustrations,
-          masterIllustrationCreated: true,
-        },
+      await mergeBookGenerationMetadata(bookId, {
+        masterIllustrations,
+        masterIllustrationCreated: true,
       })
     }
 
@@ -942,11 +975,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
         }
       }
       if (Object.keys(entityMasterIllustrations).length > 0) {
-        await updateBook(bookId, {
-          generation_metadata: {
-            entityMasterIllustrations,
-            entityMasterCreated: true,
-          },
+        await mergeBookGenerationMetadata(bookId, {
+          entityMasterIllustrations,
+          entityMasterCreated: true,
         })
       }
     }
@@ -1012,11 +1043,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
     }
 
     if (Object.keys(masterIllustrations).length > 0) {
-      await updateBook(bookId, {
-        generation_metadata: {
-          masterIllustrations,
-          masterIllustrationCreated: true,
-        },
+      await mergeBookGenerationMetadata(bookId, {
+        masterIllustrations,
+        masterIllustrationCreated: true,
       })
     }
 
@@ -1044,11 +1073,9 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
       })
 
       if (Object.keys(entityMasterIllustrations).length > 0) {
-        await updateBook(bookId, {
-          generation_metadata: {
-            entityMasterIllustrations,
-            entityMasterCreated: true,
-          },
+        await mergeBookGenerationMetadata(bookId, {
+          entityMasterIllustrations,
+          entityMasterCreated: true,
         })
       }
     }

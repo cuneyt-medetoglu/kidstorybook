@@ -485,6 +485,9 @@ export default function Step2Page() {
                 eyeColor: characterEyeColor,
                 photoBase64: photoBase64, // Photo as base64 (without data URL prefix)
                 characterType: currentCharacter.characterType, // Include character type info
+                ...(step1Data?.readingAgeBracket != null
+                  ? { readingAgeBracket: step1Data.readingAgeBracket }
+                  : {}),
               }),
             })
 
@@ -1169,9 +1172,15 @@ export default function Step2Page() {
                             <div>
                               <span className="font-medium text-gray-700 dark:text-slate-300">{t("labels.age")}</span>{" "}
                               <span className="text-gray-900 dark:text-slate-50">
-                                {typeof step1Data.age === "number" && !Number.isNaN(step1Data.age)
-                                  ? t("yearsOld", { count: step1Data.age })
-                                  : t("unknown")}
+                                {typeof step1Data.readingAgeBracket === "string"
+                                  ? t1(
+                                      step1Data.readingAgeBracket === "6+"
+                                        ? "readingAge.sixPlus"
+                                        : `readingAge.${step1Data.readingAgeBracket}`
+                                    )
+                                  : typeof step1Data.age === "number" && !Number.isNaN(step1Data.age)
+                                    ? t("yearsOld", { count: step1Data.age })
+                                    : t("unknown")}
                               </span>
                             </div>
                             <div>

@@ -489,8 +489,18 @@
       "eyeLabel": "Eye Color",
       "hairSelect": "Select hair color",
       "eyeSelect": "Select eye color",
+      "ageSelect": "Select age range",
+      "ageWordRangeHint": "Story length guide: about {range} words per page.",
       "namePlaceholder": "Enter child's name",
       "agePlaceholder": "Enter age (0-12)",
+      "readingAgeLabel": "Listening / reading age",
+      "readingAgeHint": "Sets story length and vocabulary (words per page). Pick the band that fits who will hear or read the book.",
+      "readingAge": {
+        "0-1": "0–1 years (board-book style, very few words)",
+        "1-3": "1–3 years",
+        "3-5": "3–5 years",
+        "sixPlus": "6 years and up"
+      },
       "genderBoy": "Boy",
       "genderGirl": "Girl",
       "hairColors": {

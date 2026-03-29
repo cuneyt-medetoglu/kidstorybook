@@ -1,4 +1,9 @@
 import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from '../types'
+import {
+  getReadingAgeBracketConfig,
+  wordsPerPageRangeString,
+  type ReadingAgeBracketConfig,
+} from '@/lib/config/reading-age-brackets'
 
 /**
  * Story Generation Prompt - Version 1.0.0
@@ -12,8 +17,8 @@ import type { StoryGenerationInput, StoryGenerationOutput, PromptVersion } from 
  */
 
 export const VERSION: PromptVersion = {
-  version: '2.8.0',
-  releaseDate: new Date('2026-03-20'),
+  version: '3.0.5',
+  releaseDate: new Date('2026-03-28'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -55,6 +60,12 @@ export const VERSION: PromptVersion = {
     'v2.7.0: Few-shot anchoring kaldırıldı — OUTPUT FORMAT içindeki somut kapak/sahne örnekleri (isim + mekân), environmentDescription ve shotPlan şema örnekleri nötrleştirildi. buildStoryStructureSection kamp örneği soyut akışa indirildi. getExampleText doğa/orman bias\'ı kaldırıldı (mekân-agnostic örnek cümleler). HARDCODED_ORNEKLER_VE_AMAC_ANALIZI.md (20 Mart 2026)',
     'v2.7.1: STORY STRUCTURE — mekân tutarlılığı: tohum kapalı salon/turnuva gibi bir mekân söylüyorsa coverDescription ve tüm sayfa ortamları aynı tür mekânda kalsın; hikâye ortasında dış mekân/park/çimene kayma. PROMPT_ANALIZ Ö10 (20 Mart 2026)',
     'v2.8.0: coverImagePrompt — kapak için ayrı İngilizce görsel brief (kitap kapağı kompozisyonu, üstte başlık alanı, odak); pipeline önceliği coverImagePrompt → coverDescription → coverSetting. scene.ts sabit BOOK COVER layout satırı. (20 Mart 2026)',
+    'v3.0.0: SYSTEM/USER SPLIT (A1) — statik kurallar (safety, language, DO NOT DESCRIBE, expressions guide) system mesajına taşındı; user mesajı yalnızca bu kitaba özgü dinamik veri içeriyor. A3: max_tokens kaldırıldı. A4: buildThemeSpecificSection + buildIllustrationSection sadeleşti. A5: sinematik imagePrompt direktifi (LIGHTING→DEPTH→COLOR→COMP→ATMO) system\'e eklendi. A6: coverImagePrompt = film afişi / zirve anı direktifi system\'e eklendi. buildStorySystemPrompt() export edildi. (28 Mart 2026)',
+    'v3.0.1: LANGUAGE — pages[].text %100 hedef dil; title tercihen hedef dil; görsel alanlar EN. Step 6 StepRunner: dil artık step3.language.id üzerinden okunuyor (önceden wizardData.language yanlıştı). story max_tokens: lib/ai/story-generation-config.ts (50k). step-runner createBook: age_group dolduruluyor. (28 Mart 2026)',
+    'v3.0.4: LANGUAGE — Sadece pages[].text (+ tercihen title) hedef dilde; sceneMap, supportingEntities (name, description), metadata metinleri ve tüm görsel/API alanları açıkça English-only. json_schema açıklamaları güncellendi. Repair prompt aynı kural. (28 Mart 2026)',
+    'v3.0.5: suggestedOutfits — tüm kitap için tek kıyafet seti; sadece hikâyede açık kıyafet değişimi varsa farklı. (28 Mart 2026)',
+    'v3.0.2: Okuma yaşı bantları (0-1, 1-3, 3-5, 6+) — lib/config/reading-age-brackets.ts tek kaynak; Step 1 seçim; characters API + tüm generateStoryPrompt çağrıları readingAgeBracket; getWordCountMinForStoryInput. (28 Mart 2026)',
+    'v3.0.3: Hikaye akışı ve entity disiplini güçlendirildi — itinerary/checklist anlatımı yasaklandı; sayfalar arası sebep-sonuç akışı vurgulandı. supportingEntities için tekrarlayan/merkezi nesneler (örn. teddy bear, ball, map) zorunlu hale getirildi. (28 Mart 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -77,11 +88,10 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     defaultClothing,
     // NEW: Multiple characters support
     characters,
+    readingAgeBracket,
   } = input
 
-  // Get age-appropriate rules
-  const ageGroup = getAgeGroup(characterAge)
-  const safetyRules = getSafetyRules(ageGroup)
+  const readingCfg = getReadingAgeBracketConfig(readingAgeBracket, characterAge)
   const themeConfig = getThemeConfig(theme)
   
   // REMOVED: clothing directives (v1.6.0) – kıyafet story'nin sorumluluğu değil; sadece master'da
@@ -161,17 +171,17 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     if (familyMembers.length > 0) {
       characterDesc += `\n\n**FAMILY MEMBERS USAGE (MANDATORY):**`
       characterDesc += `\n- Family Members (${familyMembers.map(c => c.name || c.type.displayName).join(', ')}) MUST appear in multiple pages`
-      characterDesc += `\n- Each Family Member should appear in at least ${Math.max(3, Math.floor(getPageCount(ageGroup, pageCount) * 0.4))} pages`
+      characterDesc += `\n- Each Family Member should appear in at least ${Math.max(3, Math.floor(resolveStoryPageCount(pageCount) * 0.4))} pages`
       characterDesc += `\n- DO NOT exclude any Family Member from the story - ALL must be included`
     }
     
     characterDesc += `\n\n**CHARACTER DISTRIBUTION REQUIREMENTS:**`
     characterDesc += `\n- ALL ${characters.length} characters should appear throughout the story`
-    characterDesc += `\n- Each character should appear in at least ${Math.max(2, Math.floor(getPageCount(ageGroup, pageCount) * 0.3))} pages`
+    characterDesc += `\n- Each character should appear in at least ${Math.max(2, Math.floor(resolveStoryPageCount(pageCount) * 0.3))} pages`
     characterDesc += `\n- Main character (${characterName}) will appear in most/all pages`
     if (characters.length > 2) {
-      characterDesc += `\n- Pages 2-${Math.floor(getPageCount(ageGroup, pageCount) * 0.6)} should feature at least 2 characters`
-      characterDesc += `\n- Pages ${Math.floor(getPageCount(ageGroup, pageCount) * 0.6) + 1}-${getPageCount(ageGroup, pageCount)} should feature all ${characters.length} characters when possible`
+      characterDesc += `\n- Pages 2-${Math.floor(resolveStoryPageCount(pageCount) * 0.6)} should feature at least 2 characters`
+      characterDesc += `\n- Pages ${Math.floor(resolveStoryPageCount(pageCount) * 0.6) + 1}-${resolveStoryPageCount(pageCount)} should feature all ${characters.length} characters when possible`
     }
     characterDesc += `\n- Distribute characters evenly - do not favor some characters over others`
     
@@ -198,23 +208,22 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     characterDesc += `\n**CRITICAL - REQUIRED FIELD:** When returning the JSON, for EACH page, you MUST include "characterIds": ["${c.id}"]`
   }
 
-  // Faz 2: Prompt bölümlerini oluştur (açılış system'de; tekrar yok)
+  // v3.0.0: System/user split — statik kurallar system'de; user = bu kitaba özgü dinamik veri
+  // Kaldırıldı: buildSafetySection (system'de), buildLanguageSection (system'de)
   const sections = [
     buildCharacterSection(characterDesc, characters),
-    buildStoryRequirementsSection(themeConfig, characterAge, ageGroup, pageCount ?? 12, language, illustrationStyle),
-    ...(customRequests?.trim() ? [buildStorySeedSection(customRequests.trim(), pageCount ?? 12, ageGroup)] : []),
+    buildStoryRequirementsSection(themeConfig, characterAge, readingCfg, pageCount ?? 12, language, illustrationStyle),
+    ...(customRequests?.trim() ? [buildStorySeedSection(customRequests.trim(), pageCount ?? 12)] : []),
     buildSupportingEntitiesSection(theme, characters), // Pets must NOT be duplicated in supportingEntities
-    buildLanguageSection(language),
-    buildAgeAppropriateSection(ageGroup),
-    buildStoryStructureSection(characterName, ageGroup, pageCount ?? 12, characters),
-    buildThemeSpecificSection(themeConfig, ageGroup, theme),
+    buildAgeAppropriateSection(readingCfg),
+    buildStoryStructureSection(characterName, pageCount ?? 12, characters),
+    buildThemeSpecificSection(themeConfig, theme),
     buildVisualDiversitySection(),
-    buildWritingStyleSection(ageGroup, language, characterName, characters),
-    buildSafetySection(ageGroup),
+    buildWritingStyleSection(readingCfg, language, characterName, characters),
     buildIllustrationSection(illustrationStyle, characterName, characters),
-    buildOutputFormatSection(ageGroup, pageCount ?? 12, illustrationStyle, theme, themeConfig, characters || [], characterName),
-    buildVerificationChecklistSection(ageGroup, characterName, themeConfig, pageCount ?? 12, language),
-    `Generate the story now in valid JSON format with EXACTLY ${getPageCount(ageGroup, pageCount)} pages.`
+    buildOutputFormatSection(readingCfg, pageCount ?? 12),
+    buildVerificationChecklistSection(readingCfg, characterName, themeConfig, pageCount ?? 12, language),
+    `Generate the story now in valid JSON format with EXACTLY ${resolveStoryPageCount(pageCount)} pages.`
   ]
   
   return sections.join('\n\n').trim()
@@ -224,105 +233,18 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
 // Helper Functions
 // ============================================================================
 
-function getAgeGroup(age: number): string {
-  if (age <= 3) return 'toddler'
-  if (age <= 5) return 'preschool'
-  if (age <= 7) return 'early-elementary'
-  if (age <= 9) return 'elementary'
-  return 'pre-teen'
-}
-
-function getPageCount(ageGroup: string, override?: number): number {
-  // Debug: Allow page count override (2-20)
+function resolveStoryPageCount(override?: number): number {
   if (override !== undefined && override >= 2 && override <= 20) {
     return override
   }
-  
-  // Varsayılan: 12 sayfa (isteğe göre 2–20 override ile değiştirilebilir)
   return 12
-  
-  // Previous logic (commented out for reference):
-  // const counts: Record<string, number> = {
-  //   toddler: 6,
-  //   preschool: 8,
-  //   'early-elementary': 10,
-  //   elementary: 12,
-  //   'pre-teen': 14,
-  // }
-  // return counts[ageGroup] || 10
 }
 
-function getVocabularyLevel(ageGroup: string): string {
-  const levels: Record<string, string> = {
-    toddler: 'very simple, common words only',
-    preschool: 'simple words, basic concepts',
-    'early-elementary': 'simple to moderate words, some new vocabulary',
-    elementary: 'moderate vocabulary, age-appropriate challenges',
-    'pre-teen': 'rich vocabulary, complex concepts',
-  }
-  return levels[ageGroup] || 'age-appropriate'
-}
-
-function getSentenceLength(ageGroup: string): string {
-  // Aksiyon planı 1.3: mikro "3-5 words" kaldırıldı; doğal kurallar
-  const lengths: Record<string, string> = {
-    toddler: 'very short sentences, simple verbs, lots of repetition',
-    preschool: 'short sentences, simple structure',
-    'early-elementary': 'short to medium sentences',
-    elementary: 'medium sentences, clear cause-effect',
-    'pre-teen': 'medium to long sentences',
-  }
-  return lengths[ageGroup] || 'age-appropriate'
-}
-
-function getComplexityLevel(ageGroup: string): string {
-  const levels: Record<string, string> = {
-    toddler: 'very simple, repetitive, predictable',
-    preschool: 'simple with gentle surprises',
-    'early-elementary': 'moderate with clear cause-effect',
-    elementary: 'moderate complexity with problem-solving',
-    'pre-teen': 'more complex with deeper themes',
-  }
-  return levels[ageGroup] || 'age-appropriate'
-}
-
-/** Yaş bandına göre hedef kelime sayısı (basılı kitap için artırılmış hedefler – 7 Şubat 2026) */
-function getWordCountRange(ageGroup: string): string {
-  const ranges: Record<string, string> = {
-    toddler: '30-45',
-    preschool: '45-65',
-    'early-elementary': '70-95',
-    elementary: '95-125',
-    'pre-teen': '130-180',
-  }
-  return ranges[ageGroup] || '70-95'
-}
-
-/** Yaş bandına göre sayfa başı minimum kelime (CRITICAL talimat ve post-process için) */
-export function getWordCountMin(ageGroup: string): number {
-  const mins: Record<string, number> = {
-    toddler: 30,
-    preschool: 45,
-    'early-elementary': 70,
-    elementary: 95,
-    'pre-teen': 130,
-  }
-  return mins[ageGroup] ?? 70
-}
-
-function getWordCount(ageGroup: string): string {
-  return getWordCountRange(ageGroup)
-}
-
-function getReadingTime(ageGroup: string): number {
-  const times: Record<string, number> = {
-    toddler: 1,
-    preschool: 2,
-    'early-elementary': 3,
-    elementary: 4,
-    'pre-teen': 5,
-  }
-  return times[ageGroup] || 3
+/** `readingAgeBracket` + karakter yaşı ile prompt'taki kelime tablosuyla aynı minimum (doğrulama / repair için). */
+export function getWordCountMinForStoryInput(
+  input: Pick<StoryGenerationInput, 'readingAgeBracket' | 'characterAge'>
+): number {
+  return getReadingAgeBracketConfig(input.readingAgeBracket, input.characterAge).wordsPerPageMin
 }
 
 /**
@@ -356,29 +278,6 @@ function getExampleText(
   }
   
   return examples[ageGroup] || examples['early-elementary']
-}
-
-function getSafetyRules(ageGroup: string) {
-  return {
-    mustInclude: [
-      'Positive, uplifting message',
-      'Age-appropriate problem-solving',
-      'Kindness, friendship, or courage themes',
-      'Safe, supportive environment',
-      'Happy or hopeful ending',
-    ],
-    mustAvoid: [
-      'Violence, fighting, weapons',
-      'Scary monsters, ghosts, or nightmares',
-      'Death, injury, or harm to characters',
-      'Abandonment or separation anxiety',
-      'Adult themes or situations',
-      'Negative stereotypes',
-      'Commercialism or brand names',
-      'Dark, frightening imagery',
-      'Hopeless or sad endings',
-    ],
-  }
 }
 
 function getThemeConfig(theme: string) {
@@ -546,43 +445,6 @@ function getThemeConfig(theme: string) {
   return configs[normalizedTheme] || configs['adventure']
 }
 
-// ============================================================================
-// Educational Focus Helper
-// ============================================================================
-
-function getEducationalFocus(ageGroup: string, theme: string): string {
-  const t = (theme || '').toString().trim().toLowerCase()
-  const normalizedTheme =
-    t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities'
-      ? 'sports'
-      : t
-
-  const focuses: Record<string, string[]> = {
-    toddler: ['colors', 'shapes', 'counting', 'emotions'],
-    preschool: ['sharing', 'kindness', 'curiosity', 'basic concepts'],
-    'early-elementary': ['problem-solving', 'creativity', 'friendship', 'courage'],
-    elementary: ['perseverance', 'teamwork', 'responsibility', 'empathy'],
-    'pre-teen': ['self-confidence', 'resilience', 'critical thinking', 'ethics'],
-  }
-  
-  const themeFocuses: Record<string, string> = {
-    adventure: 'courage and exploration',
-    sports: 'movement, teamwork, and healthy habits',
-    fantasy: 'imagination and creativity',
-    animals: 'empathy and care for animals',
-    'daily-life': 'social-emotional skills',
-    space: 'curiosity and science',
-    educational: 'curiosity, science, and learning',
-    custom: 'creativity and imagination',
-    underwater: 'environmental awareness',
-  }
-  
-  const ageFocus = focuses[ageGroup] || focuses['elementary']
-  const themeFocus = themeFocuses[normalizedTheme] || 'general growth'
-  
-  return `${themeFocus}, ${ageFocus.join(', ')}`
-}
-
 function buildCharacterDescription(
   name: string,
   age: number,
@@ -668,25 +530,30 @@ ${characterDesc}`
 function buildStoryRequirementsSection(
   themeConfig: ReturnType<typeof getThemeConfig>,
   characterAge: number,
-  ageGroup: string,
+  rac: ReadingAgeBracketConfig,
   pageCount: number,
   language: string,
   illustrationStyle: string,
 ): string {
-  const n = getPageCount(ageGroup, pageCount)
-  const wordTarget = getWordCountRange(ageGroup)
-  const wordMin = getWordCountMin(ageGroup)
+  const n = resolveStoryPageCount(pageCount)
+  const wordTarget = wordsPerPageRangeString(rac)
+  const wordMin = rac.wordsPerPageMin
+  const bandNote =
+    rac.id === '0-1'
+      ? '\n- Reading band 0-1: very short, read-aloud friendly lines; rhythm and repetition over plot; stay within the word band above.'
+      : ''
   return `# STORY REQUIREMENTS
 - Theme: ${themeConfig.name} (${themeConfig.mood} mood)
-- Target Age: ${characterAge} years old (${ageGroup} age group)
+- Reading age band: ${rac.id} (listener / reader age range for this book)
+- Character age (illustration reference): ~${characterAge} years old
 - Story Length: EXACTLY ${n} pages (CRITICAL: You MUST return exactly ${n} interior pages, no more, no less. Cover is generated separately.)
-- Words per page: ${wordTarget}. CRITICAL: Each page's "text" must be at least ${wordMin} words. Do not write a page with only 1–2 sentences; expand the narrative, add sensory details or a short dialogue to reach the minimum.
+- Words per page: ${wordTarget}. CRITICAL: Each page's "text" must be at least ${wordMin} words and at most ${rac.wordsPerPageMax} words (count words in the target story language).${bandNote}
 - Language: ${getLanguageName(language)}
 - Illustration Style: ${illustrationStyle}`
 }
 
-function buildStorySeedSection(customRequests: string, pageCount: number, ageGroup: string): string {
-  const n = getPageCount(ageGroup, pageCount)
+function buildStorySeedSection(customRequests: string, pageCount: number): string {
+  const n = resolveStoryPageCount(pageCount)
   return `# STORY SEED
 The author gave this idea for the story. Use it as the starting point.
 - It describes how the story begins (e.g. who, where, what situation). Use that for the opening (pages 1–2).
@@ -713,35 +580,30 @@ function buildSupportingEntitiesSection(
   return `# SUPPORTING ENTITIES (Master-For-All-Entities)
 Identify ADDITIONAL animals and important objects that appear in the story (each gets a master illustration).${excludeRule}
 - Include: only animals/objects that are NOT already in the character list (e.g. a toy, a second animal that is not the family pet, or a key object like a camping photo). Exclude: the family pet (it is already a character); background-only elements (e.g. trees, rocks); character clothing.
+- If a non-character animal/object is central to the action OR appears on 2+ pages, it MUST be listed in supportingEntities. Common misses: teddy bear, ball, map, kite, lantern, boat, toy.
 - Rules: unique name+id per entity; visual description for master; same name throughout; list appearsOnPages.
 - JSON: include "supportingEntities" array with id, type (animal|object), name, description, appearsOnPages. Leave the array empty [] if the only animals/objects in the story are the characters themselves.
+- **Language:** \`name\` and \`description\` must be **English** (they feed the image master API — same rule as imagePrompt).
 
 # SUGGESTED OUTFITS (for master illustrations)
-Output "suggestedOutfits": an object with one entry per character. Keys = character IDs from CHARACTER MAPPING (exact UUIDs). Value for each key = one line in English describing that character's outfit for this story (e.g. "comfortable outdoor clothing, sneakers"; "casual dress, sandals"). Used for master character illustrations so each character's clothing fits the story. Match story setting and theme. If only one character, the object has one key.`
+Output "suggestedOutfits": an object with one entry per character. Keys = character IDs from CHARACTER MAPPING (exact UUIDs). Value for each key = one line in English describing that character's outfit for this story (e.g. "comfortable outdoor clothing, sneakers"; "casual dress, sandals"). Used for master character illustrations so each character's clothing fits the story. Match story setting and theme. If only one character, the object has one key.
+- **Wardrobe consistency:** One outfit description per character applies to the **whole book** (master + page images use the same reference). Use the **same** clothing for all pages unless the story text **explicitly** changes it (e.g. pajamas at night, swimwear at the pool). Do not imply a different outfit per page without a clear story beat.`
 }
 
-function buildLanguageSection(language: string): string {
-  const langName = getLanguageName(language)
-  return `# LANGUAGE
-- **Page "text" only:** Write the story narrative (the "text" field for each page) in ${langName} only. This is what appears in the book. Do not use words from other languages in "text".
-- **All other fields** (imagePrompt, sceneDescription, environmentDescription, coverDescription, coverImagePrompt, shotPlan, characterExpressions, suggestedOutfits): Always in English only. These fields are used for image generation APIs and must be in English.`
-}
-
-function buildAgeAppropriateSection(ageGroup: string): string {
+function buildAgeAppropriateSection(rac: ReadingAgeBracketConfig): string {
   return `# AGE-APPROPRIATE GUIDELINES
-- Vocabulary: ${getVocabularyLevel(ageGroup)}
-- Sentence Length: ${getSentenceLength(ageGroup)}
-- Complexity: ${getComplexityLevel(ageGroup)}
-- Reading Time: ${getReadingTime(ageGroup)} minutes per page`
+- Vocabulary: ${rac.vocabularyLevel}
+- Sentence Length: ${rac.sentenceLength}
+- Complexity: ${rac.complexityLevel}
+- Reading Time: ${rac.readingTimeMinutesPerPage} minutes per page`
 }
 
 function buildStoryStructureSection(
   characterName: string,
-  ageGroup: string,
   pageCount: number,
   characters?: Array<{ id: string; name?: string; type: { displayName: string } }>
 ): string {
-  const n = getPageCount(ageGroup, pageCount)
+  const n = resolveStoryPageCount(pageCount)
   return `# STORY STRUCTURE
 - **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
 - **pages[]:** EXACTLY ${n} items (interior pages only). No cover in this array.
@@ -752,21 +614,24 @@ function buildStoryStructureSection(
 - Tell ONE coherent story; each page = the next natural step in the plot. Do not anchor to a single genre (e.g. only camping or only outdoor): the setting and events must follow the user's theme and STORY SEED.
 - Abstract arc: opening → events unfold → resolution. No fixed checklist of locations; each step must follow from the previous page.
 - If the story seed describes how the story starts, use it for the opening (pages 1–2). Then continue with the natural next steps of that same story — do not stretch one moment across many pages.
+- Each page should change the situation in a small but real way: discovery, question, choice, obstacle, reaction, help, or resolution. Avoid a flat "then we went here, then we went there" rhythm.
 - Each page's imagePrompt and sceneDescription should spell out that step clearly (where we are, what is happening), so each illustration is different.
-- **Setting consistency:** If the STORY SEED names a venue type (e.g. indoor arena, gym, tournament final inside a hall), keep \`coverDescription\`, \`coverImagePrompt\`, every page's \`environmentDescription\`, and scene text aligned with that venue for the whole book. Do not jump mid-story to an outdoor park, open field, grass, or "open sky" stadium unless the user seed clearly asks for outdoor.`
+- **Setting consistency:** If the STORY SEED names a venue type (e.g. indoor arena, gym, tournament final inside a hall), keep \`coverDescription\`, \`coverImagePrompt\`, every page's \`environmentDescription\`, and scene text aligned with that venue for the whole book. Do not jump mid-story to an outdoor park, open field, grass, or "open sky" stadium unless the user seed clearly asks for outdoor.
+
+# SCENE MAP (plan before writing)
+Before writing any page text, build sceneMap[] — one entry per page with: pageNumber, location (specific place name), timeOfDay, setting (one-sentence visual summary). Use this plan to guarantee visual diversity:
+- **All sceneMap strings (location, timeOfDay, setting) must be English** — they are visual-planning fields for the image pipeline, not book text.
+- Each page should have a distinct location OR distinct time of day from adjacent pages.
+- Avoid the same location + same timeOfDay for 3 consecutive pages.
+- The plan guides your imagePrompt and environmentDescription for each page.`
 }
 
 function buildThemeSpecificSection(
   themeConfig: ReturnType<typeof getThemeConfig>,
-  ageGroup: string,
   theme: string
 ): string {
   return `# THEME
-Use a setting, mood, and educational focus that fit the theme "${themeConfig.name}" and target age. Do not list fixed examples; derive them from the story you create.
-
-# DO NOT DESCRIBE VISUAL DETAILS (two rules)
-(a) **pages[].text (story narrative):** No visual details (no appearance, clothing, object colors). Focus on actions, emotions, location, time of day, plot. Narrative only.
-(b) **imagePrompt / sceneDescription:** Do NOT describe character appearance or clothing (master provides that). DO include: lighting, color, composition, atmosphere, camera angle, environment detail. sceneContext = short location/time/action only, in English (derive from THIS story; no fixed sample scene).`
+Use a setting, mood, and educational focus that fit the theme "${themeConfig.name}" and target age. Derive setting and events from the story you create.`
 }
 
 function buildVisualDiversitySection(): string {
@@ -776,24 +641,23 @@ Each page = different scene. Vary location, time of day, perspective, compositio
 - Scene description and imagePrompt: detailed (150+ and 200+ chars).`
 }
 
+function exampleRhythmKeyForReading(rac: ReadingAgeBracketConfig): string {
+  if (rac.id === '0-1' || rac.id === '1-3') return 'toddler'
+  if (rac.id === '3-5') return 'preschool'
+  return 'elementary'
+}
+
 function buildWritingStyleSection(
-  ageGroup: string,
+  rac: ReadingAgeBracketConfig,
   language: string,
   characterName: string,
   characters?: Array<{ name?: string; type: { displayName: string } }>
 ): string {
+  const rhythmKey = exampleRhythmKeyForReading(rac)
   return `# WRITING STYLE
-Each page: ${getWordCount(ageGroup)} words (stay within this range). Include dialogue, sensory details (see, hear, feel), atmosphere. Show, don't just tell. Structure: opening + action/dialogue + emotion + transition. Example (${getLanguageName(language)}): ${getExampleText(ageGroup, characterName, language, characters)}`
-}
-
-function buildSafetySection(ageGroup: string): string {
-  const safetyRules = getSafetyRules(ageGroup)
-  return `# SAFETY RULES (CRITICAL - MUST FOLLOW)
-## MUST INCLUDE:
-${safetyRules.mustInclude.map(rule => `- ${rule}`).join('\n')}
-
-## ABSOLUTELY AVOID:
-${safetyRules.mustAvoid.map(rule => `- ${rule}`).join('\n')}`
+Each page: ${wordsPerPageRangeString(rac)} words (stay within this band). Include dialogue where appropriate for the band, sensory details (see, hear, feel), atmosphere. Show, don't just tell. Structure: opening + action/dialogue + emotion + transition.
+- The story should read like a real picture-book story, not a summary of a day. Use cause-and-effect transitions between pages.
+Example (${getLanguageName(language)}, rhythm reference for this band): ${getExampleText(rhythmKey, characterName, language, characters)}`
 }
 
 function buildIllustrationSection(
@@ -802,97 +666,54 @@ function buildIllustrationSection(
   characters?: Array<{ name?: string; type: { displayName: string } }>
 ): string {
   return `# ILLUSTRATION
-Per page: scene description + detailed image prompt (${illustrationStyle}). Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.
-
-# CHARACTER FACIAL EXPRESSIONS (CRITICAL)
-For each page, describe EACH character's facial expression separately in the characterExpressions object. Use specific visual details of eyes, eyebrows, and mouth—NOT just emotion words.
-
-- GOOD: "eyes wide with surprise, eyebrows raised high, mouth slightly open in astonishment"
-- BAD: "surprised"
-
-Vary expressions by page and by character. Not every character should be 'happy' or 'smiling' on every page. Use expressions that match the scene mood:
-- Sad: downturned mouth, eyebrows raised at inner corners, eyes looking down
-- Worried/Concerned: furrowed eyebrows, tense face, mouth pressed in line
-- Curious: eyes wide, eyebrows slightly raised, head tilted
-- Angry: furrowed eyebrows, narrowed eyes, mouth turned down
-- Focused: narrowed eyes, eyebrows slightly furrowed, mouth closed neutral
-- Surprised: wide eyes, eyebrows raised, mouth open
-- Happy/Joyful: smile (describe if teeth showing, eyes crinkled, etc.)
-- Calm/Gentle: soft closed-mouth smile, relaxed eyebrows, calm eyes
-
-If multiple characters are in the scene, each can have a DIFFERENT expression. Example: one child surprised while adult is calm; or one character laughing while another looks concerned. Make it visual, like a film director's note.`
+Per page: write imagePrompt (200+ chars, cinematic) + sceneDescription (150+ chars). Illustration style: ${illustrationStyle}.
+Apply the cinematic image direction from the system prompt: LIGHTING → DEPTH → COLOR → COMPOSITION → ATMOSPHERE.
+Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.`
 }
 
 function buildOutputFormatSection(
-  ageGroup: string,
+  rac: ReadingAgeBracketConfig,
   pageCount: number,
-  illustrationStyle: string,
-  theme: string,
-  themeConfig: ReturnType<typeof getThemeConfig>,
-  characters: Array<{ id: string; name?: string; type: { displayName: string; group?: string } }>,
-  characterName: string
 ): string {
-  const characterIdsList = characters.map(c => c.id).join(', ')
-  const familyMembers = characters.filter(c => c.type?.group === "Family Members")
-  const familyMembersList = familyMembers.map(c => c.name || c.type.displayName).join(', ')
-  
-  return `# OUTPUT FORMAT (JSON)
-Return a valid JSON object:
-{
-  "title": "Story title",
-  "coverDescription": "English. 2-4 sentences: vivid, reader-friendly summary of what the cover shows (setting, story hook, mood). For humans and UI; may overlap with coverImagePrompt but stay concise.",
-  "coverImagePrompt": "English REQUIRED. 4-8 sentences for the COVER IMAGE API (primary input when combined with system layout). Describe a children's BOOK COVER (not a random interior page): (1) main scene and emotional beat, (2) composition: clear quieter or simpler area in the upper third for title text (e.g. ceiling, soft sky, blurred shelves, gradient wall) matching THIS setting, (3) one strong focal moment, (4) lighting and atmosphere. Do NOT repeat full character appearance (hair, eyes, skin) — the master reference handles that. Use character names from CHARACTER MAPPING for actions only. No typography or written words in the scene.",
-  "pages": [
-    {
-      "pageNumber": 1,
-      "text": "Page text (${getWordCount(ageGroup)} words, dialogue + descriptions)",
-      "imagePrompt": "English only. Detailed ${illustrationStyle} prompt (200+ chars): location, time of day, composition, character action. No appearance/clothing (master). Each page = distinct scene.",
-      "sceneDescription": "English only. Detailed scene (150+ chars): location, time, action, mood. No appearance/clothing.",
-      "environmentDescription": "English only. Specific background/environment for THIS page: what fills the frame (walls, floor, ceiling, horizon, objects, light sources) matching the story — indoor, outdoor, or any setting as required. Story-specific; no generic filler.",
-      "cameraDistance": "wide",
-      "characterIds": ["id-from-CHARACTER-MAPPING"],
-      "characterExpressions": {
-        "character-id-1": "English only. Visual description of THIS character's facial expression for this page (eyes, eyebrows, mouth). Example: 'eyes wide with surprise, eyebrows raised, mouth slightly open'",
-        "character-id-2": "English only. Visual description for second character (if present). Example: 'calm gentle smile, eyes crinkled at corners, relaxed eyebrows'"
-      },
-      "shotPlan": { "shotType": "<string — your choice for this page>", "lens": "<string — focal length for this scene>", "cameraAngle": "<string>", "placement": "<string>", "timeOfDay": "<string — must match this page>", "mood": "<string — must match this page>" }
-    }
-  ],
-  "supportingEntities": [ { "id": "entity-id", "type": "animal"|"object", "name": "Name", "description": "Visual for master", "appearsOnPages": [2,3] } ],
-  "suggestedOutfits": { ${characters.length > 0 ? characters.map(c => `"${c.id}": "one line English outfit"`).join(', ') : '"<uuid-from-CHARACTER_ID_MAP>": "one line English outfit"'} },
-  "metadata": { "ageGroup": "${ageGroup}", "theme": "${theme}", "educationalThemes": [], "safetyChecked": true }
-}
-coverImagePrompt REQUIRED: 4-8 sentences, English, book-cover composition brief (see schema above). Primary scene text for cover image generation before system adds identity/style.
-coverDescription REQUIRED: 2-4 sentences, English, vivid cover summary for readers.
-environmentDescription REQUIRED per page: specific background/environment for that page (not generic templates). Be story-specific.
-cameraDistance REQUIRED per page: "close" | "medium" | "wide" | "establishing". Use "wide" or "establishing" to keep character small in frame (30-40%); use "close" only for emotional close-ups. Vary per page.
-shotPlan REQUIRED per page: six English strings (shotType, lens, cameraAngle, placement, timeOfDay, mood). Replace the angle-bracket hints in the schema with real values for each page; vary timeOfDay and mood across pages when the story allows.
-Required fields and checks: see # VERIFICATION CHECKLIST below.`
+  const n = resolveStoryPageCount(pageCount)
+  return `# OUTPUT FORMAT
+The response_format schema defines the full structure. Key field constraints:
+- sceneMap[]: EXACTLY ${n} entries. Plan all page locations FIRST (before writing pages). Each entry: pageNumber, location, timeOfDay, setting — **all of location, timeOfDay, setting in English**.
+- pages[]: EXACTLY ${n} items. Each page must have all schema fields.
+- imagePrompt per page: 200+ chars, cinematic — apply LIGHTING/DEPTH/COLOR/COMPOSITION/ATMOSPHERE layers.
+- sceneDescription per page: 150+ chars, specific to that step (location, time, action, mood).
+- cameraDistance: "close" | "medium" | "wide" | "establishing". Prefer "wide"/"establishing" (character 30-40% of frame). Vary per page.
+- shotPlan: 6 English strings (shotType, lens, cameraAngle, placement, timeOfDay, mood). All real values — not placeholders.
+- characterIds[]: use exact UUIDs from CHARACTER MAPPING for each page.
+- characterExpressions{}: one key per character on that page — value = visual description (eyes, brows, mouth).
+- suggestedOutfits{}: one key per character UUID from CHARACTER MAPPING — value = one-line English outfit.
+- metadata: { ageGroup, theme, educationalThemes: [], safetyChecked: true } — fill ageGroup="${rac.metadataAgeGroup}".
+See # VERIFICATION CHECKLIST for final checks.`
 }
 
 /** A3: Single verification block – no duplicate verify/check across LANGUAGE, OUTPUT FORMAT, CRITICAL REMINDERS. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md */
 function buildVerificationChecklistSection(
-  ageGroup: string,
+  rac: ReadingAgeBracketConfig,
   characterName: string,
   themeConfig: ReturnType<typeof getThemeConfig>,
   pageCount: number,
   language: string
 ): string {
-  const n = getPageCount(ageGroup, pageCount)
+  const n = resolveStoryPageCount(pageCount)
   const langName = getLanguageName(language)
   return `# VERIFICATION CHECKLIST (before returning JSON)
-- Return EXACTLY ${n} pages. characterIds REQUIRED per page (use IDs from CHARACTER MAPPING).
-- coverImagePrompt REQUIRED: 4-8 sentences, English, book-cover composition (layout + focal moment + lighting + setting). Drives cover image together with pipeline layout.
-- coverDescription REQUIRED: 2-4 sentences, English, reader-facing cover summary.
-- suggestedOutfits REQUIRED: one key per character ID from CHARACTER MAPPING, value = one line English outfit (used for master illustration).
-- characterExpressions REQUIRED per page: one key per character ID in that page's characterIds; value = short English visual description (eyes, eyebrows, mouth).
-- environmentDescription REQUIRED per page: specific background/environment (not generic). Story-specific.
-- cameraDistance REQUIRED per page: "close" | "medium" | "wide" | "establishing". Vary per page; prefer "wide"/"establishing" for most pages.
-- shotPlan REQUIRED per page: shotType, lens, cameraAngle, placement, timeOfDay, mood (English; vary per page).
-- Verify every page "text" is in ${langName}; all other fields in English.
-- Each page = one step in the story; imagePrompt describes that step clearly so each illustration is different.
-- Word count: any page with fewer than ${getWordCountMin(ageGroup)} words must be expanded.
-- ${characterName} = main character in every scene. Positive, age-appropriate, no scary/violent content.`
+- sceneMap[]: EXACTLY ${n} entries (one per page). All pageNumbers present; locations varied across pages.
+- pages[]: EXACTLY ${n} items. characterIds REQUIRED per page (exact UUIDs from CHARACTER MAPPING).
+- coverImagePrompt: 4-8 sentences, English, movie-poster composition (see system). REQUIRED.
+- coverDescription: 2-4 sentences, English, reader-facing summary. REQUIRED.
+- suggestedOutfits: one key per character UUID; value = one-line English outfit. REQUIRED.
+- characterExpressions per page: one key per character on that page; value = visual (eyes, brows, mouth). REQUIRED.
+- environmentDescription per page: specific, story-driven background (not generic). REQUIRED.
+- cameraDistance per page: "close"|"medium"|"wide"|"establishing". Vary; prefer wide/establishing.
+- shotPlan per page: 6 real English strings. Vary timeOfDay and mood across pages.
+- Every page "text" in ${langName}; **title** prefer ${langName} when the book is not English. **All other JSON strings** (sceneMap, supportingEntities, cover fields, per-page visual fields, metadata theme/educationalThemes text): **English only**.
+- Word count: each page "text" must be between ${rac.wordsPerPageMin} and ${rac.wordsPerPageMax} words (in the story language); expand or trim to fit.
+- ${characterName} = main character in every scene. Positive, age-appropriate content.`
 }
 
 // ============================================================================
@@ -913,9 +734,173 @@ function getLanguageName(language: string = 'en'): string {
   return languageMap[language] || 'English'
 }
 
+// ============================================================================
+// Response Schema (A2 + A7) — json_schema response_format
+// ============================================================================
+
+/**
+ * JSON Schema for the story generation response.
+ * Used as response_format: { type: 'json_schema', json_schema: { name: 'story_output', strict: false, schema: buildStoryResponseSchema() } }
+ *
+ * Note: strict: false because suggestedOutfits and characterExpressions have dynamic UUID keys
+ * (cannot define additionalProperties: false for those). Upgrade to strict: true requires
+ * converting those to arrays.
+ *
+ * A7: sceneMap[] — per-page location plan — added to schema and prompt.
+ */
+export function buildStoryResponseSchema() {
+  return {
+    type: 'object',
+    properties: {
+      title: { type: 'string' },
+      coverDescription: { type: 'string' },
+      coverImagePrompt: { type: 'string' },
+      sceneMap: {
+        type: 'array',
+        description: 'One entry per page — planned BEFORE writing pages. English only for location, timeOfDay, setting (image pipeline).',
+        items: {
+          type: 'object',
+          properties: {
+            pageNumber: { type: 'integer' },
+            location: { type: 'string', description: 'English. Specific place name (e.g. "kitchen counter", "moonlit garden")' },
+            timeOfDay: { type: 'string', description: 'English. e.g. "morning", "golden hour", "night"' },
+            setting: { type: 'string', description: 'English. One-sentence visual summary of the environment' },
+          },
+          required: ['pageNumber', 'location', 'timeOfDay', 'setting'],
+        },
+      },
+      pages: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            pageNumber: { type: 'integer' },
+            text: { type: 'string' },
+            imagePrompt: { type: 'string', description: '200+ chars. Cinematic: LIGHTING, DEPTH, COLOR, COMPOSITION, ATMOSPHERE. No appearance/clothing.' },
+            sceneDescription: { type: 'string', description: '150+ chars. Location, time, action, mood.' },
+            environmentDescription: { type: 'string', description: 'Specific background/environment for this page.' },
+            cameraDistance: { type: 'string', enum: ['close', 'medium', 'wide', 'establishing'] },
+            characterIds: { type: 'array', items: { type: 'string' } },
+            characterExpressions: { type: 'object', description: 'Keys = character UUIDs. Values = visual expression (eyes, brows, mouth).' },
+            shotPlan: {
+              type: 'object',
+              properties: {
+                shotType: { type: 'string' },
+                lens: { type: 'string' },
+                cameraAngle: { type: 'string' },
+                placement: { type: 'string' },
+                timeOfDay: { type: 'string' },
+                mood: { type: 'string' },
+              },
+              required: ['shotType', 'lens', 'cameraAngle', 'placement', 'timeOfDay', 'mood'],
+            },
+          },
+          required: [
+            'pageNumber', 'text', 'imagePrompt', 'sceneDescription',
+            'environmentDescription', 'cameraDistance', 'characterIds',
+            'characterExpressions', 'shotPlan',
+          ],
+        },
+      },
+      supportingEntities: {
+        type: 'array',
+        description: 'Non-character entities for master images. name and description must be English.',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            type: { type: 'string', enum: ['animal', 'object'] },
+            name: { type: 'string', description: 'English display name for the entity' },
+            description: { type: 'string', description: 'English visual description for master illustration' },
+            appearsOnPages: { type: 'array', items: { type: 'integer' } },
+          },
+          required: ['id', 'type', 'name', 'description', 'appearsOnPages'],
+        },
+      },
+      suggestedOutfits: { type: 'object', description: 'Keys = character UUIDs. Values = one-line English outfit.' },
+      metadata: {
+        type: 'object',
+        properties: {
+          ageGroup: { type: 'string' },
+          theme: { type: 'string' },
+          educationalThemes: { type: 'array', items: { type: 'string' } },
+          safetyChecked: { type: 'boolean' },
+        },
+        required: ['ageGroup', 'theme', 'educationalThemes', 'safetyChecked'],
+      },
+    },
+    required: [
+      'title', 'coverDescription', 'coverImagePrompt', 'sceneMap',
+      'pages', 'supportingEntities', 'suggestedOutfits', 'metadata',
+    ],
+  }
+}
+
+// ============================================================================
+// System Prompt Builder (v3.0.0 — A1/A5/A6)
+// ============================================================================
+
+/**
+ * Builds the FIXED OpenAI system message for story generation.
+ * Contains: role, safety, language rule, DO NOT DESCRIBE, cinematic imagePrompt directive (A5),
+ * character expressions guide, and cover image (film poster) directive (A6).
+ *
+ * Usage: pass as messages[0].content; generateStoryPrompt() output goes in messages[1].content.
+ */
+export function buildStorySystemPrompt(language: string): string {
+  const langName = getLanguageName(language)
+
+  return `You are a professional children's book author and visual director. Create engaging, age-appropriate stories and return a single valid JSON object — no markdown, no explanation.
+
+# LANGUAGE (CRITICAL)
+- **Reader-facing story text:** only \`pages[].text\` MUST be 100% in ${langName} (every page, dialogue included). If ${langName} is not English, do not write story text in English.
+- **Book title:** \`title\` — prefer ${langName} when the book is not English (matches the reader).
+- **Everything else in the JSON** is for pipelines and image APIs — **English only**: \`sceneMap\` (location, timeOfDay, setting), \`supportingEntities\` (name, description), \`imagePrompt\`, \`sceneDescription\`, \`environmentDescription\`, \`coverDescription\`, \`coverImagePrompt\`, \`shotPlan\`, \`characterExpressions\`, \`suggestedOutfits\`, and **metadata** string fields (\`theme\`, \`educationalThemes\` entries).
+
+# STORY PRINCIPLES
+- Cover is generated separately; pages[] = interior pages only. Do NOT put a cover in pages[].
+- Narrative arc: opening (1-2 pages) → events unfold → resolution. Last page = clear ending.
+- ONE coherent story; each page = the next natural step. No abrupt scene jumps.
+- Avoid itinerary/checklist storytelling. The next page should happen because of the previous page, not just because the character moved somewhere else.
+
+# CONTENT RULES (DO NOT DESCRIBE)
+(a) pages[].text — no visual details: no appearance, clothing, or colors. Narrative only: actions, emotions, location, plot.
+(b) imagePrompt / sceneDescription — do NOT describe character appearance or clothing (the master reference handles identity). DO include: scene, environment, light, composition, atmosphere.
+
+# SAFETY (MUST FOLLOW)
+Include: positive uplifting message, kindness/friendship/courage themes, happy or hopeful ending.
+Avoid: violence, scary monsters, death, injury, abandonment, adult themes, dark imagery, hopeless endings.
+
+# CINEMATIC IMAGE DIRECTION
+Every page's imagePrompt is a scene brief for a cinematic children's book illustration. Structure it with these five layers (200+ chars total):
+- LIGHTING: quality and direction of light (soft morning glow, warm golden hour rays, cool blue dusk, rim lighting from window, diffused overcast, etc.)
+- DEPTH: three layers — foreground detail (small object, floor texture, leaf, dropped item), mid-ground (character in action), background (setting atmosphere). Give each layer at least one visual element.
+- COLOR: dominant palette + accent (warm amber walls with a pop of turquoise, soft pastels with one vivid red element, cool blues with warm lantern glow, etc.)
+- COMPOSITION: camera distance and angle (wide establishing shot from low angle, close-up on hands and object, over-shoulder medium shot, bird's-eye-view, etc.)
+- ATMOSPHERE: emotional tone in environment (golden dust motes, sense of vast open space, cozy warmth, magical shimmer, anticipation in stillness, etc.)
+Do NOT include character appearance or clothing in imagePrompt. Focus on scene, light, color, depth, and atmosphere.
+
+# CHARACTER EXPRESSIONS
+For each page, describe EACH character's facial expression in characterExpressions (keys = character IDs from CHARACTER MAPPING). Use specific visual language — eyes, eyebrows, mouth — NOT just emotion words.
+Good: "eyes wide with surprise, eyebrows raised high, mouth slightly open"
+Bad: "surprised"
+Vary expressions per page and per character. Multiple characters can have different expressions simultaneously (e.g. one laughing while another looks concerned). Think like a film director.
+
+# COVER IMAGE (coverImagePrompt)
+The cover is a MOVIE POSTER for this book — not the opening scene. Capture the story's emotional promise or most iconic moment.
+- Bold, iconic composition with all main characters
+- The setting that best represents this book's world
+- Upper third: clear, simpler area (soft sky gradient, ceiling, blurred background, plain wall) matching THIS story's setting — reserved for title text
+- Do NOT show the first-page scene; show what makes this book special
+- No typography or written words anywhere in the scene
+- 4-8 sentences, English only`
+}
+
 const baseStoryPrompts = {
   VERSION,
   generateStoryPrompt,
+  buildStorySystemPrompt,
+  buildStoryResponseSchema,
 }
 export default baseStoryPrompts
 

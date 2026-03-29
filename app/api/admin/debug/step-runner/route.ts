@@ -19,18 +19,35 @@ import OpenAI from 'openai'
 import { requireUser } from '@/lib/auth/api-auth'
 import { getUserRole } from '@/lib/db/users'
 import { getCharacterById } from '@/lib/db/characters'
-import { createBook, getBookById, updateBook } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
-import type { StoryGenerationInput } from '@/lib/prompts/types'
+import { createBook, getBookById } from '@/lib/db/books'
+import { generateStoryPrompt, buildStorySystemPrompt, buildStoryResponseSchema } from '@/lib/prompts/story/base'
+import type { CharacterDescription, StoryGenerationInput } from '@/lib/prompts/types'
+import { parseReadingAgeBracket } from '@/lib/config/reading-age-brackets'
 import {
   generateMasterCharacterIllustration,
   generateSupportingEntityMaster,
+  mergeBookGenerationMetadata,
   runImagePipeline,
   type DebugTraceEntry,
 } from '@/lib/book-generation/image-pipeline'
 import { generateTts } from '@/lib/tts/generate'
 import { chatWithLog } from '@/lib/ai/chat'
+import { prepareStoryResponseForUse } from '@/lib/ai/story-response-validator'
 import { sanitizeDebugTraceEntries, toPlainJson } from '@/lib/debug/step-runner-sanitize'
+import {
+  DEFAULT_STORY_MODEL,
+  STORY_GENERATION_MAX_OUTPUT_TOKENS,
+  STORY_GENERATION_PROMPT_VERSION,
+} from '@/lib/ai/story-generation-config'
+
+/** Karakter yaşı → books.age_group (story metadata ile uyumlu) */
+function ageToBookAgeGroup(age: number): string {
+  if (age <= 3) return 'toddler'
+  if (age <= 5) return 'preschool'
+  if (age <= 7) return 'early-elementary'
+  if (age <= 9) return 'elementary'
+  return 'pre-teen'
+}
 
 export const maxDuration = 300
 
@@ -46,6 +63,8 @@ interface StepRunnerRequest {
   themeKey: string
   illustrationStyle: string
   language: string
+  /** Wizard / test: Step 1 okuma yaşı bandı; karakterde yoksa story prompt’a bu uygulanır */
+  readingAgeBracket?: string
   customRequests?: string
   pageCount?: number
   storyModel?: string
@@ -104,7 +123,21 @@ export async function POST(request: NextRequest) {
     }
 
     const body: StepRunnerRequest = await request.json()
-    const { operationType, characterIds, themeKey: rawTheme, illustrationStyle, language, customRequests, pageCount, storyModel, sessionBookId, state, targetPageNumber } = body
+    const {
+      operationType,
+      characterIds,
+      themeKey: rawTheme,
+      illustrationStyle,
+      language,
+      readingAgeBracket: readingAgeBracketRaw,
+      customRequests,
+      pageCount,
+      storyModel,
+      sessionBookId,
+      state,
+      targetPageNumber,
+    } = body
+    const readingAgeBracketFromRequest = parseReadingAgeBracket(readingAgeBracketRaw)
 
     if (!operationType) {
       return NextResponse.json({ success: false, error: 'operationType is required' }, { status: 400 })
@@ -128,7 +161,18 @@ export async function POST(request: NextRequest) {
     // ── Dispatch by operationType ─────────────────────────────────────────────
     switch (operationType) {
       case 'story_generation':
-        return await handleStoryGeneration({ user, characters, themeKey, illustrationStyle, language, customRequests, pageCount, storyModel, startedAt })
+        return await handleStoryGeneration({
+          user,
+          characters,
+          themeKey,
+          illustrationStyle,
+          language,
+          customRequests,
+          pageCount,
+          storyModel,
+          startedAt,
+          readingAgeBracketOverride: readingAgeBracketFromRequest,
+        })
 
       case 'image_master':
         return await handleImageMaster({ user, characters, themeKey, illustrationStyle, state, sessionBookId, startedAt })
@@ -161,15 +205,30 @@ export async function POST(request: NextRequest) {
 // story_generation
 // ============================================================================
 
-async function handleStoryGeneration({ user, characters, themeKey, illustrationStyle, language, customRequests, pageCount, storyModel, startedAt }: any) {
+async function handleStoryGeneration({
+  user,
+  characters,
+  themeKey,
+  illustrationStyle,
+  language,
+  customRequests,
+  pageCount,
+  storyModel,
+  startedAt,
+  readingAgeBracketOverride,
+}: any) {
   const character = characters[0]
-  const effectiveStoryModel = storyModel || 'gpt-4.1-mini'
+  const effectiveStoryModel = storyModel || DEFAULT_STORY_MODEL
   const effectivePageCount = pageCount || 4
-  const languageName = LANGUAGE_NAMES[language] || 'English'
+
+  const desc = character.description as CharacterDescription | undefined
+  const storyReadingBracket =
+    readingAgeBracketOverride ?? parseReadingAgeBracket(desc?.readingAgeBracket)
 
   const storyPromptInput: StoryGenerationInput = {
     characterName: character.name,
     characterAge: character.age,
+    readingAgeBracket: storyReadingBracket,
     characterGender: character.gender,
     theme: themeKey,
     illustrationStyle,
@@ -193,15 +252,15 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
   const storyRequestBody = {
     model: effectiveStoryModel,
     messages: [
-      {
-        role: 'system' as const,
-        content: `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. Return exactly the requested number of pages. Write the entire story in ${languageName} only; do not use words from other languages.`,
-      },
+      { role: 'system' as const, content: buildStorySystemPrompt(language) },
       { role: 'user' as const, content: storyPrompt },
     ],
-    response_format: { type: 'json_object' as const },
+    response_format: {
+      type: 'json_schema' as const,
+      json_schema: { name: 'story_output', strict: false, schema: buildStoryResponseSchema() },
+    },
     temperature: 0.8,
-    max_tokens: 8000,
+    max_completion_tokens: STORY_GENERATION_MAX_OUTPUT_TOKENS,
   }
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -211,26 +270,43 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
     userId: user.id,
     characterId: character.id,
     operationType: 'story_generation',
-    promptVersion: 'step-runner-v1',
-    requestMeta: { language, temperature: 0.8, maxTokens: 8000, source: 'step-runner' },
+    promptVersion: STORY_GENERATION_PROMPT_VERSION,
+    requestMeta: { language, temperature: 0.8, source: 'step-runner' },
   })
 
   const durationMs = Date.now() - reqStartedAt
   const storyContent = completion.choices[0].message.content
   if (!storyContent) throw new Error('No story content returned from AI')
 
-  let storyData: any
+  let parsedStoryData: any
   try {
-    storyData = JSON.parse(storyContent)
+    parsedStoryData = JSON.parse(storyContent)
   } catch {
     throw new Error('AI returned invalid JSON for story')
   }
 
-  if (!storyData.title || !storyData.pages || !Array.isArray(storyData.pages)) {
-    throw new Error('Invalid story structure: missing title or pages')
-  }
+  const preparedStory = await prepareStoryResponseForUse({
+    openai,
+    model: effectiveStoryModel,
+    userId: user.id,
+    characterId: character.id,
+    promptVersion: STORY_GENERATION_PROMPT_VERSION,
+    requestMeta: { language, temperature: 0.8, source: 'step-runner' },
+    storyData: parsedStoryData,
+    expectedPageCount: effectivePageCount,
+    characters: characters.map((c: any) => ({ id: c.id, name: c.name })),
+  })
+  const storyData = preparedStory.storyData
+  console.log('[Step Runner] storyRepair:', {
+    repaired: preparedStory.repaired,
+    repairFieldsRequested: preparedStory.repairFieldsRequested,
+    issues: preparedStory.issues,
+  })
 
-  storyData.pages = storyData.pages.map((p: any, idx: number) => ({ ...p, pageNumber: p.pageNumber || idx + 1 }))
+  const resolvedAgeGroup =
+    typeof storyData.metadata?.ageGroup === 'string' && storyData.metadata.ageGroup.trim()
+      ? storyData.metadata.ageGroup.trim()
+      : ageToBookAgeGroup(typeof character.age === 'number' ? character.age : 5)
 
   // Create a debug book to hold the session state
   const { data: newBook } = await createBook(user.id, {
@@ -239,6 +315,7 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
     theme: themeKey,
     illustration_style: illustrationStyle,
     language,
+    age_group: resolvedAgeGroup,
     story_data: storyData,
     total_pages: storyData.pages.length,
     custom_requests: customRequests || null,
@@ -254,11 +331,19 @@ async function handleStoryGeneration({ user, characters, themeKey, illustrationS
         messages: storyRequestBody.messages,
         response_format: storyRequestBody.response_format,
         temperature: storyRequestBody.temperature,
-        max_tokens: storyRequestBody.max_tokens,
+        max_completion_tokens: storyRequestBody.max_completion_tokens,
       },
       response: {
+        // Ham JSON string: openaiChatCompletion.choices[0].message.content (repair öncesi)
+        // parsedStoryJson: prepareStoryResponseForUse sonrası nihai story nesnesi
         openaiChatCompletion: toPlainJson(completion),
         parsedStoryJson: storyData,
+        storyRepair: {
+          repaired: preparedStory.repaired,
+          repairFieldsRequested: preparedStory.repairFieldsRequested,
+          issues: preparedStory.issues,
+          repairCalls: preparedStory.repairCalls,
+        },
         requestDurationMs: durationMs,
       },
     },
@@ -326,8 +411,9 @@ async function handleImageMaster({ user, characters, themeKey, illustrationStyle
   }
 
   if (sessionBookId && Object.keys(masterIllustrations).length > 0) {
-    await updateBook(sessionBookId, {
-      generation_metadata: { masterIllustrations, masterIllustrationCreated: true },
+    await mergeBookGenerationMetadata(sessionBookId, {
+      masterIllustrations,
+      masterIllustrationCreated: true,
     })
   }
 
@@ -387,8 +473,9 @@ async function handleImageEntity({ user, characters, illustrationStyle, state, s
   )
 
   if (sessionBookId && Object.keys(entityMasterIllustrations).length > 0) {
-    await updateBook(sessionBookId, {
-      generation_metadata: { entityMasterIllustrations, entityMasterCreated: true },
+    await mergeBookGenerationMetadata(sessionBookId, {
+      entityMasterIllustrations,
+      entityMasterCreated: true,
     })
   }
 

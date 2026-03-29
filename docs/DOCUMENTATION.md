@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 22 Mart 2026 — PDF çıktı iyileştirme planı: `analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/dev/pdf-preview-test.html`, Cursor agent `.cursor/rules/pdf-generation-manager.mdc`. Önceki: 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
+**Son güncelleme:** 28 Mart 2026 — `analysis/WORKER_QUEUE_BOOK_GENERATION_FLOW.md` eklendi (kuyruk + worker özeti; `createBook-analysis/WORKER_FLOW_TEMP.md` taşındı). Önceki: 22 Mart 2026 — PDF çıktı iyileştirme planı: `analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/dev/pdf-preview-test.html`, Cursor agent `.cursor/rules/pdf-generation-manager.mdc`. Önceki: 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 
@@ -236,22 +236,23 @@ docs/
 12. **analysis/CREATE_BOOK_TIMING_ANALYSIS.md** - Create Book timing özeti; entity master paralel ve TTS pipeline örtüştürme (Şubat 2026)
 13. **analysis/PARALLEL_PROCESSING_ANALYSIS.md** - Kitap oluşturma paralel işleme (sayfa batch, TTS batch ve pipeline örtüştürme)
 14. **analysis/CREATE_BOOK_FLOW_SEQUENCE.md** - Kitap oluşturma akışı, sıra ve paralellik (TTS prewarm, master→kapak→sayfa, Step 6 butonları, timing summary, Google TTS quota); optimizasyon önerileri (OPT-1/2/3)
-15. **analysis/CHARACTER_LIMIT_3_TO_5_ANALYSIS.md** - Kitap oluşturma karakter limiti 3→5 analizi; etkilenen yerler ve dokümantasyon güncellemeleri
-16. **analysis/VISION_ANALYSIS_NECESSITY.md** - Karakter oluşturmada OpenAI Vision analizi; Vision kaldırıldı (2026-03-01), form + referans fotoğraf
-17. **analysis/LOCALIZATION_ANALYSIS.md** - Localization (i18n) analiz ve kararlar; next-intl, URL yapısı, örnek hikaye/karakter isimleri; DEV-1…DEV-10 fazları; ilerleme: implementation/LOCALIZATION_IMPLEMENTATION.md; sorumlu: @localization-agent
-18. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
-19. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
-20. **archive/2026-02/analysis/** - Arşivlenen analizler
-21. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
-22. **analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md** - KidStoryBook → herokidstory marka/proje adı değişikliği (tamamlandı); fazlama (Faz 1–4), kod/doküman/S3/DB/repo liste.
-23. **analysis/KAPAK_CICEK_CERCEVE_LOG_ANALIZI.md** - `logs/ai-api-debug.jsonl` üzerinden kapakta tekrarlayan çiçek/çimen çerçevesi analizi; sorun adımı: `image_cover` (`/v1/images/edits`)
-24. **analysis/GORSEL_PROMPT_VE_TEST_REHBERI.md** — Görsel prompt, log ve test tek giriş; doküman haritası, kod özeti, test checklist
-25. **analysis/PROMPT_ANALIZ_VE_IYILESTIRME.md** — Pipeline önerileri (Ö1–Ö11), log karşılaştırmaları; güncel başlık sürümü dokümanda
-26. **analysis/LOG_YAPRAK_SORUNU_20_MART_2026.md** — Salon/yaprak/sky log analizi; `route.ts` batch hizası notları
-27. **analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md** — Yerel Docker Redis vs EC2 systemd; `db-backup.sh` + S3 `backups/db/`, cron; migration öncesi yedek; PG kullanıcı adı uyumu
-28. **analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md** — Logo/favicon/manifest/Header-Footer/OG entegrasyonu (P0–P1); faz 5–7 beklemede; favicon şeffaflık notu
-29. **analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md** — PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka kuralları; önizleme `public/dev/pdf-preview-test.html`; sorumlu agent: `@pdf-generation-manager` (`.cursor/rules/pdf-generation-manager.mdc`)
-28. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
+15. **analysis/WORKER_QUEUE_BOOK_GENERATION_FLOW.md** - BullMQ `book-generation` kuyruğu ve PM2 worker; çok eşzamanlı kullanıcı, job birikimi, concurrency ve pipeline içi sayfa batch; Mermaid; `CREATE_BOOK_FLOW_SEQUENCE.md` ile birlikte okunur
+16. **analysis/CHARACTER_LIMIT_3_TO_5_ANALYSIS.md** - Kitap oluşturma karakter limiti 3→5 analizi; etkilenen yerler ve dokümantasyon güncellemeleri
+17. **analysis/VISION_ANALYSIS_NECESSITY.md** - Karakter oluşturmada OpenAI Vision analizi; Vision kaldırıldı (2026-03-01), form + referans fotoğraf
+18. **analysis/LOCALIZATION_ANALYSIS.md** - Localization (i18n) analiz ve kararlar; next-intl, URL yapısı, örnek hikaye/karakter isimleri; DEV-1…DEV-10 fazları; ilerleme: implementation/LOCALIZATION_IMPLEMENTATION.md; sorumlu: @localization-agent
+19. **prompts/STORY_IDEAS_PROMPT.md** - Hikaye fikri üretim prompt'u (GPT’ye kopyala-yapıştır; kategori, yaş, çıktı formatı)
+20. **guides/PROMPT_OPTIMIZATION_GUIDE.md** - Prompt optimizasyon rehberi (Sıra 13 sonrası aksiyonlar, relighting, linter açıklamaları)
+21. **archive/2026-02/analysis/** - Arşivlenen analizler
+22. **analysis/AI_REQUEST_LOGGING_ANALYSIS.md** - AI istek/yanıt loglama analizi; `ai_requests` tablo tasarımı, maliyet takibi, entegrasyon noktaları (story/image/TTS/karakter analizi)
+23. **analysis/BRAND_RENAME_KIDSTORYBOOK_TO_HEROKIDSTORY_ANALYSIS.md** - KidStoryBook → herokidstory marka/proje adı değişikliği (tamamlandı); fazlama (Faz 1–4), kod/doküman/S3/DB/repo liste.
+24. **analysis/KAPAK_CICEK_CERCEVE_LOG_ANALIZI.md** - `logs/ai-api-debug.jsonl` üzerinden kapakta tekrarlayan çiçek/çimen çerçevesi analizi; sorun adımı: `image_cover` (`/v1/images/edits`)
+25. **analysis/GORSEL_PROMPT_VE_TEST_REHBERI.md** — Görsel prompt, log ve test tek giriş; doküman haritası, kod özeti, test checklist
+26. **analysis/PROMPT_ANALIZ_VE_IYILESTIRME.md** — Pipeline önerileri (Ö1–Ö11), log karşılaştırmaları; güncel başlık sürümü dokümanda
+27. **analysis/LOG_YAPRAK_SORUNU_20_MART_2026.md** — Salon/yaprak/sky log analizi; `route.ts` batch hizası notları
+28. **analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md** — Yerel Docker Redis vs EC2 systemd; `db-backup.sh` + S3 `backups/db/`, cron; migration öncesi yedek; PG kullanıcı adı uyumu
+29. **analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md** — Logo/favicon/manifest/Header-Footer/OG entegrasyonu (P0–P1); faz 5–7 beklemede; favicon şeffaflık notu
+30. **analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md** — PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka kuralları; önizleme `public/dev/pdf-preview-test.html`; sorumlu agent: `@pdf-generation-manager` (`.cursor/rules/pdf-generation-manager.mdc`)
+31. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

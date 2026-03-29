@@ -12,7 +12,7 @@ import { appConfig } from '@/lib/config'
 import { getCharacterById } from '@/lib/db/characters'
 import { getUserRole } from '@/lib/db/users'
 import { createBook, getUserBooks, updateBook, getBookById, deleteBook } from '@/lib/db/books'
-import { generateStoryPrompt } from '@/lib/prompts/story/base'
+import { generateStoryPrompt, buildStorySystemPrompt, buildStoryResponseSchema } from '@/lib/prompts/story/base'
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
@@ -20,6 +20,19 @@ import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import { generateTts } from '@/lib/tts/generate'
 import { chatWithLog } from '@/lib/ai/chat'
+import {
+  ALLOWED_STORY_MODELS,
+  DEFAULT_STORY_MODEL,
+  DEFAULT_IMAGE_MODEL,
+  DEFAULT_IMAGE_SIZE,
+  DEFAULT_IMAGE_QUALITY,
+  DEFAULT_VISION_MODEL,
+  STORY_GENERATION_MAX_OUTPUT_TOKENS,
+  STORY_GENERATION_PROMPT_VERSION,
+  type AllowedStoryModel,
+} from '@/lib/ai/openai-models'
+import { prepareStoryResponseForUse } from '@/lib/ai/story-response-validator'
+import { parseReadingAgeBracket } from '@/lib/config/reading-age-brackets'
 import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
 import { appendAiDebugLog, sanitizeForDebugLog, summarizeFormData } from '@/lib/debug/ai-debug-log'
 import OpenAI from 'openai'
@@ -38,10 +51,6 @@ function stopAfter(step: string) {
   }
 }
 
-/** Allowed story models for debug/admin override (STORY_QUALITY_IMPROVEMENT_ANALYSIS.md §8) */
-const ALLOWED_STORY_MODELS = ['gpt-4o-mini', 'gpt-4.1-mini', 'gpt-4.1', 'gpt-4o', 'o1-mini'] as const
-type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
-
 /** Maximum number of characters (main + additional) per book. Must match create flow (Step 2). */
 const MAX_CHARACTERS = 5
 
@@ -55,6 +64,104 @@ function normalizeThemeKey(theme: string): string {
   return t
 }
 
+/** From-example: story_data içindeki metin + görsel brief alanlarında eski karakter adını yenisiyle değiştirir. */
+function applyCharacterNameSwapToStoryData(storyData: any, oldName: string, newName: string): void {
+  if (!oldName || !newName || oldName === newName) return
+  const swap = (s: string) => s.split(oldName).join(newName)
+  if (typeof storyData.title === 'string') storyData.title = swap(storyData.title)
+  for (const k of ['coverImagePrompt', 'coverDescription'] as const) {
+    if (typeof storyData[k] === 'string') storyData[k] = swap(storyData[k] as string)
+  }
+  for (const row of storyData.sceneMap || []) {
+    if (row && typeof row === 'object') {
+      for (const fld of ['location', 'setting', 'timeOfDay'] as const) {
+        if (typeof (row as any)[fld] === 'string') (row as any)[fld] = swap((row as any)[fld] as string)
+      }
+    }
+  }
+  for (const page of storyData.pages || []) {
+    const p = page as Record<string, unknown>
+    for (const fld of ['text', 'imagePrompt', 'sceneDescription', 'sceneContext', 'environmentDescription']) {
+      if (typeof p[fld] === 'string') p[fld] = swap(p[fld] as string)
+    }
+  }
+  for (const ent of storyData.supportingEntities || []) {
+    if (ent && typeof ent === 'object') {
+      const e = ent as Record<string, unknown>
+      if (typeof e.name === 'string') e.name = swap(e.name)
+      if (typeof e.description === 'string') e.description = swap(e.description)
+    }
+  }
+}
+
+function buildCharIdMapFromExampleOrder(exampleCharOrder: string[], fromExampleCharIds: string[]): Record<string, string> {
+  const map: Record<string, string> = {}
+  const n = Math.min(exampleCharOrder.length, fromExampleCharIds.length)
+  for (let i = 0; i < n; i++) {
+    map[exampleCharOrder[i]] = fromExampleCharIds[i]
+  }
+  return map
+}
+
+/** Örnek karakter UUID → kullanıcı karakter UUID eşlemesiyle sayfa characterIds, characterExpressions ve suggestedOutfits anahtarlarını günceller. */
+function remapCharacterIdKeyedMapsInStoryData(storyData: any, charIdMap: Record<string, string>): void {
+  if (!storyData?.pages?.length || Object.keys(charIdMap).length === 0) return
+  for (const page of storyData.pages) {
+    const p = page as Record<string, unknown>
+    const ids = p.characterIds as string[] | undefined
+    if (ids?.length) {
+      p.characterIds = ids.map((id) => charIdMap[id] ?? id)
+    }
+    const exprs = p.characterExpressions as Record<string, string> | undefined
+    if (exprs && typeof exprs === 'object' && !Array.isArray(exprs)) {
+      const next: Record<string, string> = {}
+      for (const [oldId, v] of Object.entries(exprs)) {
+        const nid = charIdMap[oldId] ?? oldId
+        if (typeof v === 'string') next[nid] = v
+      }
+      p.characterExpressions = next
+    }
+  }
+  const outfits = storyData.suggestedOutfits
+  if (outfits && typeof outfits === 'object' && !Array.isArray(outfits)) {
+    const nextOut: Record<string, string> = {}
+    for (const [oldId, v] of Object.entries(outfits as Record<string, string>)) {
+      const nid = charIdMap[oldId] ?? oldId
+      nextOut[nid] = v
+    }
+    storyData.suggestedOutfits = nextOut
+  }
+}
+
+/** Örnek kitabın hikâye üretimi denetim alanlarını klon kitapta izlenebilirlik için kopyalar (görsel pipeline alanlarını ezmez). */
+function extractSourceExampleStoryMetadata(exBook: { generation_metadata?: unknown }): Record<string, unknown> {
+  const raw = exBook.generation_metadata
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {}
+  const m = raw as Record<string, unknown>
+  const snapshot: Record<string, unknown> = {}
+  const keys = [
+    'storyPromptVersion',
+    'promptVersion',
+    'model',
+    'tokensUsed',
+    'generationTime',
+    'repaired',
+    'repairFieldsRequested',
+    'repairCalls',
+    'storyRepairIssues',
+    'tokensStory',
+    'tokensRepair',
+    'storyRepairCalls',
+    'storyRepaired',
+    'storyRepairFieldsRequested',
+    'storyGenerationMs',
+  ] as const
+  for (const k of keys) {
+    if (m[k] !== undefined) snapshot[k] = m[k]
+  }
+  return Object.keys(snapshot).length > 0 ? { sourceExampleStoryMetadata: snapshot } : {}
+}
+
 /** From-example: örnek kapak görselinden sahne betimi (top, tavşan, kulübe vb.) alır; kapak prompt'unu zenginleştirmek için. */
 async function describeCoverSceneForPrompt(
   imageUrl: string,
@@ -62,7 +169,7 @@ async function describeCoverSceneForPrompt(
 ): Promise<string> {
   try {
     const visionParams = {
-      model: 'gpt-4o-mini' as const,
+      model: DEFAULT_VISION_MODEL,
       messages: [{
         role: 'user' as const,
         content: [
@@ -258,10 +365,10 @@ async function generateMasterCharacterIllustration(
   // Helper to build FormData for a given prompt
   const buildMasterFormData = (prompt: string) => {
     const fd = new FormData()
-    fd.append('model', 'gpt-image-1.5')
+    fd.append('model', DEFAULT_IMAGE_MODEL)
     fd.append('prompt', prompt)
-    fd.append('size', '1024x1536')
-    fd.append('quality', 'low')
+    fd.append('size', DEFAULT_IMAGE_SIZE)
+    fd.append('quality', DEFAULT_IMAGE_QUALITY)
     fd.append('input_fidelity', 'high')
     fd.append('image[]', imageBlob, `character.${ext}`)
     return fd
@@ -272,9 +379,9 @@ async function generateMasterCharacterIllustration(
     bookId,
     characterId,
     operationType: 'image_master' as const,
-    model: 'gpt-image-1.5',
-    quality: 'low',
-    size: '1024x1536',
+    model: DEFAULT_IMAGE_MODEL,
+    quality: DEFAULT_IMAGE_QUALITY,
+    size: DEFAULT_IMAGE_SIZE,
     refImageCount: 1,
   }
 
@@ -315,7 +422,7 @@ async function generateMasterCharacterIllustration(
   if (debugTracePush) {
     debugTracePush({
       step: debugStep || `master_character_${characterId}`,
-      request: { model: 'gpt-image-1.5', prompt: usedPrompt, size: '1024x1536', quality: 'low', characterId },
+      request: { model: DEFAULT_IMAGE_MODEL, prompt: usedPrompt, size: DEFAULT_IMAGE_SIZE, quality: DEFAULT_IMAGE_QUALITY, characterId },
       response: { url: masterUrl, b64Length: (b64Image as string).length, rawResponse: result },
     })
   }
@@ -354,8 +461,8 @@ async function generateSupportingEntityMaster(
   
   // Call /v1/images/generations API (text-only; no reference image)
   const result = await imageGenerateWithLog(
-    { model: 'gpt-image-1.5', prompt: entityPrompt, size: '1024x1536', quality: 'low' },
-    { userId, bookId, operationType: 'image_entity', model: 'gpt-image-1.5', quality: 'low', size: '1024x1536' }
+    { model: DEFAULT_IMAGE_MODEL, prompt: entityPrompt, size: DEFAULT_IMAGE_SIZE, quality: DEFAULT_IMAGE_QUALITY },
+    { userId, bookId, operationType: 'image_entity', model: DEFAULT_IMAGE_MODEL, quality: DEFAULT_IMAGE_QUALITY, size: DEFAULT_IMAGE_SIZE }
   )
   const b64Image = result.data?.[0]?.b64_json
   if (!b64Image || typeof b64Image !== 'string') {
@@ -370,7 +477,7 @@ async function generateSupportingEntityMaster(
   if (debugTracePush) {
     debugTracePush({
       step: debugStep || `entity_master_${entityName}`,
-      request: { model: 'gpt-image-1.5', prompt: entityPrompt, size: '1024x1536', entityId, entityType, entityName },
+      request: { model: DEFAULT_IMAGE_MODEL, prompt: entityPrompt, size: DEFAULT_IMAGE_SIZE, entityId, entityType, entityName },
       response: { url: entityUrl, b64Length: (b64Image as string).length, rawResponse: result },
     })
   }
@@ -522,7 +629,7 @@ export interface CreateBookRequest {
   customRequests?: string
   pageCount?: number // Debug: Optional page count override (3-20)
   language?: 'en' | 'tr' | 'de' | 'fr' | 'es' | 'zh' | 'pt' | 'ru'
-  storyModel?: string // Story generation model (default: 'gpt-4o-mini')
+  storyModel?: string // Story generation model (default: DEFAULT_STORY_MODEL from openai-models.ts)
   /** When true, create book without payment. Only allowed when DEBUG_SKIP_PAYMENT or user is admin + skipPaymentForCreateBook. */
   skipPayment?: boolean
   /** Create from example: use example book's story_data and images; only swap character via edits (image[] = [exampleImage, master]). */
@@ -535,7 +642,7 @@ export interface CreateBookRequest {
   debugTrace?: boolean
   /** Pre-generated story from debug "Sadece Hikaye" flow; when provided, story generation is skipped and this story is used for masters + cover + page images. */
   story_data?: any
-  // NOTE: imageModel and imageSize removed - now hardcoded to gpt-image-1.5 / 1024x1536 / low
+  // NOTE: imageModel and imageSize removed - single source: lib/ai/openai-models.ts
 }
 
 /** One entry per step when debugTrace is true (docs/analysis/DEBUG_QUALITY_BUTTONS_PLAN.md §10) */
@@ -588,7 +695,7 @@ export async function POST(request: NextRequest) {
       customRequests,
       pageCount, // Debug: Optional page count override (0 or undefined = cover only)
       language = 'en',
-      storyModel = 'gpt-4.1-mini', // Default: GPT-4.1 Mini (daha kaliteli story output)
+      storyModel = DEFAULT_STORY_MODEL,
       skipPayment,
       fromExampleId, // Create from example: same story/scenes, only character swap via edits
       isExample, // Mark as public example (admin only; step6 "Create example book")
@@ -630,16 +737,16 @@ export async function POST(request: NextRequest) {
     const effectiveStoryModel: AllowedStoryModel =
       storyModel && (ALLOWED_STORY_MODELS as readonly string[]).includes(storyModel)
         ? (storyModel as AllowedStoryModel)
-        : 'gpt-4.1-mini'
+        : DEFAULT_STORY_MODEL
 
-    if (effectiveStoryModel !== 'gpt-4.1-mini') {
+    if (effectiveStoryModel !== DEFAULT_STORY_MODEL) {
       console.log(`[Create Book] 🔧 Story model override: ${effectiveStoryModel} (isExample=${!!isExample}, canDebug=${canUseDebugOptions})`)
     }
 
-    // Image generation defaults (hardcoded - no override)
-    const imageModel = 'gpt-image-1.5'
-    const imageSize = '1024x1536' // Portrait orientation
-    const imageQuality = 'low'
+    // Image generation defaults (single source: lib/ai/openai-models.ts)
+    const imageModel = DEFAULT_IMAGE_MODEL
+    const imageSize = DEFAULT_IMAGE_SIZE
+    const imageQuality = DEFAULT_IMAGE_QUALITY
 
     const themeKey = normalizeThemeKey(theme)
 
@@ -757,38 +864,28 @@ export async function POST(request: NextRequest) {
       }
       if (exampleCharOrder.length > 0 && fromExampleCharIds.length > 0) {
         const oldNames = await Promise.all(
-          exampleCharOrder.map((id) => getCharacterById( id).then((r) => r.data?.name ?? ''))
+          exampleCharOrder.map((id) => getCharacterById(id).then((r) => r.data?.name ?? ''))
         )
         const newNames = await Promise.all(
-          fromExampleCharIds.map((id) => getCharacterById( id).then((r) => r.data?.name ?? ''))
+          fromExampleCharIds.map((id) => getCharacterById(id).then((r) => r.data?.name ?? ''))
         )
         const replaceCount = Math.min(oldNames.length, newNames.length)
         for (let i = 0; i < replaceCount; i++) {
           const oldName = (oldNames[i] || '').trim()
           const newName = (newNames[i] || '').trim()
           if (!oldName || !newName || oldName === newName) continue
-          if (storyData.title) storyData.title = (storyData.title as string).split(oldName).join(newName)
-          for (const page of storyData.pages || []) {
-            if ((page as any).text) (page as any).text = (page as any).text.split(oldName).join(newName)
-          }
+          applyCharacterNameSwapToStoryData(storyData, oldName, newName)
         }
-        console.log('[Create Book] 📝 From-example: replaced character names in story and title')
+        console.log('[Create Book] 📝 From-example: replaced character names across story_data text/brief fields')
       }
-      // Sayfa görsellerinde master kullanılsın: örnek karakter ID'lerini kullanıcı karakter ID'leri ile eşleştir (aynı sıra).
-      const charIdMapCount = Math.min(exampleCharOrder.length, fromExampleCharIds.length)
-      if (charIdMapCount > 0) {
-        for (const page of storyData.pages || []) {
-          const ids = (page as any).characterIds as string[] | undefined
-          if (!ids?.length) continue
-          ;(page as any).characterIds = ids.map((id: string) => {
-            const idx = exampleCharOrder.indexOf(id)
-            return idx >= 0 && idx < fromExampleCharIds.length ? fromExampleCharIds[idx]! : id
-          })
-        }
-        console.log('[Create Book] 📝 From-example: replaced characterIds in pages for master lookup')
+      const charIdMap = buildCharIdMapFromExampleOrder(exampleCharOrder, fromExampleCharIds)
+      if (Object.keys(charIdMap).length > 0) {
+        remapCharacterIdKeyedMapsInStoryData(storyData, charIdMap)
+        console.log('[Create Book] 📝 From-example: remapped characterIds, characterExpressions, suggestedOutfits')
       }
       const exTheme = normalizeThemeKey(exBook.theme)
       const exTitle = storyData.title || exBook.title
+      const sourceExampleLineage = extractSourceExampleStoryMetadata(exBook)
       const { data: createdBook, error: bookError } = await createBook(user.id, {
         character_id: character.id,
         title: exTitle,
@@ -801,12 +898,14 @@ export async function POST(request: NextRequest) {
         status: 'draft',
         custom_requests: '',
         images_data: [],
+        source_example_book_id: fromExampleId,
         generation_metadata: {
           imageModel: imageModel,
           imageSize: imageSize,
           mode: 'from-example',
           fromExampleId: fromExampleId,
-          characterIds: characters.map(c => c.id),
+          characterIds: characters.map((c) => c.id),
+          ...sourceExampleLineage,
         },
       })
       if (bookError || !createdBook) {
@@ -847,7 +946,7 @@ export async function POST(request: NextRequest) {
           model: effectiveStoryModel,
           imageModel: imageModel,
           imageSize: imageSize,
-          promptVersion: '1.0.0',
+            promptVersion: STORY_GENERATION_PROMPT_VERSION,
           tokensUsed: 0, // No story generation
           generationTime: 0,
           mode: 'cover-only',
@@ -908,7 +1007,7 @@ export async function POST(request: NextRequest) {
             model: effectiveStoryModel,
             imageModel,
             imageSize,
-            promptVersion: '1.0.0',
+            promptVersion: STORY_GENERATION_PROMPT_VERSION,
             tokensUsed: 0,
             generationTime: 0,
             mode: 'full-book',
@@ -962,6 +1061,13 @@ export async function POST(request: NextRequest) {
         console.log('[Create Book] 📖 Using pre-generated story (no story generation):', storyData.pages.length, 'pages')
       }
 
+      let storyRepairForBook: {
+        repaired: boolean
+        repairFieldsRequested: string[]
+        issues: string[]
+        repairCalls: number
+      } | null = null
+
       if (!storyData) {
       console.log('[Create Book] 📖 Starting story generation...')
 
@@ -969,6 +1075,11 @@ export async function POST(request: NextRequest) {
       const storyPrompt = generateStoryPrompt({
         characterName: character.name,
         characterAge: character.age,
+        readingAgeBracket: parseReadingAgeBracket(
+          character.description && typeof character.description === 'object'
+            ? (character.description as { readingAgeBracket?: unknown }).readingAgeBracket
+            : undefined
+        ),
         characterGender: character.gender,
         theme: themeKey,
         illustrationStyle,
@@ -993,30 +1104,18 @@ export async function POST(request: NextRequest) {
         })),
       })
 
-      const languageNames: Record<string, string> = {
-        en: 'English',
-        tr: 'Turkish',
-        de: 'German',
-        fr: 'French',
-        es: 'Spanish',
-        zh: 'Chinese (Mandarin)',
-        pt: 'Portuguese',
-        ru: 'Russian',
-      }
-      const languageName = languageNames[language] || 'English'
       const storyRequestBody = {
         model: effectiveStoryModel,
         messages: [
-          {
-            role: 'system' as const,
-            content:
-              `You are a professional children's book author. Create engaging, age-appropriate stories with detailed image prompts. Return exactly the requested number of pages. Write the entire story in ${languageName} only; do not use words from other languages.`,
-          },
+          { role: 'system' as const, content: buildStorySystemPrompt(language) },
           { role: 'user' as const, content: storyPrompt },
         ],
-        response_format: { type: 'json_object' as const },
+        response_format: {
+          type: 'json_schema' as const,
+          json_schema: { name: 'story_output', strict: false, schema: buildStoryResponseSchema() },
+        },
         temperature: 0.8,
-        max_tokens: 8000, // 12+ sayfa için güvenli; limitin üzerinde kalması sorun değil
+        max_completion_tokens: STORY_GENERATION_MAX_OUTPUT_TOKENS,
       }
       console.log('[Create Book] 📤 STORY REQUEST sent (model:', effectiveStoryModel, ', prompt length:', storyPrompt.length, ')')
       stopAfter('story_request')
@@ -1029,7 +1128,7 @@ export async function POST(request: NextRequest) {
       // IMPORTANT: do NOT shadow the outer "storyData" variable (used later for image generation)
       let generatedStoryData: any = null
       let lastError: Error | null = null
-      
+
       for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
         try {
           const storyReqStart = Date.now()
@@ -1038,8 +1137,8 @@ export async function POST(request: NextRequest) {
             userId: user.id,
             characterId: characters[0]?.id,
             operationType: 'story_generation',
-            promptVersion: 'v2.6.0',
-            requestMeta: { language, temperature: 0.8, maxTokens: 8000 },
+            promptVersion: STORY_GENERATION_PROMPT_VERSION,
+            requestMeta: { language, temperature: 0.8 },
           })
           const storyReqMs = Date.now() - storyReqStart
           storyMs = storyReqMs
@@ -1050,47 +1149,32 @@ export async function POST(request: NextRequest) {
             throw new Error('No story content generated')
           }
 
-          generatedStoryData = JSON.parse(storyContent)
+          const preparedStory = await prepareStoryResponseForUse({
+            openai,
+            model: effectiveStoryModel,
+            userId: user.id,
+            characterId: characters[0]?.id,
+            promptVersion: STORY_GENERATION_PROMPT_VERSION,
+            requestMeta: { language, temperature: 0.8, source: 'create-book-route' },
+            storyData: JSON.parse(storyContent),
+            expectedPageCount: effectivePageCount,
+            characters: characters.map((char) => ({ id: char.id, name: char.name })),
+          })
+
+          generatedStoryData = preparedStory.storyData
+          storyRepairForBook = {
+            repaired: preparedStory.repaired,
+            repairFieldsRequested: [...preparedStory.repairFieldsRequested],
+            issues: [...preparedStory.issues],
+            repairCalls: preparedStory.repairCalls,
+          }
           console.log('[Create Book] 📥 STORY RESPONSE received (title:', generatedStoryData?.title, ', pages:', generatedStoryData?.pages?.length, ')')
+          console.log('[Create Book] storyRepair:', {
+            repaired: preparedStory.repaired,
+            repairFieldsRequested: preparedStory.repairFieldsRequested,
+            issues: preparedStory.issues,
+          })
           stopAfter('story_response')
-
-          // Validate Story Structure
-          if (!generatedStoryData.title || !generatedStoryData.pages || !Array.isArray(generatedStoryData.pages)) {
-            throw new Error('Invalid story structure from AI')
-          }
-
-          // Validate characterIds field in each page (REQUIRED)
-          for (const page of generatedStoryData.pages) {
-            if (!page.characterIds || !Array.isArray(page.characterIds) || page.characterIds.length === 0) {
-              throw new Error(`Page ${page.pageNumber} is missing required "characterIds" field`)
-            }
-          }
-
-          // Sıra 17: suggestedOutfits REQUIRED – one key per character ID (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
-          const suggestedOutfits = generatedStoryData.suggestedOutfits
-          if (!suggestedOutfits || typeof suggestedOutfits !== 'object') {
-            throw new Error('Story is missing required "suggestedOutfits" object')
-          }
-          for (const char of characters) {
-            const outfit = suggestedOutfits[char.id]
-            if (typeof outfit !== 'string' || !outfit.trim()) {
-              throw new Error(`suggestedOutfits is missing or empty for character ${char.id} (${char.name})`)
-            }
-          }
-
-          // Sıra 17: characterExpressions REQUIRED per page – one key per character in that page (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md)
-          for (const page of generatedStoryData.pages) {
-            const exp = page.characterExpressions
-            if (!exp || typeof exp !== 'object') {
-              throw new Error(`Page ${page.pageNumber} is missing required "characterExpressions" object`)
-            }
-            for (const charId of page.characterIds || []) {
-              const desc = exp[charId]
-              if (typeof desc !== 'string' || !desc.trim()) {
-                throw new Error(`Page ${page.pageNumber} characterExpressions is missing or empty for character ${charId}`)
-              }
-            }
-          }
 
           // Debug trace: full raw story request/response (before trim so you see what API actually returned)
           if (debugTrace) {
@@ -1107,45 +1191,20 @@ export async function POST(request: NextRequest) {
               response: {
                 rawContent: storyContent,
                 parsed: generatedStoryData,
+                storyRepair: {
+                  repaired: preparedStory.repaired,
+                  repairFieldsRequested: preparedStory.repairFieldsRequested,
+                  issues: preparedStory.issues,
+                  repairCalls: preparedStory.repairCalls,
+                },
                 pagesCount: generatedStoryData.pages?.length,
                 usage: completion?.usage,
               },
             })
           }
 
-          // v1.6.0: "clothing" field REMOVED from story schema – visual details from master system only; no validation for clothing
-
-          // Enforce requested pageCount strictly
-          if (effectivePageCount !== undefined && effectivePageCount !== null) {
-            const requestedPages = Number(effectivePageCount)
-            const returnedPages = generatedStoryData.pages.length
-
-            console.log(`[Create Book] 📏 Requested pages: ${requestedPages}, AI returned: ${returnedPages} (attempt ${attempt}/${MAX_RETRIES})`)
-
-            if (returnedPages > requestedPages) {
-              console.warn(`[Create Book] ⚠️  AI returned more pages than requested. Trimming to ${requestedPages} pages.`)
-              generatedStoryData.pages = generatedStoryData.pages.slice(0, requestedPages)
-              break // Success - exit retry loop
-            } else if (returnedPages < requestedPages) {
-              const errorMsg = `AI returned fewer pages than requested (${returnedPages}/${requestedPages})`
-              console.error(`[Create Book] ❌ ${errorMsg} (attempt ${attempt}/${MAX_RETRIES})`)
-              
-              if (attempt < MAX_RETRIES) {
-                console.log(`[Create Book] 🔄 Retrying story generation...`)
-                lastError = new Error(errorMsg)
-                continue // Retry
-              } else {
-                // Last attempt failed
-                throw new Error(`${errorMsg} after ${MAX_RETRIES} attempts`)
-              }
-            } else {
-              // Exact match - success!
-              break // Success - exit retry loop
-            }
-          } else {
-            // No page count specified - accept whatever AI returns
-            break // Success - exit retry loop
-          }
+          console.log(`[Create Book] 📏 Requested pages: ${effectivePageCount}, AI returned: ${generatedStoryData.pages.length} (attempt ${attempt}/${MAX_RETRIES})`)
+          break
         } catch (error: any) {
           lastError = error
           // STOP_AFTER is intentional – do not retry, just rethrow
@@ -1226,7 +1285,7 @@ export async function POST(request: NextRequest) {
           model: effectiveStoryModel,
           imageModel: imageModel,
           imageSize: imageSize,
-          promptVersion: '1.0.0',
+          promptVersion: STORY_GENERATION_PROMPT_VERSION,
           tokensUsed: completion.usage?.total_tokens || 0,
           generationTime: Date.now() - startTime,
           mode: 'full-book',
@@ -1236,6 +1295,12 @@ export async function POST(request: NextRequest) {
             group: "Child",
             value: "Child",
             displayName: c.name,
+          }),
+          ...(storyRepairForBook && {
+            repaired: storyRepairForBook.repaired,
+            repairFieldsRequested: storyRepairForBook.repairFieldsRequested,
+            storyRepairIssues: storyRepairForBook.issues,
+            repairCalls: storyRepairForBook.repairCalls,
           }),
         },
       })

@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story Idea Generator — HeroKidStory (dev)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #14b8a6;
+      --primary-dark: #0d9488;
+      --brand-2: #06b6d4;
+      --page-bg: #ecfdf5;
+      --text: #134e4a;
+      --muted: #5b7c78;
+      --picker-bg: #1e293b;
+      --picker-card: #334155;
+      --picker-border: rgba(148, 163, 184, 0.35);
+      --picker-text: #f1f5f9;
+      --picker-muted: #94a3b8;
+      --danger: #e11d48;
+      --success: #059669;
+      --r: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--page-bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 1rem 2rem;
+    }
+
+    .site-header {
+      background: linear-gradient(135deg, #0f766e 0%, #0e7490 55%, #0891b2 100%);
+      color: #fff;
+      padding: 1.1rem 1.25rem;
+      margin: 0 -1rem 1.25rem;
+      box-shadow: 0 4px 20px rgba(15, 118, 110, 0.22);
+    }
+    .site-header-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+    }
+    .site-logo { height: 44px; width: auto; }
+    .site-header-text h1 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .site-header-text .tagline { font-size: 0.76rem; opacity: 0.9; margin-top: 0.15rem; max-width: 480px; }
+    .site-dev-pill {
+      margin-left: auto;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .wrap { max-width: 1040px; margin: 0 auto; }
+
+    .lead {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1fr minmax(260px, 300px);
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    /* ── Koyu seçim alanı (mockup hissi) ── */
+    .picker-panel {
+      background: var(--picker-bg);
+      border-radius: var(--r);
+      padding: 1.25rem 1.35rem 1.4rem;
+      color: var(--picker-text);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      box-shadow: 0 12px 40px rgba(15, 23, 42, 0.35);
+    }
+    .picker-section-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.85rem;
+      color: #e2e8f0;
+    }
+    .picker-hint {
+      font-size: 0.72rem;
+      color: var(--picker-muted);
+      margin: -0.35rem 0 0.9rem;
+      line-height: 1.45;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.65rem;
+    }
+    @media (max-width: 720px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 420px) {
+      .card-grid { grid-template-columns: 1fr; }
+    }
+
+    .pick-card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+      padding: 0.75rem 0.8rem;
+      border-radius: 12px;
+      border: 2px solid var(--picker-border);
+      background: var(--picker-card);
+      color: var(--picker-text);
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
+      font-family: inherit;
+      min-height: 108px;
+    }
+    .pick-card:hover {
+      border-color: rgba(45, 212, 191, 0.5);
+      transform: translateY(-1px);
+    }
+    .pick-card.selected {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.35);
+    }
+    .pick-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      margin-bottom: 0.45rem;
+    }
+    .pick-card-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .pick-card-desc {
+      font-size: 0.68rem;
+      color: var(--picker-muted);
+      line-height: 1.35;
+    }
+
+    .age-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.55rem;
+    }
+    @media (max-width: 640px) {
+      .age-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .age-card {
+      min-height: auto;
+      padding: 0.65rem 0.7rem;
+    }
+    .age-card .pick-card-desc { font-size: 0.65rem; }
+    .age-extra {
+      font-size: 0.62rem;
+      color: #cbd5e1;
+      font-style: italic;
+      margin-top: 0.25rem;
+      line-height: 1.3;
+    }
+
+    #customThemeWrap {
+      display: none;
+      margin-top: 0.85rem;
+    }
+    #customThemeWrap.show { display: block; }
+    #customThemeText {
+      width: 100%;
+      min-height: 72px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--picker-border);
+      background: #0f172a;
+      color: var(--picker-text);
+      font-family: inherit;
+      font-size: 0.82rem;
+    }
+    #customThemeText::placeholder { color: #64748b; }
+
+    #optionalNudgeWrap {
+      display: block;
+      margin-top: 0.85rem;
+    }
+    #optionalNudgeWrap.hidden { display: none; }
+    #optionalNudge {
+      width: 100%;
+      min-height: 64px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--picker-border);
+      background: #0f172a;
+      color: var(--picker-text);
+      font-family: inherit;
+      font-size: 0.82rem;
+      resize: vertical;
+    }
+    #optionalNudge::placeholder { color: #64748b; }
+    .optional-nudge-hint {
+      font-size: 0.68rem;
+      color: var(--picker-muted);
+      margin: 0.3rem 0 0.45rem;
+      line-height: 1.45;
+    }
+
+    .lang-row {
+      display: flex;
+      gap: 0.45rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--picker-border);
+    }
+    .lang-btn {
+      flex: 1;
+      padding: 0.45rem;
+      border-radius: 8px;
+      border: 1px solid var(--picker-border);
+      background: #0f172a;
+      color: var(--picker-muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--brand-2));
+      color: #fff;
+      border-color: transparent;
+    }
+
+    .optional-hero {
+      margin-top: 0.75rem;
+    }
+    .optional-hero label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--picker-muted);
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .optional-hero input {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--picker-border);
+      background: #0f172a;
+      color: var(--picker-text);
+      font-size: 0.82rem;
+    }
+
+    /* ── Sağ: ayarlar ── */
+    .side-card {
+      background: #fff;
+      border: 1px solid rgba(20, 184, 166, 0.2);
+      border-radius: var(--r);
+      padding: 1.15rem 1.2rem;
+    }
+    .side-card label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 0.35rem;
+    }
+    .side-card input, .side-card select {
+      width: 100%;
+      padding: 0.5rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      font-size: 0.85rem;
+      margin-bottom: 0.85rem;
+    }
+    .key-row { display: flex; gap: 0.35rem; }
+    .key-row input { margin-bottom: 0; }
+    .icon-btn {
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 0 0.6rem;
+      cursor: pointer;
+    }
+    .gen-btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: var(--r);
+      background: linear-gradient(135deg, var(--primary), #0e7490);
+      color: #fff;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.25rem;
+    }
+    .gen-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .history-list {
+      margin-top: 0.75rem;
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .h-item {
+      padding: 0.5rem 0.6rem;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+    .h-item:hover { border-color: var(--primary); }
+
+    /* ── Çıktı ── */
+    .out-wrap {
+      grid-column: 1 / -1;
+      background: #fff;
+      border: 1px solid rgba(20, 184, 166, 0.2);
+      border-radius: var(--r);
+      padding: 1.15rem 1.25rem;
+      margin-top: 0.25rem;
+    }
+    .tab-row { display: flex; gap: 0.4rem; margin-bottom: 0.85rem; }
+    .tab-btn {
+      padding: 0.3rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      background: transparent;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .tab-btn.active {
+      background: rgba(20, 184, 166, 0.12);
+      color: var(--primary-dark);
+      border-color: var(--primary);
+    }
+    .out-box {
+      position: relative;
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+      min-height: 100px;
+    }
+    .placeholder { color: var(--muted); font-size: 0.88rem; font-style: italic; }
+    .out-title {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+    }
+    .out-brief { font-size: 0.9rem; line-height: 1.65; color: var(--text); }
+    .out-meta { margin-top: 0.65rem; font-size: 0.7rem; color: var(--muted); }
+    .copy-btn {
+      position: absolute;
+      top: 0.65rem;
+      right: 0.65rem;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid rgba(20, 184, 166, 0.3);
+      background: #fff;
+      cursor: pointer;
+    }
+    .copy-btn.copied { color: var(--success); border-color: var(--success); }
+    .cr-text {
+      white-space: pre-wrap;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--danger);
+      color: #fff;
+      padding: 0.55rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 300;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    .footer {
+      max-width: 1040px;
+      margin: 1.5rem auto 0;
+      text-align: center;
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 800px) {
+      .grid-main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <img class="site-logo" src="/brand/logo.png" width="120" height="44" alt="HeroKidStory" />
+    <div class="site-header-text">
+      <h1>HeroKidStory</h1>
+      <p class="tagline" id="headerTagline">Story Idea Generator — Sadece tema ve yaş seç; kahraman, fikir ve tonu model üretsin.</p>
+    </div>
+    <span class="site-dev-pill">Dev</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="lead" id="leadText">Çocuğunuz nasıl bir macera yaşasın?</p>
+
+  <div class="grid-main">
+    <div class="picker-panel">
+      <div class="picker-section-title" id="lblThemeSection">Hikaye temanızı seçin</div>
+      <p class="picker-hint" id="hintTheme">Somut hikâyeyi sen yazmıyorsun — sadece yön. Model detayı kendisi türetecek.</p>
+      <div class="card-grid" id="bucketGrid"></div>
+
+      <div id="optionalNudgeWrap">
+        <label for="optionalNudge" style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:0.35rem" id="lblOptionalNudge">İsteğe bağlı yönlendirme</label>
+        <p class="optional-nudge-hint" id="hintOptionalNudge">Hikâyede geçmesini istediğin unsur (hayvan, mekân…). Üstteki isim insan çocuğa aittir.</p>
+        <textarea id="optionalNudge" rows="2" placeholder=""></textarea>
+      </div>
+
+      <div id="customThemeWrap">
+        <label for="customThemeText" style="font-size:0.72rem;color:#94a3b8;display:block;margin-bottom:0.35rem" id="lblCustom">Kendi fikrin (kısa)</label>
+        <textarea id="customThemeText" placeholder="Örn. uzayda çay partisi…"></textarea>
+      </div>
+
+      <div class="picker-section-title" style="margin-top:1.15rem" id="lblAgeSection">Yaş grubu seçin</div>
+      <p class="picker-hint" id="hintAge"><code>reading-age-brackets.ts</code> ile uyumlu aralıklar.</p>
+      <div class="age-grid" id="ageGrid"></div>
+
+      <div class="lang-row">
+        <button type="button" class="lang-btn active" data-lang="tr" onclick="setLang('tr')">🇹🇷 Türkçe</button>
+        <button type="button" class="lang-btn" data-lang="en" onclick="setLang('en')">🇬🇧 English</button>
+      </div>
+
+      <div class="optional-hero">
+        <label for="heroNameOpt" id="lblHeroOpt">Kahraman adı (isteğe bağlı — boşsa model seçer)</label>
+        <input type="text" id="heroNameOpt" placeholder="" />
+      </div>
+    </div>
+
+    <div class="side-card">
+      <label>OpenAI API Key</label>
+      <div class="key-row">
+        <input type="password" id="apiKey" placeholder="sk-…" oninput="localStorage.setItem('sigen_key',this.value)" style="flex:1;margin-bottom:0" />
+        <button type="button" class="icon-btn" onclick="toggleKey()">👁</button>
+      </div>
+      <label>Model</label>
+      <select id="modelSelect">
+        <option value="gpt-4o" selected>gpt-4o — kalite</option>
+        <option value="gpt-4.1">gpt-4.1</option>
+        <option value="gpt-4.1-mini">gpt-4.1-mini — test</option>
+      </select>
+      <button type="button" class="gen-btn" id="genBtn" onclick="generate()"><span id="btnText">✦ Fikir üret</span></button>
+
+      <label style="margin-top:1rem">Geçmiş</label>
+      <div class="history-list" id="historyList"><div style="color:var(--muted);font-size:0.78rem;font-style:italic">Henüz yok</div></div>
+    </div>
+
+    <div class="out-wrap">
+      <div class="tab-row">
+        <button type="button" class="tab-btn active" id="tabBriefBtn" onclick="setTab('brief')">Konu brief</button>
+        <button type="button" class="tab-btn" id="tabCrBtn" onclick="setTab('cr')">Custom request</button>
+      </div>
+      <div id="tabBrief">
+        <div class="out-box">
+          <div id="bPlaceholder" class="placeholder">Tema + yaş seç, «Fikir üret»e bas.</div>
+          <div id="bResult" style="display:none">
+            <button type="button" class="copy-btn" id="cpBrief" onclick="copyBrief()">Kopyala</button>
+            <div class="out-title" id="outTitle"></div>
+            <div class="out-brief" id="outBrief"></div>
+            <div class="out-meta" id="outMeta"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tabCr" style="display:none">
+        <div class="out-box">
+          <div id="crPlaceholder" class="placeholder">Önce üret.</div>
+          <div id="crResult" style="display:none">
+            <button type="button" class="copy-btn" id="cpCr" onclick="copyCr()">Kopyala</button>
+            <div class="cr-text" id="crText"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <code>/dev/story-idea-generator.html</code> — Tek API çağrısı. İsteğe bağlı yönlendirme her temada (Özel hariç); Özel kartta ana fikrini yazarsın.
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  const BUCKETS = [
+    { id: 'adventure', color: '#ea580c', icon: '⛰',
+      tr: { title: 'Macera', desc: 'Heyecanlı yolculuklar ve keşifler (içeriği model uydurur)' },
+      en: { title: 'Adventure', desc: 'Journeys and discovery — the model invents specifics' } },
+    { id: 'fairy_tale', color: '#0d9488', icon: '✦',
+      tr: { title: 'Peri masalı', desc: 'Büyülü, yumuşak fantezi; korku yok' },
+      en: { title: 'Fairy tale', desc: 'Gentle magic — no fear' } },
+    { id: 'learning', color: '#2563eb', icon: '🚀',
+      tr: { title: 'Öğrenme ve keşif', desc: 'Merak, bilim, “neden” anları' },
+      en: { title: 'Learning & discovery', desc: 'Curiosity, science, wonder' } },
+    { id: 'nature', color: '#16a34a', icon: '🌿',
+      tr: { title: 'Doğa ve hayvanlar', desc: 'Dış dünya, dost canlılar' },
+      en: { title: 'Nature & animals', desc: 'Outdoors and creatures' } },
+    { id: 'sports', color: '#dc2626', icon: '🏆',
+      tr: { title: 'Spor ve aktivite', desc: 'Oyun, takım, hareket — somut sahneyi model seçer' },
+      en: { title: 'Sports & play', desc: 'Games, team spirit — model invents the scene' } },
+    { id: 'custom', color: '#9333ea', icon: '✎',
+      tr: { title: 'Özel', desc: 'Kendi kısa fikrini yazarsın' },
+      en: { title: 'Custom', desc: 'You type a short idea' } },
+  ];
+
+  const AGES = [
+    { id: '0-1',
+      tr: { title: '0–1 yaş', line1: 'Bebek — çok az metin, tekrar, duyusal', line2: 'Board book / sesli okuma' },
+      en: { title: '0–1', line1: 'Infant — minimal text, repetition', line2: 'Board book / read-aloud' } },
+    { id: '1-3',
+      tr: { title: '1–3 yaş', line1: 'Erken toddler', line2: 'Çok kısa cümleler' },
+      en: { title: '1–3', line1: 'Early toddler', line2: 'Very short sentences' } },
+    { id: '3-5',
+      tr: { title: '3–5 yaş', line1: 'Okul öncesi', line2: 'Basit olay, nazik sürpriz' },
+      en: { title: '3–5', line1: 'Preschool', line2: 'Simple plot' } },
+    { id: '6+',
+      tr: { title: '6+ yaş', line1: 'Okuma gelişiyor', line2: 'Biraz daha olay ve duygu' },
+      en: { title: '6+', line1: 'Developing reader', line2: 'Richer plot OK' } },
+  ];
+
+  const AGE_MAP = {
+    '0-1': { tr: '0–1 yaş • bebek', en: '0–1 infant' },
+    '1-3': { tr: '1–3 yaş • toddler', en: '1–3 toddler' },
+    '3-5': { tr: '3–5 yaş • okul öncesi', en: '3–5 preschool' },
+    '6+': { tr: '6+ yaş', en: '6+ reader' },
+  };
+
+  const AGE_HINT = {
+    '0-1': 'Age 0–1: one ultra-simple arc; read-aloud; repetition; sensory; no subplots.',
+    '1-3': 'Age 1–3: very short language; concrete; predictable; one beat per page when expanded.',
+    '3-5': 'Age 3–5: simple cause-effect; gentle surprises.',
+    '6+': 'Age 6+: light problem-solving; richer dialogue OK.',
+  };
+
+  const UI = {
+    tr: {
+      lead: 'Çocuğunuz nasıl bir macera yaşasın?',
+      headerTagline: 'Story Idea Generator — Sadece tema ve yaş seç; kahraman, fikir ve tonu model üretsin.',
+      themeSection: 'Hikaye temanızı seçin',
+      hintTheme: 'Somut hikâyeyi sen yazmıyorsun — sadece yön. Model detayı kendisi türetecek.',
+      ageSection: 'Yaş grubu seçin',
+      hintAge: 'Aralıklar lib/config/reading-age-brackets.ts ile uyumludur.',
+      lblOptionalNudge: 'İsteğe bağlı yönlendirme',
+      hintOptionalNudge: 'Buraya hikâyede geçmesini istediğin unsur: hayvan, mekân, nesne… Kahraman adı alanındaki isim her zaman insan çocuğa aittir; bu kutuyu o çocuğa “dönüştürme”.',
+      optionalNudgePh: 'Örn. bir sincap, deniz feneri, korsanlarla tanışma…',
+      lblCustom: 'Kendi fikrin (kısa)',
+      heroOpt: 'Çocuk kahramanın adı (isteğe bağlı — boşsa model seçer)',
+      heroPlaceholder: 'Boş bırak → model çocuk adı seçer',
+      gen: '✦ Fikir üret',
+      bPlaceholder: 'Tema + yaş seç, «Fikir üret»e bas.',
+      customPh: 'Örn. dedenin bahçesinde gizli kapı…',
+    },
+    en: {
+      lead: 'What kind of adventure should your child have?',
+      headerTagline: 'Pick theme + age only; the model invents hero, premise, and tone.',
+      themeSection: 'Choose your story theme',
+      hintTheme: 'You choose direction only — the model invents the specific story.',
+      ageSection: 'Choose age group',
+      hintAge: 'Aligned with reading-age-brackets in the codebase.',
+      lblOptionalNudge: 'Optional direction',
+      hintOptionalNudge: 'Something you want in the story: animal, place, object, motif… The name field is always a human child; do not turn that child into this ingredient.',
+      optionalNudgePh: 'e.g. a squirrel, a lighthouse, meeting pirates…',
+      lblCustom: 'Your idea (short)',
+      heroOpt: 'Child hero’s first name (optional — model chooses if empty)',
+      heroPlaceholder: 'Leave blank → model picks a child’s name',
+      gen: '✦ Generate idea',
+      bPlaceholder: 'Pick theme + age, then Generate.',
+      customPh: 'e.g. a secret door in grandpa’s garden…',
+    },
+  };
+
+  let lang = 'tr';
+  let selectedBucket = 'adventure';
+  let selectedAge = '3-5';
+  let last = null;
+  let hist = JSON.parse(localStorage.getItem('sigen_hist') || '[]');
+
+  function tBucket(b) { return lang === 'tr' ? b.tr : b.en; }
+  function tAge(a) { return lang === 'tr' ? a.tr : a.en; }
+
+  function ageLabelForId(id, l) {
+    const m = AGE_MAP[id];
+    return m ? (l === 'tr' ? m.tr : m.en) : id;
+  }
+
+  function renderPickers() {
+    const bg = document.getElementById('bucketGrid');
+    bg.innerHTML = BUCKETS.map(b => {
+      const T = tBucket(b);
+      const sel = b.id === selectedBucket ? ' selected' : '';
+      return `<button type="button" class="pick-card${sel}" data-bucket="${b.id}" onclick="selectBucket('${b.id}')">
+        <span class="pick-icon" style="background:${b.color}33">${b.icon}</span>
+        <span class="pick-card-title">${T.title}</span>
+        <span class="pick-card-desc">${T.desc}</span>
+      </button>`;
+    }).join('');
+
+    const ag = document.getElementById('ageGrid');
+    ag.innerHTML = AGES.map(a => {
+      const T = tAge(a);
+      const sel = a.id === selectedAge ? ' selected' : '';
+      return `<button type="button" class="pick-card age-card${sel}" data-age="${a.id}" onclick="selectAge('${a.id}')">
+        <span class="pick-card-title">${T.title}</span>
+        <span class="pick-card-desc">${T.line1}</span>
+        <span class="age-extra">${T.line2}</span>
+      </button>`;
+    }).join('');
+
+    syncCustomWrap();
+    syncOptionalNudgeWrap();
+  }
+
+  window.selectBucket = function (id) {
+    selectedBucket = id;
+    renderPickers();
+  };
+
+  window.selectAge = function (id) {
+    selectedAge = id;
+    renderPickers();
+  };
+
+  function syncCustomWrap() {
+    const w = document.getElementById('customThemeWrap');
+    w.classList.toggle('show', selectedBucket === 'custom');
+  }
+
+  function syncOptionalNudgeWrap() {
+    const w = document.getElementById('optionalNudgeWrap');
+    w.classList.toggle('hidden', selectedBucket === 'custom');
+  }
+
+  function applyUiStrings() {
+    const u = UI[lang];
+    document.getElementById('leadText').textContent = u.lead;
+    document.getElementById('headerTagline').textContent = u.headerTagline;
+    document.getElementById('lblThemeSection').textContent = u.themeSection;
+    document.getElementById('hintTheme').textContent = u.hintTheme;
+    document.getElementById('lblAgeSection').textContent = u.ageSection;
+    document.getElementById('hintAge').innerHTML = lang === 'tr'
+      ? 'Aralıklar <code>lib/config/reading-age-brackets.ts</code> ile uyumludur.'
+      : 'Aligned with <code>reading-age-brackets.ts</code>.';
+    document.getElementById('lblOptionalNudge').textContent = u.lblOptionalNudge;
+    document.getElementById('hintOptionalNudge').textContent = u.hintOptionalNudge;
+    document.getElementById('optionalNudge').placeholder = u.optionalNudgePh;
+    document.getElementById('lblCustom').textContent = u.lblCustom;
+    document.getElementById('lblHeroOpt').textContent = u.heroOpt;
+    document.getElementById('heroNameOpt').placeholder = u.heroPlaceholder;
+    document.getElementById('customThemeText').placeholder = u.customPh;
+    document.getElementById('bPlaceholder').textContent = u.bPlaceholder;
+    if (!document.getElementById('genBtn').disabled) document.getElementById('btnText').textContent = u.gen;
+    renderPickers();
+  }
+
+  window.setLang = function (l) {
+    lang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+    applyUiStrings();
+  };
+
+  window.toggleKey = function () {
+    const i = document.getElementById('apiKey');
+    i.type = i.type === 'password' ? 'text' : 'password';
+  };
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  window.setTab = function (t) {
+    document.getElementById('tabBrief').style.display = t === 'brief' ? 'block' : 'none';
+    document.getElementById('tabCr').style.display = t === 'cr' ? 'block' : 'none';
+    document.getElementById('tabBriefBtn').classList.toggle('active', t === 'brief');
+    document.getElementById('tabCrBtn').classList.toggle('active', t === 'cr');
+  };
+
+  window.generate = async function () {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    if (!apiKey) { toast(lang === 'tr' ? 'API key gerekli' : 'API key required'); return; }
+
+    if (selectedBucket === 'custom') {
+      const c = document.getElementById('customThemeText').value.trim();
+      if (!c) { toast(lang === 'tr' ? 'Özel tema için kısa bir fikir yaz' : 'Enter a short custom idea'); return; }
+    }
+
+    const heroInput = document.getElementById('heroNameOpt').value.trim();
+    const model = document.getElementById('modelSelect').value;
+    const ageLabel = ageLabelForId(selectedAge, lang);
+    const ageHint = AGE_HINT[selectedAge] || '';
+    const langLabel = lang === 'tr' ? 'Turkish' : 'English';
+
+    const bMeta = BUCKETS.find(x => x.id === selectedBucket);
+    const bucketHuman = tBucket(bMeta).title;
+    const customNote = selectedBucket === 'custom' ? document.getElementById('customThemeText').value.trim() : '';
+    const optionalNudgeVal = selectedBucket === 'custom'
+      ? ''
+      : document.getElementById('optionalNudge').value.trim();
+
+    const protagonistRules = heroInput
+      ? `PROTAGONIST LOCK: The first name "${heroInput}" belongs to a HUMAN CHILD only. Do not give that exact name to an animal, toy, plant, or weather. Do not make the child become that creature.
+${optionalNudgeVal ? `OPTIONAL DIRECTION = STORY INGREDIENT ONLY: "${optionalNudgeVal}" appears in the story (friend animal, encounter, setting detail, side helper) — not a replacement identity for the child. Right: the human child meets or helps that element; wrong: that element is given the child's exact first name or replaces the child as protagonist. If that ingredient is a creature, do not give it a human first name (see NAMING — SIDE CREATURES).` : ''}`
+      : `Default protagonist: a human child (relatable for parents/readers). Optional direction can shape the world or a non-human co-star, but avoid making the brief confusing unless the direction clearly centers a non-human alone.`;
+
+    const system = `You are a creative children's book concept writer for HeroKidStory.
+The user does NOT want to invent plot details — ONLY a broad theme bucket was chosen.
+YOU must invent everything specific: protagonist personality (one line in your head), a fresh concrete premise inside that bucket, emotional tone, and a gentle challenge. Use high variety — never reuse the same mini-plot twice; do not copy example phrases the user might have seen elsewhere.
+${protagonistRules}
+If the user adds an optional short direction without a locked child name, weave it into the premise in a warm, age-appropriate way — you still choose traits and resolution.
+Output language: ${langLabel}
+Age band: ${ageLabel}
+Age guidance: ${ageHint}
+Safety: no violence, fear, darkness, or scary content; age-appropriate warmth.
+
+NAMING — SIDE CREATURES & OBJECTS: Only the human child protagonist gets a conventional human first name. Animals, plants-as-characters, or objects with personality must NOT receive typical human given names in the brief (${langLabel === 'Turkish' ? 'e.g. do not write "sincap Sinan" or "kaplumbağa Ayşe"' : 'e.g. do not write "squirrel named John"'}). Refer as "bir sincap / a squirrel", "küçük kızıl sincap", "the shy rabbit", or a clearly non-human epithet (sound, color, habit) — not a name parents would give a baby. If you must label one, invent a playful creature tag that does not read as a standard person name.
+
+Output EXACTLY this plain text format (no markdown):
+TITLE: [max 8 words, catchy]
+BRIEF: [2–4 sentences: human child protagonist${heroInput ? ` named "${heroInput}" (spell exactly)` : ' with a fitting first name'}, premise inside the bucket, emotional arc, hint of resolution — NOT page-by-page, NOT a full book]`;
+
+    let userMsg = `Story theme bucket (broad category only): "${bucketHuman}" (internal id: ${selectedBucket})
+Age band: ${ageLabel}
+Output language: ${langLabel}
+`;
+    if (selectedBucket === 'custom') {
+      userMsg += `User's own short seed (respect this direction, expand uniquely): ${customNote}\n`;
+    } else if (optionalNudgeVal) {
+      userMsg += heroInput
+        ? `Story ingredient (NOT the hero's species/name): ${optionalNudgeVal}. If it is an animal, refer without a human given name.\n`
+        : `Optional user direction — include in the premise (child-safe, no fear/violence); invent hero personality and arc: ${optionalNudgeVal}. Non-human side characters: no conventional human first names.\n`;
+    }
+    if (heroInput) {
+      userMsg += `Hero first name (human child only): ${heroInput}\n`;
+    } else {
+      userMsg += `No name given — choose an appropriate hero first name in ${langLabel}.\n`;
+    }
+
+    const btn = document.getElementById('genBtn');
+    const btnText = document.getElementById('btnText');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'system', content: system }, { role: 'user', content: userMsg }],
+          temperature: 0.92,
+          max_tokens: 500,
+        }),
+      });
+      if (!res.ok) {
+        const e = await res.json().catch(() => ({}));
+        throw new Error(e.error?.message || 'HTTP ' + res.status);
+      }
+      const data = await res.json();
+      const raw = data.choices[0]?.message?.content?.trim() || '';
+      const title = (raw.match(/TITLE:\s*(.+)/i) || [])[1]?.trim() || '(?)';
+      const brief = (raw.match(/BRIEF:\s*([\s\S]+)/i) || [])[1]?.trim() || raw;
+
+      last = {
+        title, brief, lang, ageGroup: selectedAge, storyBucket: selectedBucket,
+        bucketLabel: bucketHuman, heroNameInput: heroInput || null,
+        customThemeText: customNote || null,
+        optionalNudge: optionalNudgeVal || null,
+        model, ts: Date.now(),
+      };
+      showOut(last);
+      pushHist(last);
+    } catch (e) {
+      toast((lang === 'tr' ? 'Hata: ' : 'Error: ') + e.message);
+    } finally {
+      btn.disabled = false;
+      btnText.textContent = UI[lang].gen;
+    }
+  };
+
+  function showOut(r) {
+    document.getElementById('bPlaceholder').style.display = 'none';
+    document.getElementById('bResult').style.display = 'block';
+    document.getElementById('outTitle').textContent = r.title;
+    document.getElementById('outBrief').textContent = r.brief;
+    const nudgeMeta = r.optionalNudge
+      ? ` · ↳ ${r.optionalNudge.length > 36 ? r.optionalNudge.slice(0, 36) + '…' : r.optionalNudge}`
+      : '';
+    document.getElementById('outMeta').textContent =
+      `${r.bucketLabel} · ${ageLabelForId(r.ageGroup, r.lang)} · ${r.lang.toUpperCase()} · ${r.model}${nudgeMeta}`;
+
+    const langLbl = r.lang === 'tr' ? 'Türkçe' : 'English';
+    const cr = `Story concept for a 12-page illustrated children's book.
+
+Title: ${r.title}
+
+Concept: ${r.brief}
+
+Context (for editors):
+- User-selected theme bucket only: ${r.bucketLabel} (${r.storyBucket})
+- Protagonist should be a human child${r.heroNameInput ? `; user chose first name: ${r.heroNameInput} (not an animal/object name)` : ''}; personality and premise details are in the concept above
+${r.optionalNudge ? `- User optional direction (woven into concept): ${r.optionalNudge}` : ''}
+${r.customThemeText ? `- User custom seed: ${r.customThemeText}` : ''}
+
+Guidelines:
+- Age group: ${ageLabelForId(r.ageGroup, r.lang)}
+- Book language: ${langLbl}
+- Naming: only the child hero gets a typical human first name; animals and other non-humans — descriptive phrases or non–human-style labels, not baby names (e.g. avoid "squirrel Sinan")
+- Structure: 12 pages — opening, rising discovery, transformation, resolution
+- One main beat per page where possible
+- Warm, age-appropriate tone; no violence or scary content`;
+
+    document.getElementById('crPlaceholder').style.display = 'none';
+    document.getElementById('crResult').style.display = 'block';
+    document.getElementById('crText').textContent = cr;
+  }
+
+  window.copyBrief = function () {
+    const t = document.getElementById('outTitle').textContent;
+    const b = document.getElementById('outBrief').textContent;
+    navigator.clipboard.writeText(t + '\n\n' + b).then(() => flash('cpBrief'));
+  };
+  window.copyCr = function () {
+    navigator.clipboard.writeText(document.getElementById('crText').textContent).then(() => flash('cpCr'));
+  };
+  function flash(id) {
+    const b = document.getElementById(id);
+    b.textContent = lang === 'tr' ? '✓ Kopyalandı' : '✓ Copied';
+    b.classList.add('copied');
+    setTimeout(() => {
+      b.textContent = lang === 'tr' ? 'Kopyala' : 'Copy';
+      b.classList.remove('copied');
+    }, 2000);
+  }
+
+  function pushHist(r) {
+    hist.unshift(r);
+    if (hist.length > 25) hist = hist.slice(0, 25);
+    localStorage.setItem('sigen_hist', JSON.stringify(hist));
+    renderHist();
+  }
+
+  function renderHist() {
+    const el = document.getElementById('historyList');
+    if (!hist.length) {
+      el.innerHTML = '<div style="color:#64748b;font-size:0.78rem;font-style:italic">' + (lang === 'tr' ? 'Henüz yok' : 'Empty') + '</div>';
+      return;
+    }
+    el.innerHTML = hist.map((h, i) =>
+      `<div class="h-item" onclick="loadHist(${i})"><strong>${escapeHtml(h.title)}</strong><br><span style="color:#64748b;font-size:0.72rem">${h.bucketLabel} · ${h.ageGroup}</span></div>`
+    ).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  window.loadHist = function (i) {
+    const h = hist[i];
+    if (!h) return;
+    selectedBucket = h.storyBucket || 'adventure';
+    selectedAge = h.ageGroup || '3-5';
+    if (h.lang) setLang(h.lang);
+    document.getElementById('heroNameOpt').value = h.heroNameInput || '';
+    document.getElementById('optionalNudge').value = h.optionalNudge || '';
+    document.getElementById('customThemeText').value = h.customThemeText || '';
+    renderPickers();
+    last = h;
+    showOut(h);
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const k = localStorage.getItem('sigen_key');
+    if (k) document.getElementById('apiKey').value = k;
+    applyUiStrings();
+    renderHist();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,8 +1,10 @@
 # Story Generation Prompt Template
 
 **Tek kaynak:** `lib/prompts/story/base.ts`  
-**Versiyon (kod):** **2.8.0**  
+**Versiyon (kod):** **3.0.3**  
 Bu doküman, koddaki prompt yapısının okunabilir özetidir. **Tam şema ve metin:** `base.ts` içindeki `generateStoryPrompt` + builder fonksiyonlar (`buildOutputFormatSection`, `buildVerificationChecklistSection`, …).
+
+**Önemli not:** Bu dosya artık kısa özet amaçlıdır. Güncel request yapısı için özellikle `buildStorySystemPrompt()`, `buildStoryResponseSchema()` ve `STORY_GENERATION_DEV_ROADMAP.md` esas alınmalıdır.
 
 **v2.8.0 (20 Mart 2026):** **`coverImagePrompt`** — Kapak görsel API’si için ayrı İngilizce brief (kitap kapağı kompozisyonu, üstte başlık için alan, tek odak, ışık). **`coverDescription`** — kısa okur/UI özeti (2–4 cümle). Pipeline önceliği: `lib/book-generation/image-pipeline.ts` → `resolveCoverEnvironment`: `coverImagePrompt` → `coverDescription` → `coverSetting` → `deriveCoverEnvironmentFromStory`.
 
@@ -22,15 +24,15 @@ Bu doküman, koddaki prompt yapısının okunabilir özetidir. **Tam şema ve me
 
 | Alan | Değer |
 |------|--------|
-| **model** | `storyModel` (örn. gpt-4o-mini) |
+| **model** | `storyModel` (varsayılan: `gpt-4.1-mini`) |
 | **messages** | 2 mesaj: 1 system, 1 user |
-| **response_format** | `{ type: 'json_object' }` |
+| **response_format** | `{ type: 'json_schema', json_schema: { ... } }` |
 | **temperature** | 0.8 |
-| **max_tokens** | 8000 |
+| **max_completion_tokens** | `STORY_GENERATION_MAX_OUTPUT_TOKENS` |
 
 **Parametre kısa açıklamaları:**
 - **temperature (0.8):** Modelin yanıt çeşitliliği. 0’a yakın = daha tekrarlı/öngörülebilir, 1’e yakın = daha yaratıcı/çeşitli. 0.8 hikaye için makul bir denge.
-- **max_tokens (8000):** Yanıtın maksimum uzunluğu (token). 12+ sayfa JSON için güvenli; limitin üzerinde kalması sorun değil, azaltırsan yanıt kesilebilir.
+- **max_completion_tokens:** Yanıtın maksimum completion uzunluğu. Uzun story JSON’larında kesilmeyi azaltmak için tek kaynaktan yönetilir.
 - **2 mesaj (system + user):** API yapısı: system = rol/sabit talimatlar (“Sen çocuk kitabı yazarısın”), user = tek seferlik istek (karakter, tema, sayfa sayısı). Model böyle ayırmayı destekliyor; system mesajı bağlam olarak kalıyor.
 
 ### System message (sabit)

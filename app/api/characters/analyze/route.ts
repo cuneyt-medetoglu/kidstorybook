@@ -10,6 +10,7 @@ import { requireUser } from '@/lib/auth/api-auth'
 import { generateCharacterAnalysisPrompt } from '@/lib/prompts/image/character'
 import { createCharacter } from '@/lib/db/characters'
 import { chatWithLog } from '@/lib/ai/chat'
+import { DEFAULT_CHARACTER_ANALYSIS_MODEL } from '@/lib/ai/openai-models'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       const completion = await chatWithLog(
         openai,
         {
-          model: 'gpt-4o',
+          model: DEFAULT_CHARACTER_ANALYSIS_MODEL,
           messages: [
             {
               role: 'user',
