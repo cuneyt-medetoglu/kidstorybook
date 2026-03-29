@@ -35,14 +35,22 @@ import {
   extractSceneElements,
   type SceneDiversityAnalysis,
 } from '@/lib/prompts/image/scene'
-import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
+import { getStyleDescription } from '@/lib/prompts/image/style-descriptions'
 import { generateTts } from '@/lib/tts/generate'
 import { imageEditWithLog, imageGenerateWithLog, type ImageLogContext } from '@/lib/ai/images'
 import { chatWithLog } from '@/lib/ai/chat'
 import { prepareStoryResponseForUse } from '@/lib/ai/story-response-validator'
 import { appendAiDebugLog, sanitizeForDebugLog, summarizeFormData } from '@/lib/debug/ai-debug-log'
 import { formDataToDebugRecord, sanitizeForStepRunnerDebug } from '@/lib/debug/step-runner-sanitize'
+import {
+  buildCharacterActionForPage,
+  buildPrimaryVisualBrief,
+  formatStoryScenePlanAnchor,
+  getSceneMapRowForPage,
+  mapSceneMapTimeToSceneInput,
+} from '@/lib/book-generation/page-scene-contract'
+import { buildSupportingEntityMasterPrompt, entityAppearsOnPage } from '@/lib/book-generation/supporting-entities'
 
 // ============================================================================
 // Types
@@ -481,6 +489,32 @@ function detectCharactersInPageText(
 // Master illüstrasyon üretimi
 // ============================================================================
 
+/**
+ * D4: Evcil / hayvan karakterler için tür-uyumlu kısa kimlik metni.
+ * `buildCharacterPrompt` insan-merkezli alanlar (ten rengi, saç stili, cinsiyet etiketi)
+ * üretir; bunlar köpek/kedi/vb. için anlamsız ve prompt'u kirletir.
+ * Bu yardımcı yalnızca görsel kimlik için gerekli alanları çıkarır:
+ * - `hairColor` → tüy/kürk rengi (karakter analizi bunu "saç rengi" olarak kaydeder)
+ * - `hairLength` → kürk uzunluğu
+ * - `eyeColor` → göz rengi
+ * Hiçbir insan alanı (ten, cinsiyet etiketi, yüz şekli) eklenmez.
+ */
+function buildPetCharacterBrief(desc: any, animalKind: string | null): string {
+  const parts: string[] = []
+  const coatColor = String(desc?.hairColor || '').trim()
+  const coatLength = String(desc?.hairLength || '').trim()
+  const eyeColor = String(desc?.eyeColor || '').trim()
+  const build = String(desc?.build || '').trim()
+  if (coatColor) {
+    parts.push(coatLength ? `${coatColor}, ${coatLength} coat` : `${coatColor} fur`)
+  }
+  if (eyeColor) parts.push(`${eyeColor} eyes`)
+  if (build && !['normal', 'average', 'fair'].includes(build.toLowerCase())) {
+    parts.push(`${build} build`)
+  }
+  return parts.length > 0 ? parts.join(', ') : (animalKind || 'animal')
+}
+
 export async function generateMasterCharacterIllustration(
   characterPhoto: string,
   characterDescription: any,
@@ -504,28 +538,39 @@ export async function generateMasterCharacterIllustration(
     ...characterDescription,
     gender: characterGender || characterDescription?.gender || 'boy',
   }
-  const characterPrompt = buildCharacterPrompt(fixedDescription, includeAge, true)
-  const styleDirective =
-    illustrationStyle === '3d_animation'
-      ? 'Pixar-style 3D'
-      : illustrationStyle === 'watercolor'
-      ? 'Watercolor'
-      : illustrationStyle
+  // D4: tam stil açıklaması — `STYLE_DESCRIPTIONS` kaynağından; ham keyword ("comic_book") yerine
+  // model'e "bold black outlines, flat fills, halftone" gibi stil DNA'sı iletilir.
+  const styleDirective = getStyleDescription(illustrationStyle)
 
   const outfitPart = !isPet && storyClothing?.trim() ? `Character wearing exactly: ${storyClothing}. ` : ''
+
+  // D4: Evcil için buildCharacterPrompt KULLANILMAZ (insan alanları: ten, cinsiyet etiketi, saç stili).
+  // buildPetCharacterBrief yalnızca tür-uyumlu kimlik alanlarını (tüy rengi, göz rengi) çıkarır.
+  const characterPrompt = isPet
+    ? buildPetCharacterBrief(characterDescription, animalKind)
+    : buildCharacterPrompt(fixedDescription, includeAge, true)
 
   let masterPrompt: string
   let softMasterPrompt: string
 
   if (isPet) {
+    // D4: Style-first — stil tanımı öne alındı, "match reference" sadece kimlik ipuçlarıyla sınırlandı.
+    // "Match reference photo" → "Match reference for breed/markings/proportions only; apply full illustration style."
     masterPrompt = [
-      `[STYLE] ${styleDirective}, children's book illustration [/STYLE]`,
-      `Full body, all four paws visible, natural standing or sitting pose. ${animalKind} animal. ${characterPrompt}. Plain neutral background. Illustration style (NOT photorealistic). Match reference photo for fur color, markings, body shape and face.`,
-    ].join(' ')
+      `[STYLE] ${styleDirective} [/STYLE]`,
+      `Render a ${animalKind} fully in the illustration style described above — NOT photorealistic, NOT a real photo.`,
+      characterPrompt ? `Identifying features from reference: ${characterPrompt}.` : '',
+      `Full body, all four paws visible, natural standing or sitting pose.`,
+      `Use the reference image ONLY to match: breed type, fur/coat color pattern, body markings, and body proportions. Apply the full illustration style to ALL other aspects.`,
+      `Plain neutral background. Children's book illustration.`,
+    ].filter(Boolean).join(' ')
     softMasterPrompt = [
-      `[STYLE] ${styleDirective}, children's book illustration [/STYLE]`,
-      `Full body view. Friendly ${animalKind}, relaxed pose. ${characterPrompt}. Plain neutral background. Illustration style only (NOT photorealistic). Match reference photo. Child-safe illustration for children's book.`,
-    ].join(' ')
+      `[STYLE] ${styleDirective} [/STYLE]`,
+      `A friendly ${animalKind} illustrated in the above style — NOT photorealistic.`,
+      characterPrompt ? `Identifying features: ${characterPrompt}.` : '',
+      `Full body, relaxed pose. Match reference for breed markings only; apply full illustration style throughout.`,
+      `Plain neutral background. Children's book illustration.`,
+    ].filter(Boolean).join(' ')
   } else {
     masterPrompt = [
       '[ANATOMY] 5 fingers each hand separated, arms at sides, 2 arms 2 legs, symmetrical face (2 eyes 1 nose 1 mouth) [/ANATOMY]',
@@ -534,7 +579,7 @@ export async function generateMasterCharacterIllustration(
       `Full body, standing, feet visible, neutral pose. Child from head to toe. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style (NOT photorealistic). Match reference photos for face and body.`,
     ].join(' ')
     softMasterPrompt = [
-      `[STYLE] ${styleDirective}, children's book illustration [/STYLE]`,
+      `[STYLE] ${styleDirective} — children's book illustration [/STYLE]`,
       '[EXPRESSION] Gentle facial expression, calm soft smile, relaxed. [/EXPRESSION]',
       `Standing, neutral pose, fully clothed. ${characterPrompt}. ${outfitPart}Plain neutral background. Illustration style only (NOT photorealistic). Match reference photo for face and hair. Fully clothed character. Child-safe illustration for children's book.`,
     ].join(' ')
@@ -651,18 +696,10 @@ export async function generateSupportingEntityMaster(
   bookId?: string,
   stepRunnerTrace?: DebugTraceEntry[]
 ): Promise<string> {
-  const styleDirective = getStyleDescription(illustrationStyle)
-  const cinematicPack = getCinematicPack()
-  const entityPrompt = [
-    `[STYLE] ${styleDirective} [/STYLE]`,
-    `[CINEMATIC] ${cinematicPack}. Consistent lighting and material with the book style. [/CINEMATIC]`,
-    `Neutral front-facing view. ${entityDescription}.`,
-    `Plain neutral background. Illustration style (NOT photorealistic).`,
-    entityType === 'animal'
-      ? 'Friendly and appealing animal character.'
-      : 'Clear and recognizable object.',
-    "Centered in frame. Simple, clean, professional children's book illustration.",
-  ].join(' ')
+  const entityPrompt = buildSupportingEntityMasterPrompt(
+    { name: entityName, description: entityDescription, type: entityType },
+    illustrationStyle
+  )
 
   const result = await imageGenerateWithLog(
     { model: IMAGE_MODEL, prompt: entityPrompt, size: IMAGE_SIZE, quality: IMAGE_QUALITY },
@@ -1477,23 +1514,20 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
             const i = batchStart + batchIndex
             const pageNumber = page.pageNumber || i + 1
 
-            let sceneDescription = page.imagePrompt || page.sceneDescription || page.text
-            const ageGroup = storyData.metadata?.ageGroup || 'preschool'
-            const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
-
             const pageWithContext = page as {
               sceneContext?: string
               sceneDescription?: string
               imagePrompt?: string
               text?: string
             }
-            const characterActionRaw =
-              pageWithContext.sceneContext?.trim() ||
-              pageWithContext.sceneDescription?.trim() ||
-              pageWithContext.imagePrompt?.trim() ||
-              page.text?.trim() ||
-              ''
-            const riskAnalysis = detectRiskySceneElements(sceneDescription ?? '', characterActionRaw)
+            const primaryVisualBrief = buildPrimaryVisualBrief(pageWithContext)
+            const sceneMapRow = getSceneMapRowForPage(storyData, pageNumber)
+            const storyScenePlanAnchor = formatStoryScenePlanAnchor(sceneMapRow)
+            const ageGroup = storyData.metadata?.ageGroup || 'preschool'
+            const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
+
+            const characterActionRaw = buildCharacterActionForPage(pageWithContext)
+            const riskAnalysis = detectRiskySceneElements(primaryVisualBrief, characterActionRaw)
             const characterAction = riskAnalysis.hasRisk
               ? getSafeSceneAlternative(characterActionRaw)
               : characterActionRaw
@@ -1538,9 +1572,14 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
             const pageEnvironmentDescription = (page as any).environmentDescription?.trim() || undefined
             const pageCameraDistance = (page as any).cameraDistance || undefined
 
+            const timeOfDayFromPlan =
+              !pageShotPlan?.timeOfDay?.trim() && sceneMapRow
+                ? mapSceneMapTimeToSceneInput(sceneMapRow.timeOfDay)
+                : undefined
+
             const sceneInput = {
               pageNumber,
-              sceneDescription: sceneDescription ?? '',
+              sceneDescription: primaryVisualBrief,
               theme: themeKey,
               mood,
               characterAction: characterAction ?? '',
@@ -1550,6 +1589,8 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
               ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
               ...(pageEnvironmentDescription && { environmentDescription: pageEnvironmentDescription }),
               ...(pageCameraDistance && { cameraDistance: pageCameraDistance }),
+              ...(storyScenePlanAnchor && { storyScenePlanAnchor }),
+              ...(timeOfDayFromPlan && { timeOfDay: timeOfDayFromPlan }),
             }
 
             const mainCharacter =
@@ -1574,7 +1615,7 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
             const additionalCharactersCount = pageAdditionalCharacters.length
 
             const currentSceneAnalysis = analyzeSceneDiversity(
-              sceneDescription ?? '',
+              primaryVisualBrief,
               page.text || '',
               pageNumber,
               sceneDiversityAnalysis
@@ -1611,7 +1652,7 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
             const pageEntityIds: string[] = []
             if (storyData?.supportingEntities) {
               for (const entity of storyData.supportingEntities) {
-                if (entity.appearsOnPages && entity.appearsOnPages.includes(pageNumber)) {
+                if (entityAppearsOnPage(entity, pageNumber, totalPages)) {
                   const entityName = (entity.name || '').trim().toLowerCase()
                   if (entityName && characterNames.has(entityName)) continue
                   pageEntityIds.push(entity.id)
@@ -1779,7 +1820,7 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
             if (debugTrace) {
               debugTrace.push({
                 step: `page_${pageNumber}`,
-                request: { prompt: fullPrompt, sceneDescription, pageNumber },
+                request: { prompt: fullPrompt, sceneDescription: primaryVisualBrief, pageNumber },
                 response: { url: storageImageUrl },
               })
             }

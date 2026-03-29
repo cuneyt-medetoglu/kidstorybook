@@ -1,8 +1,8 @@
 # Story generation — geliştirme yol haritası
 
-**Son güncelleme:** 29 Mart 2026 — **Faz 1 (story_generation) kapanış:** A/B/C tamam; from-example lineage (`source_example_book_id`, `sourceExampleStoryMetadata`, ad/UUID eşlemesi) bu tarihle kodlandı. **Sıradaki faz: D** (görsel pipeline sertleştirme / entegrasyon).  
-**Tek odak (bu dosya):** `story_generation` — OpenAI çağrısına giden **request** ve dönen **response** (JSON).  
-**Bu dokümanda yok:** master, kapak **pikseli**, sayfa **pikseli** (görsel üretim ayrı adımlar; model tablosu aşağıda ayrıca belirtilir).
+**Son güncelleme:** 29 Mart 2026 — A/B/C çekirdek tamam; **B genişletmesi:** `strict: false` kaynaklı sapmalar için **normalleştirme katmanı** (`cameraDistance`, `supportingEntities.type`, `metadata.ageGroup` / `safetyChecked` / `educationalThemes`, `shotPlan` boş alanlar, `characterIds` tek string, `appearsOnPages`) — `lib/ai/story-camera-distance.ts`, `lib/ai/story-response-normalize-fields.ts`, `prepareStoryResponseForUse` içinde `normalizeStoryShape`. **D1–D4** checklist tamamlandı; **master** tarafında evcil + tam `getStyleDescription` (`image-pipeline.ts`). **Debug:** `StepRunnerPanel` request/response JSON **tek tık kopyala**.  
+**Tek odak (bu dosya):** `story_generation` metin/JSON + bu dosyadaki **D** özeti (görsel zincir girişleri).  
+**Ayrıntılı görsel adımlar:** `IMAGE_PIPELINE_ROADMAP` yoksa buradaki D + sıradaki faz bölümü yeter; ileride `docs/analysis/IMAGE_PIPELINE_ROADMAP.md` açılabilir.
 
 **Kod:** `lib/prompts/story/base.ts` (`generateStoryPrompt`) · API: `app/api/books/route.ts`, `app/api/ai/generate-story/route.ts`, debug: `app/api/admin/debug/step-runner/route.ts`  
 **Prompt özeti (kodla senkron):** `docs/prompts/STORY_PROMPT_TEMPLATE.md` · **İş akışı:** `.cursor/rules/prompt-manager.mdc`
@@ -14,7 +14,7 @@
 | **A** | Request (prompt + API parametreleri) | Story girdi tarafı — **tamam** |
 | **B** | Response (JSON şema, parse, pipeline uyumu) | Validator + repair — **tamam (çekirdek)** |
 | **C** | Merkezi model config (`lib/ai/openai-models.ts`) | **Tamam** |
-| **D** | Görsel pipeline (master → entity → kapak → sayfa pikseli) | **Sıradaki** — aşağıdaki D checklist |
+| **D** | Görsel pipeline (master → entity → kapak → sayfa pikseli) | **Çekirdek maddeler tamam** — sıradaki: **Entity master / kapak / sayfa** doğrulama ve kalite (aşağı “Sıradaki faz”) |
 
 Harf sırası = önerilen ürün sırası: önce story (A/B), sonra modeller (C), sonra piksel adımları (D).
 
@@ -131,9 +131,9 @@ Sırayla ilerle; her madde sonrası mümkünse test + kısa değerlendirme.
   - `app/api/admin/debug/step-runner/route.ts`
   - `lib/book-generation/image-pipeline.ts`
 - Bu katman:
-  - story JSON’u normalize eder
+  - story JSON’u **normalizeStoryShape** ile zenginleştirir: `pages[].cameraDistance`, `shotPlan`, `characterIds`, `supportingEntities[].type` / `appearsOnPages`, `metadata` (`ageGroup`, `safetyChecked`, `educationalThemes`, `theme` trim) — ayrıntı: `story-camera-distance.ts`, `story-response-normalize-fields.ts`
   - `coverDescription`, `coverImagePrompt`, `sceneMap`, `supportingEntities`, `suggestedOutfits` eksik/bozuksa hedefli repair ister
-  - sonrasında zorunlu alanları runtime’da sert doğrular
+  - sonrasında zorunlu alanları runtime’da sert doğrular (`metadata.ageGroup` bilinen beş değerden biri olmalı)
 - Pratik sonuç: model bazen güzel bir hikaye dönse bile response gevşek kaldığında pipeline’a “yarım iyi” JSON sızması azalır.
 
 ### Story repair akışı (kısa)
@@ -187,19 +187,19 @@ Examples / hazır içerik stratejisi: `docs/analysis/READY_STORIES_AND_IDEAS_PIP
 | C3 | İsteğe bağlı: env override (`OPENAI_STORY_MODEL`, `OPENAI_IMAGE_MODEL` vb.) | Zorunlu değil; ihtiyaç doğarsa ekle |
 | ~~C4~~ ✅ | `ALLOWED_STORY_MODELS` tek kaynaktan; debug UI dinamik liste | `StepRunnerPanel` ve `step6/page.tsx` import ediyor |
 
-**C tamamlandı (28 Mart 2026):** `lib/ai/openai-models.ts` — tek nokta. Model değiştirmek için bu dosyaya bakılır. `tsc --noEmit` temiz.
+**C — onaylı kapanış (çekirdek):** C1, C2, C4 üretimde tamam ve dokümanda **onaylı** sayılır. C3 bilinçli şekilde açık bırakıldı (isteğe bağlı). **Tek kaynak:** `lib/ai/openai-models.ts` · `tsc --noEmit` temiz.
 
 ---
 
-## D) Görsel pipeline — sıradaki faz
+## D) Görsel pipeline — checklist özeti
 
-**Tek odak:** Story JSON üretildikten sonra — **master** (karakter), **entity master** (`supportingEntities`), **kapak** ve **sayfa** görselleri (Images API). Story’deki `imagePrompt`, `sceneDescription`, `environmentDescription`, `coverImagePrompt`, `sceneMap` burada birleştirilir veya tüketilir.
+**Akış:** Story JSON sonrası — **master** (karakter), **entity master** (`supportingEntities`), **kapak**, **sayfa** görselleri (Images API). Story alanları (`imagePrompt`, `sceneDescription`, `environmentDescription`, `coverImagePrompt`, `sceneMap`, …) burada birleştirilir veya tüketilir.
 
 **Kod (giriş):** `lib/book-generation/image-pipeline.ts` · `lib/prompts/image/scene.ts`, `character.ts`, `style-descriptions.ts` · `app/api/books/route.ts` (master/entity yardımcıları)
 
 **sceneMap / shotPlan / “uzun” sahne metni (şu anki durum):**
 
-- **`sceneMap[]`:** Sayfa başına **kısa** satır planı (location, timeOfDay, setting) — hikâye üretiminde zorunlu/validate edilir; görsel pipeline’da **tam entegrasyon** (öncelik sırası, tekrarın önlenmesi) D fazında netleşecek. Şimdilik story tarafında “plan + İngilizce görsel alanları” garantisi için var.
+- **`sceneMap[]`:** Sayfa başına **kısa** plan (location, timeOfDay, setting). **D1 (29.03.2026):** İç sayfada `generateFullPagePrompt` öncesinde `SceneInput.storyScenePlanAnchor` + gerektiğinde `timeOfDay` (`shotPlan` yoksa); `characterAction` artık uzun `imagePrompt` ile iki kez doldurulmuyor — `lib/book-generation/page-scene-contract.ts`.
 - **`shotPlan` (sayfa):** Opsiyonel **kompozisyon ipuçları**; kodda `generate-images` / `books` akışından `scene` girdisine **aktarılıyor** (`buildShotPlanBlock` vb.). Derin kullanım ve varsayılanlar D ile genişletilebilir.
 - **`pages[].imagePrompt` (ve ilgili sahne alanları):** Sayfa başına **uzun** görsel brief — piksel üretiminde doğrudan ana malzeme; kısa `sceneMap` satırı bunun yerine geçmez, **tamamlayıcı** katman (plan vs detaylı sahne tarifi).
 
@@ -209,12 +209,26 @@ Examples / hazır içerik stratejisi: `docs/analysis/READY_STORIES_AND_IDEAS_PIP
 
 | # | İş | Not |
 |---|-----|-----|
-| D1 | Story çıktısı → sahne/kapak prompt zinciri | `sceneMap` / sayfa alanlarının `generateFullPagePrompt` ve kapak çözümünde öncelik sırası; tekrar veya çelişki var mı |
-| D2 | `supportingEntities` → master üretim | Açıklama dili (tercihen İngilizce image brief), `appearsOnPages` ile sayfa görselleri hizası |
-| D3 | Stil (`illustrationStyle`) tutarlılığı | Örn. `comic_book` seçildiğinde stil çekirdeği + sinematik katmanların çakışmaması |
-| D4 | Uçtan uca doğrulama | Tek örnek kitap: story → master → kapak → 1–2 sayfa pikseli; regresyon notu |
+| ~~D1~~ ✅ | Story çıktısı → iç sayfa prompt zinciri | **Tamam (29.03.2026):** `page-scene-contract` — `buildPrimaryVisualBrief` / `buildCharacterActionForPage`; `sceneMap` → `storyScenePlanAnchor` + `timeOfDay` yedek; `scene.ts` PRIORITY + tek satır plan. Kapak ayrı dal (önceki davranış). |
+| ~~D2~~ ✅ | `supportingEntities` → master üretim | **Tamam (29.03.2026):** `lib/book-generation/supporting-entities.ts` — `normalizeAppearsOnPages` / `entityAppearsOnPage` (1…N sayfa, geçersiz numara elenir); `buildSupportingEntityMasterPrompt` (English-only + isim + açıklama). `generateSupportingEntityMaster` tek kaynak (`image-pipeline`); `books/route` içindeki kopya kaldırıldı. |
+| ~~D3~~ ✅ | Stil (`illustrationStyle`) tutarlılığı | **Tamam (29.03.2026):** `style-descriptions.ts` — `usesCinematicImageLayers`, grafik düz profilde `getGlobalArtDirection` + `getCinematicPack` (grafik tutarlılık paketi) + `getStyleQualityPhrase`; `scene.ts` — `buildStyleDirectives`, `getCinematicElements` / `getCinematicNaturalDirectives` dalları; `supporting-entities.ts` — `getCinematicPack(illustrationStyle)`, `[RENDER]` etiketi. |
+| ~~D4~~ ✅ | Uçtan uca doğrulama | **Otomasyon:** `npm run d4:smoke` — kamera mesafesi + pet brief + stil assert’leri. **Master (evcil + stil):** `getStyleDescription` tüm master dallarında; `buildPetCharacterBrief`; evcil prompt style-first. **Story validator (aynı dönem):** enum sapmalarında 500 önleme — normalleştirme + prompt sıkılaştırma (`base.ts` cameraDistance, metadata, supportingEntities.type, shotPlan). **Debug UI:** Step-Runner’da request/response JSON panoya kopyala. **Manuel örnek:** `createBook-analysis/master-illustrations/` + `story-generation/`. |
 
 **D başlangıç kriteri:** `createBook-analysis/story-generation/request.json` + `response.json` ile story adımı onaylandıysa D1’e geç.
+
+---
+
+### Sıradaki büyük konu (D checklist sonrası)
+
+Step-Runner sırası: **Story → Master Illustrations → Entity Masters → Cover → Page Images**. D tablosunda **D2** entity üretim kodunu (`supporting-entities.ts`, `generateSupportingEntityMaster`, `image-pipeline`) kapsıyor; **sıradaki ürün/QA odağı** pratikte şu:
+
+| Sıra | Konu | Ne yapılacak (kısa) |
+|------|------|---------------------|
+| **1** | **Entity Masters** (`image_entity`) | `supportingEntities.length > 0` olan bir hikâyeyle Step-Runner’da adımı çalıştır; çıkan görsellerin **master karakter + comic_book (veya seçilen stil)** ile uyumu; `buildSupportingEntityMasterPrompt` + `getStyleDescription` / `[RENDER]` yeterli mi, gerekirse entity-only stil satırı güçlendirme. |
+| **2** | **Cover** (`image_cover`) | Kapak prompt birleşimi, `coverImagePrompt` / master referansları; regresyon (özellikle çok karakter + tema). |
+| **3** | **Page Images** (`image_page`) | Tam sayfa veya `targetPageNumber`; `generateFullPagePrompt` + D1/D3 zinciri; maliyet/süre notu. |
+
+**Not:** Hikâyede `supportingEntities: []` ise Entity adımı “0 entity” ile geçer; anlamlı test için hikâyede en az bir destek varlığı (ör. oyuncak, nesne) olan bir seed veya repair sonrası dolu liste gerekir.
 
 ---
 

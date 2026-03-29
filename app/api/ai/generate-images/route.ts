@@ -15,6 +15,13 @@ import { generateFullPagePrompt, detectRiskySceneElements, getSafeSceneAlternati
 import { successResponse, errorResponse, handleAPIError } from '@/lib/api/response'
 import { imageEditWithLog } from '@/lib/ai/images'
 import { DEFAULT_IMAGE_MODEL, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_QUALITY } from '@/lib/ai/openai-models'
+import {
+  buildCharacterActionForPage,
+  buildPrimaryVisualBrief,
+  formatStoryScenePlanAnchor,
+  getSceneMapRowForPage,
+  mapSceneMapTimeToSceneInput,
+} from '@/lib/book-generation/page-scene-contract'
 
 export interface ImageGenerationRequest {
   bookId: string
@@ -319,48 +326,77 @@ export async function POST(request: NextRequest) {
     // STEP 2: GENERATE PAGES 2-10 (WITH COVER AS REFERENCE)
     // ====================================================================
     const pagesToGenerate = startPage === 1 ? 2 : startPage
-    
+    const storyDataForPages = book.story_data
+
     for (let i = pagesToGenerate - 1; i < actualEndPage; i++) {
       const page = pages[i]
       const pageNumber = page.pageNumber
 
       console.log(`[Image Generation] Generating image for page ${pageNumber}/${totalPages}`)
 
-      // Build prompt for this page
+      // Build prompt for this page (D1: sceneMap + contract — image-pipeline ile hizalı)
       const illustrationStyle = book.illustration_style
-      const sceneDescription = page.imagePrompt || page.sceneDescription || page.text
-      
-      // Extract character action from page text
-      const characterActionRaw = page.text || sceneDescription
-      const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
+      const pageCtx = page as {
+        sceneContext?: string
+        sceneDescription?: string
+        imagePrompt?: string
+        text?: string
+      }
+      const primaryVisualBrief = buildPrimaryVisualBrief(pageCtx)
+      const sceneMapRow = getSceneMapRowForPage(storyDataForPages, pageNumber)
+      const storyScenePlanAnchor = formatStoryScenePlanAnchor(sceneMapRow)
+
+      const characterActionRaw = buildCharacterActionForPage(pageCtx)
+      const riskAnalysis = detectRiskySceneElements(primaryVisualBrief, characterActionRaw)
       const characterAction = riskAnalysis.hasRisk
         ? getSafeSceneAlternative(characterActionRaw)
         : characterActionRaw
-      
+
       // Determine focus point
-      const focusPoint: 'character' | 'environment' | 'balanced' = 
+      const focusPoint: 'character' | 'environment' | 'balanced' =
         pageNumber === totalPages ? 'balanced' : 'balanced'
-      
+
       // Determine mood from theme or use default
-      const mood = themeKey === 'adventure' ? 'exciting' :
-                   themeKey === 'fantasy' ? 'mysterious' :
-                   themeKey === 'space' ? 'inspiring' :
-                   themeKey === 'sports' ? 'exciting' :
-                   'happy'
-      
+      const mood =
+        themeKey === 'adventure'
+          ? 'exciting'
+          : themeKey === 'fantasy'
+            ? 'mysterious'
+            : themeKey === 'space'
+              ? 'inspiring'
+              : themeKey === 'sports'
+                ? 'exciting'
+                : 'happy'
+
       // A5: Optional shotPlan from story; pass through if present
-      const pageShotPlan = (page as { shotPlan?: { shotType?: string; lens?: string; cameraAngle?: string; placement?: string; timeOfDay?: string; mood?: string } }).shotPlan
+      const pageShotPlan = (page as {
+        shotPlan?: {
+          shotType?: string
+          lens?: string
+          cameraAngle?: string
+          placement?: string
+          timeOfDay?: string
+          mood?: string
+        }
+      }).shotPlan
       const hasValidShotPlan = pageShotPlan && typeof pageShotPlan === 'object' && !Array.isArray(pageShotPlan)
+
+      const timeOfDayFromPlan =
+        !pageShotPlan?.timeOfDay?.trim() && sceneMapRow
+          ? mapSceneMapTimeToSceneInput(sceneMapRow.timeOfDay)
+          : undefined
 
       // Create SceneInput object for generateFullPagePrompt
       const sceneInput = {
         pageNumber,
-        sceneDescription,
+        sceneDescription: primaryVisualBrief,
         theme: themeKey,
         mood,
         characterAction,
         focusPoint,
         ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
+        ...(storyScenePlanAnchor && { storyScenePlanAnchor }),
+        ...(timeOfDayFromPlan && { timeOfDay: timeOfDayFromPlan }),
       }
 
       // Generate full page prompt with useCoverReference=true

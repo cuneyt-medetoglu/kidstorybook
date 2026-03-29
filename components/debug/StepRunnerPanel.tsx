@@ -6,7 +6,7 @@
  * the exact AI request/response for each step.
  */
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { ALLOWED_STORY_MODELS, DEFAULT_STORY_MODEL } from "@/lib/ai/openai-models"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -23,6 +23,8 @@ import {
   User,
   Layers,
   Mic,
+  Copy,
+  Check,
 } from "lucide-react"
 import {
   inferReadingAgeBracketFromNumericAge,
@@ -120,18 +122,54 @@ function getWizardReadingBracket(w: Record<string, unknown> | null | undefined):
 
 function JsonViewer({ data, label }: { data: any; label: string }) {
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const jsonText = useMemo(() => {
+    try {
+      return JSON.stringify(data ?? null, null, 2)
+    } catch {
+      return String(data)
+    }
+  }, [data])
+
+  const copyJson = useCallback(
+    async (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      try {
+        await navigator.clipboard.writeText(jsonText)
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 1600)
+      } catch {
+        /* clipboard API yok / izin yok */
+      }
+    },
+    [jsonText]
+  )
+
   return (
     <div className="border border-zinc-700 rounded text-xs">
-      <button
-        className="w-full flex items-center gap-1 px-3 py-1.5 text-zinc-300 hover:text-white hover:bg-zinc-800/50 transition-colors"
-        onClick={() => setOpen((v) => !v)}
-      >
-        {open ? <ChevronDown className="h-3 w-3 shrink-0" /> : <ChevronRight className="h-3 w-3 shrink-0" />}
-        <span className="font-mono text-zinc-400 uppercase tracking-wide text-[10px]">{label}</span>
-      </button>
+      <div className="flex items-stretch min-h-[2rem]">
+        <button
+          type="button"
+          className="flex-1 flex items-center gap-1 px-3 py-1.5 text-left text-zinc-300 hover:text-white hover:bg-zinc-800/50 transition-colors rounded-tl"
+          onClick={() => setOpen((v) => !v)}
+        >
+          {open ? <ChevronDown className="h-3 w-3 shrink-0" /> : <ChevronRight className="h-3 w-3 shrink-0" />}
+          <span className="font-mono text-zinc-400 uppercase tracking-wide text-[10px]">{label}</span>
+        </button>
+        <button
+          type="button"
+          onClick={copyJson}
+          className="shrink-0 px-2.5 border-l border-zinc-700/80 text-zinc-500 hover:text-emerald-400 hover:bg-zinc-800/40 transition-colors rounded-tr"
+          title="JSON’u panoya kopyala"
+          aria-label={`${label} JSON kopyala`}
+        >
+          {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
+      </div>
       {open && (
-        <pre className="px-3 py-2 overflow-x-auto text-green-300 bg-zinc-900 rounded-b max-h-72 overflow-y-auto whitespace-pre-wrap break-words">
-          {JSON.stringify(data, null, 2)}
+        <pre className="px-3 py-2 overflow-x-auto text-green-300 bg-zinc-900 rounded-b max-h-72 overflow-y-auto whitespace-pre-wrap break-words border-t border-zinc-800">
+          {jsonText}
         </pre>
       )}
     </div>
@@ -165,7 +203,7 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
     Object.fromEntries(STEPS.map((s) => [s.id, { status: "idle" }])) as Record<OperationType, StepState>
   )
   const [storyModel, setStoryModel] = useState(DEFAULT_STORY_MODEL)
-  const [pageCount, setPageCount] = useState(4)
+  const [pageCount, setPageCount] = useState(12)
   const [targetPageNumber, setTargetPageNumber] = useState<number | null>(null)
   const [expandedLogStep, setExpandedLogStep] = useState<OperationType | null>(null)
 

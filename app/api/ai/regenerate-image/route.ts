@@ -27,6 +27,13 @@ import {
 } from "@/lib/prompts/image/scene"
 import { imageEditWithLog, imageGenerateWithLog } from "@/lib/ai/images"
 import { successResponse, errorResponse, handleAPIError } from "@/lib/api/response"
+import {
+  buildCharacterActionForPage,
+  formatStoryScenePlanAnchor,
+  getSceneMapRowForPage,
+  mapSceneMapTimeToSceneInput,
+} from "@/lib/book-generation/page-scene-contract"
+import { entityAppearsOnPage } from "@/lib/book-generation/supporting-entities"
 
 const IMAGE_MODEL = "gpt-image-1.5"
 const IMAGE_SIZE = "1024x1536"
@@ -166,12 +173,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const characterActionRaw =
-      page.sceneContext?.trim() ||
-      page.sceneDescription?.trim() ||
-      page.imagePrompt?.trim() ||
-      page.text?.trim() ||
-      ""
+    const characterActionRaw = buildCharacterActionForPage(page)
     const riskAnalysis = detectRiskySceneElements(sceneDescription, characterActionRaw)
     const characterAction = riskAnalysis.hasRisk
       ? getSafeSceneAlternative(characterActionRaw)
@@ -204,6 +206,14 @@ export async function POST(request: NextRequest) {
     const hasValidShotPlan =
       pageShotPlan && typeof pageShotPlan === "object" && !Array.isArray(pageShotPlan)
 
+    const mapPageNumForScenePlan = isCover ? 1 : pageNumber
+    const sceneMapRow = getSceneMapRowForPage(book.story_data, mapPageNumForScenePlan)
+    const storyScenePlanAnchor = formatStoryScenePlanAnchor(sceneMapRow)
+    const timeOfDayFromPlan =
+      !pageShotPlan?.timeOfDay?.trim() && sceneMapRow
+        ? mapSceneMapTimeToSceneInput(sceneMapRow.timeOfDay)
+        : undefined
+
     // Master varsa kıyafet referanstan (create-book ile aynı): elbise tutarlı kalsın
     const pageMasterUrls = pageCharacters
       .map((id) => masterIllustrations[id])
@@ -230,6 +240,8 @@ export async function POST(request: NextRequest) {
       ...(Object.keys(characterExpressions).length > 0 && { characterExpressions }),
       ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
       ...(useMasterForClothing && { clothing: "match_reference" as const }),
+      ...(storyScenePlanAnchor && { storyScenePlanAnchor }),
+      ...(timeOfDayFromPlan && { timeOfDay: timeOfDayFromPlan }),
     }
 
     // ── 9. Karakter prompt (create-book ile aynı) ──────────────────────────
@@ -291,9 +303,10 @@ export async function POST(request: NextRequest) {
     const pageEntityIds: string[] = []
     // Cover için bu sayfada görünen entity'ler: pageNumber 1 kullan (ilk sayfa)
     const pageNumForEntity = isCover ? 1 : pageNumber
-    if (supportingEntities.length > 0) {
+    const totalStoryPages = book.story_data?.pages?.length ?? 0
+    if (supportingEntities.length > 0 && totalStoryPages > 0) {
       for (const entity of supportingEntities) {
-        if (!entity.appearsOnPages?.includes(pageNumForEntity)) continue
+        if (!entityAppearsOnPage(entity, pageNumForEntity, totalStoryPages)) continue
         const entityName = (entity.name || "").trim().toLowerCase()
         if (entityName && characterNamesLower.has(entityName)) continue
         pageEntityIds.push(entity.id)

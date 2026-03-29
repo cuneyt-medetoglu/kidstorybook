@@ -4,6 +4,7 @@
  * Provides detailed style descriptions for image generation prompts
  * Based on POC styleDescriptions structure
  * v1.19.0 [Sıra 16]: 3d_animation/3d + get3DAnimationNotes: vibrant saturated → rich appealing (controlled saturation) for consistency with getCinematicPack/GLOBAL_ART_DIRECTION.
+ * v1.20.0 [D3]: comic_book / geometric / sticker_art / block_world / collage — grafik düz profil: getGlobalArtDirection + getCinematicPack sinematik dil ile çakışmasın; usesCinematicImageLayers + getStyleQualityPhrase.
  */
 
 export const STYLE_DESCRIPTIONS: Record<string, string> = {
@@ -70,6 +71,31 @@ export function is3DAnimationStyle(styleKey: string): boolean {
   return normalizedKey === '3d_animation' || normalizedKey === '3d'
 }
 
+/** D3: Flat/graphic styles — sinematik volumetric/filmic katmanları istemez; stil DNA’sı ile uyumlu grafik yönergeleri kullanılır. */
+const GRAPHIC_FLAT_STYLE_KEYS = new Set([
+  'comic_book',
+  'geometric',
+  'sticker_art',
+  'block_world',
+  'collage',
+])
+
+export function normalizeIllustrationStyleKey(styleKey: string): string {
+  return styleKey.toLowerCase().replace(/[-\s]/g, '_')
+}
+
+/** @returns false for comic_book, geometric, sticker_art, block_world, collage — görsel promptta filmic pack yerine grafik tutarlılık paketi. */
+export function usesCinematicImageLayers(illustrationStyle: string): boolean {
+  return !GRAPHIC_FLAT_STYLE_KEYS.has(normalizeIllustrationStyleKey(illustrationStyle))
+}
+
+/** buildStyleDirectives ilk satırı — grafik stillerde "cinematic quality" yerine uyumlu ifade. */
+export function getStyleQualityPhrase(illustrationStyle: string): string {
+  return usesCinematicImageLayers(illustrationStyle)
+    ? 'cinematic quality'
+    : 'bold graphic illustration quality, print-ready'
+}
+
 /**
  * Get 3D Animation special notes (if applicable)
  */
@@ -89,20 +115,58 @@ const GLOBAL_ART_DIRECTION_CORE = [
   'Preserve identity/outfit from the provided reference images; do not redesign the character.',
 ].join(' ')
 
+/** D3: Grafik/düz stiller — film still / volumetric dil yok; "flat lighting" kaçınımı kaldırıldı (çizgi roman için çelişkiydi). */
+const GLOBAL_ART_DIRECTION_GRAPHIC_CORE = [
+  'Clear graphic readability; silhouettes and shapes read clearly at book size.',
+  'Foreground and background use planes and stylized detail consistent with the chosen style (not photorealistic haze or cinematic fog unless the scene text asks for atmosphere).',
+  'No text, no watermark, no UI.',
+  'Avoid: photorealistic skin, documentary photography look, muddy gradients when the style calls for flat fills and clean edges.',
+  'Preserve identity/outfit from the provided reference images; do not redesign the character.',
+].join(' ')
+
+function styleLabelForArtDirection(illustrationStyle: string): string {
+  const desc = getStyleDescription(illustrationStyle)
+  const short = desc.split(' - ')[0]?.trim()
+  return short && short.length > 0 ? short : illustrationStyle
+}
+
 export function getGlobalArtDirection(illustrationStyle: string): string {
-  const normalized = illustrationStyle.toLowerCase().replace(/[-\s]/g, '_')
+  const normalized = normalizeIllustrationStyleKey(illustrationStyle)
   const is3D = normalized === '3d_animation' || normalized === '3d'
+
+  if (GRAPHIC_FLAT_STYLE_KEYS.has(normalized)) {
+    const label = styleLabelForArtDirection(illustrationStyle)
+    const styleLead = `Graphic storybook illustration in ${label} — stylized illustrated page, NOT live-action film still or photorealistic photo.`
+    return `${styleLead} ${GLOBAL_ART_DIRECTION_GRAPHIC_CORE}`
+  }
+
   const styleLead = is3D
     ? 'Cinematic 3D animated storybook illustration, like a high-quality animated film still (stylized, NOT live-action photo).'
     : `Cinematic storybook illustration in ${illustrationStyle} style, like a high-quality illustrated film still (stylized, NOT live-action photo).`
   return `${styleLead} ${GLOBAL_ART_DIRECTION_CORE}`
 }
 
+function getGraphicStyleConsistencyPack(): string {
+  return [
+    'lighting and color that stay true to the chosen graphic style (no photorealistic volumetric haze unless the scene text asks for it)',
+    'clear separation of foreground and background using style-appropriate planes (flat fills, simple gradients, halftone, or blocks — not cinematic fog)',
+    'consistent line weight, palette, and shading rules as defined by the style',
+    'readable composition; avoid filmic bloom and heavy lens effects unless they fit the style',
+  ].join(', ')
+}
+
 /**
- * CINEMATIC_PACK – tüm stiller için ortak sinematik kalite (GPT önerisi, 7 Şubat 2026)
- * Stil DNA'sını bozmadan "film tadı" ekler: lighting, color grade, environment depth.
+ * CINEMATIC_PACK — sinematik stiller için filmic kalite; D3: grafik düz stillerde `getGraphicStyleConsistencyPack`.
+ * @param illustrationStyle İstenirse stile göre dal; verilmezse legacy tam sinematik paket (entity vb. geriye uyum).
  */
-export function getCinematicPack(): string {
+export function getCinematicPack(illustrationStyle?: string): string {
+  if (
+    illustrationStyle !== undefined &&
+    illustrationStyle !== '' &&
+    !usesCinematicImageLayers(illustrationStyle)
+  ) {
+    return getGraphicStyleConsistencyPack()
+  }
   return [
     'cinematic key light with soft fill and rim light',
     'volumetric sun rays where appropriate',

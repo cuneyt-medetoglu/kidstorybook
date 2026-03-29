@@ -1,5 +1,13 @@
 import type { PromptVersion, ShotPlan } from '../types'
-import { getStyleDescription, is3DAnimationStyle, get3DAnimationNotes, getCinematicPack, getGlobalArtDirection } from './style-descriptions'
+import {
+  getStyleDescription,
+  is3DAnimationStyle,
+  get3DAnimationNotes,
+  getCinematicPack,
+  getGlobalArtDirection,
+  getStyleQualityPhrase,
+  usesCinematicImageLayers,
+} from './style-descriptions'
 import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStrategy } from './negative'
 
 /**
@@ -16,8 +24,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStr
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.17.0',
-  releaseDate: new Date('2026-02-08'),
+  version: '1.22.0',
+  releaseDate: new Date('2026-03-29'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -73,6 +81,8 @@ export const VERSION: PromptVersion = {
     'v1.18.0: [Sıra 14] Kapak ortamı hikayeden – SceneInput.coverEnvironment; getEnvironmentDescription(..., coverEnvironment) kapakta tema şablonu yerine hikaye ortamı; extractSceneElements öncelikli locationKeywords (glacier, ice, space, ocean vb.). COVER_PATH_FLOWERS_ANALYSIS.md (8 Şubat 2026)',
     'v1.19.0: [Sıra 16] Çelişkili stil ifadeleri – Tek stil profili (filmic, controlled saturation). getEnhancedAtmosphericDepth: vibrant saturated/high contrast → rich textures, clear detail, moderate saturation; getLightingDescription/getCinematicElements: dramatic → clear/defined; getStyleSpecificDirectives 3d: vibrant → rich appealing. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md (8 Şubat 2026)',
     'v1.20.0: [Sıra 19] Allow relighting – Interior sayfa prompt\'una "Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene." eklendi. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md (8 Şubat 2026)',
+    'v1.21.0: [D1] story_data.sceneMap → SceneInput.storyScenePlanAnchor; characterAction imagePrompt ile ikinci kez doldurulmaz (page-scene-contract). PRIORITY sırasına plan satırı eklendi. (29 Mart 2026)',
+    'v1.22.0: [D3] illustrationStyle grafik düz profil (comic_book, geometric, sticker_art, block_world, collage): getGlobalArtDirection/getCinematicPack/getStyleQualityPhrase; getCinematicElements/getCinematicNaturalDirectives grafik dala; sinematik katmanlar ile stil çekirdeği çakışması azaltıldı. (29 Mart 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -105,6 +115,11 @@ export interface SceneInput {
   environmentDescription?: string
   /** Camera distance hint from story LLM: "close" | "medium" | "wide" | "establishing" */
   cameraDistance?: 'close' | 'medium' | 'wide' | 'establishing'
+  /**
+   * D1: `story_data.sceneMap` satırının tek satırlık özeti (yer | zaman | setting).
+   * Uzun `imagePrompt` ile çelişirse yer ve günün zamanı için plan önceliklidir.
+   */
+  storyScenePlanAnchor?: string
 }
 
 // NEW: Scene Diversity Analysis (16 Ocak 2026)
@@ -133,10 +148,10 @@ export function generateScenePrompt(
 
   // 1. STYLE - v1.7.0: Using buildStyleDirectives (first directive only for scene prompt)
   const styleDirectives = buildStyleDirectives(illustrationStyle)
-  parts.push(styleDirectives[0]) // First style directive: `${styleDesc} illustration, cinematic quality`
+  parts.push(styleDirectives[0]) // First style directive: style + quality phrase (cinematic vs graphic)
   
-  // 2. CINEMATIC ELEMENTS - Add cinematic composition
-  const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood, scene.timeOfDay)
+  // 2. CINEMATIC ELEMENTS — D3: grafik stillerde filmic god rays / mist azaltılır
+  const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood, scene.timeOfDay, illustrationStyle)
   parts.push(cinematicElements)
   
   // 3. CHARACTER - With emphasis on consistency - v1.7.0: Using buildCharacterConsistencyDirectives
@@ -344,19 +359,27 @@ function getMoodDescription(mood: string): string {
 export function getCinematicElements(
   pageNumber: number,
   mood: string,
-  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night'
+  timeOfDay?: 'morning' | 'afternoon' | 'evening' | 'night',
+  illustrationStyle?: string
 ): string {
   const elements: string[] = []
-  
+  const graphic = illustrationStyle !== undefined && !usesCinematicImageLayers(illustrationStyle)
+
   // Lighting based on time of day and mood
   if (timeOfDay === 'evening') {
     elements.push('golden hour lighting')
     elements.push('warm amber tones, golden glow')
-    elements.push('backlighting with rim light around character')
-    elements.push('volumetric god rays through atmosphere')
+    if (graphic) {
+      elements.push('bold warm color fields and graphic rim read (style-appropriate, not photoreal god rays)')
+    } else {
+      elements.push('backlighting with rim light around character')
+      elements.push('volumetric god rays through atmosphere')
+    }
   } else if (timeOfDay === 'morning') {
     elements.push('soft morning light')
-    elements.push('gentle backlighting')
+    if (!graphic) {
+      elements.push('gentle backlighting')
+    }
     elements.push('warm diffused light')
   } else if (timeOfDay === 'night') {
     elements.push('moonlight')
@@ -365,29 +388,26 @@ export function getCinematicElements(
   } else {
     // Afternoon or default
     if (mood === 'exciting') {
-      elements.push('dynamic lighting with defined shadows')
+      elements.push(graphic ? 'clear defined shadows in graphic style' : 'dynamic lighting with defined shadows')
     } else if (mood === 'calm') {
       elements.push('soft ambient light, even diffusion')
     } else {
       elements.push('warm natural light')
     }
   }
-  
-  // Source → Obstacle → Medium structure for realistic light effects
-  if (timeOfDay === 'morning' || timeOfDay === 'evening') {
+
+  if (!graphic && (timeOfDay === 'morning' || timeOfDay === 'evening')) {
     elements.push('sunlight through trees into morning mist (source → obstacle → medium)')
   }
-  
-  // Composition elements
-  elements.push('layered depth')
+
+  elements.push(graphic ? 'clear foreground/background planes (graphic readability)' : 'layered depth')
   elements.push('rule of thirds composition')
-  
-  // Camera angle
+
   const angle = pageNumber === 1 ? 'hero shot' : 'varied perspective'
   elements.push(angle)
-  
-  elements.push('cinematic quality')
-  
+
+  elements.push(graphic ? 'bold graphic illustration quality' : 'cinematic quality')
+
   return elements.join(', ')
 }
 
@@ -706,7 +726,16 @@ export function getCharacterIntegrationDirectives(): string {
  * Use for interior pages to avoid "looking at camera" and achieve immersive, natural composition.
  * Reference: campfire/sunset style – characters looking at scene, each other, or objects (fire, sky, path).
  */
-export function getCinematicNaturalDirectives(): string {
+export function getCinematicNaturalDirectives(illustrationStyle?: string): string {
+  const graphic = illustrationStyle !== undefined && !usesCinematicImageLayers(illustrationStyle)
+  if (graphic) {
+    return [
+      'illustrated story moment — characters act within the scene, not posing for a photo',
+      'characters engaged with the scene and each other, not staring at the viewer',
+      'do NOT have characters look directly at the viewer; they look at the scene, each other, or objects (e.g. fire, sky, path, horizon)',
+      'natural composition for a children\'s book spread; clear graphic readability',
+    ].join(', ')
+  }
   return [
     'cinematic, storybook moment – as if capturing a moment in the story, not a photo shoot',
     'characters engaged with the scene and each other, not posing for the viewer',
@@ -999,8 +1028,9 @@ function buildCharacterConsistencyDirectives(): string[] {
  */
 function buildStyleDirectives(illustrationStyle: string): string[] {
   const styleDesc = getStyleDescription(illustrationStyle)
+  const qualityPhrase = getStyleQualityPhrase(illustrationStyle)
   return [
-    `${styleDesc} illustration, cinematic quality`,
+    `${styleDesc} illustration, ${qualityPhrase}`,
     `ILLUSTRATION STYLE: ${styleDesc}`,
     'Illustration style (NOT photorealistic). Match reference features.'
   ]
@@ -1470,8 +1500,16 @@ export function generateFullPagePrompt(
 
   // ─── INTERIOR PAGE PATH ─────────────────────────────────────────────────────
 
-  // 0. [A4] Priority ladder
-  promptParts.push('PRIORITY: If any conflict, follow this order: 1) Scene composition & character scale, 2) Environment richness & depth, 3) Character action & expression, 4) Reference identity match.')
+  // 0. [A4] Priority ladder (+ D1: sceneMap planı uzun brief ile çelişirse yer/zaman için plan)
+  promptParts.push(
+    'PRIORITY: If any conflict, follow this order: 1) STORY SCENE PLAN line (place & time-of-day) when present, 2) Scene composition & character scale, 3) Environment richness & depth, 4) Character action & expression, 5) Reference identity match.'
+  )
+
+  if (sceneInput.storyScenePlanAnchor?.trim()) {
+    promptParts.push(
+      `STORY SCENE PLAN (authoritative for place & time-of-day if long brief disagrees): ${sceneInput.storyScenePlanAnchor.trim()}`
+    )
+  }
 
   // 0.4. [A7] GLOBAL_ART_DIRECTION
   promptParts.push(getGlobalArtDirection(illustrationStyle))
@@ -1506,12 +1544,12 @@ export function generateFullPagePrompt(
   // 6. Style Section
   promptParts.push(...buildStyleSection(illustrationStyle))
 
-  // 6.5. CINEMATIC_PACK
-  promptParts.push(getCinematicPack())
+  // 6.5. CINEMATIC_PACK (D3: grafik stillerde stil-tutarlılık paketi)
+  promptParts.push(getCinematicPack(illustrationStyle))
 
   // 7. Character Integration
   promptParts.push(...buildCharacterIntegrationSection())
-  promptParts.push(getCinematicNaturalDirectives())
+  promptParts.push(getCinematicNaturalDirectives(illustrationStyle))
 
   // 8. Scene Content
   promptParts.push(...buildSceneContentSection(

@@ -582,7 +582,7 @@ Identify ADDITIONAL animals and important objects that appear in the story (each
 - Include: only animals/objects that are NOT already in the character list (e.g. a toy, a second animal that is not the family pet, or a key object like a camping photo). Exclude: the family pet (it is already a character); background-only elements (e.g. trees, rocks); character clothing.
 - If a non-character animal/object is central to the action OR appears on 2+ pages, it MUST be listed in supportingEntities. Common misses: teddy bear, ball, map, kite, lantern, boat, toy.
 - Rules: unique name+id per entity; visual description for master; same name throughout; list appearsOnPages.
-- JSON: include "supportingEntities" array with id, type (animal|object), name, description, appearsOnPages. Leave the array empty [] if the only animals/objects in the story are the characters themselves.
+- JSON: include "supportingEntities" array with id, type, name, description, appearsOnPages. **type** must be exactly the string "animal" or "object" (lowercase, no synonyms). Leave the array empty [] if the only animals/objects in the story are the characters themselves.
 - **Language:** \`name\` and \`description\` must be **English** (they feed the image master API — same rule as imagePrompt).
 
 # SUGGESTED OUTFITS (for master illustrations)
@@ -682,12 +682,12 @@ The response_format schema defines the full structure. Key field constraints:
 - pages[]: EXACTLY ${n} items. Each page must have all schema fields.
 - imagePrompt per page: 200+ chars, cinematic — apply LIGHTING/DEPTH/COLOR/COMPOSITION/ATMOSPHERE layers.
 - sceneDescription per page: 150+ chars, specific to that step (location, time, action, mood).
-- cameraDistance: "close" | "medium" | "wide" | "establishing". Prefer "wide"/"establishing" (character 30-40% of frame). Vary per page.
-- shotPlan: 6 English strings (shotType, lens, cameraAngle, placement, timeOfDay, mood). All real values — not placeholders.
+- cameraDistance: **exactly** one of these four JSON strings (lowercase, no spaces): "close", "medium", "wide", "establishing". Never use compounds like "medium-wide" or "close-up" — pick the single best match. Prefer "wide"/"establishing" (character 30-40% of frame). Vary per page.
+- shotPlan: 6 English strings (shotType, lens, cameraAngle, placement, timeOfDay, mood). Each must be a non-empty string (no null/empty). All real values — not placeholders.
 - characterIds[]: use exact UUIDs from CHARACTER MAPPING for each page.
 - characterExpressions{}: one key per character on that page — value = visual description (eyes, brows, mouth).
 - suggestedOutfits{}: one key per character UUID from CHARACTER MAPPING — value = one-line English outfit.
-- metadata: { ageGroup, theme, educationalThemes: [], safetyChecked: true } — fill ageGroup="${rac.metadataAgeGroup}".
+- metadata: { ageGroup, theme, educationalThemes: [], safetyChecked: true } — ageGroup must be **exactly** one of: toddler, preschool, early-elementary, elementary, pre-teen (use "${rac.metadataAgeGroup}" for this book). safetyChecked must be JSON boolean true/false, not a string.
 See # VERIFICATION CHECKLIST for final checks.`
 }
 
@@ -709,8 +709,10 @@ function buildVerificationChecklistSection(
 - suggestedOutfits: one key per character UUID; value = one-line English outfit. REQUIRED.
 - characterExpressions per page: one key per character on that page; value = visual (eyes, brows, mouth). REQUIRED.
 - environmentDescription per page: specific, story-driven background (not generic). REQUIRED.
-- cameraDistance per page: "close"|"medium"|"wide"|"establishing". Vary; prefer wide/establishing.
-- shotPlan per page: 6 real English strings. Vary timeOfDay and mood across pages.
+- cameraDistance per page: exactly "close", "medium", "wide", or "establishing" only (no hyphens, no extra words). Vary; prefer wide/establishing.
+- shotPlan per page: 6 non-empty English strings (no null). Vary timeOfDay and mood across pages.
+- metadata.ageGroup: exactly one of toddler, preschool, early-elementary, elementary, pre-teen. metadata.safetyChecked: boolean.
+- supportingEntities[].type: exactly "animal" or "object" only.
 - Every page "text" in ${langName}; **title** prefer ${langName} when the book is not English. **All other JSON strings** (sceneMap, supportingEntities, cover fields, per-page visual fields, metadata theme/educationalThemes text): **English only**.
 - Word count: each page "text" must be between ${rac.wordsPerPageMin} and ${rac.wordsPerPageMax} words (in the story language); expand or trim to fit.
 - ${characterName} = main character in every scene. Positive, age-appropriate content.`

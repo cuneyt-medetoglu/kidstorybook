@@ -1,5 +1,18 @@
 import type OpenAI from 'openai'
 import { chatWithLog, type ChatLogContext } from '@/lib/ai/chat'
+import { normalizeStoryCameraDistance, STORY_CAMERA_DISTANCES } from '@/lib/ai/story-camera-distance'
+import {
+  metadataThemeTrim,
+  normalizeAppearsOnPages,
+  normalizeEducationalThemes,
+  normalizeMetadataSafetyChecked,
+  normalizePageCharacterIds,
+  normalizePageShotPlan,
+  normalizeStoryMetadataAgeGroup,
+  normalizeSupportingEntityType,
+  STORY_METADATA_AGE_GROUPS,
+  SUPPORTING_ENTITY_TYPES,
+} from '@/lib/ai/story-response-normalize-fields'
 
 type StoryCharacterRef = {
   id: string
@@ -56,14 +69,45 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
 }
 
-function normalizeStoryShape(storyData: any, expectedPageCount: number): any {
+/** Re-export: tek kaynak `story-camera-distance.ts` */
+export type { StoryCameraDistance } from '@/lib/ai/story-camera-distance'
+export { normalizeStoryCameraDistance } from '@/lib/ai/story-camera-distance'
+
+function normalizeStoryShape(
+  storyData: any,
+  expectedPageCount: number,
+  normalizationNotes?: string[]
+): any {
   const normalized = typeof storyData === 'object' && storyData !== null ? structuredClone(storyData) : {}
 
   if (Array.isArray(normalized.pages)) {
-    normalized.pages = normalized.pages.slice(0, expectedPageCount).map((page: any, index: number) => ({
-      ...page,
-      pageNumber: index + 1,
-    }))
+    normalized.pages = normalized.pages.slice(0, expectedPageCount).map((page: any, index: number) => {
+      const beforeCam = page?.cameraDistance
+      const cameraDistance = normalizeStoryCameraDistance(beforeCam, index)
+      if (
+        normalizationNotes &&
+        beforeCam !== undefined &&
+        beforeCam !== null &&
+        String(beforeCam).trim() !== '' &&
+        String(beforeCam).trim().toLowerCase() !== cameraDistance &&
+        !(STORY_CAMERA_DISTANCES as readonly string[]).includes(String(beforeCam).trim().toLowerCase())
+      ) {
+        normalizationNotes.push(
+          `Page ${index + 1}: cameraDistance normalized from ${JSON.stringify(beforeCam)} to "${cameraDistance}"`
+        )
+      }
+
+      const shotPlan = normalizePageShotPlan(page?.shotPlan, index, normalizationNotes)
+      const characterIds = normalizePageCharacterIds(page?.characterIds, index, normalizationNotes)
+
+      return {
+        ...page,
+        pageNumber: index + 1,
+        cameraDistance,
+        shotPlan,
+        characterIds,
+      }
+    })
   }
 
   if (Array.isArray(normalized.sceneMap)) {
@@ -71,6 +115,69 @@ function normalizeStoryShape(storyData: any, expectedPageCount: number): any {
       ...entry,
       pageNumber: index + 1,
     }))
+  }
+
+  if (Array.isArray(normalized.supportingEntities)) {
+    normalized.supportingEntities = normalized.supportingEntities.map((entity: any, ei: number) => {
+      const beforeType = entity?.type
+      const type = normalizeSupportingEntityType(beforeType, ei)
+      if (
+        normalizationNotes &&
+        String(beforeType ?? '').trim() !== '' &&
+        type !== String(beforeType).trim().toLowerCase()
+      ) {
+        normalizationNotes.push(
+          `supportingEntities[${ei}].type normalized from ${JSON.stringify(beforeType)} to "${type}"`
+        )
+      }
+      const beforePages = entity?.appearsOnPages
+      const appearsOnPages = normalizeAppearsOnPages(beforePages)
+      if (
+        normalizationNotes &&
+        beforePages !== undefined &&
+        JSON.stringify(beforePages ?? null) !== JSON.stringify(appearsOnPages)
+      ) {
+        normalizationNotes.push(`supportingEntities[${ei}].appearsOnPages coerced to integer page list`)
+      }
+      return { ...entity, type, appearsOnPages }
+    })
+  }
+
+  if (normalized.metadata && typeof normalized.metadata === 'object') {
+    const m = normalized.metadata as Record<string, unknown>
+    const beforeAge = m.ageGroup
+    m.ageGroup = normalizeStoryMetadataAgeGroup(beforeAge)
+    const beforeAgeKey = String(beforeAge ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+    if (
+      normalizationNotes &&
+      String(beforeAge ?? '').trim() !== '' &&
+      !(STORY_METADATA_AGE_GROUPS as readonly string[]).includes(beforeAgeKey)
+    ) {
+      normalizationNotes.push(
+        `metadata.ageGroup normalized from ${JSON.stringify(beforeAge)} to "${m.ageGroup}"`
+      )
+    }
+
+    const beforeSafety = m.safetyChecked
+    if (normalizationNotes && typeof beforeSafety !== 'boolean') {
+      normalizationNotes.push(
+        `metadata.safetyChecked coerced from ${JSON.stringify(beforeSafety)} to ${normalizeMetadataSafetyChecked(beforeSafety)}`
+      )
+    }
+    m.safetyChecked = normalizeMetadataSafetyChecked(beforeSafety)
+
+    const beforeThemes = m.educationalThemes
+    m.educationalThemes = normalizeEducationalThemes(beforeThemes)
+    if (normalizationNotes && !Array.isArray(beforeThemes)) {
+      normalizationNotes.push('metadata.educationalThemes coerced to string array')
+    }
+
+    if (typeof m.theme === 'string') {
+      m.theme = metadataThemeTrim(m.theme)
+    }
   }
 
   return normalized
@@ -81,7 +188,7 @@ function isSupportingEntitiesEntryValid(entity: unknown): boolean {
   const e = entity as Record<string, unknown>
   return (
     isNonEmptyString(e.id) &&
-    (e.type === 'animal' || e.type === 'object') &&
+    (SUPPORTING_ENTITY_TYPES as readonly string[]).includes(e.type as string) &&
     isNonEmptyString(e.name) &&
     isNonEmptyString(e.description) &&
     Array.isArray(e.appearsOnPages)
@@ -402,7 +509,7 @@ function assertStoryResponseValid(
     if (!isNonEmptyString(page?.environmentDescription)) {
       throw new Error(`Page ${index + 1} is missing "environmentDescription"`)
     }
-    if (!['close', 'medium', 'wide', 'establishing'].includes(page?.cameraDistance)) {
+    if (!(STORY_CAMERA_DISTANCES as readonly string[]).includes(page?.cameraDistance)) {
       throw new Error(`Page ${index + 1} has invalid "cameraDistance"`)
     }
     if (!Array.isArray(page?.characterIds) || page.characterIds.length === 0) {
@@ -440,7 +547,7 @@ function assertStoryResponseValid(
   for (const entity of storyData.supportingEntities) {
     if (
       !isNonEmptyString(entity?.id) ||
-      !['animal', 'object'].includes(entity?.type) ||
+      !(SUPPORTING_ENTITY_TYPES as readonly string[]).includes(entity?.type) ||
       !isNonEmptyString(entity?.name) ||
       !isNonEmptyString(entity?.description) ||
       !Array.isArray(entity?.appearsOnPages)
@@ -465,6 +572,12 @@ function assertStoryResponseValid(
 
   if (
     !isNonEmptyString(storyData.metadata.ageGroup) ||
+    !(STORY_METADATA_AGE_GROUPS as readonly string[]).includes(String(storyData.metadata.ageGroup).trim())
+  ) {
+    throw new Error('Story metadata.ageGroup is missing or not a known age band')
+  }
+
+  if (
     !isNonEmptyString(storyData.metadata.theme) ||
     !Array.isArray(storyData.metadata.educationalThemes) ||
     typeof storyData.metadata.safetyChecked !== 'boolean'
@@ -477,7 +590,9 @@ export async function prepareStoryResponseForUse(
   params: PrepareStoryResponseParams
 ): Promise<PreparedStoryResponse> {
   const issues: string[] = []
-  let storyData = normalizeStoryShape(params.storyData, params.expectedPageCount)
+  const normNotesInitial: string[] = []
+  let storyData = normalizeStoryShape(params.storyData, params.expectedPageCount, normNotesInitial)
+  issues.push(...normNotesInitial)
 
   const repairFields = findRepairableFields(
     storyData,
@@ -492,7 +607,9 @@ export async function prepareStoryResponseForUse(
   if (repairFields.length > 0) {
     issues.push(`repair requested: ${repairFields.join(', ')}`)
     const { data: repairedFields, usage } = await repairStoryFields({ ...params, storyData }, repairFields)
-    storyData = normalizeStoryShape({ ...storyData, ...repairedFields }, params.expectedPageCount)
+    const normNotesAfterRepair: string[] = []
+    storyData = normalizeStoryShape({ ...storyData, ...repairedFields }, params.expectedPageCount, normNotesAfterRepair)
+    issues.push(...normNotesAfterRepair)
     repaired = true
     repairCalls = STORY_RESPONSE_MAX_REPAIR_CALLS
     repairUsage = usage

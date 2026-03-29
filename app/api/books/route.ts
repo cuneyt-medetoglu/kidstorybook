@@ -16,7 +16,6 @@ import { generateStoryPrompt, buildStorySystemPrompt, buildStoryResponseSchema }
 import { successResponse, errorResponse, handleAPIError, CommonErrors } from '@/lib/api/response'
 import { buildCharacterPrompt, buildDetailedCharacterPrompt, buildMultipleCharactersPrompt } from '@/lib/prompts/image/character'
 import { generateFullPagePrompt, analyzeSceneDiversity, detectRiskySceneElements, getSafeSceneAlternative, extractSceneElements, type SceneDiversityAnalysis } from '@/lib/prompts/image/scene'
-import { getStyleDescription, getCinematicPack } from '@/lib/prompts/image/style-descriptions'
 import { getLayoutSafeMasterDirectives } from '@/lib/prompts/image/master'
 import { generateTts } from '@/lib/tts/generate'
 import { chatWithLog } from '@/lib/ai/chat'
@@ -37,7 +36,15 @@ import { imageEditWithLog, imageGenerateWithLog } from '@/lib/ai/images'
 import { appendAiDebugLog, sanitizeForDebugLog, summarizeFormData } from '@/lib/debug/ai-debug-log'
 import OpenAI from 'openai'
 import { enqueueBookGeneration } from '@/lib/queue/client'
-import { resolveCoverEnvironment } from '@/lib/book-generation/image-pipeline'
+import { resolveCoverEnvironment, generateSupportingEntityMaster } from '@/lib/book-generation/image-pipeline'
+import {
+  buildCharacterActionForPage,
+  buildPrimaryVisualBrief,
+  formatStoryScenePlanAnchor,
+  getSceneMapRowForPage,
+  mapSceneMapTimeToSceneInput,
+} from '@/lib/book-generation/page-scene-contract'
+import { entityAppearsOnPage } from '@/lib/book-generation/supporting-entities'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -427,61 +434,6 @@ async function generateMasterCharacterIllustration(
     })
   }
   return masterUrl
-}
-
-/**
- * Generate Master Illustration for Supporting Entity (Animal/Object)
- * NEW: 31 Ocak 2026 - Master-For-All-Entities
- * Creates master illustration for animals and objects WITHOUT reference photo
- * Uses text-only prompt generation
- */
-async function generateSupportingEntityMaster(
-  entityId: string,
-  entityType: 'animal' | 'object',
-  entityName: string,
-  entityDescription: string,
-  illustrationStyle: string,
-  userId: string,
-  debugTracePush?: (entry: DebugTraceEntry) => void,
-  debugStep?: string,
-  bookId?: string
-): Promise<string> {
-  // Build prompt for entity master (text-only, no reference photo)
-  // GPT sinematik kalite: aynı STYLE_CORE + CINEMATIC_PACK ile kitap bütünlüğü (7 Şubat 2026)
-  const styleDirective = getStyleDescription(illustrationStyle)
-  const cinematicPack = getCinematicPack()
-  const entityPrompt = [
-    `[STYLE] ${styleDirective} [/STYLE]`,
-    `[CINEMATIC] ${cinematicPack}. Consistent lighting and material with the book style. [/CINEMATIC]`,
-    `Neutral front-facing view. ${entityDescription}.`,
-    `Plain neutral background. Illustration style (NOT photorealistic).`,
-    entityType === 'animal' ? 'Friendly and appealing animal character.' : 'Clear and recognizable object.',
-    'Centered in frame. Simple, clean, professional children\'s book illustration.',
-  ].join(' ')
-  
-  // Call /v1/images/generations API (text-only; no reference image)
-  const result = await imageGenerateWithLog(
-    { model: DEFAULT_IMAGE_MODEL, prompt: entityPrompt, size: DEFAULT_IMAGE_SIZE, quality: DEFAULT_IMAGE_QUALITY },
-    { userId, bookId, operationType: 'image_entity', model: DEFAULT_IMAGE_MODEL, quality: DEFAULT_IMAGE_QUALITY, size: DEFAULT_IMAGE_SIZE }
-  )
-  const b64Image = result.data?.[0]?.b64_json
-  if (!b64Image || typeof b64Image !== 'string') {
-    throw new Error('No b64_json in entity master response. API may require response_format.')
-  }
-
-  const imageBuffer = Buffer.from(b64Image, 'base64')
-  const timestamp = Date.now()
-  const filename = `${userId}/entity-masters/entity_master_${entityId}_${timestamp}.png`
-  const s3Key = await uploadFile('books', filename, imageBuffer, 'image/png')
-  const entityUrl = getPublicUrl(s3Key)
-  if (debugTracePush) {
-    debugTracePush({
-      step: debugStep || `entity_master_${entityName}`,
-      request: { model: DEFAULT_IMAGE_MODEL, prompt: entityPrompt, size: DEFAULT_IMAGE_SIZE, entityId, entityType, entityName },
-      response: { url: entityUrl, b64Length: (b64Image as string).length, rawResponse: result },
-    })
-  }
-  return entityUrl
 }
 
 /**
@@ -2354,17 +2306,18 @@ export async function POST(request: NextRequest) {
 
             console.log(`[Create Book] 🖼️  [BATCH] Generating image for page ${pageNumber}/${totalPages}...`)
 
-        // Build prompt for this page
-        let sceneDescription = page.imagePrompt || page.sceneDescription || page.text
+        // Build prompt for this page (D1: page-scene-contract — sceneMap + tekrarı azalt)
+        const pageWithContext = page as { sceneContext?: string; sceneDescription?: string; imagePrompt?: string; text?: string }
+        const primaryVisualBrief = buildPrimaryVisualBrief(pageWithContext)
+        const sceneMapRow = getSceneMapRowForPage(storyData, pageNumber)
+        const storyScenePlanAnchor = formatStoryScenePlanAnchor(sceneMapRow)
         const ageGroup = storyData.metadata?.ageGroup || 'preschool'
         // NEW (v1.6.0): Story no longer generates clothing; master system handles it
         const pageUseMasterClothing = Object.keys(masterIllustrations).length > 0
         // Note: stripClothingFromSceneText REMOVED (v1.6.0) - story doesn't produce clothing text anymore
 
-        // Sıra 15: characterAction = İngilizce kaynak (FOREGROUND'a gider); page.text (Türkçe) sadece fallback. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md
-        const pageWithContext = page as { sceneContext?: string; sceneDescription?: string; imagePrompt?: string; text?: string }
-        const characterActionRaw = pageWithContext.sceneContext?.trim() || pageWithContext.sceneDescription?.trim() || pageWithContext.imagePrompt?.trim() || page.text?.trim() || ''
-        const riskAnalysis = detectRiskySceneElements(sceneDescription ?? '', characterActionRaw)
+        const characterActionRaw = buildCharacterActionForPage(pageWithContext)
+        const riskAnalysis = detectRiskySceneElements(primaryVisualBrief, characterActionRaw)
         let characterAction = riskAnalysis.hasRisk ? getSafeSceneAlternative(characterActionRaw) : characterActionRaw
         const focusPoint: 'character' | 'environment' | 'balanced' = 'balanced'
         const mood = themeKey === 'adventure' ? 'exciting' : themeKey === 'fantasy' ? 'mysterious' : themeKey === 'space' ? 'inspiring' : themeKey === 'sports' ? 'exciting' : 'happy'
@@ -2390,9 +2343,14 @@ export async function POST(request: NextRequest) {
         const pageEnvironmentDescription = (page as { environmentDescription?: string }).environmentDescription?.trim() || undefined
         const pageCameraDistance = (page as { cameraDistance?: string }).cameraDistance || undefined
 
+        const timeOfDayFromPlan =
+          !pageShotPlan?.timeOfDay?.trim() && sceneMapRow
+            ? mapSceneMapTimeToSceneInput(sceneMapRow.timeOfDay)
+            : undefined
+
         const sceneInput = {
           pageNumber,
-          sceneDescription: sceneDescription ?? '',
+          sceneDescription: primaryVisualBrief,
           theme: themeKey,
           mood,
           characterAction: characterAction ?? '',
@@ -2402,6 +2360,8 @@ export async function POST(request: NextRequest) {
           ...(hasValidShotPlan && { shotPlan: pageShotPlan }),
           ...(pageEnvironmentDescription && { environmentDescription: pageEnvironmentDescription }),
           ...(pageCameraDistance && { cameraDistance: pageCameraDistance as 'close' | 'medium' | 'wide' | 'establishing' }),
+          ...(storyScenePlanAnchor && { storyScenePlanAnchor }),
+          ...(timeOfDayFromPlan && { timeOfDay: timeOfDayFromPlan }),
         }
 
         // Generate full page prompt (NEW: Master illustration only, no cover reference)
@@ -2442,7 +2402,7 @@ export async function POST(request: NextRequest) {
         
         // NEW: Analyze scene diversity (16 Ocak 2026)
         const currentSceneAnalysis = analyzeSceneDiversity(
-          sceneDescription ?? '',
+          primaryVisualBrief,
           page.text || '',
           pageNumber,
           sceneDiversityAnalysis
@@ -2485,7 +2445,7 @@ export async function POST(request: NextRequest) {
         )
         if (storyData?.supportingEntities) {
           for (const entity of storyData.supportingEntities) {
-            if (entity.appearsOnPages && entity.appearsOnPages.includes(pageNumber)) {
+            if (entityAppearsOnPage(entity, pageNumber, totalPages)) {
               // Do not add entity if it has the same name as a character (e.g. pet Luna) — avoids duplicate dog in images
               const entityName = (entity.name || '').trim().toLowerCase()
               if (entityName && characterNames.has(entityName)) continue
@@ -2858,7 +2818,7 @@ export async function POST(request: NextRequest) {
         if (debugTrace) {
           debugTrace.push({
             step: `page_${pageNumber}`,
-            request: { prompt: fullPrompt, sceneDescription, pageNumber },
+            request: { prompt: fullPrompt, sceneDescription: primaryVisualBrief, pageNumber },
             response: { url: storageImageUrl },
           })
         }
