@@ -63,7 +63,6 @@ poc/Untitled
 herokidstory_accessKeys.csv
 
 # Google Cloud Service Account Keys
-*.json
 !package.json
 !package-lock.json
 !tsconfig.json
