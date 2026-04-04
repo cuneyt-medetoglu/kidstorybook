@@ -138,6 +138,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const themeNormalized = String(theme).trim().toLowerCase()
+    if (themeNormalized === 'custom' && !String(customRequests ?? '').trim()) {
+      return errorResponse(
+        'customRequests required',
+        'When theme is "custom", customRequests (story seed) is required and must be non-empty.',
+        400
+      )
+    }
+
     // ====================================================================
     // 3. Get Character
     // ====================================================================
@@ -243,6 +252,7 @@ export async function POST(request: NextRequest) {
       storyData: JSON.parse(storyContent),
       expectedPageCount,
       characters: charactersForPrompt.map((character) => ({ id: character.id, name: character.name })),
+      customRequests,
     })
     const storyData = preparedStory.storyData
 

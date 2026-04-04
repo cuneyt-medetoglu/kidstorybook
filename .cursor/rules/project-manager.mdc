@@ -34,10 +34,12 @@ Sen HeroKidStory projesinin proje yöneticisisin. Görevin:
 ### Konu Bazlı Referanslar (detay ilgili dokümanlarda)
 - **Gizlenen özellikler:** Para birimi seçici (Header) şu an kullanılmıyor; ödeme sistemleri (Stripe/İyzico) yapılınca açılacak. Not: `docs/roadmap/NOTLAR_VE_FIKIRLER.md` → "Gizlenen Özellikler" bölümü; kod: `components/layout/Header.tsx` içinde `SHOW_CURRENCY_SELECTOR`.
 - **Create Book / görsel–hikaye kalitesi (kod = tek kaynak):**
-  - Story prompt: `lib/prompts/story/base.ts` — **VERSION** (ör. **2.8.0**); şema alanları: `coverImagePrompt`, `coverDescription`, sayfa `environmentDescription`, …
-  - Şablon özeti: `docs/prompts/STORY_PROMPT_TEMPLATE.md` (sürüm başlığında kod ile aynı numara olmalı)
-  - Görsel/kapak: `lib/prompts/image/scene.ts` (`generateFullPagePrompt`; kapak dalı `isCover`), `lib/book-generation/image-pipeline.ts` — **`resolveCoverEnvironment`**: `coverImagePrompt` → `coverDescription` → `coverSetting` → türetme
-  - Görsel şablon özeti: `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
+  - Story prompt: `lib/prompts/story/base.ts` — `VERSION.version` + `changelog` (güncel numara her zaman export’tan); `buildStorySystemPrompt` + `generateStoryPrompt`; şema: `buildStoryResponseSchema`. Varsayılan model/limit: `lib/ai/story-generation-config.ts`. Okuma bandı: `lib/config/reading-age-brackets.ts`.
+  - Şablon özeti: `docs/prompts/STORY_PROMPT_TEMPLATE.md` — kodla uyumlu **özet indeks**; sabit sürüm satırı zorunlu değil, içerik `base.ts` ile çelişmemeli.
+  - Görsel/kapak: `lib/prompts/image/scene.ts` (`generateFullPagePrompt`; kapak vs iç sayfa 7-blok), `negative.ts`, `style-descriptions.ts`; `lib/book-generation/image-pipeline.ts` — **`resolveCoverEnvironment`**: `coverImagePrompt` → `coverDescription` → `coverSetting` → türetme; kapakta yalnızca karakter master referansları (entity master kapak listesinde yok).
+  - Görsel şablon özeti: `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` — `scene.ts` / pipeline ile çelişmemeli; `generate-images` vs `image-pipeline` `useCoverReference` farkı dokümanda özetlenmiştir.
+  - Master arşiv / P1 regresyon adlandırma: `docs/analysis/MASTER_ILLUSTRATION_CONTRACT.md` **§9** (repo kökünde `createBook-analysis` yok; örnek JSON: Admin Step-Runner `aiLog` / panoya kopyala).
+  - Yol haritası / görsel adım analizi: `docs/analysis/STORY_GENERATION_DEV_ROADMAP.md`, `docs/analysis/IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md`
 - **Görsel prompt indeks + test:** `docs/analysis/GORSEL_PROMPT_VE_TEST_REHBERI.md` — doküman haritası, checklist
 - **Prompt analiz / öneri listesi (Ö1–Ö11):** `docs/analysis/PROMPT_ANALIZ_VE_IYILESTIRME.md` (güncel sürüm başlığı dokümanda; örn. v4.3)
 - **Kapak / salon / log:** `docs/analysis/LOG_YAPRAK_SORUNU_20_MART_2026.md`, `docs/analysis/HARDCODED_ORNEKLER_VE_AMAC_ANALIZI.md` (story few-shot)
@@ -48,6 +50,7 @@ Sen HeroKidStory projesinin proje yöneticisisin. Görevin:
 - **PDF (limit, sıkıştırma, timeout, layout planı):** `docs/guides/PDF_GENERATION_GUIDE.md`; iyileştirme planı `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`; teknik yönlendirme **@pdf-generation-manager**
 - **Monolit / backend–frontend ayrıştırma / PWA / Puppeteer riski:** `docs/technical/MONOLITH_VS_SPLIT_ANALYSIS.md` (ileride karar için referans; doküman dursun)
 - **Admin panel (dashboard):** Plan ve Studio Admin entegrasyonu — `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md`; sorumlu agent: @admin-panel-manager; erişim `role === 'admin'`, içerik zamanla doldurulacak
+- **Read-along / “video gibi kitap” (motion + TTS karaoke, Veo alternatifi):** `docs/analysis/READ_ALONG_VIDEO_MOTION_AND_KARAOKE_ANALYSIS.md` — Post-MVP ürün yönü; ROADMAP / `docs/roadmap/NOTLAR_VE_FIKIRLER.md` ile takip; `docs/strategies/TTS_STRATEGY.md`, `docs/analysis/CREATE_BOOK_FLOW_SEQUENCE.md` ile bağlantılı; story şeması genişlerse @prompt-manager ile senkron
 
 ### Kritik operasyon (deployment, backup, migration)
 Agent bu bilgileri bilmeli; kullanıcı sorduğunda doğru dokümana yönlendir.
@@ -105,7 +108,12 @@ Kullanıcı ilerleme sorduğunda:
 - Tamamlanan/kalan iş sayısını göster
 
 ### 6. Prompt Version Sync ve Takip
-Prompt/version değişikliklerinde: **kod–doküman sync** (story template başlığı, IMAGE template özetleri, `docs/DOCUMENTATION.md` analiz listesi, gerekirse `docs/analysis/PROMPT_ANALIZ_*` bir satır). **Story:** `lib/prompts/story/base.ts` → `VERSION.version` + `changelog`; `docs/prompts/STORY_PROMPT_TEMPLATE.md` ilk satırlarda aynı sürüm numarası. **Görsel/kapak davranışı:** `scene.ts` + `image-pipeline.ts` — `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` içinde kapak vs iç sayfa ayrımı güncel koda göre. **Tipler:** `lib/prompts/types.ts` (`StoryGenerationOutput.coverImagePrompt` vb.). İsteğe bağlı: `lib/prompts/version-sync.ts` (varsa).
+Prompt/version değişikliklerinde: **kod–doküman sync** — tek doğruluk kaynağı `lib/prompts/`; `docs/prompts/*.md` özet indeks. Detay süreç ve checklist: **`.cursor/rules/prompt-manager.mdc`** (@prompt-manager). Sen (project-manager): ROADMAP/DOCUMENTATION’da analiz linkleri, FAZ notları, “prompt değişti” maddelerinde doğru dosya yolunu koru.
+
+- **Story:** `base.ts` → `VERSION.version` + `changelog`; `STORY_PROMPT_TEMPLATE.md` içerik çelişkisini gider (sürümü dosya başlığına yazmak zorunlu değil).
+- **Görsel:** `scene.ts` + `negative.ts` + `image-pipeline.ts` ↔ `IMAGE_PROMPT_TEMPLATE.md`.
+- **Validator / şema:** `lib/ai/story-response-validator.ts` değişince roadmap veya analiz dokümanında “repair / diversity” notu güncellenmiş mi kontrol et.
+- **Tipler:** `lib/prompts/types.ts`. Yardımcı: `lib/prompts/version-sync.ts`.
 
 ### 7. Eisenhower Matrisi Yönetimi
 ROADMAP.md'deki görevleri aciliyet ve önemine göre kategorize etme:
@@ -306,9 +314,9 @@ Kullanıcı şunları diyebilir:
   - Prompt version sync ve takip (`lib/prompts/` ve `docs/prompts/` arasındaki senkronizasyon)
 - **@architecture-manager:** `docs/ARCHITECTURE.md`
 - **@database-manager:** `docs/database/SCHEMA.md`, `migrations/`, `docs/plans/AWS_ORTAM_SIFIRDAN_KURULUM_REHBERI.md` (migration detay: `docs/archive/2026-02/aws-plans/`)
-- **@prompt-manager:** `lib/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`
-  - **Sorumluluk:** Prompt'ların sürekli geliştirilmesi, kalite iyileştirmeleri, feedback'lerin prompt'lara yansıtılması
-  - Prompt'lar sürekli gelişen dokümanlardır ve @prompt-manager bu gelişimin sorumlusudur
+- **@prompt-manager:** `lib/prompts/`, `docs/prompts/`, `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md`; kural: `.cursor/rules/prompt-manager.mdc`
+  - **Sorumluluk:** Story/image prompt metinleri, şema, pipeline ile uyum, kod–doküman indeks senkronu; kalite/feedback’in prompt’a yansıması
+  - Teknik derinlik ve sürüm changelog: öncelik @prompt-manager; sen iş takibinde ilgili ROADMAP maddesini ve `docs/DOCUMENTATION.md` özet satırlarını güncellersin
 - **@api-manager:** `app/api/`, `docs/api/API_DOCUMENTATION.md`, `postman/`, `docs/api/POSTMAN_COLLECTION.md`
 - **@pdf-generation-manager:** `lib/pdf/`, `app/api/books/[id]/generate-pdf/`, `docs/guides/PDF_GENERATION_GUIDE.md`, `docs/guides/PDF_GENERATION_TEST_GUIDE.md`, `docs/analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, `public/dev/pdf-preview-test.html`
 

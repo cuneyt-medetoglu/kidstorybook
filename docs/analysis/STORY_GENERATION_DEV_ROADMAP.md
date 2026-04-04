@@ -1,8 +1,10 @@
 # Story generation — geliştirme yol haritası
 
-**Son güncelleme:** 29 Mart 2026 — A/B/C çekirdek tamam; **B genişletmesi:** `strict: false` kaynaklı sapmalar için **normalleştirme katmanı** (`cameraDistance`, `supportingEntities.type`, `metadata.ageGroup` / `safetyChecked` / `educationalThemes`, `shotPlan` boş alanlar, `characterIds` tek string, `appearsOnPages`) — `lib/ai/story-camera-distance.ts`, `lib/ai/story-response-normalize-fields.ts`, `prepareStoryResponseForUse` içinde `normalizeStoryShape`. **D1–D4** checklist tamamlandı; **master** tarafında evcil + tam `getStyleDescription` (`image-pipeline.ts`). **Debug:** `StepRunnerPanel` request/response JSON **tek tık kopyala**.  
+**Son güncelleme:** 3 Şubat 2026 — A/B/C çekirdek + D1–D4 tamam; story **v3.0.8** (entity max 2). **Master M1–M3 tamam** (sözleşme, arşiv, usage/DB + Step-Runner usage satırı). **Sıradaki:** Master **M4** (ürün kararları: `input_fidelity`, retry tablosu). Analiz: [`IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md`](./IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md).  
+**Görsel kalite / prompt / kapak–sayfa iyileştirme fazları (ayrı plan, 2026):** [`IMAGE_QUALITY_IMPROVEMENT_PLAN.md`](./IMAGE_QUALITY_IMPROVEMENT_PLAN.md) — bu dosyanın yerine geçmez; story A/B/C/D ile görsel fazları birlikte kullanılır.  
 **Tek odak (bu dosya):** `story_generation` metin/JSON + bu dosyadaki **D** özeti (görsel zincir girişleri).  
-**Ayrıntılı görsel adımlar:** `IMAGE_PIPELINE_ROADMAP` yoksa buradaki D + sıradaki faz bölümü yeter; ileride `docs/analysis/IMAGE_PIPELINE_ROADMAP.md` açılabilir.
+**Story request/response referans:** Admin **Step-Runner** story adımı (`aiLog`, JSON panoya kopyala) + bu dokümandaki A/B/C — tekrar derin analiz önceliği düşük.  
+**Master / entity / sonraki görsel adımlar (analiz + aksiyon planı):** [`docs/analysis/IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md`](./IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md) — **master illustration** (edits, çoklu karakter), **entity master** (generations, metin-only), planlı incelemeler: **kapak**, **sayfa görselleri**, **TTS**.
 
 **Kod:** `lib/prompts/story/base.ts` (`generateStoryPrompt`) · API: `app/api/books/route.ts`, `app/api/ai/generate-story/route.ts`, debug: `app/api/admin/debug/step-runner/route.ts`  
 **Prompt özeti (kodla senkron):** `docs/prompts/STORY_PROMPT_TEMPLATE.md` · **İş akışı:** `.cursor/rules/prompt-manager.mdc`
@@ -14,7 +16,7 @@
 | **A** | Request (prompt + API parametreleri) | Story girdi tarafı — **tamam** |
 | **B** | Response (JSON şema, parse, pipeline uyumu) | Validator + repair — **tamam (çekirdek)** |
 | **C** | Merkezi model config (`lib/ai/openai-models.ts`) | **Tamam** |
-| **D** | Görsel pipeline (master → entity → kapak → sayfa pikseli) | **Çekirdek maddeler tamam** — sıradaki: **Entity master / kapak / sayfa** doğrulama ve kalite (aşağı “Sıradaki faz”) |
+| **D** | Görsel pipeline (master → entity → kapak → sayfa pikseli) | **Çekirdek tamam.** Master kalite fazları **M1–M2** bitti; **M3–M4** ve tablo sırasındaki diğer görsel adımlar aşağıda |
 
 Harf sırası = önerilen ürün sırası: önce story (A/B), sonra modeller (C), sonra piksel adımları (D).
 
@@ -22,8 +24,8 @@ Harf sırası = önerilen ürün sırası: önce story (A/B), sonra modeller (C)
 
 | Durum | Ne yap |
 |--------|--------|
-| **Her A maddesi mümkünse** | Küçük kontrol: `request.json` mantıklı mı, bir story çalıştırıldı mı, bariz kırılma var mı? (zorunlu: her satır değil; riskli değişikliklerde evet) |
-| **A paketi tamam (A1–A7 bitti)** | **Tam test:** örnek `request.json` + `response.json` kaydet; aşağıdaki “hızlı sorular” + gerekirse senin onayın → **sonra B’ye geç** |
+| **Her A maddesi mümkünse** | Küçük kontrol: Step-Runner story isteği/yanıtı mantıklı mı, bir story çalıştırıldı mı, bariz kırılma var mı? (zorunlu: her satır değil; riskli değişikliklerde evet) |
+| **A paketi tamam (A1–A7 bitti)** | **Tam test:** örnek story request/response’u Step-Runner logundan veya panodan kaydet; aşağıdaki “hızlı sorular” + gerekirse senin onayın → **sonra B’ye geç** |
 | **B maddeleri** | Şema / parse değiştikçe her seferinde JSON geçerli mi, pipeline kırılmıyor mu? **B paketi bitince** tekrar uçtan uca story_generation dene |
 | **C (model config)** | Deploy / env sonrası: varsayılan model beklediğin gibi gidiyor mu (log veya tek istek)? |
 
@@ -34,7 +36,7 @@ Pratik kural: **A bütünü bitmeden B’ye geçme** demek istemiyorsan — **A1
 ## Nasıl çalışacağız (ortak ilke)
 
 - Kitap üretiminde **birçok adım** var; her adımı **ayrı ayrı** ele alıp bitirip doğrulayacağız.
-- **Küçük, izlenebilir işler:** Mümkünse tek seferde tek tema değişsin; sonra `request.json` / `response.json` ile kontrol edelim.
+- **Küçük, izlenebilir işler:** Mümkünse tek seferde tek tema değişsin; sonra Step-Runner ile story istek/yanıt özetiyle kontrol edelim.
 - **Onay:** Sen “bu adım tamam” deyince sonraki maddeye geçeriz; gerekirse bu adıma sonra döneriz.
 - Amaç: sorun çıkınca **hangi değişikliğin** etkisi olduğu kaybolmasın.
 
@@ -97,10 +99,10 @@ Sırayla ilerle; her madde sonrası mümkünse test + kısa değerlendirme.
 - `max_tokens` → **`max_completion_tokens`** geçişi yapıldı (Chat Completions güncel öneri).
 - Story varsayılanları (`DEFAULT_STORY_MODEL`, promptVersion, output token limiti) tek kaynakta toplandı: `lib/ai/story-generation-config.ts`
 - Prompt tarafında hikayenin **itinerary/checklist** gibi akmasını azaltmak için sebep-sonuç akışı ve picture-book tonu güçlendirildi.
-- `supportingEntities` için tekrar eden / merkezi nesneler (örn. oyuncak ayı, top, harita) açık zorunluluk haline getirildi.
+- `supportingEntities`: v3.0.7 ile `minItems: 1` kaldırıldı; entity sayısını hikaye içeriği belirler (tipik 1–5). Story seed objeleri entity ipucu olarak prompt'a eklendi. Repair akıllı: seed varsa + entities boşsa → repair tetiklenir.
 - Son durum: **A tamamlandı**. Bundan sonra request tarafında ancak kaliteye doğrudan etkisi olan küçük rötuşlar yapılır; ana odak **B**.
 
-**Test dosyaları:** `createBook-analysis/story-generation/request.json` · `response.json`
+**Test kaydı:** Story için örnek istek/yanıt — Admin **Step-Runner** story adımı + `aiLog` (veya `npm run d4:smoke`).
 
 ---
 
@@ -145,7 +147,7 @@ Sırayla ilerle; her madde sonrası mümkünse test + kısa değerlendirme.
 [4] assert → geçerli değilse hata (sonsuz döngü yok; ikinci repair turu yok)
 ```
 
-**supportingEntities + repair:** Alan yok/bozuk, **boş dizi** veya listede **geçersiz kayıt** varsa hedefli repair tetiklenir (kalite: model destekleyici nesneleri doldurur). Sadece “alan tamamen eksik” değil; boş `[]` de bir repair turuna girer.
+**supportingEntities + repair (v3.0.7):** `minItems: 1` sabit kısıtı **kaldırıldı** — entity sayısını hikaye içeriği belirler (prompt: "typically 1–5"). Repair tetiklenme kuralı: alan yok/bozuk veya listede geçersiz kayıt varsa → repair. Ayrıca `supportingEntities` **boş dizi** + **customRequests (story seed) mevcut** ise → repair tetiklenir (seed objeleri entity adayı olarak repair prompt'una verilir). Seed yoksa ve entities boşsa artık hard hata yok — model o hikaye için entity gerekmediğine karar vermiş demektir.
 
 **Not:** Ham yanıtta `usage` token sayar; OpenAI **USD tutarı** göndermez — maliyet `lib/pricing/openai-usage-cost` veya route’taki tahmini `formatStoryCost` ile hesaplanır.
 
@@ -203,7 +205,7 @@ Examples / hazır içerik stratejisi: `docs/analysis/READY_STORIES_AND_IDEAS_PIP
 - **`shotPlan` (sayfa):** Opsiyonel **kompozisyon ipuçları**; kodda `generate-images` / `books` akışından `scene` girdisine **aktarılıyor** (`buildShotPlanBlock` vb.). Derin kullanım ve varsayılanlar D ile genişletilebilir.
 - **`pages[].imagePrompt` (ve ilgili sahne alanları):** Sayfa başına **uzun** görsel brief — piksel üretiminde doğrudan ana malzeme; kısa `sceneMap` satırı bunun yerine geçmez, **tamamlayıcı** katman (plan vs detaylı sahne tarifi).
 
-**Bu dokümanda kalmaz:** D ilerledikçe istenirse `docs/analysis/IMAGE_PIPELINE_ROADMAP.md` gibi ayrı kısa dosya açılabilir; burada sadece faz özeti.
+**Ayrıntılı request/response analizi ve kalıcı iyileştirme aksiyonları:** [`IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md`](./IMAGE_STEPS_REQUEST_RESPONSE_ANALYSIS.md) — bu roadmap’teki D özetiyle birlikte okunur.
 
 ### D) — yapılacaklar (checklist)
 
@@ -212,23 +214,43 @@ Examples / hazır içerik stratejisi: `docs/analysis/READY_STORIES_AND_IDEAS_PIP
 | ~~D1~~ ✅ | Story çıktısı → iç sayfa prompt zinciri | **Tamam (29.03.2026):** `page-scene-contract` — `buildPrimaryVisualBrief` / `buildCharacterActionForPage`; `sceneMap` → `storyScenePlanAnchor` + `timeOfDay` yedek; `scene.ts` PRIORITY + tek satır plan. Kapak ayrı dal (önceki davranış). |
 | ~~D2~~ ✅ | `supportingEntities` → master üretim | **Tamam (29.03.2026):** `lib/book-generation/supporting-entities.ts` — `normalizeAppearsOnPages` / `entityAppearsOnPage` (1…N sayfa, geçersiz numara elenir); `buildSupportingEntityMasterPrompt` (English-only + isim + açıklama). `generateSupportingEntityMaster` tek kaynak (`image-pipeline`); `books/route` içindeki kopya kaldırıldı. |
 | ~~D3~~ ✅ | Stil (`illustrationStyle`) tutarlılığı | **Tamam (29.03.2026):** `style-descriptions.ts` — `usesCinematicImageLayers`, grafik düz profilde `getGlobalArtDirection` + `getCinematicPack` (grafik tutarlılık paketi) + `getStyleQualityPhrase`; `scene.ts` — `buildStyleDirectives`, `getCinematicElements` / `getCinematicNaturalDirectives` dalları; `supporting-entities.ts` — `getCinematicPack(illustrationStyle)`, `[RENDER]` etiketi. |
-| ~~D4~~ ✅ | Uçtan uca doğrulama | **Otomasyon:** `npm run d4:smoke` — kamera mesafesi + pet brief + stil assert’leri. **Master (evcil + stil):** `getStyleDescription` tüm master dallarında; `buildPetCharacterBrief`; evcil prompt style-first. **Story validator (aynı dönem):** enum sapmalarında 500 önleme — normalleştirme + prompt sıkılaştırma (`base.ts` cameraDistance, metadata, supportingEntities.type, shotPlan). **Debug UI:** Step-Runner’da request/response JSON panoya kopyala. **Manuel örnek:** `createBook-analysis/master-illustrations/` + `story-generation/`. |
+| ~~D4~~ ✅ | Uçtan uca doğrulama | **Otomasyon:** `npm run d4:smoke` — kamera mesafesi + pet brief + stil assert’leri. **Master (evcil + stil):** `getStyleDescription` tüm master dallarında; `buildPetCharacterBrief`; evcil prompt style-first. **Story validator (aynı dönem):** enum sapmalarında 500 önleme — normalleştirme + prompt sıkılaştırma (`base.ts` cameraDistance, metadata, supportingEntities.type, shotPlan). **Debug UI:** Step-Runner’da request/response JSON panoya kopyala. **Manuel örnek:** Step-Runner master + story adımlarından dışa aktarılan özetler. |
 
-**D başlangıç kriteri:** `createBook-analysis/story-generation/request.json` + `response.json` ile story adımı onaylandıysa D1’e geç.
+**D başlangıç kriteri:** Story adımı Step-Runner veya eşdeğer akışta onaylandıysa D1’e geç.
 
 ---
 
-### Sıradaki büyük konu (D checklist sonrası)
+### Sıradaki ana konu (şimdi): Master illustrations (`image_master`)
 
-Step-Runner sırası: **Story → Master Illustrations → Entity Masters → Cover → Page Images**. D tablosunda **D2** entity üretim kodunu (`supporting-entities.ts`, `generateSupportingEntityMaster`, `image-pipeline`) kapsıyor; **sıradaki ürün/QA odağı** pratikte şu:
+**Pipeline sırası (hatırlatma):** Story → **Master** → Entity → Cover → Sayfa → TTS. Şu an **Master** sırası.
 
-| Sıra | Konu | Ne yapılacak (kısa) |
-|------|------|---------------------|
-| **1** | **Entity Masters** (`image_entity`) | `supportingEntities.length > 0` olan bir hikâyeyle Step-Runner’da adımı çalıştır; çıkan görsellerin **master karakter + comic_book (veya seçilen stil)** ile uyumu; `buildSupportingEntityMasterPrompt` + `getStyleDescription` / `[RENDER]` yeterli mi, gerekirse entity-only stil satırı güçlendirme. |
-| **2** | **Cover** (`image_cover`) | Kapak prompt birleşimi, `coverImagePrompt` / master referansları; regresyon (özellikle çok karakter + tema). |
-| **3** | **Page Images** (`image_page`) | Tam sayfa veya `targetPageNumber`; `generateFullPagePrompt` + D1/D3 zinciri; maliyet/süre notu. |
+**Amaç:** Edits API (`/v1/images/edits`) ile üretilen karakter master’ında request/response ve **çocuk / evcil** dalları için net sözleşme, izlenebilirlik ve küçük regresyon profili — story adımındaki disipline yaklaşmak.
 
-**Not:** Hikâyede `supportingEntities: []` ise Entity adımı “0 entity” ile geçer; anlamlı test için hikâyede en az bir destek varlığı (ör. oyuncak, nesne) olan bir seed veya repair sonrası dolu liste gerekir.
+| Faz | Kapsam | Dev “hazır” sayılır | Senin testin (nasıl / sonuç) |
+|-----|--------|----------------------|------------------------------|
+| **M1 — Sözleşme** | [`MASTER_ILLUSTRATION_CONTRACT.md`](./MASTER_ILLUSTRATION_CONTRACT.md) — FormData alanları, Child vs Pet dalları, kaynak tabloları. `IMAGE_STEPS` §2 bu dosyaya link verir. | ✅ Doküman yazıldı (3 Şubat 2026). Sen: metni oku ve onayla. | **Manuel:** Step-Runner master `request` özeti ile sözleşme §1 eşle; checklist §7–§8. |
+| **M2 — Arşiv + profil** | [`MASTER_ILLUSTRATION_CONTRACT.md`](./MASTER_ILLUSTRATION_CONTRACT.md) **§9** — dosya adı kuralı, **regresyon profili P1** (1 çocuk + 1 pet + `3d_animation`). | ✅ Bu dosyada (§9). Sen: P1 tablosunu onayla. | **Manuel:** Step-Runner **Master Illustrations**; örnekleri §9 adlandırma kuralına göre sakla; P1 satırlarıyla prompt/görsel kontrolü. |
+| **M3 — Gözlemlenebilirlik** | Zaten: `imageEditWithLog` → `cost_usd` + `response_meta.usage` (`lib/ai/images.ts`). Ek: Step-Runner’da `usage` özeti satırı; [`MASTER_ILLUSTRATION_CONTRACT.md`](./MASTER_ILLUSTRATION_CONTRACT.md) §7. | ✅ Doküman + UI özeti (3 Şubat 2026). | **Manuel:** Master adımı çalıştır → `aiLog`’da yeşil **OpenAI usage**; istenirse DB `ai_requests` doğrula. |
+| **M4 — Kararlar** | `input_fidelity` (şu an `high`) için stil veya env ile ürün kararı dokümante; moderation sonrası **soft** prompt yeniden deneme dışında hangi hatalarda retry / kullanıcı mesajı — kısa tablo. | Karar metni bu dosyada veya `IMAGE_STEPS`’te referanslı. | **Manuel:** Tabloyu oku; canlıda bir hata senaryosu yoksa “karar onaylandı” yeter. |
+
+**Onay akışı:** M1 → sen onayla → M2 → … Her faz bitince bir sonrakine geçilir; paralel iki faz önerilmez.
+
+**Story tarafı (regresyon):** Hikaye JSON için mevcut otomasyon: `npm run d4:smoke` — Master fazlarından bağımsız, kitap öncesi hızlı kontrol.
+
+---
+
+### Sonraki ana konular (sıra — henüz başlatılmadı)
+
+Aynı mantıkla (fazlar + test + onay) sırayla ele alınacak; detay şablonu Master bittikten sonra bu bölüme 1 satır + link ile eklenebilir.
+
+| Sıra | Konu | API / not |
+|------|------|-----------|
+| 2 | Entity masters | `image_entity`, generations |
+| 3 | Cover | `image_cover` |
+| 4 | Page images | `image_page` |
+| 5 | TTS | `lib/tts/generate.ts` |
+
+**Not (v3.0.8):** `supportingEntities` **en fazla 2** (maliyet). 0–2 entity ile Entity adımı çalışır.
 
 ---
 

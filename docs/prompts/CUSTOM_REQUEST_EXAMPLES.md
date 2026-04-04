@@ -4,7 +4,9 @@
 
 **Kullanım:** Aşağıdaki örneklerden yaş + kategori + karakter sayısına uygun birini seçip kopyalayın; gerekirse karakter isimlerini değiştirin. Önce **İngilizce** satır Create Book’da kullanılır; altındaki Türkçe referans içindir.
 
-**Yaş grupları:** 0-2, 3-5, 6-9  
+**Ürün okuma bantları (kod):** `lib/config/reading-age-brackets.ts` — `0-1`, `1-3`, `3-5`, `6+`.  
+**Bu dosyadaki bölüm etiketleri** (0-2, 3-5, 6-9) yalnızca örnek gruplamasıdır; Create Book Step 1’de **en yakın gerçek bandı** seçin (ör. “0-2” tonu → çoğunlukla `1-3` veya `3-5`).
+
 **Kategoriler:** adventure, fairy_tale, educational, nature, space, sports  
 **Karakter:** Tek (1 çocuk) / İki (2 karakter: çocuk + ebeveyn veya çocuk + pet vb.)
 

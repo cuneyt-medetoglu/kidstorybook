@@ -1,6 +1,6 @@
 # 📋 HeroKidStory - Dokümantasyon Haritası
 
-**Tarih:** 2 Şubat 2026  
+**Tarih:** 30 Mart 2026  
 **FAZ 1 Çıktısı:** Tüm MD dosyalarının kategorisi ve özeti  
 **Amaç:** Hangi dokümanın nerede olduğunu, güncel mi eski mi olduğunu tek bakışta görmek
 
@@ -72,6 +72,7 @@
 | DEBUG_QUALITY_IMPLEMENTATION_SUMMARY.md | ✅ AKTİF | 7 Şubat 2026 | Debug kalite butonları (admin, trace export). |
 | STORY_PROMPT_ACTION_PLAN.md | ✅ AKTİF | 7 Şubat 2026 | Hikaye + görsel kalite aksiyon planı. |
 | PDF_OUTPUT_IMPROVEMENT_PLAN.md | ✅ AKTİF | 22 Mart 2026 | PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka; önizleme `public/dev/pdf-preview-test.html`; @pdf-generation-manager. |
+| READ_ALONG_VIDEO_MOTION_AND_KARAOKE_ANALYSIS.md | ✅ AKTİF | 30 Mart 2026 | Veo alternatifi: motion + TTS karaoke; zaman çizelgesi; fazlar; `lib/tts/generate.ts`, BookViewer; @project-manager. |
 | (7 dosya) | → archive/2026-02/analysis/ | 7 Şubat 2026 | CHATGPT_STORY_REQUEST_REVIEW_PROMPT, CLOTHING_CONSISTENCY_ROOT_CAUSE_ANALYSIS, SYSTEM_REDESIGN_CLOTHING_CONSISTENCY, GPT_FOLLOWUP_AND_PLAN, GPT_ILLUSTRATION_AND_CINEMATIC_MESSAGE, GPT_TRACE_CEVAPLARI_AKSIYON, GPT_TRACE_QUESTIONS_2026-02-07. |
 
 ---
@@ -170,8 +171,8 @@
 
 | Dosya | Kategori | Özet |
 |-------|----------|------|
-| STORY_PROMPT_TEMPLATE.md | ✅ AKTİF | Hikaye prompt şablonu (kod ile senkron). v2.6.0: anlatı yayı (narrative arc) STORY STRUCTURE’da. |
-| IMAGE_PROMPT_TEMPLATE.md | ✅ AKTİF | Görsel prompt şablonu (kod ile senkron). |
+| STORY_PROMPT_TEMPLATE.md | ✅ AKTİF | Hikaye prompt özeti; tek kaynak `lib/prompts/story/base.ts` (API, bölüm sırası, şema). |
+| IMAGE_PROMPT_TEMPLATE.md | ✅ AKTİF | Görsel prompt özeti; tek kaynak `lib/prompts/image/scene.ts` (7-blok iç sayfa, kapak dalı, pipeline referansları). |
 | HERO_TRANSFORMATION_PROMPTS.md | ✅ AKTİF | Hero "Your Child, The Hero" sahne prompt örnekleri (FAZ 9; eskiden scripts/hero-transformation-prompts.txt). |
 
 ---

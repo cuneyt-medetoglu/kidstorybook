@@ -32,6 +32,9 @@ export type RepairableField =
  */
 export const STORY_RESPONSE_MAX_REPAIR_CALLS = 1
 
+/** Ürün kuralı: entity master görseli başına maliyet — en fazla bu kadar supporting entity. */
+export const MAX_SUPPORTING_ENTITIES = 2
+
 type PrepareStoryResponseParams = {
   openai: OpenAI
   model: string
@@ -43,6 +46,8 @@ type PrepareStoryResponseParams = {
   storyData: any
   expectedPageCount: number
   characters: StoryCharacterRef[]
+  /** Story seed text; used for smart entity repair (if entities empty but seed mentions objects). */
+  customRequests?: string
 }
 
 export interface PreparedStoryResponse {
@@ -198,7 +203,8 @@ function isSupportingEntitiesEntryValid(entity: unknown): boolean {
 function findRepairableFields(
   storyData: any,
   expectedPageCount: number,
-  characterIds: string[]
+  characterIds: string[],
+  customRequests?: string
 ): RepairableField[] {
   const repairFields = new Set<RepairableField>()
 
@@ -211,10 +217,18 @@ function findRepairableFields(
   }
 
   const supportingEntities = storyData?.supportingEntities
+  const hasInvalidEntry = Array.isArray(supportingEntities) &&
+    supportingEntities.some((entry: unknown) => !isSupportingEntitiesEntryValid(entry))
+  const isEmptyWithSeed = Array.isArray(supportingEntities) &&
+    supportingEntities.length === 0 &&
+    typeof customRequests === 'string' && customRequests.trim().length > 0
+  const tooManyEntities =
+    Array.isArray(supportingEntities) && supportingEntities.length > MAX_SUPPORTING_ENTITIES
   const needsSupportingEntitiesRepair =
     !Array.isArray(supportingEntities) ||
-    supportingEntities.length === 0 ||
-    supportingEntities.some((entry: unknown) => !isSupportingEntitiesEntryValid(entry))
+    hasInvalidEntry ||
+    isEmptyWithSeed ||
+    tooManyEntities
   if (needsSupportingEntitiesRepair) {
     repairFields.add('supportingEntities')
   }
@@ -244,6 +258,101 @@ function findRepairableFields(
   }
 
   return [...repairFields]
+}
+
+// ============================================================================
+// Faz 1.2 — Sahne çeşitliliği kontrolleri
+// ============================================================================
+
+/**
+ * Gerund (-ing) pattern: storybook imagePrompt'larda aktif sahne için en güvenilir proxy.
+ * "reaching", "holding", "running" gibi kelimeler aksiyon varlığını gösterir.
+ */
+const HAS_ACTION_RE = /\b\w+ing\b/
+
+/** Bakış fiilleri: looks/watches/peers/gazes/stares */
+const GAZE_RE = /\b(looks?|watches?|peers?|gazes?|stares?)\b/i
+
+/**
+ * Faz 1.2: Story response'un sahne çeşitliliği kontrollerini yapar.
+ *
+ * Uyarılar `issues[]` dizisine eklenir (log + debug export'ta görünür).
+ * Sadece ardışık lokasyon tekrarı `sceneMap` repair'ini tetikler — diğerleri uyarı.
+ *
+ * Kontroller:
+ * 1. Ardışık 3 sayfa aynı `location`  → sceneMap repair
+ * 2. Sayfaların yarısından fazlası aynı `cameraDistance` → uyarı
+ * 3. imagePrompt'ta gerund/aksiyon fiili yok → uyarı
+ * 4. (V2) Ardışık iki sayfada gaze dominant imagePrompt → uyarı
+ */
+function checkSceneDiversity(
+  storyData: any,
+  issues: string[]
+): RepairableField[] {
+  const additionalRepairFields: RepairableField[] = []
+  const pages: any[] = Array.isArray(storyData?.pages) ? storyData.pages : []
+  const sceneMap: any[] = Array.isArray(storyData?.sceneMap) ? storyData.sceneMap : []
+
+  // ── 1. Ardışık 3 sayfa aynı location → sceneMap repair ──────────────────
+  for (let i = 0; i <= sceneMap.length - 3; i++) {
+    const l0 = String(sceneMap[i]?.location ?? '').trim().toLowerCase()
+    const l1 = String(sceneMap[i + 1]?.location ?? '').trim().toLowerCase()
+    const l2 = String(sceneMap[i + 2]?.location ?? '').trim().toLowerCase()
+    if (l0 && l0 === l1 && l1 === l2) {
+      issues.push(
+        `diversity: pages ${i + 1}–${i + 3} share the same location ("${sceneMap[i]?.location}") — sceneMap repair requested`
+      )
+      additionalRepairFields.push('sceneMap')
+      break // tek bir lokasyon bloğu yeterli tetikleyici
+    }
+  }
+
+  // ── 2. Sayfaların ≥50 %'si aynı cameraDistance → uyarı ──────────────────
+  if (pages.length >= 6) {
+    const camCounts: Record<string, number> = {}
+    for (const page of pages) {
+      const cam = String(page?.cameraDistance ?? '').trim()
+      if (cam) camCounts[cam] = (camCounts[cam] ?? 0) + 1
+    }
+    for (const [cam, count] of Object.entries(camCounts)) {
+      if (count >= Math.ceil(pages.length / 2)) {
+        issues.push(
+          `diversity warning: cameraDistance "${cam}" appears on ${count}/${pages.length} pages — low variety`
+        )
+      }
+    }
+  }
+
+  // ── 3. imagePrompt'ta aksiyon fiili (gerund) yok → uyarı ────────────────
+  const pagesWithoutAction: number[] = []
+  for (const page of pages) {
+    const prompt = String(page?.imagePrompt ?? '')
+    if (!HAS_ACTION_RE.test(prompt) && typeof page?.pageNumber === 'number') {
+      pagesWithoutAction.push(page.pageNumber)
+    }
+  }
+  if (pagesWithoutAction.length > 0) {
+    issues.push(
+      `diversity warning: pages ${pagesWithoutAction.join(', ')} imagePrompt may lack an active action verb (no gerund found)`
+    )
+  }
+
+  // ── 4. (V2) Ardışık iki sayfada gaze dominant imagePrompt → uyarı ────────
+  let prevGaze = false
+  for (const page of pages) {
+    const prompt = String(page?.imagePrompt ?? '')
+    const hasGaze = GAZE_RE.test(prompt)
+    if (hasGaze && prevGaze && typeof page?.pageNumber === 'number') {
+      issues.push(
+        `diversity warning: page ${page.pageNumber} and the preceding page both have gaze-dominant imagePrompt — consider alternating action types`
+      )
+      prevGaze = false // tek uyarı per çift yeterli; kaskadı önler
+      continue
+    }
+    prevGaze = hasGaze
+  }
+
+  return additionalRepairFields
 }
 
 function buildRepairSchema(fields: RepairableField[]) {
@@ -280,6 +389,9 @@ function buildRepairSchema(fields: RepairableField[]) {
   if (fields.includes('supportingEntities')) {
     properties.supportingEntities = {
       type: 'array',
+      maxItems: MAX_SUPPORTING_ENTITIES,
+      description:
+        `At most ${MAX_SUPPORTING_ENTITIES} plot-significant objects or non-character animals; never scenery-only.`,
       items: {
         type: 'object',
         properties: {
@@ -351,7 +463,8 @@ function buildRepairPrompt(
   fields: RepairableField[],
   storyData: any,
   expectedPageCount: number,
-  characters: StoryCharacterRef[]
+  characters: StoryCharacterRef[],
+  customRequests?: string
 ): string {
   const fieldNotes = fields.map((field) => {
     switch (field) {
@@ -360,9 +473,9 @@ function buildRepairPrompt(
       case 'coverImagePrompt':
         return '- coverImagePrompt: 4-8 English sentences, cinematic movie-poster cover brief; not page 1.'
       case 'sceneMap':
-        return '- sceneMap: exactly one entry per page; pageNumber/location/timeOfDay/setting must match the existing story beats. location, timeOfDay, setting — English only (image pipeline).'
+        return '- sceneMap: exactly one entry per page; pageNumber/location/timeOfDay/setting must match the existing story beats. DIVERSITY: no 3 consecutive pages with the exact same location — if present, vary them (adjacent area, different room, different part of the environment). location, timeOfDay, setting — English only (image pipeline).'
       case 'supportingEntities':
-        return '- supportingEntities: include recurring or central non-character animals/objects (teddy bear, ball, map, kite, lantern, boat, toy, pond, log…). Return [] only if none exist. name and description — English only (image master API). appearsOnPages = page numbers where the object appears.'
+        return `- supportingEntities: **At most ${MAX_SUPPORTING_ENTITIES} entries** (product cost cap). Each entry = plot-significant object or non-character animal (carried, found, worn, shared, talked to, used to solve a problem). If more than ${MAX_SUPPORTING_ENTITIES} candidates exist, keep only the two most central to the plot (prioritize story-seed objects if listed). No scenery-only items. name and description — English only. appearsOnPages = page numbers where the entity appears.`
       case 'suggestedOutfits':
         return '- suggestedOutfits: one English outfit line per character UUID. Same outfit for the whole book unless the story text explicitly changes wardrobe (e.g. pajamas, swimwear).'
       default:
@@ -371,6 +484,11 @@ function buildRepairPrompt(
   })
 
   const characterMap = Object.fromEntries(characters.map((character) => [character.id, character.name ?? character.id]))
+
+  const seedBlock =
+    fields.includes('supportingEntities') && customRequests?.trim()
+      ? `\n\n**Story seed (author's original idea):**\n"${customRequests.trim()}"\nAny object or animal mentioned in this seed that is plot-significant MUST appear in supportingEntities.`
+      : ''
 
   return `Repair the children story JSON below.
 
@@ -384,7 +502,7 @@ Requirements:
 ${fieldNotes.join('\n')}
 - Expected page count: ${expectedPageCount}
 - Character map (do NOT add these to supportingEntities): ${JSON.stringify(characterMap)}
-- sceneMap must follow the actual current pages in order, pageNumber = 1..${expectedPageCount}.
+- sceneMap must follow the actual current pages in order, pageNumber = 1..${expectedPageCount}.${seedBlock}
 
 Story context:
 ${buildRepairStoryContext(fields, storyData)}`
@@ -398,7 +516,8 @@ async function repairStoryFields(
     fields,
     params.storyData,
     params.expectedPageCount,
-    params.characters
+    params.characters,
+    params.customRequests
   )
 
   const repairContext: ChatLogContext = {
@@ -544,6 +663,12 @@ function assertStoryResponseValid(
     throw new Error('Story is missing required "supportingEntities" array')
   }
 
+  if (storyData.supportingEntities.length > MAX_SUPPORTING_ENTITIES) {
+    throw new Error(
+      `supportingEntities must contain at most ${MAX_SUPPORTING_ENTITIES} entries (entity master cost cap)`
+    )
+  }
+
   for (const entity of storyData.supportingEntities) {
     if (
       !isNonEmptyString(entity?.id) ||
@@ -594,11 +719,21 @@ export async function prepareStoryResponseForUse(
   let storyData = normalizeStoryShape(params.storyData, params.expectedPageCount, normNotesInitial)
   issues.push(...normNotesInitial)
 
-  const repairFields = findRepairableFields(
+  const structuralRepairFields = findRepairableFields(
     storyData,
     params.expectedPageCount,
-    params.characters.map((character) => character.id)
+    params.characters.map((character) => character.id),
+    params.customRequests
   )
+
+  // Faz 1.2: sahne çeşitliliği kontrolleri — uyarıları issues[]'e ekle;
+  // lokasyon tekrarı varsa sceneMap repair'i de tetiklenebilir.
+  const diversityRepairFields = checkSceneDiversity(storyData, issues)
+  const repairFieldSet = new Set<RepairableField>([
+    ...structuralRepairFields,
+    ...diversityRepairFields,
+  ])
+  const repairFields = [...repairFieldSet]
 
   let repaired = false
   let repairCalls = 0

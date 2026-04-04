@@ -2,13 +2,12 @@ import type { PromptVersion, ShotPlan } from '../types'
 import {
   getStyleDescription,
   is3DAnimationStyle,
-  get3DAnimationNotes,
   getCinematicPack,
   getGlobalArtDirection,
   getStyleQualityPhrase,
   usesCinematicImageLayers,
 } from './style-descriptions'
-import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStrategy } from './negative'
+import { getAnatomicalCorrectnessDirectives } from './negative'
 
 /**
  * Scene Generation Prompts - Version 1.0.0
@@ -24,8 +23,8 @@ import { getAnatomicalCorrectnessDirectives, getSafeHandPoses, getDefaultHandStr
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.22.0',
-  releaseDate: new Date('2026-03-29'),
+  version: '1.29.0',
+  releaseDate: new Date('2026-04-04'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -83,6 +82,13 @@ export const VERSION: PromptVersion = {
     'v1.20.0: [Sıra 19] Allow relighting – Interior sayfa prompt\'una "Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene." eklendi. PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md (8 Şubat 2026)',
     'v1.21.0: [D1] story_data.sceneMap → SceneInput.storyScenePlanAnchor; characterAction imagePrompt ile ikinci kez doldurulmaz (page-scene-contract). PRIORITY sırasına plan satırı eklendi. (29 Mart 2026)',
     'v1.22.0: [D3] illustrationStyle grafik düz profil (comic_book, geometric, sticker_art, block_world, collage): getGlobalArtDirection/getCinematicPack/getStyleQualityPhrase; getCinematicElements/getCinematicNaturalDirectives grafik dala; sinematik katmanlar ile stil çekirdeği çakışması azaltıldı. (29 Mart 2026)',
+    'v1.23.0: [Faz 2.1] Çelişki temizliği — C1: getGazeDirectionForPage index-0 + POSE_VARIATIONS[1] viewer-facing gaze kaldırıldı (getCinematicNaturalDirectives ile çelişiyordu); C2: getDefaultHandStrategy "not holding objects/no hand gestures" kaldırıldı (story aksiyonu ile çelişiyordu), buildAnatomicalAndSafetySection getSafeHandPoses satırı kaldırıldı; C3a: buildCharacterConsistencySection içinde buildStyleDirectives[2] + buildCharacterConsistencyDirectives[2] — kelimesi kelimesine aynı string iki kez push ediliyordu, sadece gerçek tutarlılık direktifleri bırakıldı; C3b: generateScenePrompt() başındaki buildStyleDirectives[0] kaldırıldı (getGlobalArtDirection + buildStyleSection zaten kapsıyor); C4: buildFirstInteriorPageDirectives "NOT centered" tekrarı kaldırıldı (SHOT PLAN zaten söylüyor). (4 Nisan 2026)',
+    'v1.25.0: [Faz 2.2b-A] [SCENE] tekrar temizliği — Depth: FOREGROUND satırında characterAction tekrarı kaldırıldı (üst satırda zaten var). MIDGROUND sceneDescription (= uzun imagePrompt, ~420 karakter) yerine kısa environment kullanıyor. Tahmini ek düşüş ~100-250 karakter. (4 Nisan 2026)',
+    'v1.29.0: [Faz 2.2b-B] İç sayfa [7] AVOID ve kapak buildAvoidShort: "extra or fused fingers", "extra limbs", "messy anatomy" kaldırıldı — kısa kompozisyon + arka plan + teknik yasaklar kaldı (OpenAI prompting: kısıtları kısa tut; parmak negatifleri token gürültüsü). (4 Nisan 2026)',
+    'v1.28.0: [Faz 4] Kapak özel iyileştirme — (1) Cover PATH [1]: "Illustration style: ..." generic satırı → getGlobalArtDirection(illustrationStyle) (interior ile aynı stil profili); (2) Cover PATH [4] SCENE: buildStyleDirectives[0] (~150 karakter stil tekrarı) kaldırıldı — üstte zaten getGlobalArtDirection var. Pipeline (image-pipeline.ts): entity master URL\'leri kapak referans listesinden çıkarıldı — kapakta yalnızca karakter master\'ları gönderiliyor (entity görselleri karakter kimliğini karıştırabilir). (4 Nisan 2026)',
+    'v1.27.0: [Faz 3] Stil izolasyon düzeltmesi — clay_animation: "stop-motion" kelimesi kaldırıldı (model sahneyi dondurulmuş / hareketsiz kare olarak yorumlayabiliyordu); "claymation handcrafted look" ile değiştirildi. Hem STYLE_DESCRIPTIONS hem getStyleSpecificDirectives güncellendi. get3DAnimationNotes dead import temizlendi. (4 Nisan 2026)',
+    'v1.26.0: [Faz 1.3] Story staging + pozitif gaze — (1) getCinematicNaturalDirectives: "do NOT look at camera" yerine pozitif sahne hedefi ("look toward scene elements"); (2) [4] SCENE bloğu: "Do NOT look at camera" yerine "look toward the scene: at each other, at the object they interact with, toward the path"; (3) [7] AVOID: "looking directly at camera" kaldırıldı (pozitif yönlendirme ile gereksizleşti). base.ts\'te ILLUSTRATION / STAGING direktifi: her sceneDescription\'a 1 cümle gaze hedefi ekleme zorunluluğu getirildi. (4 Nisan 2026)',
+    'v1.24.0: [Faz 2.2] 7-blok prompt yapısı — İç sayfa prompt\'u ~14 dağınık bloktan 7 odaklı bloğa indirildi: [1] PRIORITY, [2] STYLE, [3] SHOT PLAN, [4] SCENE, [5] CHARACTER IDENTITY, [6] EXPRESSIONS, [7] AVOID. Ortam×3→×1, Aydınlatma×2→×1, Stil×3→×1, Tutarlılık×4→×1, Kompozisyon×2→SHOT PLAN\'a birleştirildi. generateScenePrompt() / generateLayeredComposition() iç sayfa için artık çağrılmıyor (benzersiz içerik [4] SCENE\'e taşındı). [ANATOMY] bloğu kaldırıldı, anahtar kelimeler [7] AVOID\'a eklendi. Kalite dolgu satırları (professional children\'s book, high quality, print-ready) tamamen kaldırıldı. Tahmini prompt uzunluğu ~4000→~1800 karakter (~%55 azalma), sahne içeriğinin token oranı artırıldı. (4 Nisan 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -146,11 +152,12 @@ export function generateScenePrompt(
 ): string {
   const parts: string[] = []
 
-  // 1. STYLE - v1.7.0: Using buildStyleDirectives (first directive only for scene prompt)
-  const styleDirectives = buildStyleDirectives(illustrationStyle)
-  parts.push(styleDirectives[0]) // First style directive: style + quality phrase (cinematic vs graphic)
-  
-  // 2. CINEMATIC ELEMENTS — D3: grafik stillerde filmic god rays / mist azaltılır
+  // NOTE v1.23.0 (Faz 2.1): Style directive removed from here — it is already provided by
+  // getGlobalArtDirection() + buildStyleSection() in generateFullPagePrompt.
+  // Repeating the full styleDesc (~150 chars) a third time was diluting scene content.
+  // generateScenePrompt is only called from generateFullPagePrompt (interior pages).
+
+  // 1. CINEMATIC ELEMENTS — D3: grafik stillerde filmic god rays / mist azaltılır
   const cinematicElements = getCinematicElements(scene.pageNumber, scene.mood, scene.timeOfDay, illustrationStyle)
   parts.push(cinematicElements)
   
@@ -685,13 +692,13 @@ export function getEnhancedAtmosphericDepth(): string {
 // ============================================================================
 
 const POSE_VARIATIONS = [
-  "character facing forward, standing naturally, arms at sides or one hand slightly raised",
-  "character looking directly at viewer, warm smile, natural relaxed posture",
+  "character facing into the scene, standing naturally, arms at sides or one hand slightly raised",
+  "character looking at a nearby companion or scene object with warmth, relaxed and natural posture",
   "character walking forward confidently, one leg mid-step, dynamic movement",
-  "character sitting cross-legged on ground, comfortable and relaxed",
+  "character sitting cross-legged on ground, comfortable and relaxed, gazing at something nearby",
   "character jumping with joy, both arms raised above head, feet off ground",
-  "character pointing at something off-screen with one hand, engaged expression",
-  "character looking up at sky with wonder, head tilted back slightly, arms at sides",
+  "character pointing excitedly toward something in the scene, engaged expression, eyes on the target",
+  "character looking up at sky with wonder, head tilted back slightly, arms open",
   "character crouching down examining something on ground, curious expression",
 ]
 
@@ -731,16 +738,14 @@ export function getCinematicNaturalDirectives(illustrationStyle?: string): strin
   if (graphic) {
     return [
       'illustrated story moment — characters act within the scene, not posing for a photo',
-      'characters engaged with the scene and each other, not staring at the viewer',
-      'do NOT have characters look directly at the viewer; they look at the scene, each other, or objects (e.g. fire, sky, path, horizon)',
+      'characters look toward scene elements (path, object, companion, horizon) — eyes follow the story action',
       'natural composition for a children\'s book spread; clear graphic readability',
     ].join(', ')
   }
   return [
-    'cinematic, storybook moment – as if capturing a moment in the story, not a photo shoot',
-    'characters engaged with the scene and each other, not posing for the viewer',
-    'do NOT have characters look directly at the viewer or camera; they look at the scene, at each other, or at objects (e.g. fire, sky, path, horizon)',
-    'natural composition, immersive atmosphere, natural lighting and depth'
+    'cinematic storybook moment — capture a live instant in the story, not a posed photo',
+    'characters look toward the scene: at each other, at the object they are interacting with, toward the path, or at something in the environment',
+    'natural composition, immersive atmosphere, natural lighting and depth',
   ].join(', ')
 }
 
@@ -920,7 +925,7 @@ export function getStyleSpecificDirectives(illustrationStyle: string): string {
     'watercolor': 'Transparent watercolor, soft brushstrokes, paper texture visible',
     'block_world': 'Pixelated blocky aesthetic, Minecraft-like, limited palette',
     'collage': 'Cut-out pieces, rough edges, layered textures, mixed media',
-    'clay_animation': 'Clay-like texture, fingerprints visible, matte finish, stop-motion',
+    'clay_animation': 'Clay-like texture, fingerprints visible, matte finish, claymation handcrafted look',
     'kawaii': 'Oversized head, large sparkling eyes, pastel colors, cute aesthetic',
     'comic_book': 'Bold black outlines, flat colors, dramatic shadows, high contrast',
     'sticker_art': 'Clean lines, saturated colors, glossy look, white border effect',
@@ -957,8 +962,8 @@ function buildCoverDirectives(additionalCharactersCount: number): string[] {
 function buildFirstInteriorPageDirectives(additionalCharactersCount: number): string[] {
   const charNote = additionalCharactersCount > 0 ? `All ${additionalCharactersCount + 1} characters prominent` : 'Character integrated into scene'
   return [
-    'FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition (e.g. rule of thirds, character off-center), and/or expanded scene detail. Do not repeat the same framing as the cover.',
-    'Character smaller in frame, NOT centered; use rule of thirds or leading lines (e.g. path).',
+    'FIRST INTERIOR PAGE: Must be distinctly different from the book cover. Use a different camera angle (e.g. cover = medium/portrait, page 1 = wide or low-angle), different composition, and/or expanded scene detail. Do not repeat the same framing as the cover.',
+    'Character smaller in frame; rule of thirds or leading lines (e.g. path) — composition distinct from cover.',
     `Book interior illustration (flat, standalone, NOT 3D mockup). ${charNote}. No text/writing.`
   ]
 }
@@ -1044,22 +1049,9 @@ function buildStyleDirectives(illustrationStyle: string): string[] {
  * Build anatomical and safety section
  * v1.7.0: Extracted from generateFullPagePrompt for modularity
  */
-function buildAnatomicalAndSafetySection(ageGroup: string): string[] {
-  const parts: string[] = []
-  
-  // Anatomical correctness
-  const anatomicalDirectives = getAnatomicalCorrectnessDirectives()
-  parts.push(anatomicalDirectives)
-  
-  // [A11] Parmak stratejisi – varsayılan: el vurgulama (hands at sides, no gestures)
-  parts.push(getDefaultHandStrategy())
-  
-  // Safe hand poses (backup: simple wave, behind back)
-  const safeHandPoses = getSafeHandPoses()
-  parts.push('Preferred hand poses: ' + safeHandPoses.join(', '))
-  parts.push('') // Empty line for separation
-  
-  return parts
+/** @deprecated v1.24.0: No longer called from interior path (7-block); anatomy moved to [7] AVOID. Kept for cover path compatibility. */
+function buildAnatomicalAndSafetySection(_ageGroup: string): string[] {
+  return [getAnatomicalCorrectnessDirectives(), '']
 }
 
 /**
@@ -1183,12 +1175,12 @@ function buildCharacterIntegrationSection(): string[] {
   return [getCharacterIntegrationDirectives()]
 }
 
-/** Faz 3.4: Gaze direction variety – character not always looking at viewer. */
+/** Faz 3.4: Gaze direction variety – character NEVER looks at viewer (see getCinematicNaturalDirectives). */
 function getGazeDirectionForPage(pageNumber: number, totalPages: number): string {
   const gazes = [
-    'character looking toward viewer, warm expression',
+    'character looking ahead into the scene, wide-eyed wonder or curiosity',
     'character looking into scene (path, horizon, or object), engaged with environment',
-    'character looking up (sky, trees), sense of wonder',
+    'character looking up (sky, trees, clouds), sense of wonder',
     'character looking to the side, following action in scene',
     'character looking down at something in scene (e.g. animal, object), curious',
     'character looking toward companion or element in frame, not at camera',
@@ -1278,16 +1270,17 @@ function buildSpecialPageDirectives(
 /**
  * Build character consistency section
  * v1.7.0: Extracted from generateFullPagePrompt for modularity
+ * v1.23.0: Faz 2.1 — removed exact-duplicate style string (both buildStyleDirectives[2] and
+ *   buildCharacterConsistencyDirectives[2] were pushing the same literal string twice).
+ *   Style is already covered by getGlobalArtDirection() + buildStyleSection().
+ *   Only actual character consistency directives remain here.
  */
-function buildCharacterConsistencySection(illustrationStyle: string): string[] {
-  const parts: string[] = []
-  
-  const styleDirectives = buildStyleDirectives(illustrationStyle)
-  parts.push(styleDirectives[2]) // Third style directive
+function buildCharacterConsistencySection(_illustrationStyle: string): string[] {
   const charConsistency = buildCharacterConsistencyDirectives()
-  parts.push(charConsistency[2]) // Third consistency directive
-  
-  return parts
+  return [
+    charConsistency[0], // 'consistent character design, same character as previous pages'
+    charConsistency[1], // 'character must match reference photo exactly, same features on every page'
+  ]
 }
 
 /**
@@ -1392,7 +1385,8 @@ function buildCompositionRulesShort(): string {
 // ============================================================================
 
 function buildAvoidShort(): string {
-  return 'AVOID: character filling the frame, close-up portrait framing, extra limbs, messy anatomy, blurry background, neon saturation, text or watermark.'
+  // Faz 2.2b-B: parmak / ekstremite / “messy anatomy” negatifleri kaldırıldı — kısa kompozisyon + teknik yasaklar.
+  return 'AVOID: character filling the frame, close-up portrait framing, blurry background, neon saturation, text or watermark.'
 }
 
 /** Kısa, sabit kitap kapağı kompozisyonu — çiçek/çerçeve sızıntısı tetiklemeden poster hissi. Story metni ayrı gelir (coverEnvironment). */
@@ -1421,13 +1415,7 @@ export function generateFullPagePrompt(
   totalPages: number = 12, // v1.8.0: For pose variation distribution (Faz 2.3)
   characterListForExpressions?: Array<{ id: string; name: string }> // v1.11.0: For [CHARACTER_EXPRESSIONS] labels (char ID → name)
 ): string {
-  // Interior: full hybrid scene prompt. Cover: built only inside the cover branch (no wonder/adventure chain).
-  const scenePrompt = isCover
-    ? ''
-    : generateScenePrompt(sceneInput, characterPrompt, illustrationStyle, false)
-
-  // Get environment for layered composition.
-  // Priority: environmentDescription (interior) > coverEnvironment (cover) > sceneDescription > theme template
+  // Environment: story environmentDescription > coverEnvironment > sceneDescription > theme template
   const environment = getEnvironmentDescription(
     sceneInput.theme,
     sceneInput.sceneDescription,
@@ -1436,21 +1424,14 @@ export function generateFullPagePrompt(
     !isCover ? sceneInput.environmentDescription : undefined
   )
 
-  // Build layered composition (FOREGROUND/MIDGROUND/BACKGROUND)
-  const midgroundOverride = isCover ? 'Book cover: key story moments and theme in one image' : undefined
-  const layeredComp = generateLayeredComposition(sceneInput, sceneInput.characterAction, environment, midgroundOverride)
-
-  // Add age-appropriate rules
-  const ageRules = getAgeAppropriateSceneRules(ageGroup)
-
   const promptParts: string[] = []
 
   // ─── COVER PATH ────────────────────────────────────────────────────────────
   // Story-driven scene (coverEnvironment = resolveCoverEnvironment: coverImagePrompt first).
-  // Fixed layout line + identity; no GLOBAL_ART_DIRECTION / PRIORITY / old cinematic bloat.
+  // v1.28.0 (Faz 4): getGlobalArtDirection replaces the generic "Illustration style: ..." line.
   if (isCover) {
-    // 1. Style identifier (short)
-    promptParts.push(`Illustration style: ${illustrationStyle}. Children's picture book, digital art.`)
+    // 1. Style — same cinematic/graphic profile used by interior pages
+    promptParts.push(getGlobalArtDirection(illustrationStyle))
 
     // 2. Character identity reference (short, no pose copying)
     const useMatchRefCover = sceneInput.clothing === 'match_reference'
@@ -1474,11 +1455,11 @@ export function generateFullPagePrompt(
     // 3c. Book-cover composition (code-owned; keeps poster/title-safe feel without re-adding PRIORITY blocks)
     promptParts.push(getCoverBookLayoutDirectives())
 
-    // 4. SCENE — story cover brief + style only (avoid generateScenePrompt chain)
-    const styleLead = buildStyleDirectives(illustrationStyle)[0] || ''
+    // 4. SCENE — story cover brief (style already in [1] getGlobalArtDirection; no repeat here)
+    // v1.28.0 (Faz 4): buildStyleDirectives[0] removed (was repeating style description ~150 chars).
     const styleExtra = getStyleSpecificDirectives(illustrationStyle) || ''
     const envPrimary = sceneInput.coverEnvironment?.trim() || sceneInput.sceneDescription?.trim() || ''
-    const coverSceneText = [styleLead, styleExtra, envPrimary].filter(Boolean).join(', ')
+    const coverSceneText = [styleExtra, envPrimary].filter(Boolean).join(', ')
     promptParts.push(`SCENE: ${coverSceneText}`)
 
     // 5. Character expressions from story
@@ -1498,71 +1479,92 @@ export function generateFullPagePrompt(
     return promptParts.join(', ')
   }
 
-  // ─── INTERIOR PAGE PATH ─────────────────────────────────────────────────────
+  // ─── INTERIOR PAGE PATH (v1.24.0 — 7-BLOCK STRUCTURE) ──────────────────────
+  //
+  // Seven focused blocks replace the previous ~14 blocks and eliminate:
+  //   • Environment ×3 → ×1, Lighting ×2 → ×1, Style ×3 → ×1
+  //   • Character consistency ×4 → ×1, Composition ×2 → merged into SHOT PLAN
+  //   • Quality filler lines removed entirely
+  //   • generateScenePrompt() / generateLayeredComposition() no longer called
+  //     for interior pages (their unique content folded into [4] SCENE)
+  // Target: ~1800 chars (~470 tokens) vs. previous ~4000 chars (~1000 tokens)
 
-  // 0. [A4] Priority ladder (+ D1: sceneMap planı uzun brief ile çelişirse yer/zaman için plan)
+  // ── [1] PRIORITY + CONTEXT ──────────────────────────────────────────────────
   promptParts.push(
-    'PRIORITY: If any conflict, follow this order: 1) STORY SCENE PLAN line (place & time-of-day) when present, 2) Scene composition & character scale, 3) Environment richness & depth, 4) Character action & expression, 5) Reference identity match.'
+    'PRIORITY: If conflict, follow: 1) STORY SCENE PLAN (place & time) when present, 2) Scene composition & character scale, 3) Environment richness, 4) Character action & expression, 5) Reference identity.'
   )
-
   if (sceneInput.storyScenePlanAnchor?.trim()) {
-    promptParts.push(
-      `STORY SCENE PLAN (authoritative for place & time-of-day if long brief disagrees): ${sceneInput.storyScenePlanAnchor.trim()}`
-    )
+    promptParts.push(`STORY SCENE PLAN: ${sceneInput.storyScenePlanAnchor.trim()}`)
+  }
+  if (sceneInput.pageNumber === 1) {
+    promptParts.push('FIRST INTERIOR PAGE: Distinctly different from cover — different camera angle, composition, and scene detail. Do not repeat cover framing.')
   }
 
-  // 0.4. [A7] GLOBAL_ART_DIRECTION
+  // ── [2] STYLE ───────────────────────────────────────────────────────────────
   promptParts.push(getGlobalArtDirection(illustrationStyle))
+  const styleSpecific = getStyleSpecificDirectives(illustrationStyle)
+  if (styleSpecific) promptParts.push(styleSpecific)
 
-  // 0.45. [A8] SHOT PLAN
+  // ── [3] SHOT PLAN ───────────────────────────────────────────────────────────
   promptParts.push(buildShotPlanBlock(sceneInput, isCover, previousScenes))
+  promptParts.push('Environment dominates frame. Leading lines, rule of thirds.')
+  if (previousScenes && previousScenes.length > 0) {
+    const diversityHint = getSceneDiversityDirectives(previousScenes[previousScenes.length - 1])
+    if (diversityHint) promptParts.push(diversityHint)
+  }
 
-  // 0.5. Scene Establishment — skip outdoor atmospheric depth when story defined the environment
-  const hasStoryEnvironment = !!(sceneInput.environmentDescription?.trim())
-  promptParts.push(...buildSceneEstablishmentSection(environment, hasStoryEnvironment))
+  // ── [4] SCENE (story content — all visual info, ONE TIME) ───────────────────
+  // v1.25.0 (Faz 2.2b-A): FOREGROUND no longer repeats characterAction — already in top line.
+  // MIDGROUND uses environment (short); imagePrompt was sceneDescription which ballooned to ~420 chars here.
+  const sceneLines: string[] = []
+  sceneLines.push(sceneInput.characterAction)
+  sceneLines.push(environment)
+  if (sceneInput.timeOfDay) {
+    sceneLines.push(getLightingDescription(sceneInput.timeOfDay, sceneInput.mood))
+  }
+  if (sceneInput.timeOfDay === 'evening' || sceneInput.mood === 'warm' || sceneInput.mood === 'happy') {
+    sceneLines.push('soft natural lighting, subtle warm tones, atmospheric depth')
+  }
+  if (sceneInput.weather && sceneInput.weather !== 'sunny') {
+    sceneLines.push(getWeatherDescription(sceneInput.weather))
+  }
+  sceneLines.push(
+    `Depth: FOREGROUND — character in action, sharp focus, integrated in scene. MIDGROUND — ${environment}. BACKGROUND — distance, atmospheric haze.`
+  )
+  sceneLines.push(getPoseVariationForPage(sceneInput.pageNumber, totalPages))
+  sceneLines.push(getGazeDirectionForPage(sceneInput.pageNumber, totalPages))
+  const isGraphicStyle = !usesCinematicImageLayers(illustrationStyle)
+  sceneLines.push(
+    isGraphicStyle
+      ? 'Characters act within scene. Eyes follow the story action — look at objects, each other, or the environment.'
+      : 'Cinematic storybook moment — characters look toward the scene: at each other, at the object they interact with, toward the path, or at something in the environment.'
+  )
+  sceneLines.push('Character naturally integrated into scene, same lighting as environment, feet on ground.')
+  promptParts.push(`[SCENE] ${sceneLines.join('. ')} [/SCENE]`)
 
-  // 0.5. Reference = identity only
+  // ── [5] CHARACTER IDENTITY ──────────────────────────────────────────────────
+  const identityLines: string[] = []
   const useMatchReference = sceneInput.clothing === 'match_reference'
   if (useMatchReference) {
-    promptParts.push('CRITICAL: Use reference image ONLY for character identity (same face, body proportions, and outfit). Do NOT copy pose, expression, or gaze from the reference. Pose, expression, and composition must come from THIS scene description. Same outfit every page; do not change clothing. Identity match does NOT imply close-up. Keep the wide framing.')
+    identityLines.push('Reference = character identity ONLY (face, body, outfit). Do NOT copy pose, expression, or gaze from reference. Same outfit every page. Keep wide framing.')
   } else if (sceneInput.clothing?.trim()) {
-    promptParts.push(`CRITICAL: Character MUST wear EXACTLY: ${sceneInput.clothing.trim()}. This outfit is LOCKED for the entire book.`)
+    identityLines.push(`Character MUST wear: ${sceneInput.clothing.trim()} (locked for entire book).`)
   }
+  identityLines.push('Reference = face, hair, outfit only; do NOT copy lighting or background. Allow relighting to match this scene.')
+  identityLines.push('Consistent character design every page, match reference exactly.')
+  identityLines.push(buildClothingDirectives(sceneInput.clothing, sceneInput.theme, isCover, useCoverReference))
+  if (characterPrompt?.trim()) {
+    identityLines.push(`Character identity: ${characterPrompt.trim()}.`)
+  }
+  if (useCoverReference) {
+    identityLines.push(buildCoverReferenceConsistencyDirectives(additionalCharactersCount))
+  }
+  if (additionalCharactersCount > 0) {
+    identityLines.push(`${additionalCharactersCount + 1} characters in scene, all visible and identifiable.`)
+  }
+  promptParts.push(identityLines.join(' '))
 
-  // 0.55. Allow relighting
-  promptParts.push('Use reference for face, hair, and outfit only; do NOT copy lighting or background from reference. Allow relighting to match this scene.')
-
-  // 1. Anatomical & Safety Section
-  promptParts.push(...buildAnatomicalAndSafetySection(ageGroup))
-
-  // 5. Lighting & Atmosphere
-  promptParts.push(...buildLightingAndAtmosphereSection(sceneInput.timeOfDay, sceneInput.mood))
-
-  // 5.5. COMPOSITION RULES
-  promptParts.push(buildCompositionRulesShort())
-
-  // 6. Style Section
-  promptParts.push(...buildStyleSection(illustrationStyle))
-
-  // 6.5. CINEMATIC_PACK (D3: grafik stillerde stil-tutarlılık paketi)
-  promptParts.push(getCinematicPack(illustrationStyle))
-
-  // 7. Character Integration
-  promptParts.push(...buildCharacterIntegrationSection())
-  promptParts.push(getCinematicNaturalDirectives(illustrationStyle))
-
-  // 8. Scene Content
-  promptParts.push(...buildSceneContentSection(
-    scenePrompt,
-    layeredComp,
-    ageRules,
-    sceneInput.pageNumber,
-    totalPages,
-    sceneInput,
-    isCover
-  ))
-
-  // 8.5. Per-character expressions
+  // ── [6] EXPRESSIONS ─────────────────────────────────────────────────────────
   if (sceneInput.characterExpressions && Object.keys(sceneInput.characterExpressions).length > 0) {
     const charList = characterListForExpressions && characterListForExpressions.length > 0
       ? characterListForExpressions.filter(c => sceneInput.characterExpressions![c.id])
@@ -1570,31 +1572,14 @@ export function generateFullPagePrompt(
     promptParts.push(...buildCharacterExpressionsSection(sceneInput.characterExpressions, charList))
   }
 
-  // 9. Special Page Directives
-  promptParts.push(...buildSpecialPageDirectives(
-    sceneInput.pageNumber,
-    isCover,
-    useCoverReference,
-    additionalCharactersCount,
-    sceneInput
-  ))
+  // ── [7] AVOID ────────────────────────────────────────────────────────────────
+  // v1.26.0 (Faz 1.3): "looking directly at camera" kaldırıldı.
+  // v1.29.0 (Faz 2.2b-B): parmak / ekstremite / messy anatomy negatifleri kaldırıldı (model gürültüsü; GPT-Image 1.5 için A/B sonrası karar).
+  promptParts.push(
+    'AVOID: character filling frame, close-up portrait, blurry background, neon saturation, text or watermark.'
+  )
 
-  // 10. Character Consistency
-  promptParts.push(...buildCharacterConsistencySection(illustrationStyle))
-
-  // 11. Scene Diversity
-  promptParts.push(...buildSceneDiversitySection(isCover, previousScenes))
-
-  // 12. Clothing
-  promptParts.push(...buildClothingSection(sceneInput.clothing, sceneInput.theme, isCover, useCoverReference))
-
-  // 13. AVOID
-  promptParts.push(buildAvoidShort())
-
-  // Combine everything
-  const fullPrompt = promptParts.join(', ')
-
-  return fullPrompt
+  return promptParts.join(', ')
 }
 
 // ============================================================================

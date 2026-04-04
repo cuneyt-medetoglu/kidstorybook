@@ -2,7 +2,7 @@
 
 Bu klasör projenin tüm dokümantasyonunu içerir.
 
-**Son güncelleme:** 28 Mart 2026 — `analysis/WORKER_QUEUE_BOOK_GENERATION_FLOW.md` eklendi (kuyruk + worker özeti; `createBook-analysis/WORKER_FLOW_TEMP.md` taşındı). Önceki: 22 Mart 2026 — PDF çıktı iyileştirme planı: `analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/dev/pdf-preview-test.html`, Cursor agent `.cursor/rules/pdf-generation-manager.mdc`. Önceki: 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
+**Son güncelleme:** 30 Mart 2026 — `analysis/READ_ALONG_VIDEO_MOTION_AND_KARAOKE_ANALYSIS.md` eklendi (motion + TTS senkron karaoke; Veo alternatifi; @project-manager takip). Önceki: 28 Mart 2026 — `analysis/WORKER_QUEUE_BOOK_GENERATION_FLOW.md` eklendi (kuyruk + worker özeti). Önceki: 22 Mart 2026 — PDF çıktı iyileştirme planı: `analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md`, önizleme `public/dev/pdf-preview-test.html`, Cursor agent `.cursor/rules/pdf-generation-manager.mdc`. Önceki: 21 Mart 2026 — Marka shell: `BrandWordmark`, Header (`xl` breakpoint / hamburger), Footer (responsive grid), `metadataBase` + manifest middleware; `analysis/BRAND_UI_PROTOTYPE_AND_ALTERNATIVES.md` + `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` ile uyumlu. Önceki aynı gün: `analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md` (P0–P1; favicon şeffaflık notu). Önceki: `analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md` (Redis yerel/prod, db-backup S3). Önceki: 20 Mart 2026 — `books` zaman damgaları (`docs/implementation/FAZ5_5_IMPLEMENTATION.md`). Önceki: AI maliyet (`docs/guides/AI_COST_AND_USAGE_LOGGING.md`); 7 Mart 2026 Design Token (`docs/guides/THEME_AND_COLOR_GUIDE.md`).
 
 ---
 
@@ -252,7 +252,8 @@ docs/
 28. **analysis/DEPLOYMENT_LOCAL_VS_PROD_OPS.md** — Yerel Docker Redis vs EC2 systemd; `db-backup.sh` + S3 `backups/db/`, cron; migration öncesi yedek; PG kullanıcı adı uyumu
 29. **analysis/LOGO_FAVICON_SITE_INTEGRATION_ANALYSIS.md** — Logo/favicon/manifest/Header-Footer/OG entegrasyonu (P0–P1); faz 5–7 beklemede; favicon şeffaflık notu
 30. **analysis/PDF_OUTPUT_IMPROVEMENT_PLAN.md** — PDF layout hedefi (A5 kapak + A4 spread + arka kapak), marka kuralları; önizleme `public/dev/pdf-preview-test.html`; sorumlu agent: `@pdf-generation-manager` (`.cursor/rules/pdf-generation-manager.mdc`)
-31. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
+31. **analysis/READ_ALONG_VIDEO_MOTION_AND_KARAOKE_ANALYSIS.md** — “Video gibi kitap” (Veo yerine): Ken Burns/motion şablon, YouTube tarzı 2–3 kelime karaoke, TTS senkronu; zaman çizelgesi (alignment/heuristik); fazlar; kod referansları; takip @project-manager; şema genişlemesi isteğe bağlı @prompt-manager
+32. **public/ai-debug-log-viewer.html** - `ai-api-debug.jsonl` dosyasını insan-okur formatta inceleme aracı (filtre, arama, tam ekran JSON modal, kopyalama)
 
 ### Strateji Dokümanları
 1. **strategies/TTS_STRATEGY.md** - Text-to-Speech (TTS) strateji ve gereksinimler dokümanı

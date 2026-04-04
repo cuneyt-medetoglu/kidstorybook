@@ -1111,6 +1111,7 @@ export async function POST(request: NextRequest) {
             storyData: JSON.parse(storyContent),
             expectedPageCount: effectivePageCount,
             characters: characters.map((char) => ({ id: char.id, name: char.name })),
+            customRequests,
           })
 
           generatedStoryData = preparedStory.storyData

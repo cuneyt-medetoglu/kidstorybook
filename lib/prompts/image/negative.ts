@@ -8,8 +8,8 @@ import type { PromptVersion } from '../types'
  */
 
 export const VERSION: PromptVersion = {
-  version: '1.3.0',
-  releaseDate: new Date('2026-02-08'),
+  version: '1.4.0',
+  releaseDate: new Date('2026-04-04'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -30,6 +30,7 @@ export const VERSION: PromptVersion = {
     'v1.1.0: Prompt optimization - anatomical directives ultra-simplified (500→120 chars), safe poses minimized (150→40 chars), ANATOMICAL_NEGATIVE reduced to 3 items (18 Ocak 2026)',
     'v1.2.0: El/parmak – getAnatomicalCorrectnessDirectives: five distinct fingers, well-formed hands, properly proportioned. ANATOMICAL_NEGATIVE: extra fingers, missing fingers, fused fingers (7 Şubat 2026)',
     'v1.3.0: [A11] Parmak stratejisi – getDefaultHandStrategy(): hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects. getHandDirectivesWhenVisible(): five fingers + avoid (PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md, 8 Şubat 2026)',
+    'v1.4.0: [Faz 2.1] getDefaultHandStrategy() güncellendi — "not holding objects, no hand gestures" kaldırıldı (story aksiyonu ile çelişiyordu). Yeni versiyon: el konumu sahne aksiyonunu takip eder, görünür ellerde 5 parmak kalitesi. (4 Nisan 2026)',
   ],
   author: '@prompt-manager',
 }
@@ -392,11 +393,12 @@ export function getSafeHandPoses(): string[] {
 // ============================================================================
 
 /**
- * Default hand strategy: de-emphasize hands to reduce finger errors.
- * "Hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects."
+ * Default hand strategy: hands follow the scene action.
+ * Does NOT restrict holding objects or gestures — those come from story/scene.
+ * Only ensures finger quality when hands are visible.
  */
 export function getDefaultHandStrategy(): string {
-  return 'Hands at sides, relaxed, partially out of frame, no hand gestures, not holding objects.'
+  return 'Hands natural, position matches scene action. If hands are visible: five clearly separated fingers, no fused or extra digits.'
 }
 
 /**

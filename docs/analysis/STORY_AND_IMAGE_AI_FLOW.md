@@ -57,17 +57,18 @@ Bu değişikliklerle tekrar test edebilirsiniz; story cevabında `clothing` olma
 **generateStoryPrompt’a verilen input (özet):**
 
 - `characterName`, `characterAge`, `characterGender`
+- **`readingAgeBracket`** (`0-1` | `1-3` | `3-5` | `6+`) — kelime bandı ve yaş uygunluğu için tek kaynak: `reading-age-brackets.ts`
 - `theme`, `illustrationStyle`, `customRequests`, `pageCount`
 - `referencePhotoAnalysis` (opsiyonel)
 - `language`
 - `characters` (birden fazla karakter varsa)
 - `hairColor`, `eyeColor` (Step 1’den)
-- **v1.6.0:** `defaultClothing` artık kullanılmıyor (story kıyafet üretmiyor).
+- **`defaultClothing`** (opsiyonel) — `generate-story` route’u master’dan doldurur; `generateStoryPrompt` şu an bu alanı **prompt metnine yazmaz** (yalnızca destructure). Kıyafet tutarlılığı `suggestedOutfits` + görsel master ile yönetilir.
 
 **Prompt’un bölümleri (özet):**
 
-- v1.7.0 Prompt Slim: CHARACTER (PERSONALITY yok), STORY REQUIREMENTS, SUPPORTING ENTITIES (kısa), LANGUAGE (tek satır), STORY STRUCTURE (kısa), THEME + DO NOT DESCRIBE, VISUAL DIVERSITY, WRITING STYLE, SAFETY, ILLUSTRATION, OUTPUT FORMAT (JSON), CRITICAL REMINDERS. Tam request: logda `📤 STORY REQUEST (raw):` sonrası ham JSON.
-- **Anlatı yayı:** STORY STRUCTURE bölümünde hikayenin tek bir anlatı yayı izlemesi zorunludur: giriş (ilk 1–2 sayfa), gelişme (orta sayfalar), net kapanış (son 1–2 sayfa). Detay: `docs/prompts/STORY_PROMPT_TEMPLATE.md` §6.
+- **v3.x (system + user):** `messages[0]` = `buildStorySystemPrompt(language)` (dil, güvenlik, DO NOT DESCRIBE, sinematik görsel kuralları, kapak/ifade rehberi). `messages[1]` = `generateStoryPrompt(input)` — bölüm sırası ve tam metin `lib/prompts/story/base.ts`. Özet indeks: `docs/prompts/STORY_PROMPT_TEMPLATE.md`.
+- **Anlatı yayı:** STORY STRUCTURE + SCENE MAP içinde giriş → gelişme → kapanış zorunludur. Özet: `docs/prompts/STORY_PROMPT_TEMPLATE.md` → “Story STRUCTURE, sceneMap ve anlatı yayı”.
 - **Opsiyonel önceden üretilmiş hikaye (Debug):** `POST /api/books` body'de **`story_data`** (geçerli `pages[]` içeren nesne) gönderilirse hikaye üretimi atlanır; bu veri doğrudan kullanılır (masters → kapak → sayfa görselleri aynı akışla). Debug panelinde "Sadece Hikaye" sonrası "Bu hikayeden kitap oluştur" bu yöntemi kullanır.
 
 **İnceleme için:**  

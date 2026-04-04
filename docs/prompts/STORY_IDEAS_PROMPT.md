@@ -4,7 +4,8 @@
 
 **Kullanım:** Aşağıdaki kutu içeriğini ChatGPT veya Gemini'de bir kez yapıştır. İkinci mesajda kategori + yaş + **karakterler** yaz. İstersen tarayıcıda **`/story-ideas-helper.html`** aç (uygulama çalışırken örn. http://localhost:3000/story-ideas-helper.html), oradan seçip Step 2 metnini kopyala. Çıktı: TITLE + EXAMPLE STORY. İngilizce (TR sonra lokalizasyonla).
 
-**Örnek ikinci mesaj:** `adventure 0-2. Characters: Mia (child), Mom (mother), Sparky (dog).`
+**Örnek ikinci mesaj:** `adventure 0-2. Characters: Mia (child), Mom (mother), Sparky (dog).`  
+*(Harici asistan için sade etiket; Create Book’da okuma bandı `0-1` / `1-3` / `3-5` / `6+` — `reading-age-brackets.ts`.)*
 
 **Kalite hedefi:** Akıcı, diyaloglu, atmosferli anlatı—kesik kesik cümleler değil. Her hikaye kullanıcının verdiği kategori ve karakterlere göre **farklı** olsun. Metin, Create Book'da **STORY SEED** olarak kullanılır: açılış sahnesi ve yön verir; 12 sayfalık kitap buradan adım adım gelişir. Tek sahneye kilitlenmeyen, gelişmeye açık fikirler ver.
 
@@ -36,7 +37,7 @@ AVOID:
 Age-appropriate: 0-2 = simpler words but still flowing; 3-5 = clear sentences; 6-9 = slightly richer. Match the category (adventure, fairy_tale, educational, nature, space, sports). This text will be used as a "custom request" to generate a full 12-page book — it sets the opening scene and journey direction, not a page-by-page script.
 
 Valid categories: adventure, fairy_tale, educational, nature, space, sports.
-Valid age groups: 0-2, 3-5, 6-9.
+Valid age groups (for this helper chat): 0-2, 3-5, 6-9. Map loosely to the app's reading bands 0-1, 1-3, 3-5, 6+ when creating a book in HeroKidStory.
 ```
 
 ---

@@ -4,6 +4,8 @@
 **Format:** Her örnekte **EN** (yapıştırılacak metin) + **TR** (referans). Maksimum 1-2 cümle.  
 **Kural:** Kim, nerede, ne başlıyor — yeter. Adımları, arki, çözümü yazma.
 
+**Yaş etiketleri:** Aşağıdaki “0-2 / 3-5 / 6-9” başlıkları örnek gruplamasıdır. Uygulamadaki gerçek bantlar `lib/config/reading-age-brackets.ts` içinde `0-1`, `1-3`, `3-5`, `6+` olarak tanımlıdır; kitap oluştururken Step 1’de buna göre seçim yapın.
+
 ---
 
 ## 0-2 · adventure

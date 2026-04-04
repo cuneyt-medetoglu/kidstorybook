@@ -17,8 +17,8 @@ import {
  */
 
 export const VERSION: PromptVersion = {
-  version: '3.0.5',
-  releaseDate: new Date('2026-03-28'),
+  version: '3.2.0',
+  releaseDate: new Date('2026-04-04'),
   status: 'active',
   changelog: [
     'Initial release',
@@ -64,6 +64,11 @@ export const VERSION: PromptVersion = {
     'v3.0.1: LANGUAGE — pages[].text %100 hedef dil; title tercihen hedef dil; görsel alanlar EN. Step 6 StepRunner: dil artık step3.language.id üzerinden okunuyor (önceden wizardData.language yanlıştı). story max_tokens: lib/ai/story-generation-config.ts (50k). step-runner createBook: age_group dolduruluyor. (28 Mart 2026)',
     'v3.0.4: LANGUAGE — Sadece pages[].text (+ tercihen title) hedef dilde; sceneMap, supportingEntities (name, description), metadata metinleri ve tüm görsel/API alanları açıkça English-only. json_schema açıklamaları güncellendi. Repair prompt aynı kural. (28 Mart 2026)',
     'v3.0.5: suggestedOutfits — tüm kitap için tek kıyafet seti; sadece hikâyede açık kıyafet değişimi varsa farklı. (28 Mart 2026)',
+    'v3.0.6: supportingEntities — en az bir kayıt (pipeline kuralı); prompt/şema/repair minItems; arka plan entity yasağı ilke dilinde; custom tema + boş customRequests step-runner/generate-story 400. (30 Mart 2026)',
+    'v3.0.7: supportingEntities — minItems kaldırıldı; entity sayısını hikaye içeriği belirler (1–5 tipik); story seed objelerine entity ipucu; repair prompt customRequests bağlamı; assert hard length kontrolü kaldırıldı. (30 Mart 2026)',
+    'v3.0.8: supportingEntities — en fazla 2 (maliyet); şema maxItems 2; validator + repair; seed çok aday varsa en kritik 2. (30 Mart 2026)',
+    'v3.2.0: [Faz 1.3] STAGING direktifi — buildIllustrationSection\'a zorunlu "STAGING (gaze & orientation)" satırı eklendi: her sceneDescription\'a karakterlerin neye baktığını / yöneldiğini belirten 1 İngilizce cümle ekleme direktifi (sahne elemanı hedefi: yol, nesne, arkadaş, ufuk). Kamera bakış yönetimi negatif yasaktan pozitif yöne çevrildi. (4 Nisan 2026)',
+    'v3.1.0: [Faz 1.1] Story anti-pattern kuralları — (1) buildIllustrationSection: "Visual safety: hands at sides" kaldırıldı (GPT Image 1.5 4.47/5 el skoru, kısıtlama gereksiz); aktif sahne direktifi eklendi: her imagePrompt spesifik fiil+nesne içermeli. (2) buildVisualDiversitySection: ardışık aynı fiil yasağı (sit/stand/walk/look 2 art arda yasak); checklist ritmi yasağı açık kurala dönüştürüldü. (3) buildStoryStructureSection: Sayfa 1 vs Kapak farkı güçlendirildi — kapak = zirve dramatik an, sayfa 1 = başlangıç; farklı yer+aksiyon+kamera zorunlu. (4) buildStorySystemPrompt/#COVER IMAGE: cover direktifi güçlendirildi — "en dramatik an" zorunluluğu, karakterler aksiyon içinde, kapak+sayfa1 farklı sahne garantisi. (4 Nisan 2026)',
     'v3.0.2: Okuma yaşı bantları (0-1, 1-3, 3-5, 6+) — lib/config/reading-age-brackets.ts tek kaynak; Step 1 seçim; characters API + tüm generateStoryPrompt çağrıları readingAgeBracket; getWordCountMinForStoryInput. (28 Mart 2026)',
     'v3.0.3: Hikaye akışı ve entity disiplini güçlendirildi — itinerary/checklist anlatımı yasaklandı; sayfalar arası sebep-sonuç akışı vurgulandı. supportingEntities için tekrarlayan/merkezi nesneler (örn. teddy bear, ball, map) zorunlu hale getirildi. (28 Mart 2026)',
   ],
@@ -214,7 +219,7 @@ export function generateStoryPrompt(input: StoryGenerationInput): string {
     buildCharacterSection(characterDesc, characters),
     buildStoryRequirementsSection(themeConfig, characterAge, readingCfg, pageCount ?? 12, language, illustrationStyle),
     ...(customRequests?.trim() ? [buildStorySeedSection(customRequests.trim(), pageCount ?? 12)] : []),
-    buildSupportingEntitiesSection(theme, characters), // Pets must NOT be duplicated in supportingEntities
+    buildSupportingEntitiesSection(theme, characters, customRequests), // Pets must NOT be duplicated in supportingEntities
     buildAgeAppropriateSection(readingCfg),
     buildStoryStructureSection(characterName, pageCount ?? 12, characters),
     buildThemeSpecificSection(themeConfig, theme),
@@ -565,7 +570,8 @@ The author gave this idea for the story. Use it as the starting point.
 
 function buildSupportingEntitiesSection(
   theme: string,
-  characters?: Array<{ name?: string; type?: { displayName?: string; group?: string } }>
+  characters?: Array<{ name?: string; type?: { displayName?: string; group?: string } }>,
+  customRequests?: string
 ): string {
   const petNames =
     characters
@@ -577,13 +583,20 @@ function buildSupportingEntitiesSection(
       ? `\n- **CRITICAL:** Do NOT add to "supportingEntities" any animal that is already a CHARACTER (e.g. the family pet). The following are characters and must NOT appear in supportingEntities: ${petNames.join(', ')}. supportingEntities is ONLY for ADDITIONAL entities (e.g. a toy, a wild animal that is not the pet, or an important object like a photo or map). One pet = one character; do not duplicate it as an entity.`
       : ''
 
+  const seedHint =
+    customRequests?.trim()
+      ? `
+- **Story seed entities:** The STORY SEED names objects or animals. Include the **most plot-critical** among them in supportingEntities (see max count below). If the seed names more than two candidates, pick only the two that drive the story most (e.g. central prop + key animal).`
+      : ''
+
   return `# SUPPORTING ENTITIES (Master-For-All-Entities)
-Identify ADDITIONAL animals and important objects that appear in the story (each gets a master illustration).${excludeRule}
-- Include: only animals/objects that are NOT already in the character list (e.g. a toy, a second animal that is not the family pet, or a key object like a camping photo). Exclude: the family pet (it is already a character); background-only elements (e.g. trees, rocks); character clothing.
-- If a non-character animal/object is central to the action OR appears on 2+ pages, it MUST be listed in supportingEntities. Common misses: teddy bear, ball, map, kite, lantern, boat, toy.
-- Rules: unique name+id per entity; visual description for master; same name throughout; list appearsOnPages.
-- JSON: include "supportingEntities" array with id, type, name, description, appearsOnPages. **type** must be exactly the string "animal" or "object" (lowercase, no synonyms). Leave the array empty [] if the only animals/objects in the story are the characters themselves.
-- **Language:** \`name\` and \`description\` must be **English** (they feed the image master API — same rule as imagePrompt).
+Identify ADDITIONAL animals and important objects that appear in the story (each gets a master illustration).${excludeRule}${seedHint}
+- Include only: objects or non-character animals that are **plot-significant** — the story names them, characters interact with them as their own thing (hold, find, share, talk to, solve a problem with), or they recur across pages as a focus — not as mere backdrop.
+- Exclude: any character already in CHARACTER MAPPING; scenery and setting geometry (vegetation, terrain features, paths, water as “the place”, sky, weather); character clothing; vague “the forest” as an entity.
+- **How many?** **At most 2** entries in \`supportingEntities\` (each entity = one paid master image). Include the one or two most plot-significant non-character animals or objects only. If many things appear in the story, choose the two that matter most to the plot; do not pad.
+- Rules: unique name+id per entity; English visual description suitable for a standalone master sheet; list appearsOnPages for pages where the entity matters visually.
+- JSON: \`supportingEntities\` array with id, type, name, description, appearsOnPages. **type** must be exactly \`animal\` or \`object\` (lowercase).
+- **Language:** \`name\` and \`description\` must be **English** (image master API).
 
 # SUGGESTED OUTFITS (for master illustrations)
 Output "suggestedOutfits": an object with one entry per character. Keys = character IDs from CHARACTER MAPPING (exact UUIDs). Value for each key = one line in English describing that character's outfit for this story (e.g. "comfortable outdoor clothing, sneakers"; "casual dress, sandals"). Used for master character illustrations so each character's clothing fits the story. Match story setting and theme. If only one character, the object has one key.
@@ -607,7 +620,7 @@ function buildStoryStructureSection(
   return `# STORY STRUCTURE
 - **Cover:** Cover is generated separately; do NOT include cover in pages. pages[] = interior pages only.
 - **pages[]:** EXACTLY ${n} items (interior pages only). No cover in this array.
-- **Page 1 (first interior):** Must differ from the cover (different moment, angle, or setting).
+- **Page 1 (first interior):** MUST be a completely different moment from the cover — different location, action, AND camera angle. The cover shows the book's PEAK dramatic moment; page 1 shows the BEGINNING (how the story starts, the ordinary world before the adventure). They must be visually unrelated scenes.
 - **Narrative arc:** One clear story from beginning to end. First 1–2 pages set the situation; middle pages are the main events (things that happen, step by step); last 1–2 pages bring a clear resolution. The last page should feel like an ending.
 
 # ONE STORY, STEP BY STEP
@@ -638,6 +651,8 @@ function buildVisualDiversitySection(): string {
   return `# VISUAL DIVERSITY
 Each page = different scene. Vary location, time of day, perspective, composition, and character action/pose.
 - Do NOT repeat the same pose or action on consecutive pages. Each page must have a distinctly different character action or pose (e.g. one page running, next page sitting or looking around; one page jumping, next page crouching or pointing).
+- Do NOT use the same dominant action verb (sit, stand, walk, look, watch) on two consecutive pages. If page 4 is "looking at something", page 5 must involve a different kind of action (reaching, climbing, tasting, hiding, picking up, pointing, running, splashing, etc.).
+- Checklist rhythm is FORBIDDEN. "First they went here, then they went there" is NOT a story. Each new scene must follow as a consequence of the previous page's action or discovery.
 - Scene description and imagePrompt: detailed (150+ and 200+ chars).`
 }
 
@@ -668,7 +683,8 @@ function buildIllustrationSection(
   return `# ILLUSTRATION
 Per page: write imagePrompt (200+ chars, cinematic) + sceneDescription (150+ chars). Illustration style: ${illustrationStyle}.
 Apply the cinematic image direction from the system prompt: LIGHTING → DEPTH → COLOR → COMPOSITION → ATMOSPHERE.
-Visual safety: avoid holding hands, detailed hand objects, complex gestures. Prefer hands at sides, simple poses.`
+Each page's imagePrompt MUST include a clear story action: what the character is actively DOING right now (specific verb + object or environment interaction) — not just where they are. Bad: "Arya stands in the garden." Good: "Arya reaches toward the beehive with one hand, eyes wide in awe, while Bal sniffs at the bark below."
+STAGING (gaze & orientation): In sceneDescription, add 1 short English sentence describing WHERE each character is looking or facing — name a scene element, not the camera. Examples: "Arya looks up toward the beehive on the branch above." / "Bal looks toward Arya and sniffs the jar between them." / "Both characters face the winding path ahead." This replaces any camera-facing default and gives the image model a clear positive target.`
 }
 
 function buildOutputFormatSection(
@@ -712,7 +728,7 @@ function buildVerificationChecklistSection(
 - cameraDistance per page: exactly "close", "medium", "wide", or "establishing" only (no hyphens, no extra words). Vary; prefer wide/establishing.
 - shotPlan per page: 6 non-empty English strings (no null). Vary timeOfDay and mood across pages.
 - metadata.ageGroup: exactly one of toddler, preschool, early-elementary, elementary, pre-teen. metadata.safetyChecked: boolean.
-- supportingEntities[].type: exactly "animal" or "object" only.
+- supportingEntities: **at most 2** entries; each .type exactly "animal" or "object" only; no scenery-only entities; pick the most important plot objects/animals (story seed candidates prioritized among equals).
 - Every page "text" in ${langName}; **title** prefer ${langName} when the book is not English. **All other JSON strings** (sceneMap, supportingEntities, cover fields, per-page visual fields, metadata theme/educationalThemes text): **English only**.
 - Word count: each page "text" must be between ${rac.wordsPerPageMin} and ${rac.wordsPerPageMax} words (in the story language); expand or trim to fit.
 - ${characterName} = main character in every scene. Positive, age-appropriate content.`
@@ -806,7 +822,8 @@ export function buildStoryResponseSchema() {
       },
       supportingEntities: {
         type: 'array',
-        description: 'Non-character entities for master images. name and description must be English.',
+        description:
+          'Plot-significant non-character entities for entity-master images. Props or animals only; name and description English; not scenery. Let story content determine count.',
         items: {
           type: 'object',
           properties: {
@@ -889,11 +906,12 @@ Bad: "surprised"
 Vary expressions per page and per character. Multiple characters can have different expressions simultaneously (e.g. one laughing while another looks concerned). Think like a film director.
 
 # COVER IMAGE (coverImagePrompt)
-The cover is a MOVIE POSTER for this book — not the opening scene. Capture the story's emotional promise or most iconic moment.
-- Bold, iconic composition with all main characters
-- The setting that best represents this book's world
+The cover is a MOVIE POSTER for this book. Ask yourself: "What single moment from this story would make a child reach out and pick up this book?" — write THAT as the cover. It must be the peak dramatic, exciting, or emotionally resonant moment of the story, NOT the opening scene and NOT a generic standing pose.
+- Characters must be DOING something in the cover image — active pose that tells a story (e.g. "leaping over a stream", "holding up a glowing jar to the light", "hiding behind a giant flower while peeking at a bee") — not simply standing or walking
+- Bold, iconic composition with all main characters in action
+- The setting that best represents this book's world (peak location or most memorable environment)
 - Upper third: clear, simpler area (soft sky gradient, ceiling, blurred background, plain wall) matching THIS story's setting — reserved for title text
-- Do NOT show the first-page scene; show what makes this book special
+- The cover and page 1 MUST show different moments, locations, and actions — describe them as visually unrelated scenes
 - No typography or written words anywhere in the scene
 - 4-8 sentences, English only`
 }

@@ -25,6 +25,7 @@ import {
   Mic,
   Copy,
   Check,
+  Download,
 } from "lucide-react"
 import {
   inferReadingAgeBracketFromNumericAge,
@@ -75,6 +76,15 @@ const STEPS: { id: OperationType; label: string; icon: React.ReactNode; prereqs:
   { id: "tts", label: "Text-to-Speech", icon: <Mic className="h-4 w-4" />, prereqs: ["story_generation"] },
 ]
 
+/** Step-runner aiLog entry: OpenAI Images `usage` on `response.body` (edits/generations). */
+function extractOpenAiImageUsage(entry: { response?: unknown }): unknown {
+  const r = entry?.response as Record<string, unknown> | undefined
+  if (!r || typeof r !== "object") return undefined
+  const body = r.body as Record<string, unknown> | undefined
+  const u = body?.usage
+  return u !== undefined && u !== null ? u : undefined
+}
+
 // ============================================================================
 // Helpers — wizard localStorage shape: step3.language / step3.theme (objects with .id)
 // ============================================================================
@@ -107,6 +117,26 @@ function getWizardIllustrationStyleId(w: Record<string, unknown> | null | undefi
   }
   if (typeof style === "string") return style
   return "cartoon"
+}
+
+/** Hikâye fikri metni — Step 5 `step5.customRequests`; kök `customRequests` yedek (eski taslaklar). */
+function getWizardCustomRequests(w: Record<string, unknown> | null | undefined): string | undefined {
+  const s5 = w?.step5 as Record<string, unknown> | undefined
+  const fromStep5 =
+    (typeof s5?.customRequests === "string" ? s5.customRequests.trim() : "") ||
+    (typeof s5?.customRequest === "string" ? s5.customRequest.trim() : "")
+  if (fromStep5) return fromStep5
+  const root = typeof w?.customRequests === "string" ? w.customRequests.trim() : ""
+  return root || undefined
+}
+
+/** Step 5 sayfa sayısı — yoksa veya geçersizse 12 (API ile uyumlu 2–20). */
+function getWizardPageCount(w: Record<string, unknown> | null | undefined): number {
+  const s5 = w?.step5 as Record<string, unknown> | undefined
+  const raw = s5?.pageCount
+  const n = typeof raw === "number" && Number.isFinite(raw) ? raw : parseInt(String(raw ?? ""), 10)
+  if (Number.isFinite(n) && n >= 2 && n <= 20) return Math.floor(n)
+  return 12
 }
 
 function getWizardReadingBracket(w: Record<string, unknown> | null | undefined): ReadingAgeBracketId | undefined {
@@ -176,6 +206,95 @@ function JsonViewer({ data, label }: { data: any; label: string }) {
   )
 }
 
+const STEP_RUNNER_EXPORT_VERSION = 1 as const
+
+/** Tek dosyada: meta + tamamlanan adımlar (aiLog ayrı bölümler) + oturum özeti — manuel kopyaya gerek kalmaz. */
+function buildStepRunnerExportPayload(args: {
+  stepStates: Record<OperationType, StepState>
+  session: SessionState
+  wizardData: Record<string, unknown> | null | undefined
+  pageCount: number
+  storyModel: string
+  targetPageNumber: number | null
+}): {
+  meta: Record<string, unknown>
+  stepsCompleted: Record<string, unknown>
+  sessionSnapshot: Record<string, unknown>
+} | null {
+  const { stepStates, session, wizardData, pageCount, storyModel, targetPageNumber } = args
+
+  const completed = STEPS.filter((s) => stepStates[s.id]?.status === "done")
+  const hasAnythingToExport =
+    completed.length > 0 || Boolean(session.sessionBookId || session.storyData)
+  if (!hasAnythingToExport) {
+    return null
+  }
+
+  const stepsCompleted: Record<string, unknown> = {}
+  const stepOrder: string[] = []
+  for (const s of completed) {
+    const st = stepStates[s.id]
+    stepOrder.push(s.id)
+    stepsCompleted[s.id] = {
+      label: s.label,
+      operationType: s.id,
+      status: st.status,
+      durationMs: st.durationMs ?? null,
+      resultPreview: st.resultPreview ?? null,
+      /** Her öğe: { step, request, response } — UI’daki sıra ile aynı */
+      aiLog: Array.isArray(st.aiLog) ? st.aiLog : [],
+    }
+  }
+
+  return {
+    meta: {
+      exportVersion: STEP_RUNNER_EXPORT_VERSION,
+      exportedAt: new Date().toISOString(),
+      purpose:
+        "Step Runner debug bundle: completed steps only (per-step aiLog). Share with AI or archive. URLs only in sessionSnapshot — no image binaries.",
+      sessionBookId: session.sessionBookId ?? null,
+      wizardContext: {
+        themeKey: getWizardThemeKey(wizardData),
+        illustrationStyle: getWizardIllustrationStyleId(wizardData),
+        language: getWizardLanguageCode(wizardData),
+        readingAgeBracket: getWizardReadingBracket(wizardData) ?? null,
+        customRequests: getWizardCustomRequests(wizardData) ?? null,
+        pageCount,
+        storyModel,
+        targetPageNumber,
+      },
+      stepsExported: stepOrder,
+      readme:
+        "stepsCompleted.<operationType>.aiLog[i] matches UI log order. Each entry.step is the pipeline sub-step name.",
+    },
+    stepsCompleted,
+    sessionSnapshot: {
+      sessionBookId: session.sessionBookId ?? null,
+      storyTitle: session.storyData?.title ?? null,
+      storyData: session.storyData ?? null,
+      masterIllustrations: session.masterIllustrations ?? {},
+      entityMasterIllustrations: session.entityMasterIllustrations ?? {},
+      coverUrl: session.coverUrl ?? null,
+      pageImages: session.pageImages ?? {},
+      audioUrls: session.audioUrls ?? {},
+    },
+  }
+}
+
+function downloadJsonFile(filename: string, data: unknown) {
+  const text = JSON.stringify(data, null, 2)
+  const blob = new Blob([text], { type: "application/json;charset=utf-8" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = filename
+  a.rel = "noopener"
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 function ImageGrid({ urls, label }: { urls: string[]; label: string }) {
   if (!urls.length) return null
   return (
@@ -203,7 +322,7 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
     Object.fromEntries(STEPS.map((s) => [s.id, { status: "idle" }])) as Record<OperationType, StepState>
   )
   const [storyModel, setStoryModel] = useState(DEFAULT_STORY_MODEL)
-  const [pageCount, setPageCount] = useState(12)
+  const [pageCount, setPageCount] = useState(() => getWizardPageCount(wizardData as Record<string, unknown>))
   const [targetPageNumber, setTargetPageNumber] = useState<number | null>(null)
   const [expandedLogStep, setExpandedLogStep] = useState<OperationType | null>(null)
 
@@ -239,7 +358,7 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
         illustrationStyle: getWizardIllustrationStyleId(wizardData),
         language: getWizardLanguageCode(wizardData),
         readingAgeBracket: getWizardReadingBracket(wizardData as Record<string, unknown>),
-        customRequests: wizardData?.customRequests || undefined,
+        customRequests: getWizardCustomRequests(wizardData as Record<string, unknown>),
         pageCount,
         storyModel,
         sessionBookId: session.sessionBookId,
@@ -325,18 +444,52 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
   const entityUrls = Object.values(session.entityMasterIllustrations || {})
   const pageUrls = Object.values(session.pageImages || {})
 
+  const exportPayload = useMemo(
+    () =>
+      buildStepRunnerExportPayload({
+        stepStates,
+        session,
+        wizardData: wizardData as Record<string, unknown>,
+        pageCount,
+        storyModel,
+        targetPageNumber,
+      }),
+    [stepStates, session, wizardData, pageCount, storyModel, targetPageNumber]
+  )
+
+  const downloadDebugBundle = useCallback(() => {
+    if (!exportPayload) return
+    const shortId = (session.sessionBookId || "no-book").replace(/-/g, "").slice(0, 8)
+    const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)
+    downloadJsonFile(`step-runner-export_${shortId}_${stamp}.json`, exportPayload)
+  }, [exportPayload, session.sessionBookId])
+
   return (
     <div className="rounded-lg border border-purple-500/40 bg-purple-950/20 dark:bg-purple-900/10 p-4 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div>
           <p className="text-sm font-semibold text-purple-300">Debug Step-Runner</p>
           <p className="text-[11px] text-purple-400/70">Admin only — runs real pipeline steps in isolation</p>
         </div>
-        <Button variant="ghost" size="sm" onClick={resetSession} className="text-purple-400 hover:text-purple-200 gap-1">
-          <RotateCcw className="h-3 w-3" />
-          Reset
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            type="button"
+            disabled={!exportPayload}
+            onClick={downloadDebugBundle}
+            title="Tamamlanan adımların aiLog + oturum özeti tek JSON — AI veya arşiv için"
+            className="text-purple-200 border-purple-500/50 hover:bg-purple-900/40 gap-1 disabled:opacity-40"
+          >
+            <Download className="h-3 w-3" />
+            İndir (JSON)
+          </Button>
+          <Button variant="ghost" size="sm" onClick={resetSession} className="text-purple-400 hover:text-purple-200 gap-1">
+            <RotateCcw className="h-3 w-3" />
+            Reset
+          </Button>
+        </div>
       </div>
 
       {/* Session info */}
@@ -488,15 +641,23 @@ export function StepRunnerPanel({ wizardData, characterIds }: StepRunnerPanelPro
                   )}
 
                   {/* Per-log-entry JSON */}
-                  {state.aiLog.map((entry: any, i: number) => (
-                    <div key={i} className="space-y-1">
-                      <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">
-                        [{i + 1}] {entry.step}
-                      </p>
-                      <JsonViewer data={entry.request} label="request" />
-                      <JsonViewer data={entry.response} label="response" />
-                    </div>
-                  ))}
+                  {state.aiLog.map((entry: any, i: number) => {
+                    const openAiUsage = extractOpenAiImageUsage(entry)
+                    return (
+                      <div key={i} className="space-y-1">
+                        <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-wide">
+                          [{i + 1}] {entry.step}
+                        </p>
+                        {openAiUsage !== undefined && (
+                          <p className="text-[11px] text-emerald-500/90 font-mono break-all" title="M3: usage from OpenAI Images response">
+                            OpenAI usage: {JSON.stringify(openAiUsage)}
+                          </p>
+                        )}
+                        <JsonViewer data={entry.request} label="request" />
+                        <JsonViewer data={entry.response} label="response" />
+                      </div>
+                    )
+                  })}
                 </div>
               ) : null}
             </div>

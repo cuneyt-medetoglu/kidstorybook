@@ -17,7 +17,7 @@ export const ALLOWED_STORY_MODELS = [
 
 export type AllowedStoryModel = typeof ALLOWED_STORY_MODELS[number]
 
-export const DEFAULT_STORY_MODEL: AllowedStoryModel = 'gpt-4.1-mini'
+export const DEFAULT_STORY_MODEL: AllowedStoryModel = 'gpt-4.1'
 
 /**
  * gpt-4.1-mini için güvenli üst sınır; başka model seçilirse limit farklı olabilir.

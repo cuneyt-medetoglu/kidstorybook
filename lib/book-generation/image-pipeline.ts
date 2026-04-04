@@ -874,6 +874,7 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
           storyData: JSON.parse(storyContent),
           expectedPageCount: effectivePageCount,
           characters: characters.map((char) => ({ id: char.id, name: char.name })),
+          customRequests,
         })
 
         generatedStoryData = preparedStory.storyData
@@ -1237,13 +1238,15 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
 
     console.log('[Pipeline] 📤 COVER IMAGE REQUEST: prompt length=', textPrompt.length)
 
+    // Faz 4: Entity master'lar kapak referanslarına dahil edilmez.
+    // Kapak için model yalnızca karakter kimliğine ihtiyaç duyar; entity görselleri
+    // (arı, kavanoz vb.) referans listesine eklenince model kapak sahnesini
+    // entity etrafında kurgulayabilir veya kimlik karışıklığı yaşar.
     const coverMasterUrls = Object.values(masterIllustrations).filter((url): url is string => Boolean(url))
-    const entityMasterUrls = Object.values(entityMasterIllustrations).filter((url): url is string => Boolean(url))
-    const allCoverMasters = [...coverMasterUrls, ...entityMasterUrls]
 
     const referenceImageUrls =
-      allCoverMasters.length > 0
-        ? allCoverMasters
+      coverMasterUrls.length > 0
+        ? coverMasterUrls
         : characters.map((char) => char.reference_photo_url).filter((url): url is string => Boolean(url))
 
     let coverImageUrl: string | null = null

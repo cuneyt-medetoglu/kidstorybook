@@ -1,0 +1,527 @@
+{
+  "info": {
+    "name": "KidStoryBook API",
+    "description": "Complete API collection for KidStoryBook - AI-powered personalized children's storybook platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "kidstorybook-api-v1"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Authentication helper requests",
+      "item": [
+        {
+          "name": "Get Auth Token (Test Login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.data?.session?.access_token) {",
+                  "        pm.environment.set('auth_token', response.data.session.access_token);",
+                  "        pm.environment.set('user_id', response.data.user.id);",
+                  "        console.log('Auth token saved:', response.data.session.access_token.substring(0, 20) + '...');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/test-login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "test-login"]
+            },
+            "description": "⚠️ Development Only: Login to get authentication token for testing. Token will be automatically saved to environment. This endpoint only works in development mode."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Characters",
+      "description": "Character management endpoints",
+      "item": [
+        {
+          "name": "Analyze Character Photo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has character data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    if (jsonData.data?.id) {",
+                  "        pm.environment.set('character_id', jsonData.data.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"photoUrl\": \"https://example.com/photo.jpg\",\n  \"name\": \"Arya\",\n  \"age\": 5,\n  \"gender\": \"girl\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/characters/analyze",
+              "host": ["{{base_url}}"],
+              "path": ["characters", "analyze"]
+            },
+            "description": "Analyzes a reference photo and creates a master character description using AI."
+          }
+        },
+        {
+          "name": "Get All Characters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/characters",
+              "host": ["{{base_url}}"],
+              "path": ["characters"]
+            },
+            "description": "Returns all characters for the authenticated user."
+          }
+        },
+        {
+          "name": "Get Character by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["characters", "{{character_id}}"]
+            },
+            "description": "Returns detailed information about a specific character."
+          }
+        },
+        {
+          "name": "Update Character",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"age\": 6\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["characters", "{{character_id}}"]
+            },
+            "description": "Updates character properties."
+          }
+        },
+        {
+          "name": "Delete Character",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/characters/{{character_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["characters", "{{character_id}}"]
+            },
+            "description": "Deletes a character permanently."
+          }
+        },
+        {
+          "name": "Set Default Character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/characters/{{character_id}}/set-default",
+              "host": ["{{base_url}}"],
+              "path": ["characters", "{{character_id}}", "set-default"]
+            },
+            "description": "Sets a character as the user's default character."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Books",
+      "description": "Book management endpoints",
+      "item": [
+        {
+          "name": "Create Book (Generate Story)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has book data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('id');",
+                  "    if (jsonData.data?.id) {",
+                  "        pm.environment.set('book_id', jsonData.data.id);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"{{character_id}}\",\n  \"theme\": \"adventure\",\n  \"illustrationStyle\": \"watercolor\",\n  \"customRequests\": \"Make it exciting\",\n  \"language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/books",
+              "host": ["{{base_url}}"],
+              "path": ["books"]
+            },
+            "description": "Creates a new book and generates the story using AI. This endpoint combines story generation and book creation."
+          }
+        },
+        {
+          "name": "Get All Books",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/books?status=completed&limit=10&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["books"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed",
+                  "description": "Filter by status (draft, generating, completed, failed, archived)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of books per page"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Offset for pagination"
+                }
+              ]
+            },
+            "description": "Returns all books for the authenticated user with optional filtering and pagination."
+          }
+        },
+        {
+          "name": "Get Book by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/books/{{book_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["books", "{{book_id}}"]
+            },
+            "description": "Returns detailed information about a specific book. Automatically increments view count."
+          }
+        },
+        {
+          "name": "Update Book",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Title\",\n  \"is_favorite\": true,\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/books/{{book_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["books", "{{book_id}}"]
+            },
+            "description": "Updates book properties like title, status, favorite status, images, etc."
+          }
+        },
+        {
+          "name": "Delete Book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/books/{{book_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["books", "{{book_id}}"]
+            },
+            "description": "Deletes a book permanently. Cascade deletes related images."
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Generation",
+      "description": "AI-powered story and image generation",
+      "item": [
+        {
+          "name": "Generate Story",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has story data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('storyId');",
+                  "    if (jsonData.data?.storyId) {",
+                  "        pm.environment.set('book_id', jsonData.data.storyId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"{{character_id}}\",\n  \"theme\": \"adventure\",\n  \"illustrationStyle\": \"watercolor\",\n  \"customRequests\": \"Make it exciting\",\n  \"language\": \"en\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/generate-story",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "generate-story"]
+            },
+            "description": "Generates a complete children's story with image prompts using GPT-4o."
+          }
+        },
+        {
+          "name": "Generate Images",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has images data', function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('success', true);",
+                  "    pm.expect(jsonData.data).to.have.property('images');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookId\": \"{{book_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ai/generate-images",
+              "host": ["{{base_url}}"],
+              "path": ["ai", "generate-images"]
+            },
+            "description": "Generates images for all pages of a book using DALL-E 3. This is a long-running operation (~10s per image)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "TTS",
+      "description": "Text-to-Speech generation",
+      "item": [
+        {
+          "name": "Generate Speech",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Once upon a time...\",\n  \"language\": \"en\",\n  \"voice\": \"en-US-Neural2-F\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tts/generate",
+              "host": ["{{base_url}}"],
+              "path": ["tts", "generate"]
+            },
+            "description": "Generates speech audio from text using Google Cloud TTS."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "character_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "book_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "test_email",
+      "value": "test@example.com",
+      "type": "string"
+    },
+    {
+      "key": "test_password",
+      "value": "testpassword123",
+      "type": "string"
+    }
+  ]
+}
+

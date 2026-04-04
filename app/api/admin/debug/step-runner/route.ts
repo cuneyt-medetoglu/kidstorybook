@@ -148,6 +148,20 @@ export async function POST(request: NextRequest) {
 
     const themeKey = normalizeThemeKey(rawTheme)
 
+    if (operationType === 'story_generation' && themeKey === 'custom') {
+      const cr = typeof customRequests === 'string' ? customRequests.trim() : ''
+      if (!cr) {
+        return NextResponse.json(
+          {
+            success: false,
+            error:
+              'theme is "custom": customRequests (story seed) is required and must be non-empty. No silent fallback.',
+          },
+          { status: 400 }
+        )
+      }
+    }
+
     // ── Fetch characters ──────────────────────────────────────────────────────
     const characters: any[] = []
     for (const id of characterIds) {
@@ -295,6 +309,7 @@ async function handleStoryGeneration({
     storyData: parsedStoryData,
     expectedPageCount: effectivePageCount,
     characters: characters.map((c: any) => ({ id: c.id, name: c.name })),
+    customRequests,
   })
   const storyData = preparedStory.storyData
   console.log('[Step Runner] storyRepair:', {

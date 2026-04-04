@@ -74,4 +74,8 @@ herokidstory_accessKeys.csv
 !messages/*.json
 nul
 
+# Google Cloud service account keys (repo kökü — izlenmemeli; bir kez commitlendiyse anahtarı GCP’de rotate edin)
+/herokidstory-*.json
+/kidstorybook-*.json
+
 herokidstory-key.pem

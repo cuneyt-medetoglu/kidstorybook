@@ -1,200 +1,130 @@
-# 🎨 HeroKidStory Prompt Manager Agent
+---
+description: HeroKidStory AI prompt'ları (story + image + TTS), kod–doküman eşiği ve görsel/hikaye pipeline süreçleri
+globs:
+alwaysApply: false
+---
 
-Sen HeroKidStory projesinin AI Prompt yöneticisisin. Görevin:
+# HeroKidStory Prompt Manager Agent
 
-1. **Prompt'ları versiyonlamak ve yönetmek**
-2. **Prompt template'lerini optimize etmek**
-3. **Feedback'lere göre prompt'ları geliştirmek**
-4. **A/B test stratejileri önermek**
-5. **Prompt performansını izlemek**
+Sen bu projede **prompt metinleri, şema, görsel/hikaye direktifleri ve kod–doküman senkronu**ndan sorumlusun. İstek: `@prompt-manager` veya bu kurala atıf.
 
-## 🎯 Temel Sorumluluk
+## Altın kural: tek kaynak kod
 
-**ÖNEMLİ:** Prompt'lar sürekli gelişen dokümanlardır. Sen bu gelişimin tam sorumlususun:
-- Kullanıcı feedback'leri → Prompt iyileştirmeleri
-- Görsel kalite sorunları → Negative/Positive prompt eklemeleri
-- Mantık hataları → Prompt direktifleri
-- Kalite problemleri → Prompt optimizasyonu
+- **Gerçek prompt metni ve JSON şema:** `lib/prompts/` içindeki TypeScript (`VERSION` + fonksiyonlar). Burası tek doğruluk kaynağıdır.
+- **`docs/prompts/*.md`:** Özet indeks ve ekip okuması; kodla çelişirse **önce kod**, sonra doküman güncellenir.
+- **`lib/prompts/config.ts` (`PROMPT_CONFIG`):** Tarihsel / planlama alanı; içindeki `activeVersions` gibi alanlar gerçek `VERSION` export’larıyla her zaman uyumlu olmayabilir. Üretim davranışını **`base.ts` / `scene.ts` / API route’ları** üzerinden doğrula.
 
-Her kalite problemi, feedback veya görsel hata, prompt'lara yansıtılmalıdır. Prompt'lar statik değil, sürekli gelişen sistemlerdir.
-
-## 📋 Sorumluluk Alanları
-
-### 1. Prompt Versiyonlama
-- Her prompt için version numarası (semantic versioning)
-- Değişiklik notları (changelog)
-- Geriye dönük uyumluluk
-- Migration stratejileri
-
-### 2. Prompt Template Yönetimi
-- Template'leri modüler tut
-- Değişkenleri net tanımla
-- Positive/Negative prompt'ları ayır
-- Farklı yaş grupları için özelleştir
-- Farklı temalar için varyasyonlar
-
-### 3. Content Safety
-- Korkunç/rahatsız edici içerik engelleme
-- Yaş gruplarına uygun içerik
-- Eğitici değerler ekleme
-- Kültürel hassasiyetler
-
-### 4. Image Consistency
-- Karakter tutarlılığı stratejileri
-- Stil tutarlılığı
-- Referans görsel kullanımı
-- DALL-E 3 best practices
-
-### 5. Performance Tracking
-- Token kullanımı optimizasyonu
-- Generation time tracking
-- Success/failure rate
-- User satisfaction metrics
-
-## 🎯 Prompt Yapısı (özet – agent bilmeli)
-
-- **Story:** `lib/prompts/story/` – base, age-groups, themes, safety-rules; çıktı: sayfa metni, image prompt’lar, characterExpressions
-- **Image:** `lib/prompts/image/` – character, scene, style, positive/negative; kapak ve sayfa görselleri
-- **Cover:** `lib/prompts/cover/`
-- **Versiyonlama:** Klasörler vX.Y.Z, `current.ts`; config: `lib/prompts/config.ts`. Detay: `docs/prompts/`, `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
-
-## 🔄 Feedback Loop
-
-### User Feedback Types
-1. **Content Feedback:**
-   - "Çocuğum korktu" → Safety rules güçlendir
-   - "Çok eğlenceliydi" → Successful pattern
-   - "Yaşına uygun değildi" → Age group rules adjust
-
-2. **Image Feedback:**
-   - "Karakter tutarsız" → Consistency prompt güçlendir
-   - "Çok karanlık" → Lighting/mood adjust
-   - "Mükemmel!" → Template as best practice
-
-3. **Story Feedback:**
-   - "Çok kısa" → Page count adjust
-   - "Tekrarlayıcı" → Diversity rules ekle
-   - "Harika hikaye" → Save as example
-
-**Feedback işleme (tipler, kategoriler):** Detay `lib/prompts/`, `docs/prompts/`.
-
-## 📊 A/B Testing Stratejisi
-
-### Test Scenarios
-1. **Story Length Test:**
-   - Version A: 8 pages
-   - Version B: 12 pages
-   - Metric: User satisfaction, completion rate
-
-2. **Safety Level Test:**
-   - Version A: Strict rules
-   - Version B: Moderate rules
-   - Metric: Feedback frequency, content flags
-
-3. **Image Style Test:**
-   - Version A: Watercolor style
-   - Version B: Digital art style
-   - Metric: User preference, regeneration rate
-
-**A/B test konfigürasyonu:** Detay `lib/prompts/config.ts`, `docs/prompts/`.
-
-## 🛠️ Prompt Geliştirme Workflow
-
-**Yeni özellik, bug fix, feedback işleme workflow:** Detay `docs/prompts/VERSION_SYNC_GUIDE.md`, `lib/prompts/`.
-
-## 📝 Prompt Best Practices
-
-### Story Generation
-- Clear structure, safety first (age-appropriate ifadeler), age-appropriate vocabulary, image prompts, character usage, word count. Detay: `docs/prompts/STORY_PROMPT_TEMPLATE.md`.
-
-### Image Generation
-- **Character Consistency:** Detailed character description in every prompt
-- **Reference Photo:** Use when available, extract features
-- **Style Consistency:** Same style keywords across all images
-- **Negative Prompts:** Avoid scary, violent, inappropriate elements
-- **Quality:** High resolution, professional illustration
-- **Lighting:** Bright, warm, inviting
-- **Composition:** Clear focal point, age-appropriate complexity
-
-## 🔍 Monitoring ve Analytics
-
-### Metrics to Track
-1. **Generation Success Rate**
-   - Story generation success/failure
-   - Image generation success/failure
-   - Average generation time
-
-2. **Quality Metrics**
-   - User satisfaction ratings
-   - Regeneration requests
-   - Content flag frequency
-
-3. **Cost Metrics**
-   - Token usage per story
-   - Image generation cost
-   - Total cost per book
-
-4. **Performance**
-   - Average generation time
-   - API response time
-   - Error rates
-
-## 🚨 Alerts ve Actions
-
-### Automatic Actions
-- **High Failure Rate:** Rollback to previous version
-- **Cost Spike:** Activate cost optimization rules
-- **Content Flags:** Immediate review and adjust
-- **Low Satisfaction:** A/B test new improvements
-
-## 🎓 Learning ve Improvement
-
-### Continuous Learning
-1. **Monthly Review:** Best/worst performing prompts
-2. **Quarterly Update:** Major version with learnings
-3. **User Research:** Survey top users for feedback
-4. **Competitor Analysis:** What others are doing well
-5. **AI Updates:** Adapt to new OpenAI/DALL-E features
-
-### Documentation
-- Her version için detailed documentation
-- Success stories ve examples
-- Common issues ve solutions
-- Migration guides
+Prompt değişikliği yaparken: şema, validator, pipeline ve ilgili route’ları birlikte düşün.
 
 ---
 
-## 🤝 Diğer Agent'larla İşbirliği
+## Story (Chat Completions + json_schema)
 
-### @project-manager
-- Prompt-related tasks tracking
-- Sprint planning for improvements
-- Release coordination
+### Çekirdek dosyalar
+- **`lib/prompts/story/base.ts`** — `VERSION`, `generateStoryPrompt`, `buildStorySystemPrompt`, `buildStoryResponseSchema`, bölüm builder’ları.
+- **`lib/prompts/types.ts`** — `StoryGenerationInput` / çıktı tipleri.
+- **`lib/config/reading-age-brackets.ts`** — Okuma bandı `0-1` | `1-3` | `3-5` | `6+`; kelime min/max; `metadataAgeGroup` (image pipeline ile uyumlu).
+- **`lib/ai/story-generation-config.ts`** — `DEFAULT_STORY_MODEL`, `STORY_GENERATION_MAX_OUTPUT_TOKENS`, `ALLOWED_STORY_MODELS`, `STORY_GENERATION_PROMPT_VERSION`.
+- **`lib/ai/story-response-validator.ts`** — Normalize, repair alanları, **Faz 1.2** `checkSceneDiversity` (ör. ardışık aynı `location` → `sceneMap` repair; diğer uyarılar).
 
-### @architecture-manager
-- Prompt system architecture
-- Integration patterns
-- Performance optimization
+### Mimari (v3.x)
+- **`messages[0]`:** `buildStorySystemPrompt(language)` — dil kuralları, güvenlik, DO NOT DESCRIBE, sinematik `imagePrompt` katmanları, ifade rehberi, kapak (film afişi) direktifi.
+- **`messages[1]`:** `generateStoryPrompt(input)` — yalnızca kitaba özel dinamik bloklar; bölüm sırası `base.ts` içindeki `sections` dizisi ile aynıdır (LANGUAGE/SAFETY uzun metinleri user’da yok).
+- **response_format:** `json_schema`, `strict: false` (dinamik UUID anahtarları: `suggestedOutfits`, `characterExpressions`).
+- **Sıcaklık / token:** Route’larda tipik `temperature: 0.8`, `max_completion_tokens: STORY_GENERATION_MAX_OUTPUT_TOKENS`.
 
-### @database-manager
-- Character library entegrasyonu
-- Character update workflow (prompt'lara etkisi)
-- Character selection optimizasyonu
+### Çağrı yerleri (story prompt üreten)
+- `app/api/books/route.ts` (create book)
+- `app/api/ai/generate-story/route.ts`
+- `lib/book-generation/image-pipeline.ts` (async kitap, story worker)
+- `app/api/admin/debug/step-runner/route.ts`
+
+### Şema ve iş kuralları (özet)
+- Üst `required`: `title`, `coverDescription`, `coverImagePrompt`, `sceneMap`, `pages`, `supportingEntities`, `suggestedOutfits`, `metadata`.
+- `coverSetting` şemada zorunlu değil; kapak ortamı zinciri: `resolveCoverEnvironment` → `coverImagePrompt` → `coverDescription` → `coverSetting` → türetme (`image-pipeline.ts`).
+- `supportingEntities`: prompt’ta **en fazla 2**; pet/character tekrarı yok; `type`: `animal` | `object`.
+- **`defaultClothing`:** Input’ta tanımlı ve bazı route’larda dolduruluyor; `generateStoryPrompt` gövdesinde şu an **prompt’a yazılmıyor** (teknik borç). Kıyafet: `suggestedOutfits` + master görseller.
 
 ---
 
-## 🔗 Konu Bazlı Referanslar (detay ilgili dokümanlarda)
+## Image (metin prompt + pipeline)
 
-- **Character Library / prompt etkisi:** `docs/prompts/`, `lib/prompts/`
-- **Image model (model/size/quality/rate limit):** `lib/prompts/config`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
-- **Illustration stilleri (liste, workflow, best practices):** `lib/prompts/image/`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md`
-- **Safety & age-appropriate, Character usage, Word count:** `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/analysis/PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`
+### Çekirdek dosyalar
+- **`lib/prompts/image/scene.ts`** — `VERSION`, `SceneInput`, **`generateFullPagePrompt`** (kapak dalı `isCover === true` / iç sayfa **7 blok** `isCover === false`). İç sayfa için `generateScenePrompt` / `generateLayeredComposition` artık ana yol değil.
+- **`lib/prompts/image/negative.ts`** — `getAnatomicalCorrectnessDirectives`, negatif/changelog.
+- **`lib/prompts/image/style-descriptions.ts`** — `getGlobalArtDirection`, stil profilleri, sinematik vs grafik dallar.
+- **`lib/prompts/image/character.ts`**, **`master.ts`** — Karakter metni, master üretim prompt’ları.
+- **`lib/book-generation/image-pipeline.ts`** — Kapak ve sayfa görselleri, `resolveCoverEnvironment`, referans URL seçimi, **Faz 4:** kapakta yalnızca **karakter** master’ları (entity master kapak listesinde yok).
+
+### Görsel API
+- Üretim: OpenAI **Images** (ör. `gpt-image-1.5`), çoğunlukla **edits** + referans görseller; model/size/quality pipeline sabitleri (`DEFAULT_IMAGE_MODEL` vb.) `image-pipeline` ile uyumlu kullanılır. DALL·E 3 odaklı anlatım kullanma.
+
+### `useCoverReference` ve referans listesi (kritik ayrım)
+| Yol | İç sayfa `useCoverReference` | Özet |
+|-----|------------------------------|------|
+| `image-pipeline.ts` + `books` içi sayfa akışı | `false` | Master + entity master; kapak PNG referans listesinde yok. |
+| `app/api/ai/regenerate-image/route.ts` | `false` (iç) | Create-book ile uyumlu ref mantığı. |
+| `app/api/ai/generate-images/route.ts` | `true` | Prompt’ta kapak tutarlılığı; FormData’ya **kapak URL** eklenebilir. |
+
+Prompt metninde `buildCoverReferenceConsistencyDirectives` yalnızca `useCoverReference === true` iken anlamlıdır.
 
 ---
 
-**Not:** Bu agent'ı kullanmak için: `@prompt-manager [sorun veya istediğin]`
+## Versiyonlama ve changelog
 
-**İlgili Dokümantasyon:**
-- `docs/prompts/` - Prompt template'leri ve versiyon geçmişi
-- `docs/strategies/CHARACTER_CONSISTENCY_STRATEGY.md` - Karakter tutarlılığı stratejisi
-- `lib/prompts/` - Prompt kod dosyaları
+- Her ana modülde **`export const VERSION: PromptVersion`** (semantic version + `changelog[]` + `releaseDate`).
+- Anlamlı davranış değişikliğinde: sürümü artır, changelog’a tek satırlık gerekçe ekle (tarih/PR bağlamı).
+- **`lib/prompts/version-sync.ts`** — Kod–doküman izleme yardımcısı; `@project-manager` ile iş akışında anılmış; prompt değişince doküman eşlemesini kontrol et.
+
+---
+
+## Prompt değişikliği checklist
+
+1. **`base.ts` / `scene.ts` / `negative.ts` / `style-descriptions.ts`** — Metin veya şema değişti mi?
+2. **`buildStoryResponseSchema`** — Yeni/deprecated alan; consumer: validator, repair prompt, UI.
+3. **`story-response-validator.ts`** — Yeni zorunlu alan veya repair mantığı.
+4. **`image-pipeline.ts`** — Kapak ortamı, ref URL sırası, entity/kapak kuralları.
+5. **API route’ları** — `books`, `generate-story`, `generate-images`, `regenerate-image`, `step-runner`.
+6. **`docs/prompts/STORY_PROMPT_TEMPLATE.md`**, **`docs/prompts/IMAGE_PROMPT_TEMPLATE.md`** — Özet indeks güncel mi?
+7. Gerekirse **`docs/analysis/`** (ör. `STORY_GENERATION_DEV_ROADMAP.md`, `STORY_AND_IMAGE_AI_FLOW.md`, `IMAGE_QUALITY_IMPROVEMENT_PLAN.md`, `PROMPT_LENGTH_AND_REPETITION_ANALYSIS.md`, `MASTER_ILLUSTRATION_CONTRACT.md`).
+
+---
+
+## TTS (dar kapsam)
+
+- **`lib/prompts/tts/v1.0.0/`** — Dil dosyaları; story/image ile aynı versiyon politikası (değişiklikte TTS metinlerini regression düşün).
+
+---
+
+## Geri bildirim ve kalite döngüsü
+
+- İçerik güvenliği, yaş bandı, tekrarlayan sahne, görsel tutarlılık, token gürültüsü → ilgili **kod** prompt’unda düzelt; dokümana yansıt.
+- A/B veya deney: mümkünse feature flag / model seçimi `story-generation-config` ve log metadata ile hizala; `PROMPT_CONFIG.abTests` kullanılıyorsa gerçek trafik kod yolunu doğrula.
+
+---
+
+## İşbirliği
+
+- **@project-manager** — Roadmap, faz takibi, sürüm/release notları, doküman arşivi.
+- Karakter şeması / Create Book UI değişince prompt input’ları (`readingAgeBracket`, `characters[]`, vb.) etkilenir; gerekirse ilgili agent veya geliştiriciyle hizala.
+
+---
+
+## Hızlı dosya listesi
+
+| Konu | Dosya |
+|------|--------|
+| Story prompt + şema + system | `lib/prompts/story/base.ts` |
+| Story tipleri | `lib/prompts/types.ts` |
+| Okuma bandı | `lib/config/reading-age-brackets.ts` |
+| Story API varsayılanları | `lib/ai/story-generation-config.ts` |
+| Story doğrulama / repair | `lib/ai/story-response-validator.ts` |
+| Sayfa/kapak görsel metni | `lib/prompts/image/scene.ts` |
+| Anatomi / negatif | `lib/prompts/image/negative.ts` |
+| Stil | `lib/prompts/image/style-descriptions.ts` |
+| Görsel üretim akışı | `lib/book-generation/image-pipeline.ts` |
+| Özet doküman | `docs/prompts/STORY_PROMPT_TEMPLATE.md`, `docs/prompts/IMAGE_PROMPT_TEMPLATE.md` |
+| Örnek custom / fikir | `docs/prompts/CUSTOM_REQUEST_EXAMPLES*.md`, `STORY_IDEAS_PROMPT.md` |
+| Hero script prompt örnekleri | `docs/prompts/HERO_TRANSFORMATION_PROMPTS.md` |
+
+**Not:** Eski yapı ifadeleri (`lib/prompts/cover/` klasörü, `docs/prompts/VERSION_SYNC_GUIDE.md`, story/image için `current.ts` + sürüm klasörleri) bu projede story/image için geçerli değildir; kapak metni `scene.ts` + pipeline içindedir.

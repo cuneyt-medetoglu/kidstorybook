@@ -28,6 +28,8 @@ export interface WizardState {
     style: string
   }
   step5?: {
+    /** UI / Step 6: `customRequests` (çoğul). Eski taslaklarda `customRequest` tekil görülebilir. */
+    customRequests?: string
     customRequest?: string
     pageCount?: number
   }

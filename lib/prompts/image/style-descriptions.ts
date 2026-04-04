@@ -26,8 +26,8 @@ export const STYLE_DESCRIPTIONS: Record<string, string> = {
   'collage': 'Collage - Cut-out pieces with visible rough edges, distinct layers with varied textures, torn edges showing paper texture, mixed media feel, visible shadows between layers, vibrant colors, handcrafted appearance, illustration',
   
   // Clay Animation - Clay-like appearance with hand-molded look
-  'clay_animation': 'Clay Animation - Clay-like appearance, visible fingerprints and tool marks, soft organic texture, matte finish, slightly lumpy surfaces, hand-molded look, soft rounded shadows, stop-motion aesthetic, illustration',
-  'clay-animation': 'Clay Animation - Clay-like appearance, visible fingerprints and tool marks, soft organic texture, matte finish, slightly lumpy surfaces, hand-molded look, soft rounded shadows, stop-motion aesthetic, illustration',
+  'clay_animation': 'Clay Animation - Clay-like appearance, visible fingerprints and tool marks, soft organic texture, matte finish, slightly lumpy surfaces, hand-molded look, soft rounded shadows, claymation handcrafted look, illustration',
+  'clay-animation': 'Clay Animation - Clay-like appearance, visible fingerprints and tool marks, soft organic texture, matte finish, slightly lumpy surfaces, hand-molded look, soft rounded shadows, claymation handcrafted look, illustration',
   
   // Kawaii - Exaggerated cuteness with oversized head and sparkling eyes
   'kawaii': 'Kawaii - Oversized head (1:2 or 1:3 head-to-body ratio), large sparkling eyes with star highlights, tiny dot-like nose, small mouth, soft rounded cheeks, pastel color palette (baby pink, sky blue, mint green, lavender), blush marks on cheeks, decorative hearts/stars/sparkles, exaggerated cuteness, illustration',
