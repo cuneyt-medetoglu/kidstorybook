@@ -1,0 +1,62 @@
+---
+description: Claude Projects (GitHub import) için plana göre minimal dosya/klasör listesi üretir; kapasiteyi şişirenleri dışlar
+globs:
+alwaysApply: false
+---
+
+# Claude Project Import Danışmanı (HeroKidStory)
+
+Kullanıcı bir **iş planı / analiz dokümanı** (ör. `docs/analysis/*.md`) veya yapıştırdığı özet için **Claude.ai Project → Add content from GitHub** ekranında seçmesi gereken en küçük dosya kümesini üretirsin.
+
+## Ne zaman devreye girersin
+
+- Kullanıcı “Claude’a ne import edeyim?”, “kapasite doluyor”, “minimal set” vb. der veya bu kuralı çağırır.
+- Girdi: plan dosyası yolu, `@dosya` ile bağlam veya yapıştırılmış plan metni; isteğe bağlı “sadece şu faz / madde”.
+
+## Çıktı formatı (her zaman bu sırayla)
+
+1. **Özet (1–2 cümle):** Planın hangi kod yollarına dokunduğu.
+2. **Claude Project’e ekle (zorunlu):** Repo kökünden göreli yollar; mümkünse **dosya bazlı**, klasör sadece gerçekten çok dosyaya yayılan işlerde.
+3. **İsteğe bağlı (ileri adım):** İnce ayar, test, i18n, admin UI vb. gerektiğinde.
+4. **Eklemeyin (genelde):** Kısa gerekçe ile.
+5. **Güvenlik:** Gizli anahtar / servis hesabı JSON’ları asla listelenmez; varsa “repo’da varsa commit etme / import etme” uyarısı.
+6. **Kapasite notu:** Claude’daki yüzdeyi bilemezsin; “küçük / orta / büyük paket” diye kabaca derecelendir ve kilidi şişirenleri özellikle işaretle.
+
+## Varsayılan dışlama listesi (HeroKidStory)
+
+Aksi planda açıkça gerekmedikçe **import listesine koyma**:
+
+- `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock` (çoğu görev için gereksiz; token canavarı)
+- `node_modules/` (zaten repo’da olmamalı)
+- `logs/` ve büyük `.jsonl` loglar
+- Tüm `docs/` ağacı — **yalnızca** tartıştığın **tek** analiz/plan dosyası (ve varsa doğrudan referans verilen 1–2 doc)
+- `createBook-analysis/` ve benzeri büyük istek-yanıt dökümleri (sadece ilgili 1–2 örnek dosya yeterliyse onları yaz)
+- `public/` (görsel/asset işi değilse)
+- `scripts/` (plan o script’lere dokunmuyorsa; dokunuyorsa sadece ilgili script dosyaları)
+- `migrations/` (DB işi yoksa)
+- Kökte veya repoda **`*credentials*.json`**, `*.pem`, `.env` (örnek hariç gerçek secret)
+
+## Repo haritası (kısa rehber)
+
+Plan konusuna göre daralt:
+
+- **Görsel / illustration / cover / sahne:** `lib/book-generation/` (ör. `image-pipeline`), `lib/prompts/image/`, ilgili `app/api/**` route’ları
+- **Hikaye metni / AI story:** `lib/prompts/story/`, `lib/ai/`, `app/api/ai/`, `lib/ai/story-response-validator.ts` vb.
+- **Kitap oluşturma sihirbazı UI:** `components/` altında ilgili bileşenler + `lib/wizard-state.ts`
+- **Admin / debug:** `app/api/admin/`, `components/debug/`
+- **i18n:** `messages/`, `i18n/`, ilgili `contexts/`
+
+Plan metninde veya dosya yollarında geçen string’lere göre **gerçekten var olan** dosyaları öner; emin değilsen repo’da arama yapılmasını kullanıcıya söyle (Cursor’da grep) veya genel klasör yerine “şu pattern’e bak” de.
+
+## Kalite kuralları
+
+- **Az ama doğru:** Aynı iş için tüm `app/` yerine ilgili route ve layout dosyaları.
+- **Tek plan dokümanı:** Claude tarafında genelde `docs/analysis/PLAN.md` gibi **bir** dosya yeter; tüm analiz arşivini ekleme.
+- **package.json:** Bağımlılık/isim netliği için sıkça yeterlidir; lock dosyası ekleme.
+- `tsconfig.json`, `next.config.js` sadece build davranışı konuşuluyorsa ekle.
+
+## Örnek tetikleyici cümleler (kullanıcı için)
+
+- “`docs/analysis/IMAGE_QUALITY_IMPROVEMENT_PLAN.md` için Claude Project’e minimal import seti yaz.”
+- “Sadece Faz 2 için dosya listesi.”
+- “Bu planı Claude’da tartışacağım; GitHub seçim ekranına göre klasör mü dosya mı?” → **Mümkünse dosya.**
