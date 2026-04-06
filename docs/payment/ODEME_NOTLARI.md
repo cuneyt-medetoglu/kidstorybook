@@ -27,7 +27,7 @@ Kişisel hatırlatma / günlük notlar. Ana takip: [PAYMENT_ROADMAP.md](PAYMENT_
 
 - **025b “index already exists”:** `IF NOT EXISTS` ile tekrar çalıştırma genelde sorun değil; uyarı/notice görülebilir.
 
-- **Tam migration sırası:** `025` → `025b` (indeks) → `025c` (trigger) → `026` → `027` → **`027c` (yalnızca eski `payments` şeması varsa)** → `027b` → `028` → `028b`.
+- **Tam migration sırası:** `025` → `025b` (indeks) → `025c` (trigger) → `026` → `027` → **`027c` (yalnızca eski `payments` şeması varsa)** → `027b` → `028` → `028b` → **`029_payments_user_id.sql`** (`payments.user_id`; kod INSERT ile doldurur).
 
 - **027 çalıştı ama `payment_provider` yok / 027b sütun bulamıyor**  
   Veritabanında **daha önce oluşturulmuş** bir `payments` tablosu vardı; `CREATE TABLE IF NOT EXISTS` hiçbir şey yapmadı. **Çözüm:** `027c_payments_align_legacy.sql` dosyasını **tümüyle** çalıştır, ardından **`027b`**’yi tekrar çalıştır.  

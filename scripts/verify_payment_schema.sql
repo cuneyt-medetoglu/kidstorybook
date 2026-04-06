@@ -1,7 +1,7 @@
 -- ============================================================================
 -- Ödeme / sipariş şeması doğrulama (DBeaver: Ctrl+A → çalıştır)
 --
--- Beklenen: migrations 025 → 025c, 026, 027 → 027c (gerekirse), 027b, 028, 028b
+-- Beklenen: migrations 025 → 025c, 026, 027 → 027c (gerekirse), 027b, 028, 028b, 029
 -- ============================================================================
 
 -- 1) Ödeme akışı için zorunlu tablolar var mı?
@@ -32,6 +32,7 @@ SELECT * FROM (
   UNION ALL SELECT 'order_items', 'book_id'
   UNION ALL SELECT 'order_items', 'item_type'
   UNION ALL SELECT 'payments', 'payment_provider'
+  UNION ALL SELECT 'payments', 'user_id'
   UNION ALL SELECT 'payments', 'provider_payment_id'
   UNION ALL SELECT 'payments', 'payment_currency'
   UNION ALL SELECT 'payments', 'amount'

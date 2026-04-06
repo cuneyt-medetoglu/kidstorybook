@@ -158,6 +158,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // 4b. Ödeme kaydı oluştur (initiated)
     const paymentRecord = await createPaymentRecord({
       orderId:  order.id,
+      userId:   user.id,
       provider: 'iyzico',
       amount:   totals.totalAmount,
       currency,

@@ -86,6 +86,8 @@ export interface OrderItem {
 export interface Payment {
   id: string
   order_id: string
+  /** Sipariş sahibi — DB'de NOT NULL; orders.user_id ile aynı değer */
+  user_id: string
   payment_provider: PaymentProvider
   provider_payment_id: string | null
   provider_session_id: string | null
@@ -163,6 +165,8 @@ export interface UpdateOrderStatusInput {
 
 export interface CreatePaymentInput {
   orderId: string
+  /** payments.user_id NOT NULL olan veritabanları için zorunlu */
+  userId: string
   provider: PaymentProvider
   amount: number
   currency: string

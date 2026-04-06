@@ -146,12 +146,13 @@ export async function createPaymentRecord(
 ): Promise<Payment> {
   const { rows } = await pool.query<Payment>(
     `INSERT INTO payments (
-      order_id, payment_provider, amount, payment_currency,
+      order_id, user_id, payment_provider, amount, payment_currency,
       provider_session_id, status
-    ) VALUES ($1,$2,$3,$4,$5,$6)
+    ) VALUES ($1,$2,$3,$4,$5,$6,$7)
     RETURNING *`,
     [
       input.orderId,
+      input.userId,
       input.provider,
       input.amount,
       input.currency,
