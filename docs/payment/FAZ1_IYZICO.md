@@ -1,7 +1,7 @@
 # 💳 Faz 1 — iyzico Entegrasyonu (Türkiye)
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** ✅ Sandbox ödeme başarıyla tamamlandı — Faz 1.5 ödeme-sonrası UX düzeltmeleri de uygulandı.  
+**Durum:** ✅ Faz 1 kapatıldı — sandbox uçtan uca testler doğrulandı; Faz 1.5 (başarı sonrası sepet temizliği + sipariş deep-link) uygulandı.  
 **Ön koşul:** [Faz 0](FAZ0_HAZIRLIK.md) tamamlanmış olmalı  
 **Tahmini süre:** 3-5 gün
 
@@ -505,14 +505,17 @@ Canlıya geçmek için iyzico'ya başvuru yapılması gerekir:
 - [ ] `dashboard/settings/page.tsx` → sipariş listesi **mock datadan** gerçek DB sorgusuna taşı (`getOrdersByUserId`) — **Faz 4**
 - [ ] Sipariş başarılı → otomatik onay e-postası — **Faz 5**
 
-### Test (tamamlananlar)
+### Test (Faz 1 kapanış — tamamlananlar)
 - [x] Sandbox ile başarılı ödeme — `orders.status=paid`, `payment_events.event_type=checkout.success` doğrulandı
 - [x] Callback → `/payment/success` yönlendirmesi çalışıyor
 - [x] DB: sipariş ID, `payment_events.received_at`, `processed=false` (audit kaydı) doğrulandı
-- [ ] 3D Secure tam test (red kartı ile)
-- [ ] Başarısız ödeme tam testi
+- [x] Başarı sayfası: sepet temizlenir; “Siparişimi Görüntüle” → `/dashboard/settings?section=orders`
 
-**Nasıl test edilir:** [ODEME_NOTLARI.md](ODEME_NOTLARI.md) → "Sandbox — uçtan uca test"
+**Canlı öncesi önerilen ek testler** (Faz 1’i açmaz; [FAZ6](FAZ6_TEST_VE_CANLIYA_ALIS.md) ile de uyumlu):
+- [ ] Yalnız 3DS zorunlu kart senaryosu (iyzico test kartları)
+- [ ] Bilinçli başarısız ödeme → `/payment/failure` + `orders`/`payments` `failed`
+
+**Nasıl test edilir:** [ODEME_NOTLARI.md](ODEME_NOTLARI.md) → “Sandbox — uçtan uca test”. Tek sipariş SQL: `scripts/verify_order_by_id.sql`.
 
 ---
 

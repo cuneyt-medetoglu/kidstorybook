@@ -4,6 +4,15 @@ Kişisel hatırlatma / günlük notlar. Ana takip: [PAYMENT_ROADMAP.md](PAYMENT_
 
 **Şema kontrolü:** `scripts/verify_payment_schema.sql` — DBeaver’da açıp Ctrl+A ile çalıştırın; eksik tablo / sütun özetini verir.
 
+**Tek sipariş doğrulama:** `scripts/verify_order_by_id.sql` — URL’deki `orderId` ile değiştirip çalıştırın; `payment_events` için zaman sütunu `received_at` ( `created_at` yok).
+
+---
+
+## 2026-04-06
+
+- **Faz 1 QA kapatıldı:** Sandbox başarılı ödeme, callback, DB satırları ve başarı sonrası UX (sepet + sipariş linki) ekip tarafından onaylandı. Özet: [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md), [FAZ1_IYZICO.md](FAZ1_IYZICO.md).
+- **Sıradaki doküman:** [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) (mock sipariş listesi → gerçek DB).
+
 ---
 
 ## 2026-04-05
@@ -65,6 +74,7 @@ Kişisel hatırlatma / günlük notlar. Ana takip: [PAYMENT_ROADMAP.md](PAYMENT_
    - Başarılı: tarayıcı `/payment/success?orderId=...` (locale prefix’li olabilir, örn. `/tr/payment/success`).
    - Başarısız: `/payment/failure?reason=...`
    - DB: `orders` → `paid`, `payments` → `succeeded`, `payment_events` satırı (token ile idempotency).
+   - UI (Faz 1.5): başarıdan sonra sepet rozeti sıfırlanır; “Siparişimi Görüntüle” → Ayarlar’da Siparişler sekmesi (`?section=orders`). Sipariş tablosu mock olabilir — gerçek liste Faz 4.
 
 5. **Sorun giderme**
    - Initialize 503: iyzico API hata mesajı sunucu log’unda; anahtar / base URL kontrolü.

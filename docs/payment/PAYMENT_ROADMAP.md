@@ -1,8 +1,8 @@
 # 💳 HeroKidStory — Ödeme Sistemi Entegrasyonu Yol Haritası
 
 **Oluşturma tarihi:** 5 Nisan 2026  
-**Son güncelleme:** 5 Nisan 2026 — Faz 1: iyzico akışı + step 6’da sepete ekleme düzeltmesi + checkout i18n namespace düzeltmeleri. **Sıradaki:** hedef DB’de `027` migration, sandbox + public callback URL. **Faz 3:** onayınız olmadan başlanmaz.
-**Durum:** Faz 0 ✅ · Faz 1 ✅ (sandbox ödeme ✅ · Faz 1.5 UX düzeltmeleri ✅)
+**Son güncelleme:** 6 Nisan 2026 — **Faz 1 uçtan uca testleri doğrulandı** (sandbox ödeme, callback, DB, Faz 1.5 UX). **Sıradaki implementasyon:** [Faz 4 — Admin siparişler](FAZ4_ADMIN_SIPARISLER.md). **Faz 3:** onay olmadan başlanmaz.
+**Durum:** Faz 0 ✅ · Faz 1 ✅ (kod + sandbox QA + Faz 1.5)
 **Kapsam:** iyzico (TR) ile uçtan uca ödeme; Stripe (uluslararası) plan dokümanda duruyor, **implementasyon sonra.**
 
 ---
@@ -11,7 +11,7 @@
 
 | Dalga | Kapsam |
 |-------|--------|
-| **Şimdi** | Faz 0 ✅ → Faz 1 + (Faz 3'ün iyzico kısmı) + Faz 4–6'da iyzico odaklı test ve canlıya alış |
+| **Şimdi** | Faz 0 ✅ · Faz 1 ✅ → **Faz 4** (sipariş UI / admin); Faz 3 geo-routing onayla; Faz 5–6 post-ödeme ve canlı checklist |
 | **Sonra** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) — Stripe entegrasyonu; ardından Faz 3'te tam geo-routing (TR → iyzico, diğer → Stripe) |
 
 **iyzico sandbox:** Panelden alınan API / güvenlik anahtarları **yalnızca** yerel `.env` dosyasına yazılır; **asla** git'e commit edilmez ve dokümana gerçek değer olarak eklenmez.
@@ -26,9 +26,10 @@
 
 | Sıradaki | Dosya / iş |
 |----------|------------|
-| **Faz 1** 🟡 | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) — Kod ✅. **Kalan:** sandbox testleri (başarılı / 3DS / başarısız), callback URL’nin dışarıdan erişilebilir olması (staging veya ngrok). Detay: [ODEME_NOTLARI.md](ODEME_NOTLARI.md) |
+| **Faz 1** ✅ | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) — Sandbox uçtan uca + DB doğrulaması tamam. İsteğe bağlı canlı öncesi: ayrı 3DS / başarısız kart testi ([FAZ6](FAZ6_TEST_VE_CANLIYA_ALIS.md)). |
+| **Faz 4** ⬜ | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) — **Sıradaki implementasyon:** kullanıcı sipariş listesi (DB), admin sipariş görünümü |
 | **Faz 3** ⏸️ | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) — **Beklemede** (ürün → sepet UX, geo-routing vb.); başlamak için ayrı onay |
-| **Faz 4–6** | Admin sipariş, post-ödeme e-posta, test + canlı |
+| **Faz 5–6** | Post-ödeme e-posta / teslimat; test + canlıya alış |
 
 **Deploy notu:** `package.json` ve `package-lock.json` commit edildiyse `deploy:build` / sunucuda `npm install` `iyzipay`’ı kurar. Sunucu `.env` içinde `IYZICO_*` tanımlı olmalı (commit edilmez).
 
@@ -164,7 +165,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 - **SDK:** `iyzipay` — **`package.json` → `dependencies`** (repoda sabitlenir); sunucuda `npm install` / `npm ci`
 
 ### Stripe *(sonra)*
-- **Durum:** Faz 0 ✅ · Faz 1 🟡 (backend ✅, frontend + checkout kalan)
+- **Durum:** Faz 0 ✅ · Faz 1 ✅ (iyzico tamam) · Stripe henüz yok ([FAZ2](FAZ2_STRIPE.md))
 - **Test:** `dashboard.stripe.com` test mode — mevcut hesap
 - **Prod:** Mevcut Stripe hesabı bağlanacak
 - **Yöntem:** Stripe Payment Element (embedded) veya Stripe Checkout (hosted)
@@ -189,7 +190,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 - [x] i18n: `products`, `orders`, `payment` anahtarları (TR + EN)
 - [x] Migration'lar PostgreSQL'e uygulandı (`025` → `025c` → `026` → `027` → `027b` → `028` → `028b`) — ortam başına doğrula
 - [x] `iyzipay` — `package.json` + lockfile; yerelde `npm install` / sunucuda deploy ile kurulum
-- [ ] iyzico callback için public URL (production veya ngrok) — Faz 1 testinde gerekli
+- [x] iyzico callback için public erişilebilir `NEXT_PUBLIC_APP_URL` — Faz 1 sandbox QA’da doğrulandı (staging/production; yerel tünel gerekirse ngrok vb.)
 
 ---
 
@@ -198,7 +199,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 | Faz | İçerik | Tahmini süre | Önerilen model | Durum |
 |-----|--------|--------------|----------------|-------|
 | Faz 0 | DB + Env + Altyapı (iyzico) | 1-2 gün | Sonnet 4.6 / Auto | ✅ **Tamamlandı** |
-| Faz 1 | iyzico | 3-5 gün | Opus 4.6 / GPT 5.4 | ⬜ |
+| Faz 1 | iyzico | 3-5 gün | Opus 4.6 / GPT 5.4 | ✅ **Tamamlandı** |
 | Faz 2 | Stripe | 3-5 gün | Opus 4.6 / GPT 5.4 | ⏸️ Ertelendi |
 | Faz 3 | Checkout (önce iyzico-only) | 2-3 gün | Sonnet 4.6 / Composer 2 | ⬜ |
 | Faz 4 | Admin sipariş | 2-3 gün | Sonnet 4.6 / Auto | ⬜ |
@@ -209,13 +210,13 @@ Kullanıcı → Sepet → Checkout Sayfası
 
 ### Sıradaki adım (implementasyon)
 
-**Faz 0 tamam** (DB + altyapı paketleri + `iyzipay` dependency). **Sıradaki:** **[Faz 1 — iyzico](FAZ1_IYZICO.md)** (API route’lar, Checkout Form, callback, sipariş/ödeme güncelleme).
+**Faz 1 tamam** — özet: [FAZ1_IYZICO.md](FAZ1_IYZICO.md). **Sıradaki:** **[Faz 4 — Admin siparişler](FAZ4_ADMIN_SIPARISLER.md)** (kullanıcı sipariş listesi mock’tan DB’ye; admin görünümü). Faz 2–3 Stripe / geo-routing ayrı onayla.
 
-Faz 1 öncesi kontrol listesi:
-1. [x] Migration zinciri hedef DB’de uygulandı mı?
-2. [x] `package.json` / `package-lock.json` repoda; sunucuda `npm install` sonrası `iyzipay` kurulu mu?
-3. [ ] Sunucu `.env`: `IYZICO_API_KEY`, `IYZICO_SECRET_KEY`, `IYZICO_BASE_URL` (commit edilmez)
-4. [ ] Callback testi için public URL (ngrok vb.) — Faz 1 içinde
+Faz 1 kapanış kontrolü (tamamlandı):
+1. [x] Migration zinciri hedef DB’de
+2. [x] `iyzipay` deploy ortamında kurulu
+3. [x] Sunucu `.env`: `IYZICO_*` + `NEXT_PUBLIC_APP_URL` (commit edilmez)
+4. [x] Callback + başarılı ödeme + DB (`orders` / `payment_events`) doğrulandı
 
 ---
 
