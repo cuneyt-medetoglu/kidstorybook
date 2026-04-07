@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, useEffect, useCallback, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
+import { Link } from "@/i18n/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslations } from "next-intl"
 import {
@@ -20,6 +21,8 @@ import {
   Eye,
   Trash2,
   Plus,
+  Loader2,
+  RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,22 +45,53 @@ import { ToastProvider } from "@/components/providers/ToastProvider"
 
 type Section = "profile" | "account" | "orders" | "free-cover" | "notifications" | "billing"
 
-const mockOrders = [
-  {
-    id: "ORD-001",
-    title: "Luna's Magical Adventure",
-    date: "2026-01-05",
-    type: "E-book",
-    status: "completed",
-  },
-  {
-    id: "ORD-002",
-    title: "Space Explorer Tommy",
-    date: "2025-12-20",
-    type: "Print",
-    status: "shipped",
-  },
-]
+interface OrderItemData {
+  id: string
+  book_id: string
+  item_type: string
+  unit_price: number
+  quantity: number
+  total_price: number
+  fulfillment_status: string
+  book_title: string | null
+  book_cover_url: string | null
+}
+
+interface UserOrder {
+  id: string
+  status: string
+  payment_provider: string
+  order_currency: string
+  total_amount: number
+  created_at: string
+  paid_at: string | null
+  items: OrderItemData[]
+}
+
+function formatCurrency(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat(currency === "TRY" ? "tr-TR" : "en-US", {
+      style: "currency",
+      currency,
+    }).format(amount)
+  } catch {
+    return `${currency} ${amount.toFixed(2)}`
+  }
+}
+
+function shortOrderId(id: string): string {
+  return id.slice(0, 8).toUpperCase()
+}
+
+const ORDER_STATUS_VARIANT: Record<string, "default" | "secondary" | "outline" | "destructive"> = {
+  paid: "default",
+  pending: "secondary",
+  processing: "secondary",
+  failed: "destructive",
+  cancelled: "outline",
+  refunded: "outline",
+  partially_refunded: "outline",
+}
 
 const mockPaymentMethods = [{ id: "1", last4: "1234", expiry: "12/25", brand: "Visa" }]
 
@@ -82,6 +116,7 @@ const VALID_SECTIONS: Section[] = ["profile", "account", "orders", "free-cover",
 
 function ProfilePageContent() {
   const t = useTranslations("dashboard.settings")
+  const tOrders = useTranslations("orders")
   const searchParams = useSearchParams()
   const sectionParam = searchParams.get("section") as Section | null
   const initialSection: Section =
@@ -106,7 +141,33 @@ function ProfilePageContent() {
   const [orderUpdates, setOrderUpdates] = useState(true)
   const [newFeatures, setNewFeatures] = useState(false)
   const [marketingEmails, setMarketingEmails] = useState(false)
+  const [orders, setOrders] = useState<UserOrder[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(false)
+  const [ordersError, setOrdersError] = useState(false)
+  const [ordersLoaded, setOrdersLoaded] = useState(false)
   const { toast } = useToast()
+
+  const fetchOrders = useCallback(async () => {
+    setOrdersLoading(true)
+    setOrdersError(false)
+    try {
+      const res = await fetch("/api/orders")
+      if (!res.ok) throw new Error("fetch failed")
+      const data = await res.json()
+      setOrders(data.orders ?? [])
+      setOrdersLoaded(true)
+    } catch {
+      setOrdersError(true)
+    } finally {
+      setOrdersLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeSection === "orders" && !ordersLoaded && !ordersLoading) {
+      fetchOrders()
+    }
+  }, [activeSection, ordersLoaded, ordersLoading, fetchOrders])
 
   const handleSaveProfile = async () => {
     setIsSaving(true)
@@ -322,7 +383,21 @@ function ProfilePageContent() {
                 <CardDescription>{t("orders.subtitle")}</CardDescription>
               </CardHeader>
               <CardContent>
-                {mockOrders.length === 0 ? (
+                {ordersLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <Loader2 className="size-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">{t("orders.loading")}</p>
+                  </div>
+                ) : ordersError ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <AlertTriangle className="size-10 text-destructive" />
+                    <p className="text-muted-foreground">{t("orders.error")}</p>
+                    <Button variant="outline" size="sm" onClick={fetchOrders}>
+                      <RefreshCw className="size-4 mr-2" />
+                      {t("orders.view")}
+                    </Button>
+                  </div>
+                ) : orders.length === 0 ? (
                   <div className="text-center py-12">
                     <ShoppingBag className="size-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">{t("orders.empty")}</p>
@@ -335,47 +410,64 @@ function ProfilePageContent() {
                         <TableHead>{t("orders.bookTitle")}</TableHead>
                         <TableHead>{t("orders.date")}</TableHead>
                         <TableHead>{t("orders.type")}</TableHead>
+                        <TableHead>{t("orders.amount")}</TableHead>
                         <TableHead>{t("orders.status")}</TableHead>
                         <TableHead>{t("orders.actions")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {mockOrders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell className="font-mono text-sm">{order.id}</TableCell>
-                          <TableCell className="font-medium">{order.title}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>{order.type}</TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                order.status === "completed"
-                                  ? "default"
-                                  : order.status === "shipped"
-                                    ? "secondary"
-                                    : "outline"
-                              }
-                            >
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              {order.type === "E-book" ? (
-                                <Button variant="outline" size="sm">
-                                  <Download className="size-4 mr-1" />
-                                  {t("orders.download")}
-                                </Button>
-                              ) : (
-                                <Button variant="outline" size="sm">
-                                  <Eye className="size-4 mr-1" />
-                                  {t("orders.view")}
-                                </Button>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {orders.map((order) => {
+                        const bookNames = order.items
+                          .map((i) => i.book_title || t("orders.unknownBook"))
+                          .join(", ")
+                        const itemTypes = [
+                          ...new Set(order.items.map((i) => i.item_type)),
+                        ]
+                          .map((it) => tOrders(`itemType.${it}`))
+                          .join(", ")
+                        const hasEbook = order.items.some(
+                          (i) => i.item_type === "ebook" || i.item_type === "bundle"
+                        )
+
+                        return (
+                          <TableRow key={order.id}>
+                            <TableCell className="font-mono text-sm">
+                              {shortOrderId(order.id)}
+                            </TableCell>
+                            <TableCell className="font-medium max-w-[200px] truncate">
+                              {bookNames}
+                            </TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              {new Date(order.created_at).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell>{itemTypes}</TableCell>
+                            <TableCell className="font-medium whitespace-nowrap">
+                              {formatCurrency(order.total_amount, order.order_currency)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={ORDER_STATUS_VARIANT[order.status] ?? "outline"}>
+                                {tOrders(`status.${order.status}`)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                {hasEbook && order.status === "paid" && (
+                                  <Button variant="outline" size="sm">
+                                    <Download className="size-4 mr-1" />
+                                    {t("orders.download")}
+                                  </Button>
+                                )}
+                                <Link href={`/orders/${order.id}`}>
+                                  <Button variant="outline" size="sm">
+                                    <Eye className="size-4 mr-1" />
+                                    {t("orders.view")}
+                                  </Button>
+                                </Link>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                     </TableBody>
                   </Table>
                 )}

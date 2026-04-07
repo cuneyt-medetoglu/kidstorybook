@@ -5,6 +5,18 @@
 import { pool } from './pool'
 import { parseCostUsd } from '@/lib/utils/cost-usd'
 
+export interface OrderStats {
+  totalPaidOrders: number
+  ordersToday: number
+  ordersThisWeek: number
+  ordersThisMonth: number
+  revenueTry: number
+  revenueUsd: number
+  iyzicoOrders: number
+  stripeOrders: number
+  failedLast24h: number
+}
+
 export interface AdminStats {
   totalUsers: number
   totalBooks: number
@@ -13,6 +25,7 @@ export interface AdminStats {
   totalFailedBooks: number
   recentBooks: RecentBook[]
   recentUsers: RecentUser[]
+  orderStats: OrderStats
 }
 
 export interface RecentBook {
@@ -327,6 +340,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     bookCountResult,
     recentBooksResult,
     recentUsersResult,
+    orderStatsResult,
   ] = await Promise.all([
     pool.query<{ count: string }>('SELECT COUNT(*) as count FROM users'),
     pool.query<{ status: string; count: string }>(
@@ -350,11 +364,36 @@ export async function getAdminStats(): Promise<AdminStats> {
        ORDER BY u.created_at DESC
        LIMIT 8`
     ),
+    pool.query<{
+      total_paid: string
+      orders_today: string
+      orders_week: string
+      orders_month: string
+      revenue_try: string
+      revenue_usd: string
+      iyzico_count: string
+      stripe_count: string
+      failed_24h: string
+    }>(`
+      SELECT
+        COUNT(*) FILTER (WHERE status = 'paid')                                          AS total_paid,
+        COUNT(*) FILTER (WHERE status = 'paid' AND created_at >= NOW() - INTERVAL '24 hours')  AS orders_today,
+        COUNT(*) FILTER (WHERE status = 'paid' AND created_at >= NOW() - INTERVAL '7 days')    AS orders_week,
+        COUNT(*) FILTER (WHERE status = 'paid' AND created_at >= NOW() - INTERVAL '30 days')   AS orders_month,
+        COALESCE(SUM(total_amount) FILTER (WHERE status = 'paid' AND order_currency = 'TRY'), 0) AS revenue_try,
+        COALESCE(SUM(total_amount) FILTER (WHERE status = 'paid' AND order_currency != 'TRY'), 0) AS revenue_usd,
+        COUNT(*) FILTER (WHERE payment_provider = 'iyzico' AND status = 'paid')          AS iyzico_count,
+        COUNT(*) FILTER (WHERE payment_provider = 'stripe'  AND status = 'paid')          AS stripe_count,
+        COUNT(*) FILTER (WHERE status = 'failed' AND created_at >= NOW() - INTERVAL '24 hours') AS failed_24h
+      FROM orders
+    `),
   ])
 
   const bookStatusMap = Object.fromEntries(
     bookCountResult.rows.map(r => [r.status, parseInt(r.count)])
   )
+
+  const os = orderStatsResult.rows[0]
 
   return {
     totalUsers: parseInt(userCountResult.rows[0].count),
@@ -367,5 +406,16 @@ export async function getAdminStats(): Promise<AdminStats> {
       ...r,
       book_count: parseInt(r.book_count as unknown as string),
     })),
+    orderStats: {
+      totalPaidOrders: parseInt(os.total_paid),
+      ordersToday: parseInt(os.orders_today),
+      ordersThisWeek: parseInt(os.orders_week),
+      ordersThisMonth: parseInt(os.orders_month),
+      revenueTry: parseFloat(os.revenue_try),
+      revenueUsd: parseFloat(os.revenue_usd),
+      iyzicoOrders: parseInt(os.iyzico_count),
+      stripeOrders: parseInt(os.stripe_count),
+      failedLast24h: parseInt(os.failed_24h),
+    },
   }
 }

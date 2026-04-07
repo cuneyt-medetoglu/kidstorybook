@@ -21,7 +21,7 @@ const NAV_ITEMS: { key: string; href: string; icon: React.ElementType; available
   { key: 'dashboard', href: '/admin', icon: LayoutDashboard, available: true },
   { key: 'bookManagement', href: '/admin/books', icon: BookOpen, available: true },
   { key: 'jobQueue', href: '/admin/queues', icon: Activity, available: true },
-  { key: 'orders', href: '/admin/orders', icon: ShoppingCart, available: false },
+  { key: 'orders', href: '/admin/orders', icon: ShoppingCart, available: true },
   { key: 'users', href: '/admin/users', icon: Users, available: true },
   { key: 'system', href: '/admin/settings', icon: Settings, available: false },
 ]

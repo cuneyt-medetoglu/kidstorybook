@@ -137,6 +137,62 @@ export async function getOrdersByUser(userId: string): Promise<Order[]> {
 }
 
 // ============================================================================
+// User: sipariş + item + kitap bilgisi (settings / orders sayfası)
+// ============================================================================
+
+export interface OrderItemWithBook {
+  id: string
+  book_id: string
+  item_type: string
+  unit_price: number
+  quantity: number
+  total_price: number
+  fulfillment_status: string
+  book_title: string | null
+  book_cover_url: string | null
+}
+
+export interface UserOrderWithItems extends Order {
+  items: OrderItemWithBook[]
+}
+
+/**
+ * Kullanıcının siparişlerini satır kalemleri ve kitap bilgisiyle döndürür.
+ * Tek sorgu — JSON aggregation ile N+1 sorgusu önlenir.
+ */
+export async function getOrdersByUserWithItems(
+  userId: string
+): Promise<UserOrderWithItems[]> {
+  const { rows } = await pool.query<UserOrderWithItems>(
+    `SELECT o.*,
+       COALESCE(
+         json_agg(
+           json_build_object(
+             'id',                oi.id,
+             'book_id',           oi.book_id,
+             'item_type',         oi.item_type,
+             'unit_price',        oi.unit_price,
+             'quantity',          oi.quantity,
+             'total_price',       oi.total_price,
+             'fulfillment_status', oi.fulfillment_status,
+             'book_title',        b.title,
+             'book_cover_url',    b.cover_image_url
+           )
+         ) FILTER (WHERE oi.id IS NOT NULL),
+         '[]'::json
+       ) AS items
+     FROM orders o
+     LEFT JOIN order_items oi ON oi.order_id = o.id
+     LEFT JOIN books b ON b.id = oi.book_id
+     WHERE o.user_id = $1
+     GROUP BY o.id
+     ORDER BY o.created_at DESC`,
+    [userId]
+  )
+  return rows
+}
+
+// ============================================================================
 // Payments
 // ============================================================================
 
@@ -276,6 +332,7 @@ export async function markPaymentEventProcessed(
 export interface AdminOrderRow extends Order {
   user_email: string
   user_name: string | null
+  items: OrderItemWithBook[]
 }
 
 export interface GetAdminOrdersOptions {
@@ -283,12 +340,12 @@ export interface GetAdminOrdersOptions {
   limit?: number
   status?: string
   provider?: string
-  search?: string    // sipariş ID, kullanıcı email
+  search?: string
 }
 
 export async function getAdminOrders(
   opts: GetAdminOrdersOptions = {}
-): Promise<{ rows: AdminOrderRow[]; total: number }> {
+): Promise<{ rows: AdminOrderRow[]; total: number; page: number; pageSize: number; totalPages: number }> {
   const page  = Math.max(1, opts.page ?? 1)
   const limit = Math.min(100, Math.max(1, opts.limit ?? 20))
   const offset = (page - 1) * limit
@@ -318,7 +375,24 @@ export async function getAdminOrders(
   const { rows } = await pool.query<AdminOrderRow>(
     `SELECT o.*,
             u.email AS user_email,
-            u.name  AS user_name
+            u.name  AS user_name,
+            (SELECT COALESCE(json_agg(
+              json_build_object(
+                'id',                oi.id,
+                'book_id',           oi.book_id,
+                'item_type',         oi.item_type,
+                'unit_price',        oi.unit_price,
+                'quantity',          oi.quantity,
+                'total_price',       oi.total_price,
+                'fulfillment_status', oi.fulfillment_status,
+                'book_title',        b.title,
+                'book_cover_url',    b.cover_image_url
+              )
+            ), '[]'::json)
+            FROM order_items oi
+            LEFT JOIN books b ON b.id = oi.book_id
+            WHERE oi.order_id = o.id
+            ) AS items
      FROM orders o
      JOIN public.users u ON u.id = o.user_id
      ${where}
@@ -335,7 +409,120 @@ export async function getAdminOrders(
     values
   )
 
-  return { rows, total: parseInt(countRows[0].count, 10) }
+  const total = parseInt(countRows[0].count, 10)
+
+  return {
+    rows,
+    total,
+    page,
+    pageSize: limit,
+    totalPages: Math.ceil(total / limit) || 1,
+  }
+}
+
+// ============================================================================
+// Order detail (kullanıcı + admin)
+// ============================================================================
+
+export interface OrderDetailForUser extends Order {
+  items: OrderItemWithBook[]
+}
+
+/**
+ * Tek sipariş detayı — kullanıcı tarafı.
+ * userId verilirse sahiplik kontrolü yapılır.
+ */
+export async function getOrderDetailForUser(
+  orderId: string,
+  userId: string
+): Promise<OrderDetailForUser | null> {
+  const { rows } = await pool.query<OrderDetailForUser>(
+    `SELECT o.*,
+       (SELECT COALESCE(json_agg(
+         json_build_object(
+           'id',                oi.id,
+           'book_id',           oi.book_id,
+           'item_type',         oi.item_type,
+           'unit_price',        oi.unit_price,
+           'quantity',          oi.quantity,
+           'total_price',       oi.total_price,
+           'fulfillment_status', oi.fulfillment_status,
+           'book_title',        b.title,
+           'book_cover_url',    b.cover_image_url
+         )
+       ), '[]'::json)
+       FROM order_items oi
+       LEFT JOIN books b ON b.id = oi.book_id
+       WHERE oi.order_id = o.id
+       ) AS items
+     FROM orders o
+     WHERE o.id = $1 AND o.user_id = $2
+     LIMIT 1`,
+    [orderId, userId]
+  )
+  return rows[0] ?? null
+}
+
+export interface AdminOrderDetail extends Order {
+  user_email: string
+  user_name: string | null
+  items: OrderItemWithBook[]
+  payments: Payment[]
+  events: PaymentEvent[]
+}
+
+/**
+ * Tek sipariş detayı — admin tarafı.
+ * Kullanıcı bilgisi, ödeme kayıtları ve eventler dahil.
+ */
+export async function getOrderDetailForAdmin(
+  orderId: string
+): Promise<AdminOrderDetail | null> {
+  const { rows: orderRows } = await pool.query(
+    `SELECT o.*,
+       u.email AS user_email,
+       u.name  AS user_name,
+       (SELECT COALESCE(json_agg(
+         json_build_object(
+           'id',                oi.id,
+           'book_id',           oi.book_id,
+           'item_type',         oi.item_type,
+           'unit_price',        oi.unit_price,
+           'quantity',          oi.quantity,
+           'total_price',       oi.total_price,
+           'fulfillment_status', oi.fulfillment_status,
+           'book_title',        b.title,
+           'book_cover_url',    b.cover_image_url
+         )
+       ), '[]'::json)
+       FROM order_items oi
+       LEFT JOIN books b ON b.id = oi.book_id
+       WHERE oi.order_id = o.id
+       ) AS items
+     FROM orders o
+     JOIN public.users u ON u.id = o.user_id
+     WHERE o.id = $1
+     LIMIT 1`,
+    [orderId]
+  )
+  if (!orderRows[0]) return null
+
+  const [paymentResult, eventResult] = await Promise.all([
+    pool.query<Payment>(
+      `SELECT * FROM payments WHERE order_id = $1 ORDER BY created_at DESC`,
+      [orderId]
+    ),
+    pool.query<PaymentEvent>(
+      `SELECT * FROM payment_events WHERE order_id = $1 ORDER BY received_at DESC`,
+      [orderId]
+    ),
+  ])
+
+  return {
+    ...orderRows[0],
+    payments: paymentResult.rows,
+    events: eventResult.rows,
+  } as AdminOrderDetail
 }
 
 // ============================================================================
