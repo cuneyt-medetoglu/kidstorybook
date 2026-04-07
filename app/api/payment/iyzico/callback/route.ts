@@ -29,6 +29,7 @@ import {
   savePaymentEvent,
   getPaymentByOrderId,
 } from '@/lib/db/orders'
+import { handlePaymentSuccess, handlePaymentFailed } from '@/lib/payment/post-payment'
 
 export const dynamic = 'force-dynamic'
 
@@ -104,7 +105,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           status: 'paid',
           paidAt: new Date(),
         }),
-        // Ödeme kaydını bul ve güncelle
         getPaymentByOrderId(orderId, 'iyzico').then((payment) => {
           if (!payment) return
           return updatePaymentRecord(payment.id, {
@@ -114,6 +114,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           })
         }),
       ])
+
+      // 5. Post-payment işlemleri (e-posta, admin bildirimi vb.)
+      // Ana ödeme akışını bloke etmemek için fire-and-forget; hata olursa içerde loglanır.
+      handlePaymentSuccess(orderId).catch((err) => {
+        console.error('[iyzico/callback] post-payment hatası:', err)
+      })
 
       return redirectToSuccess(orderId)
     } else {
@@ -133,6 +139,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           })
         }),
       ])
+
+      handlePaymentFailed(orderId, reason).catch((err) => {
+        console.error('[iyzico/callback] post-payment-failed hatası:', err)
+      })
 
       return redirectToFailure(
         encodeURIComponent(reason),

@@ -1,9 +1,9 @@
 # 💳 Faz 5 — Ödeme Sonrası Akışlar
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** ⬜ Bekliyor  
-**Ön koşul:** [Faz 1](FAZ1_IYZICO.md), [Faz 2](FAZ2_STRIPE.md), [Faz 3](FAZ3_CHECKOUT.md) tamamlanmış olmalı  
-**Tahmini süre:** 1-2 gün
+**Durum:** 🔶 Kısmen Tamamlandı (7 Nisan 2026)  
+**Ön koşul:** Faz 1 ✅ (iyzico). Faz 2/3 (Stripe/geo) beklerken de domain-bağımsız kodlar tamamlandı.  
+**Tahmini süre:** Kalan kısım (domain + SMTP/Resend) domain hazır olunca ~1 gün
 
 ---
 
@@ -214,22 +214,29 @@ export async function GET(
 
 ## 6. Yapılacaklar Kontrol Listesi
 
-### E-Posta
-- [ ] E-posta servisini belirle (Resend önerilir)
-- [ ] `lib/email/templates/order-confirmation.ts` oluştur
-- [ ] `lib/email/templates/ebook-ready.ts` oluştur
-- [ ] `lib/email/templates/payment-failed.ts` oluştur
-- [ ] `lib/email/send.ts` — e-posta gönderim fonksiyonu
-- [ ] `.env`'e e-posta servis API key'i ekle
+### E-Posta (Kod) ✅ Tamamlandı
+- [x] E-posta servisini belirle → **Resend** (fetch tabanlı, domain gerektirir)
+- [x] `lib/email/templates/order-confirmation.ts` oluştur
+- [x] `lib/email/templates/ebook-ready.ts` oluştur
+- [x] `lib/email/templates/admin-hardcopy.ts` oluştur
+- [x] `lib/email/send.ts` — feature-flag'li gönderici (EMAIL_ENABLED=false dev'de mock)
+- [x] `.env`'e e-posta env şablonu eklendi (gerçek key'ler domain hazır olunca girilecek)
+- [ ] `lib/email/templates/payment-failed.ts` — ileride eklenecek
 
-### Post-Payment Handler
-- [ ] `lib/payment/post-payment.ts` oluştur
-- [ ] iyzico callback'ine post-payment çağrısı ekle
-- [ ] Stripe webhook'una post-payment çağrısı ekle
+### Post-Payment Handler ✅ Tamamlandı
+- [x] `lib/payment/post-payment.ts` — `handlePaymentSuccess`, `handlePaymentFailed`
+- [x] iyzico callback'ine post-payment çağrısı eklendi (fire-and-forget)
+- [ ] Stripe webhook'una post-payment çağrısı ekle (Faz 2 ile birlikte)
 
-### Dijital Teslimat
-- [ ] `app/api/orders/[id]/download/route.ts` oluştur
-- [ ] Kullanıcı sipariş detay sayfasına "PDF İndir" butonu ekle
+### Dijital Teslimat ✅ Tamamlandı
+- [x] `app/api/orders/[id]/download/route.ts` oluştur
+- [ ] Kullanıcı sipariş detay sayfasına "PDF İndir" butonu bağla (sipariş detay sayfası zaten var — butona tıklayınca `/api/orders/[id]/download` çağrılmalı)
+
+### Domain + Gerçek Mail Gönderimi (Bekliyor)
+- [ ] Domain al ve Resend'e ekle (SPF/DKIM doğrula)
+- [ ] `RESEND_API_KEY` ve `EMAIL_FROM` env'e gir
+- [ ] `EMAIL_ENABLED=true` yap ve prod'da test et
+- [ ] `payment-failed` e-posta şablonu tamamla
 
 ---
 

@@ -89,8 +89,9 @@ Aşağıdaki isimler **Cursor / benzeri araçlarda seçebileceğiniz model takma
 | **Faz 2** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) | Stripe entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ⏸️ **ERTELENDİ — sonra** |
 | **Faz 3** | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) | Checkout, geo-routing | **Sonnet 4.6** veya **Composer 2** *(UI ağırlıklı)* | ⬜ Bekliyor *(Stripe yokken: önce iyzico-only)* |
 | **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) | Admin sipariş | **Sonnet 4.6** *(veya Auto — tablo/liste rutini)* | ✅ **Tamamlandı** |
-| **Faz 5** | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) | Post-ödeme, e-posta | **Sonnet 4.6** veya **Auto** | ⬜ Bekliyor |
+| **Faz 5** | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) | Post-ödeme, e-posta | **Sonnet 4.6** veya **Auto** | 🔶 Kısmen Tamamlandı *(domain bekliyor)* |
 | **Faz 6** | [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md) | Test, canlıya alış | **Auto** veya **Gemini 3.1 Pro** *(uzun checklist / doküman taraması)* | ⬜ Bekliyor |
+| **Faz 7** | [FAZ7_PROMO_KODLARI.md](FAZ7_PROMO_KODLARI.md) | İndirim / promo kodu sistemi | **Sonnet 4.6** | ⬜ Bekliyor |
 
 ---
 
@@ -204,8 +205,9 @@ Kullanıcı → Sepet → Checkout Sayfası
 | Faz 2 | Stripe | 3-5 gün | Opus 4.6 / GPT 5.4 | ⏸️ Ertelendi |
 | Faz 3 | Checkout (önce iyzico-only) | 2-3 gün | Sonnet 4.6 / Composer 2 | ⬜ |
 | Faz 4 | Admin sipariş | 2-3 gün | Sonnet 4.6 / Auto | ✅ **Tamamlandı** |
-| Faz 5 | Post-ödeme | 1-2 gün | Sonnet 4.6 / Auto | ⬜ |
+| Faz 5 | Post-ödeme | 1-2 gün | Sonnet 4.6 / Auto | 🔶 Kısmen *(domain bekliyor)* |
 | Faz 6 | Test + Canlıya alış | 2-3 gün | Auto / Gemini 3.1 Pro | ⬜ |
+| Faz 7 | İndirim / Promo Kodları | 2-3 gün | Sonnet 4.6 | ⬜ |
 
 **İlk dalga (iyzico):** yaklaşık 10–16 gün (Stripe hariç). Stripe eklendiğinde Faz 2 + Faz 3 tam birleşim.
 

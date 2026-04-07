@@ -530,6 +530,72 @@ export async function getOrderDetailForAdmin(
 }
 
 // ============================================================================
+// Post-payment: sipariş + kullanıcı bilgisi (e-posta için)
+// ============================================================================
+
+export interface OrderForEmail {
+  id: string
+  status: string
+  order_currency: string
+  total_amount: number
+  subtotal: number
+  discount_amount: number
+  billing_address: Record<string, unknown> | null
+  user_id: string
+  user_email: string
+  user_name: string | null
+  payment_provider: string
+  items: Array<{
+    id: string
+    book_id: string
+    item_type: string
+    unit_price: number
+    quantity: number
+    total_price: number
+    book_title: string | null
+    book_cover_url: string | null
+    fulfillment_status: string
+  }>
+}
+
+/**
+ * Post-payment handler için sipariş + kullanıcı bilgisi.
+ * E-posta şablonlarına gerekli tüm veriyi tek sorguda getirir.
+ */
+export async function getOrderForEmail(
+  orderId: string
+): Promise<OrderForEmail | null> {
+  const { rows } = await pool.query<OrderForEmail>(
+    `SELECT o.*,
+       u.email AS user_email,
+       u.name  AS user_name,
+       (SELECT COALESCE(json_agg(
+         json_build_object(
+           'id',                oi.id,
+           'book_id',           oi.book_id,
+           'item_type',         oi.item_type,
+           'unit_price',        oi.unit_price,
+           'quantity',          oi.quantity,
+           'total_price',       oi.total_price,
+           'fulfillment_status', oi.fulfillment_status,
+           'book_title',        b.title,
+           'book_cover_url',    b.cover_image_url
+         )
+       ), '[]'::json)
+       FROM order_items oi
+       LEFT JOIN books b ON b.id = oi.book_id
+       WHERE oi.order_id = o.id
+       ) AS items
+     FROM orders o
+     JOIN public.users u ON u.id = o.user_id
+     WHERE o.id = $1
+     LIMIT 1`,
+    [orderId]
+  )
+  return rows[0] ?? null
+}
+
+// ============================================================================
 // İç yardımcılar
 // ============================================================================
 
