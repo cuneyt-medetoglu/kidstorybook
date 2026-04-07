@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTranslations } from "next-intl"
 import {
@@ -77,8 +78,14 @@ const mockBillingHistory = [
   },
 ]
 
-export default function ProfilePage() {
+const VALID_SECTIONS: Section[] = ["profile", "account", "orders", "free-cover", "notifications", "billing"]
+
+function ProfilePageContent() {
   const t = useTranslations("dashboard.settings")
+  const searchParams = useSearchParams()
+  const sectionParam = searchParams.get("section") as Section | null
+  const initialSection: Section =
+    sectionParam && VALID_SECTIONS.includes(sectionParam) ? sectionParam : "profile"
 
   const sidebarItems = [
     { id: "profile" as Section, label: t("nav.profile"), icon: User },
@@ -89,7 +96,7 @@ export default function ProfilePage() {
     { id: "billing" as Section, label: t("nav.billing"), icon: CreditCard },
   ]
 
-  const [activeSection, setActiveSection] = useState<Section>("profile")
+  const [activeSection, setActiveSection] = useState<Section>(initialSection)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [name, setName] = useState("John Doe")
   const [bio, setBio] = useState("")
@@ -680,3 +687,10 @@ export default function ProfilePage() {
   )
 }
 
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>}>
+      <ProfilePageContent />
+    </Suspense>
+  )
+}

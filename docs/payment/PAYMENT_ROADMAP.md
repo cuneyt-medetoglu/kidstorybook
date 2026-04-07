@@ -2,7 +2,7 @@
 
 **Oluşturma tarihi:** 5 Nisan 2026  
 **Son güncelleme:** 5 Nisan 2026 — Faz 1: iyzico akışı + step 6’da sepete ekleme düzeltmesi + checkout i18n namespace düzeltmeleri. **Sıradaki:** hedef DB’de `027` migration, sandbox + public callback URL. **Faz 3:** onayınız olmadan başlanmaz.
-**Durum:** Faz 0 ✅ · Faz 1 🟡 (implementasyon ✅, **test + operasyonel doğrulama** kaldı)
+**Durum:** Faz 0 ✅ · Faz 1 ✅ (sandbox ödeme ✅ · Faz 1.5 UX düzeltmeleri ✅)
 **Kapsam:** iyzico (TR) ile uçtan uca ödeme; Stripe (uluslararası) plan dokümanda duruyor, **implementasyon sonra.**
 
 ---
@@ -83,7 +83,7 @@ Aşağıdaki isimler **Cursor / benzeri araçlarda seçebileceğiniz model takma
 | Faz | Dosya | Konu | Önerilen model | Durum |
 |-----|-------|------|----------------|-------|
 | **Faz 0** | [FAZ0_HAZIRLIK.md](FAZ0_HAZIRLIK.md) | DB şeması, env, temel altyapı | **Sonnet 4.6** *(veya Auto — migration tekrarlarında)* | ✅ **Tamamlandı** |
-| **Faz 1** | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) | iyzico entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ⬜ Bekliyor |
+| **Faz 1** | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) | iyzico entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ✅ **Tamamlandı** |
 | **Faz 2** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) | Stripe entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ⏸️ **ERTELENDİ — sonra** |
 | **Faz 3** | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) | Checkout, geo-routing | **Sonnet 4.6** veya **Composer 2** *(UI ağırlıklı)* | ⬜ Bekliyor *(Stripe yokken: önce iyzico-only)* |
 | **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) | Admin sipariş | **Sonnet 4.6** *(veya Auto — tablo/liste rutini)* | ⬜ Bekliyor |

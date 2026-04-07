@@ -1,7 +1,7 @@
 # 💳 Faz 1 — iyzico Entegrasyonu (Türkiye)
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** 🟡 Kod tamam — **Sandbox testleri** ve operasyonel doğrulama kaldı (Faz 3’e geçiş için onay bekle).  
+**Durum:** ✅ Sandbox ödeme başarıyla tamamlandı — Faz 1.5 ödeme-sonrası UX düzeltmeleri de uygulandı.  
 **Ön koşul:** [Faz 0](FAZ0_HAZIRLIK.md) tamamlanmış olmalı  
 **Tahmini süre:** 3-5 gün
 
@@ -495,21 +495,32 @@ Canlıya geçmek için iyzico'ya başvuru yapılması gerekir:
 - [x] `app/[locale]/(public)/payment/failure/page.tsx` — başarısız ödeme
 - [x] i18n: `checkout.billingAddress`, `checkout.iyzicoPayment`, `checkout.shipping.hardcopyNote`, `payment.failure.reasonLabel`
 
-### Opsiyonel (Faz 1 dışı / sonraki sprint)
-- [ ] `app/api/payment/webhooks/iyzico/route.ts` — iyzico webhook (callback yeterli olabilir; canlıda eklenir)
+### Faz 1.5 — Ödeme Sonrası UX (sandbox testi sonrası tamamlandı)
+- [x] `payment/success/page.tsx` → `clearCart()` — ödeme başarılıysa sepet temizlenir
+- [x] `payment/success/page.tsx` → "Siparişimi Görüntüle" linki `/dashboard/settings?section=orders` olarak güncellendi
+- [x] `dashboard/settings/page.tsx` → `?section=` URL param desteği: `Suspense` wrapper + `useSearchParams` ile doğrudan sipariş sekmesine deep-link
 
-### Test (sen yapacaksın — kontrol listesi)
-- [ ] Sandbox ile başarılı ödeme testi
-- [ ] 3D Secure akışı testi
-- [ ] Başarısız ödeme testi
-- [ ] Callback doğrulama testi (`/api/payment/iyzico/callback` → `/payment/success|failure`)
-- [ ] DB: `orders.status = paid`, `payments.status = succeeded`, `payment_events` kaydı
+### Opsiyonel / Sonraki fazlar
+- [ ] `app/api/payment/webhooks/iyzico/route.ts` — iyzico webhook (canlıda eklenir)
+- [ ] `dashboard/settings/page.tsx` → sipariş listesi **mock datadan** gerçek DB sorgusuna taşı (`getOrdersByUserId`) — **Faz 4**
+- [ ] Sipariş başarılı → otomatik onay e-postası — **Faz 5**
 
-**Nasıl test edilir (özet):** Ayrıntı: [ODEME_NOTLARI.md](ODEME_NOTLARI.md) → “Sandbox — uçtan uca test”.
+### Test (tamamlananlar)
+- [x] Sandbox ile başarılı ödeme — `orders.status=paid`, `payment_events.event_type=checkout.success` doğrulandı
+- [x] Callback → `/payment/success` yönlendirmesi çalışıyor
+- [x] DB: sipariş ID, `payment_events.received_at`, `processed=false` (audit kaydı) doğrulandı
+- [ ] 3D Secure tam test (red kartı ile)
+- [ ] Başarısız ödeme tam testi
+
+**Nasıl test edilir:** [ODEME_NOTLARI.md](ODEME_NOTLARI.md) → "Sandbox — uçtan uca test"
 
 ---
 
-## ⏭️ Sonraki Faz
+## ⏭️ Sonraki Fazlar
 
-→ [FAZ2_STRIPE.md](FAZ2_STRIPE.md) — Stripe entegrasyonu  
-→ [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) — Her iki sağlayıcıyı birleştiren checkout sayfası
+| Faz | Dosya | Durum |
+|-----|-------|-------|
+| **Faz 2** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) — Stripe entegrasyonu | ⏸️ Ertelenmiş |
+| **Faz 3** | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) — Geo-routing, para birimi | ⬜ Onay bekleniyor |
+| **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) — Admin + gerçek sipariş listesi + detay sayfası | ⬜ Sıradaki |
+| **Faz 5** | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) — E-posta, PDF erişimi, hardcopy kargo | ⬜ Faz 4 sonrası |

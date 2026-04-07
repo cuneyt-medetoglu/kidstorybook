@@ -9,7 +9,7 @@
  * Localization: payment.success namespace.
  */
 
-import { Suspense } from "react"
+import { Suspense, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Link } from "@/i18n/navigation"
 import { motion } from "framer-motion"
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle, BookOpen, ArrowRight } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { useCart } from "@/contexts/CartContext"
 
 // ============================================================================
 // İçerik (searchParams gerektiren kısım Suspense içinde)
@@ -26,6 +27,13 @@ function SuccessContent() {
   const searchParams = useSearchParams()
   const orderId = searchParams.get("orderId")
   const t = useTranslations("payment.success")
+  const { clearCart } = useCart()
+
+  useEffect(() => {
+    if (orderId) {
+      clearCart()
+    }
+  }, [orderId, clearCart])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-background dark:from-slate-900 dark:to-slate-950">
@@ -86,7 +94,7 @@ function SuccessContent() {
                   </Button>
                 </Link>
                 {orderId && (
-                  <Link href="/dashboard?tab=orders" className="flex-1">
+                  <Link href="/dashboard/settings?section=orders" className="flex-1">
                     <Button size="lg" variant="outline" className="w-full">
                       {t("viewOrder")}
                       <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
