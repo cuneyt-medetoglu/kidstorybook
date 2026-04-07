@@ -247,6 +247,10 @@
       "allStatuses": "Tüm Durumlar",
       "allProviders": "Tüm Sağlayıcılar",
       "count": "{count} sipariş",
+      "orderStats": {
+        "export": "CSV dışa aktar",
+        "exporting": "Dışa aktarılıyor…"
+      },
       "table": {
         "orderId": "Sipariş No",
         "customer": "Müşteri",
@@ -1158,8 +1162,7 @@
         "howItWorksTitle": "Ücretsiz Kapak Nasıl Çalışır",
         "item1": "Her kullanıcı bir ücretsiz özel kitap kapağı hakkı alır",
         "item2": "Oluşturduğunuz herhangi bir kitap projesi için kullanın",
-        "item3": "Ek kapaklar her biri 9,99 $ karşılığında satın alınabilir",
-        "item4": "Ücretsiz kapağınız kullanılana kadar sona ermez"
+        "item3": "Ücretsiz kapağınız kullanılana kadar sona ermez"
       },
       "notifications": {
         "title": "Bildirim Tercihleri",
@@ -1725,6 +1728,7 @@
       "stripe": "Stripe"
     },
     "viewDetail": "Siparişi Görüntüle",
+    "multipleItems": "{count} ürün",
     "downloadEbook": "E-Kitabı İndir",
     "trackShipment": "Kargo Takibi",
     "detail": {

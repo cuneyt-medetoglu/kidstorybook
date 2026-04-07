@@ -510,7 +510,6 @@ function ProfilePageContent() {
                     <p>• {t("freeCover.item1")}</p>
                     <p>• {t("freeCover.item2")}</p>
                     <p>• {t("freeCover.item3")}</p>
-                    <p>• {t("freeCover.item4")}</p>
                   </CardContent>
                 </Card>
               </CardContent>

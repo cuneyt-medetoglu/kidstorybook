@@ -97,6 +97,10 @@ export async function updateOrderStatus(
     setClauses.push(`failure_reason = $${idx++}`)
     values.push(update.failureReason)
   }
+  if (update.notes !== undefined) {
+    setClauses.push(`notes = $${idx++}`)
+    values.push(update.notes)
+  }
 
   const { rows } = await pool.query<Order>(
     `UPDATE orders SET ${setClauses.join(', ')} WHERE id = $1 RETURNING *`,

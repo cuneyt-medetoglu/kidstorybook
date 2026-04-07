@@ -1,7 +1,7 @@
 # 💳 Faz 4 — Sipariş Yönetimi ve Admin Panel
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** ⬜ Bekliyor  
+**Durum:** ✅ Tamamlandı (7 Nisan 2026)  
 **Ön koşul:** [Faz 0](FAZ0_HAZIRLIK.md) tamamlanmış olmalı (DB tabloları gerekli)  
 **İlgili Doküman:** `docs/analysis/ADMIN_DASHBOARD_ANALYSIS.md` → Faz B.1  
 **Tahmini süre:** 2-3 gün
@@ -293,28 +293,29 @@ export default async function OrdersPage() {
 ## 6. Yapılacaklar Kontrol Listesi
 
 ### Kullanıcı Tarafı
-- [ ] `lib/db/orders.ts` — tüm DB fonksiyonları
-- [ ] `app/api/orders/route.ts` — kullanıcı sipariş listesi
-- [ ] `app/api/orders/[id]/route.ts` — sipariş detayı
-- [ ] `app/[locale]/(public)/orders/page.tsx`
-- [ ] `app/[locale]/(public)/orders/[id]/page.tsx`
-- [ ] `components/orders/OrderCard.tsx`
-- [ ] `components/orders/OrderDetail.tsx`
+- [x] `lib/db/orders.ts` — tüm DB fonksiyonları
+- [x] `app/api/orders/route.ts` — kullanıcı sipariş listesi
+- [x] `app/api/orders/[id]/route.ts` — sipariş detayı
+- [x] `app/[locale]/(public)/orders/page.tsx`
+- [x] `app/[locale]/(public)/orders/[id]/page.tsx`
+- [x] `components/orders/OrderCard.tsx` *(sipariş listesi satır içi — ayrı bileşen yerine page.tsx içinde)*
+- [x] `components/orders/OrderDetail.tsx` *(detail page.tsx içinde)*
 
 ### Admin Tarafı
-- [ ] `app/api/admin/orders/route.ts` — liste + stats
-- [ ] `app/api/admin/orders/[id]/route.ts` — detay + güncelleme
-- [ ] `app/api/admin/orders/[id]/refund/route.ts` — iade
-- [ ] `app/api/admin/orders/export/route.ts` — CSV
-- [ ] `app/(admin)/admin/orders/page.tsx` — admin sipariş listesi
-- [ ] `app/(admin)/admin/orders/[id]/page.tsx` — admin detay
-- [ ] Admin sidebar'a "Siparişler" linki ekle
-- [ ] Admin dashboard'a sipariş istatistikleri ekle
+- [x] `app/api/admin/orders/route.ts` — liste + stats
+- [x] `app/api/admin/orders/[id]/route.ts` — detay + PATCH (durum + not güncelleme)
+- [x] `app/api/admin/orders/[id]/refund/route.ts` — iade
+- [x] `app/api/admin/orders/export/route.ts` — CSV
+- [x] `app/(admin)/admin/orders/page.tsx` — admin sipariş listesi
+- [x] `app/(admin)/admin/orders/[id]/page.tsx` — admin detay
+- [x] Admin sidebar'a "Siparişler" linki eklendi
+- [x] Admin dashboard'a sipariş istatistikleri eklendi
+- [x] `components/admin/order-actions.tsx` — durum güncelleme + iade aksiyon bileşeni
 
 ### İade
-- [ ] `lib/payment/iyzico/refund.ts`
-- [ ] `lib/payment/stripe/refund.ts`
-- [ ] İade API endpoint
+- [x] `lib/payment/iyzico/refund.ts` — cancel.create (tam iade)
+- [ ] `lib/payment/stripe/refund.ts` — Faz 2 (Stripe entegrasyonu) ile eklenecek
+- [x] İade API endpoint (`/api/admin/orders/[id]/refund`)
 
 ---
 

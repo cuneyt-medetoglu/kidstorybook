@@ -247,6 +247,10 @@
       "allStatuses": "All Statuses",
       "allProviders": "All Providers",
       "count": "{count} orders",
+      "orderStats": {
+        "export": "Export CSV",
+        "exporting": "Exporting…"
+      },
       "table": {
         "orderId": "Order ID",
         "customer": "Customer",
@@ -1158,8 +1162,7 @@
         "howItWorksTitle": "How Free Cover Works",
         "item1": "Every user receives one free custom book cover",
         "item2": "Use it for any book project you create",
-        "item3": "Additional covers can be purchased at $9.99 each",
-        "item4": "Your free cover never expires until used"
+        "item3": "Your free cover never expires until used"
       },
       "notifications": {
         "title": "Notification Preferences",
@@ -1725,6 +1728,7 @@
       "stripe": "Stripe"
     },
     "viewDetail": "View Order",
+    "multipleItems": "{count} items",
     "downloadEbook": "Download E-Book",
     "trackShipment": "Track Shipment",
     "detail": {

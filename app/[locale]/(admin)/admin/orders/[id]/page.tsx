@@ -6,6 +6,7 @@ import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import OrderActions from '@/components/admin/order-actions'
 import {
   ArrowLeft,
   ShoppingCart,
@@ -278,6 +279,14 @@ export default async function AdminOrderDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Admin Actions */}
+      <OrderActions
+        orderId={order.id}
+        currentStatus={order.status}
+        paymentProvider={order.payment_provider}
+        locale={locale}
+      />
 
       {/* Payment events */}
       <Card>

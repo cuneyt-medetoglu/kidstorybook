@@ -161,6 +161,8 @@ export interface UpdateOrderStatusInput {
   refundedAt?: Date
   providerPaymentId?: string
   failureReason?: string
+  /** Admin notu */
+  notes?: string
 }
 
 export interface CreatePaymentInput {

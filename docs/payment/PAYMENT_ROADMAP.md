@@ -1,8 +1,8 @@
 # 💳 HeroKidStory — Ödeme Sistemi Entegrasyonu Yol Haritası
 
 **Oluşturma tarihi:** 5 Nisan 2026  
-**Son güncelleme:** 6 Nisan 2026 — **Faz 1 uçtan uca testleri doğrulandı** (sandbox ödeme, callback, DB, Faz 1.5 UX). **Sıradaki implementasyon:** [Faz 4 — Admin siparişler](FAZ4_ADMIN_SIPARISLER.md). **Faz 3:** onay olmadan başlanmaz.
-**Durum:** Faz 0 ✅ · Faz 1 ✅ (kod + sandbox QA + Faz 1.5)
+**Son güncelleme:** 7 Nisan 2026 — **Faz 4 tamamlandı** (kullanıcı sipariş listesi, admin sipariş yönetimi, iyzico iade API, aksiyon bileşeni). **Sıradaki implementasyon:** [Faz 5 — Post-ödeme akışları](FAZ5_POST_ODEME.md).  
+**Durum:** Faz 0 ✅ · Faz 1 ✅ (kod + sandbox QA + Faz 1.5) · Faz 4 ✅
 **Kapsam:** iyzico (TR) ile uçtan uca ödeme; Stripe (uluslararası) plan dokümanda duruyor, **implementasyon sonra.**
 
 ---
@@ -27,9 +27,10 @@
 | Sıradaki | Dosya / iş |
 |----------|------------|
 | **Faz 1** ✅ | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) — Sandbox uçtan uca + DB doğrulaması tamam. İsteğe bağlı canlı öncesi: ayrı 3DS / başarısız kart testi ([FAZ6](FAZ6_TEST_VE_CANLIYA_ALIS.md)). |
-| **Faz 4** ⬜ | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) — **Sıradaki implementasyon:** kullanıcı sipariş listesi (DB), admin sipariş görünümü |
+| **Faz 4** ✅ | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) — Kullanıcı sipariş listesi, admin sipariş yönetimi + detay, iyzico iade API, aksiyon bileşeni. **Tamamlandı.** |
+| **Faz 5** ⬜ | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) — **Sıradaki:** Post-ödeme e-posta, e-book teslimi, fulfillment |
 | **Faz 3** ⏸️ | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) — **Beklemede** (ürün → sepet UX, geo-routing vb.); başlamak için ayrı onay |
-| **Faz 5–6** | Post-ödeme e-posta / teslimat; test + canlıya alış |
+| **Faz 6** | Test + canlıya alış, 3DS / edge-case testleri |
 
 **Deploy notu:** `package.json` ve `package-lock.json` commit edildiyse `deploy:build` / sunucuda `npm install` `iyzipay`’ı kurar. Sunucu `.env` içinde `IYZICO_*` tanımlı olmalı (commit edilmez).
 
@@ -87,7 +88,7 @@ Aşağıdaki isimler **Cursor / benzeri araçlarda seçebileceğiniz model takma
 | **Faz 1** | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) | iyzico entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ✅ **Tamamlandı** |
 | **Faz 2** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) | Stripe entegrasyonu | **Opus 4.6** veya **GPT 5.4** | ⏸️ **ERTELENDİ — sonra** |
 | **Faz 3** | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) | Checkout, geo-routing | **Sonnet 4.6** veya **Composer 2** *(UI ağırlıklı)* | ⬜ Bekliyor *(Stripe yokken: önce iyzico-only)* |
-| **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) | Admin sipariş | **Sonnet 4.6** *(veya Auto — tablo/liste rutini)* | ⬜ Bekliyor |
+| **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) | Admin sipariş | **Sonnet 4.6** *(veya Auto — tablo/liste rutini)* | ✅ **Tamamlandı** |
 | **Faz 5** | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) | Post-ödeme, e-posta | **Sonnet 4.6** veya **Auto** | ⬜ Bekliyor |
 | **Faz 6** | [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md) | Test, canlıya alış | **Auto** veya **Gemini 3.1 Pro** *(uzun checklist / doküman taraması)* | ⬜ Bekliyor |
 
@@ -202,7 +203,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 | Faz 1 | iyzico | 3-5 gün | Opus 4.6 / GPT 5.4 | ✅ **Tamamlandı** |
 | Faz 2 | Stripe | 3-5 gün | Opus 4.6 / GPT 5.4 | ⏸️ Ertelendi |
 | Faz 3 | Checkout (önce iyzico-only) | 2-3 gün | Sonnet 4.6 / Composer 2 | ⬜ |
-| Faz 4 | Admin sipariş | 2-3 gün | Sonnet 4.6 / Auto | ⬜ |
+| Faz 4 | Admin sipariş | 2-3 gün | Sonnet 4.6 / Auto | ✅ **Tamamlandı** |
 | Faz 5 | Post-ödeme | 1-2 gün | Sonnet 4.6 / Auto | ⬜ |
 | Faz 6 | Test + Canlıya alış | 2-3 gün | Auto / Gemini 3.1 Pro | ⬜ |
 
@@ -210,9 +211,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 
 ### Sıradaki adım (implementasyon)
 
-**Faz 1 tamam** — özet: [FAZ1_IYZICO.md](FAZ1_IYZICO.md). **Sıradaki:** **[Faz 4 — Admin siparişler](FAZ4_ADMIN_SIPARISLER.md)** (kullanıcı sipariş listesi mock’tan DB’ye; admin görünümü). Faz 2–3 Stripe / geo-routing ayrı onayla.
-
-Faz 1 kapanış kontrolü (tamamlandı):
+**Faz 4 tamam** — özet: [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md). **Sıradaki:** **[Faz 5 — Post-ödeme akışları](FAZ5_POST_ODEME.md)** (e-posta bildirimleri, e-book teslimi, fulfillment). Faz 2–3 Stripe / geo-routing ayrı onayla.panış kontrolü (tamamlandı):
 1. [x] Migration zinciri hedef DB’de
 2. [x] `iyzipay` deploy ortamında kurulu
 3. [x] Sunucu `.env`: `IYZICO_*` + `NEXT_PUBLIC_APP_URL` (commit edilmez)
