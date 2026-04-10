@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Alegreya } from 'next/font/google'
 import '../globals.css'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { SessionProvider } from '@/components/providers/SessionProvider'
@@ -14,6 +14,13 @@ import { buildPageMetadata } from '@/lib/metadata'
 import { auth } from '@/auth'
 
 const inter = Inter({ subsets: ['latin'] })
+const alegreya = Alegreya({
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-story',
+  display: 'swap',
+})
 
 /** Mutlak metadata URL’leri (manifest, OG) — locale path’e göre çözülmesin */
 const METADATA_BASE = new URL(
@@ -59,7 +66,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${alegreya.variable}`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider
             attribute="class"
