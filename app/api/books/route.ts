@@ -46,6 +46,7 @@ import {
 } from '@/lib/book-generation/page-scene-contract'
 import { entityAppearsOnPage } from '@/lib/book-generation/supporting-entities'
 import { getCoverReferenceImageUrls } from '@/lib/book-generation/cover-reference-images'
+import { normalizeThemeKey } from '@/lib/book-generation/normalize-theme-key'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -67,13 +68,6 @@ const MAX_CHARACTERS = 5
 
 /** Max length for customRequests (story idea). Must match create Step 5. */
 const STORY_IDEA_MAX_LENGTH = 1000
-
-function normalizeThemeKey(theme: string): string {
-  const t = (theme || '').toString().trim().toLowerCase()
-  if (!t) return t
-  if (t === 'sports&activities' || t === 'sports_activities' || t === 'sports-activities') return 'sports'
-  return t
-}
 
 /** From-example: story_data içindeki metin + görsel brief alanlarında eski karakter adını yenisiyle değiştirir. */
 function applyCharacterNameSwapToStoryData(storyData: any, oldName: string, newName: string): void {

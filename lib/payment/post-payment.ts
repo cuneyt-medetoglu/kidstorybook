@@ -19,6 +19,7 @@ import { sendEmail } from '@/lib/email/send'
 import { buildOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation'
 import { buildAdminHardcopyEmail } from '@/lib/email/templates/admin-hardcopy'
 import type { OrderConfirmationData } from '@/lib/email/templates/order-confirmation'
+import { enqueuePaidCheckoutBooks } from '@/lib/payment/paid-checkout-generation'
 
 // ============================================================================
 // Yardımcılar
@@ -57,6 +58,13 @@ export async function handlePaymentSuccess(orderId: string): Promise<void> {
   if (!order) {
     console.error('[post-payment] Sipariş bulunamadı:', orderId)
     return
+  }
+
+  // 0. Ödeme sonrası placeholder e-kitapları üretim kuyruğuna al (önce — kullanıcı generating görür)
+  try {
+    await enqueuePaidCheckoutBooks(orderId)
+  } catch (err) {
+    console.error('[post-payment] paid-checkout-generation hatası:', { orderId, err })
   }
 
   const locale = localeFromCurrency(order.order_currency)

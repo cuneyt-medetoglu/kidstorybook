@@ -134,8 +134,11 @@ function DraftPreviewContent() {
     const uuidRe =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
     const charIds = draft.characterData.characterIds ?? []
-    const characterId = charIds.find((id) => typeof id === "string" && uuidRe.test(id))
-    const titleLine = `E-Book (${selectedPlan} pages) - ${draft.characterData.name}'s Story`
+    const characterIds = charIds.filter(
+      (id): id is string => typeof id === "string" && uuidRe.test(id)
+    )
+    const characterId = characterIds[0]
+    const titleLine = `E-Book – ${draft.characterData.name}`
     const lang =
       (draft.wizardState?.step3?.language as string | undefined) || "tr"
 
@@ -146,6 +149,7 @@ function DraftPreviewContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...(characterId ? { characterId } : {}),
+          ...(characterIds.length ? { characterIds } : {}),
           title: titleLine,
           theme: draft.theme || "story",
           illustrationStyle: draft.style || "3d_animation",

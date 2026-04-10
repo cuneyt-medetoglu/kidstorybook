@@ -649,7 +649,6 @@ function FromExampleContent() {
                         const childName =
                           characters[0]?.name?.trim() || example.title
                         const titleLine = t("cartEbookLine", {
-                          pages: planType,
                           name: childName,
                         })
                         setPayCheckout(true)
@@ -660,6 +659,7 @@ function FromExampleContent() {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                               characterId: characterIds[0],
+                              characterIds,
                               title: titleLine,
                               theme: example.theme,
                               illustrationStyle: example.illustration_style,

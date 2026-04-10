@@ -61,6 +61,7 @@ export interface CreateBookInput {
 export interface UpdateBookInput {
   title?: string
   status?: 'draft' | 'generating' | 'completed' | 'failed' | 'archived'
+  total_pages?: number
   story_data?: any
   images_data?: any[]
   cover_image_url?: string
@@ -234,6 +235,10 @@ export async function updateBook(
     if (input.title !== undefined) {
       fields.push(`title = $${paramCount++}`)
       values.push(input.title)
+    }
+    if (input.total_pages !== undefined) {
+      fields.push(`total_pages = $${paramCount++}`)
+      values.push(input.total_pages)
     }
     if (input.status !== undefined) {
       fields.push(`status = $${paramCount++}`)

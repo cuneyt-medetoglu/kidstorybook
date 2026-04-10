@@ -903,7 +903,7 @@
       "invalidEmail": "Please enter a valid email address",
       "freeCoverCreditHint": "Use your free cover credit to create just the cover (Page 1)",
       "payCreate": "Pay & Create My Book • {price}",
-      "cartEbookLine": "E-Book ({pages} pp.) – {name}",
+      "cartEbookLine": "E-Book – {name}",
       "hardcoverDiscount": "You'll receive {price} as a discount on the hardcover!",
       "whatHappensNext": "What Happens Next",
       "timeline": {
@@ -1001,7 +1001,7 @@
       "createWithoutPaymentDebug": "Create without payment (Debug)",
       "adminDebugOnly": "Admin / debug only – no payment",
       "payCreate": "Pay & Create My Book • {price}",
-      "cartEbookLine": "E-Book ({pages} pp.) – {name}",
+      "cartEbookLine": "E-Book – {name}",
       "hardcoverDiscount": "You'll receive {price} as a discount on the hardcover!",
       "toasts": {
         "errorTitle": "Error",

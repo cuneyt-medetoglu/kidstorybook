@@ -706,7 +706,6 @@ export default function Step6Page() {
     const characterIds = getCharacterIdsForApi(chars)
     const characterId = characterIds[0]
     const titleLine = t("cartEbookLine", {
-      pages: planType,
       name: formData.character.name,
     })
 
@@ -717,6 +716,7 @@ export default function Step6Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...(characterId ? { characterId } : {}),
+          ...(characterIds.length ? { characterIds } : {}),
           title: titleLine,
           theme: String(formData.theme?.name || formData.theme?.id || "story"),
           illustrationStyle: String(

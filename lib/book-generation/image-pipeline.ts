@@ -773,6 +773,15 @@ export async function runImagePipeline(ctx: PipelineContext): Promise<void> {
     debugTrace,
   } = ctx
   let storyData = initialStoryData
+  // Placeholder kitaplarda story_data {} olarak kayıtlı olabiliyordu; pipeline null bekliyor.
+  if (
+    storyData &&
+    typeof storyData === 'object' &&
+    !Array.isArray(storyData) &&
+    Object.keys(storyData as object).length === 0
+  ) {
+    storyData = null
+  }
 
   const character = characters[0]
 

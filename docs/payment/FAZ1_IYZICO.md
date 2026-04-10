@@ -42,7 +42,21 @@ iyzico, Türkiye merkezli bir ödeme altyapısı sağlayıcısıdır. Özellikle
 
 **Test API'si:** `https://sandbox-api.iyzipay.com`
 
-**Test Kart Numaraları:**
+**Resmî test kartları:** [iyzico — Test Kartları](https://docs.iyzico.com/ek-bilgiler/test-kartlari)
+
+Aşağıdaki örnekler günlük sandbox testinde sık kullanılır (SKT/CVV: formatta ve gelecekte bir tarih olmalı; CVV çoğu senaryoda rastgele geçerli değer kabul edilir):
+
+| Amaç | Kart numarası | Not |
+|------|----------------|-----|
+| Başarılı ödeme (Visa) | `4603450000000000` | Denizbank Visa kredi |
+| Başarılı ödeme (Mastercard) | `5528790000000008` | Halkbank MC kredi |
+| Başarılı ödeme (Troy) | `9792072000017956` | Akbank Troy |
+| 3D Secure / banka yönlendirmesi | `4766620000000001` | Denizbank Visa banka kartı |
+| Yetersiz bakiye (hata) | `4111111111111129` | “Not sufficient funds” |
+| Genel hata | `4130111111111118` | “General error” |
+
+**Eski özet (referans):**
+
 | Kart | Numara | Son kullanma | CVV |
 |------|--------|--------------|-----|
 | Visa (başarılı) | 5528790000000008 | 12/30 | 123 |

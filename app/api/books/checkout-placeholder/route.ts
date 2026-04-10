@@ -18,6 +18,8 @@ interface Body {
   language?: string
   totalPages: number
   characterId?: string
+  /** Çoklu karakter — ödeme sonrası kuyruk için (sıra önemli) */
+  characterIds?: string[]
   /** Örnek kitaptan satın alma — metadata; FK değil */
   sourceExampleBookId?: string
 }
@@ -44,6 +46,13 @@ function validateBody(raw: unknown): raw is Body {
     !UUID_RE.test(b.sourceExampleBookId)
   )
     return false
+  if (b.characterIds !== undefined) {
+    if (!Array.isArray(b.characterIds)) return false
+    if (b.characterIds.length > 5) return false
+    for (const id of b.characterIds) {
+      if (typeof id !== 'string' || !UUID_RE.test(id)) return false
+    }
+  }
   return true
 }
 
@@ -72,11 +81,17 @@ export async function POST(request: NextRequest) {
       language = 'tr',
       totalPages,
       characterId,
+      characterIds: bodyCharacterIds,
       sourceExampleBookId,
     } = raw
 
+    const paidCheckoutCharacterIds: string[] | undefined =
+      bodyCharacterIds && bodyCharacterIds.length > 0
+        ? bodyCharacterIds
+        : undefined
+
     const { data: book, error } = await createBook(user.id, {
-      character_id: characterId || undefined,
+      character_id: characterId || paidCheckoutCharacterIds?.[0] || undefined,
       title: title.trim().slice(0, 500),
       theme: theme.trim().slice(0, 200),
       illustration_style: illustrationStyle.trim().slice(0, 200),
@@ -90,6 +105,7 @@ export async function POST(request: NextRequest) {
       generation_metadata: {
         checkoutPlaceholder: true,
         pendingPaidCheckout: true,
+        ...(paidCheckoutCharacterIds ? { paidCheckoutCharacterIds } : {}),
         ...(sourceExampleBookId ? { sourceExampleBookId } : {}),
       },
       ...(sourceExampleBookId

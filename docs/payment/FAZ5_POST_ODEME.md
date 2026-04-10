@@ -225,6 +225,7 @@ export async function GET(
 
 ### Post-Payment Handler ✅ Tamamlandı
 - [x] `lib/payment/post-payment.ts` — `handlePaymentSuccess`, `handlePaymentFailed`
+- [x] `lib/payment/paid-checkout-generation.ts` — ödeme sonrası `checkout-placeholder` kitaplarını `enqueueBookGeneration` ile kuyruğa alır (wizard + örnek kitap + taslak planı)
 - [x] iyzico callback'ine post-payment çağrısı eklendi (fire-and-forget)
 - [ ] Stripe webhook'una post-payment çağrısı ekle (Faz 2 ile birlikte)
 
