@@ -2,7 +2,7 @@
 
 **Amaç:** Sunucu / sandbox testlerinde yapılacak adımlar ve beklenen sonuçlar. Tamamladığınız satırları işaretleyin; bitince ekip ile “done” kontrolü yapılabilir.
 
-**İlgili dokümanlar:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md) · [FAZ1_IYZICO.md](FAZ1_IYZICO.md) (test kartları) · [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md)
+**İlgili dokümanlar:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md) *(11 Nisan 2026 güncel özet)* · [FAZ1_IYZICO.md](FAZ1_IYZICO.md) (test kartları) · [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md) · [FAZ7_PROMO_KODLARI.md](FAZ7_PROMO_KODLARI.md)
 
 **Ön koşullar**
 
@@ -31,9 +31,13 @@
 | **Başlık (UI)** |
 | 9 | Yeni oluşturulan sepet satırı başlığı | `E-Kitap – {isim}` (parantezde sayfa yok) | ☐ |
 | **Kullanıcı siparişleri** |
-| 10 | `/orders` listesi | Ödenen siparişler görünür | ☐ |
-| 11 | `/orders/[id]` detay | Tutar, kalemler, durum doğru | ☐ |
+| 10 | **Profil Ayarları → Siparişlerim** (`/dashboard/settings?section=orders`) veya `/orders` (yönlendirme) | Ödenen siparişler sidebar’lı ayarlar düzeninde listelenir; `/orders` aynı hedefe yönlenir | ☐ |
+| 11 | `/orders/[id]` detay | Tutar, kalemler, durum doğru; “geri” hedefi ayarlardaki Siparişlerim ile uyumlu | ☐ |
 | 12 | `GET /api/orders/{id}/download` (oturum, `paid`) | `downloads[]` ve `pdfUrl` / viewer URL | ☐ |
+| **Promo kodu (Faz 7)** |
+| 12b | Sepette geçerli kod uygula → ödeme | Toplam indirimli; `initialize` sonrası sipariş tutarı doğru | ☐ |
+| 12c | Başarılı ödeme sonrası | `promo_code_usages` satırı ve `promo_codes.used_count` beklendiği gibi | ☐ |
+| 12d | Admin `/admin/promo-codes` | Kod oluştur / düzenle; kullanım listesi (varsa) tutarlı | ☐ |
 | **Admin** |
 | 13 | `/admin/orders` + export | Liste ve CSV çalışır | ☐ |
 | 14 | Sipariş detayında durum / iade (iyzico `paid`) | PATCH ve iade akışı beklendiği gibi | ☐ |
@@ -47,7 +51,8 @@
 
 - Eski siparişlerde oluşturulmuş “E-Kitap (10 sayfa) – …” başlıkları veritabanında kalır; yeni checkout’tan sonra gelen kayıtlar yeni formatta olur.
 - Üretim sunucusunda worker süreçlerinin PM2/systemd ile tanımlı olduğundan emin olun.
+- **`/orders`:** Artık tek başına liste sayfası değil; **`/dashboard/settings?section=orders`** adresine yönlendirir (tek “Siparişlerim” deneyimi).
 
 ---
 
-**Son güncelleme:** 10 Nisan 2026
+**Son güncelleme:** 11 Nisan 2026

@@ -1,10 +1,14 @@
 # 🏷️ Faz 7 — İndirim / Promo Kodu Sistemi
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** ⬜ Planlama — Implementasyon başlanmadı  
+**Durum:** ✅ **Kod tamamlandı** (11 Nisan 2026) — Canlı öncesi her ortamda **`migrations/031_promo_codes.sql`** uygulanmalı ve [PAYMENT_MANUAL_TESTS.md](PAYMENT_MANUAL_TESTS.md) ile regresyon önerilir.  
 **Ön koşul:** Faz 1 ✅ (iyzico aktif, orders/order_items tabloları mevcut)  
-**Tahmini süre:** 2-3 gün  
+**Tahmini süre:** *(planlama için)* 2-3 gün  
 **Öncelik:** Orta — lansman öncesi veya lansman sonrasında eklenebilir
+
+**Uygulama özeti (referans):** `promo_codes` / `promo_code_usages`, `orders.promo_code_id`, `lib/db/promo-codes.ts`, `POST /api/promo/validate`, `/api/admin/promo-codes`, sepet + `iyzico/initialize` + `post-payment` entegrasyonu, `/admin/promo-codes`.
+
+> Aşağıdaki bölümler **orijinal tasarım / spesifikasyon** olarak korunmuştur; gerçek şema ve alan adları için repodaki `migrations/031_promo_codes.sql` ve `lib/db/promo-codes.ts` kaynak kabul edilir.
 
 ---
 

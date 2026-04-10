@@ -1,8 +1,8 @@
 # 💳 Faz 6 — Test ve Canlıya Alış
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** ⬜ Bekliyor  
-**Ön koşul:** Faz 0–5 tamamlanmış olmalı  
+**Durum:** ⬜ Bekliyor — **11 Nisan 2026:** Ödeme konusunda **sıradaki ana blok** (Stripe / faturalama hariç) olarak roadmap’te işaretlendi; güncel sıra ve checklist: [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md) → *Kalan işler (Stripe + faturalama hariç)*.  
+**Ön koşul:** Faz 0–1, 4, 7 *(kod)* mevcut; Faz 5 operasyonel olarak kısmen tamamlanabilir.  
 **Tahmini süre:** 2-3 gün
 
 ---
@@ -22,6 +22,7 @@ Tüm ödeme akışını kapsamlı biçimde test etmek ve canlıya güvenli geçi
 - [ ] Stripe webhook local yönlendirme: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
 - [ ] iyzico callback için: `ngrok http 3000` (veya localhost.run) → iyzico callback URL'ini güncelle
 - [ ] DB: `orders`, `order_items`, `payments`, `payment_events` tabloları mevcut
+- [ ] DB: Faz 7 — `promo_codes`, `promo_code_usages`, `orders.promo_code_id` (`031_promo_codes`) hedef ortamda uygulandı
 
 ### 1.2 Test Kullanıcıları
 

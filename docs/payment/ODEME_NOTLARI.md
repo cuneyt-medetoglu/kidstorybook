@@ -8,6 +8,12 @@ Kişisel hatırlatma / günlük notlar. Ana takip: [PAYMENT_ROADMAP.md](PAYMENT_
 
 ---
 
+## 2026-04-11
+
+- **Ara veriş:** Ödeme tarafında gelinen nokta, kalan işler (Stripe + faturalama hariç/sonra) ve ortam checklist tek yerde: [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md) (11 Nisan güncellemesi). Promo: `031_promo_codes`; manuel testler: [PAYMENT_MANUAL_TESTS.md](PAYMENT_MANUAL_TESTS.md).
+
+---
+
 ## 2026-04-06
 
 - **Faz 1 QA kapatıldı:** Sandbox başarılı ödeme, callback, DB satırları ve başarı sonrası UX (sepet + sipariş linki) ekip tarafından onaylandı. Özet: [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md), [FAZ1_IYZICO.md](FAZ1_IYZICO.md).
@@ -36,7 +42,7 @@ Kişisel hatırlatma / günlük notlar. Ana takip: [PAYMENT_ROADMAP.md](PAYMENT_
 
 - **025b “index already exists”:** `IF NOT EXISTS` ile tekrar çalıştırma genelde sorun değil; uyarı/notice görülebilir.
 
-- **Tam migration sırası:** `025` → `025b` (indeks) → `025c` (trigger) → `026` → `027` → **`027c` (gerekirse)** → `027b` → `028` → `028b` → **`029`** → **`030_payments_drop_legacy_columns.sql`**.
+- **Tam migration sırası:** `025` → `025b` (indeks) → `025c` (trigger) → `026` → `027` → **`027c` (gerekirse)** → `027b` → `028` → `028b` → **`029`** → **`030_payments_drop_legacy_columns.sql`** → **`031_promo_codes.sql`** *(promo / Faz 7)*.
 
 - **Hibrit `payments`:** Eski + yeni sütunlar bir aradaysa → **`030_payments_drop_legacy_columns.sql`** çalıştır (yinelenen eski sütunları **DROP**). Teşhis: `scripts/diagnose_payments_schema.sql`.
 

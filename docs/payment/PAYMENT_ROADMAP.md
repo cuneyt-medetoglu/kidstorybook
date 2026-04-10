@@ -1,9 +1,77 @@
 # 💳 HeroKidStory — Ödeme Sistemi Entegrasyonu Yol Haritası
 
 **Oluşturma tarihi:** 5 Nisan 2026  
-**Son güncelleme:** 7 Nisan 2026 — **Faz 4 tamamlandı** (kullanıcı sipariş listesi, admin sipariş yönetimi, iyzico iade API, aksiyon bileşeni). **Sıradaki implementasyon:** [Faz 5 — Post-ödeme akışları](FAZ5_POST_ODEME.md).  
-**Durum:** Faz 0 ✅ · Faz 1 ✅ (kod + sandbox QA + Faz 1.5) · Faz 4 ✅
-**Kapsam:** iyzico (TR) ile uçtan uca ödeme; Stripe (uluslararası) plan dokümanda duruyor, **implementasyon sonra.**
+**Son güncelleme:** **11 Nisan 2026** — Bu dosya, **geldiğimiz nokta** ve **Stripe + faturalama dışında kalan işler** için güncel özet ekrandır. *(Konuya ara verildi; devam ederken buradan başlayın.)*
+
+**Durum özeti:** Faz 0 ✅ · Faz 1 ✅ · Faz 4 ✅ · **Faz 7 ✅** *(kod)* · Faz 5 🔶 *(kısmen)* · Faz 2 ⏸️ · Faz 3 ⬜ · Faz 6 ⬜
+
+**Kapsam:** iyzico (TR) ile uçtan uca ödeme. **Stripe** ve **Profil Ayarları / Faturalama** tarafı **bilinçli olarak sonra**; ayrıntılar [Kalan işler (Stripe + faturalama hariç)](#snapshot-remaining-without-stripe) ve [Kalan işler — sonra](#snapshot-remaining-stripe-billing) bölümlerinde.
+
+---
+
+## Bu sayfada ne var?
+
+| Bölüm | İçerik |
+|-------|--------|
+| **[Geldiğimiz nokta (11 Nisan 2026)](#snapshot-done-2026-04-11)** | Son teslimatlar (kod + UX) |
+| **[Ortam kontrol listesi](#snapshot-env-checklist)** | Prod/staging’de doğrulanacaklar |
+| **[Kalan işler (Stripe + faturalama hariç)](#snapshot-remaining-without-stripe)** | Faz 6, Faz 5 kapanışı, Faz 3 |
+| **[Kalan işler — sonra](#snapshot-remaining-stripe-billing)** | Stripe, faturalama |
+| Aşağıdaki tablolar | Strateji, faz dosyaları, mimari, SSS, bağımlılıklar *(referans)* |
+
+---
+
+<a id="snapshot-done-2026-04-11"></a>
+
+## Geldiğimiz nokta (11 Nisan 2026)
+
+### Kod ve ürün UX
+
+- **Faz 7 — Promo kodları:** `migrations/031_promo_codes.sql` (`promo_codes`, `promo_code_usages`, `orders.promo_code_id`), `lib/db/promo-codes.ts`, `POST /api/promo/validate`, admin CRUD (`/api/admin/promo-codes`), sepet + iyzico initialize’da sunucu tarafı doğrulama ve indirim, ödeme sonrası kullanım kaydı (`recordPromoCodeUsage`), admin arayüzü `/admin/promo-codes`.
+- **Ödeme başarılı ekranı:** `/payment/success` — kısa ödeme onayı + kitap üretim aşamaları (canlı ilerleme), kapatınca arka planda devam / yönlendirme akışı.
+- **Siparişler tek deneyim:** Header “Siparişlerim” → `/dashboard/settings?section=orders`; ayarlar sidebar’ında **Siparişlerim** / **My Orders**; `/orders` aynı hedefe **yönlendirme**; `/orders/[id]` detay geri linki ile uyumlu.
+
+### Faz 0–1–4 (özet, değişmedi)
+
+- Ödeme tabloları, iyzico Checkout Form, callback, sipariş DB, kullanıcı + admin sipariş ekranları, iade API — tamamlandı (detay: ilgili `FAZx_*.md` dosyaları).
+
+---
+
+<a id="snapshot-env-checklist"></a>
+
+## Ortam kontrol listesi (promo + sipariş)
+
+Ortam başına doğrulayın:
+
+- [ ] **`031_promo_codes`** migration’ı **staging / production** PostgreSQL’de uygulandı (yerel ile prod aynı olmayabilir).
+- [ ] Promo kodu ile sepet → ödeme → `paid` sonrası **`promo_code_usages`** ve **`used_count`** beklendiği gibi.
+- [ ] Manuel regresyon: [PAYMENT_MANUAL_TESTS.md](PAYMENT_MANUAL_TESTS.md).
+
+---
+
+<a id="snapshot-remaining-without-stripe"></a>
+
+## Kalan işler (Stripe + faturalama hariç)
+
+Önerilen sıra: önce **güven ve regresyon**, sonra **post-ödeme kapanışı** ve **checkout iyileştirmeleri**.
+
+| Sıra | Konu | Doküman |
+|------|------|---------|
+| **1** | **Faz 6** — sandbox / 3DS / kenar durumlar, canlıya alış checklist | [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md), [PAYMENT_MANUAL_TESTS.md](PAYMENT_MANUAL_TESTS.md) |
+| **2** | **Faz 5 kapanışı** — e-posta (domain / Resend), hardcopy fulfillment netliği, operasyonel “tamam” | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) |
+| **3** | **Faz 3** — checkout / geo-routing (Stripe yokken iyzico-only parçalar mümkün) | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) |
+| **İsteğe bağlı** | `docs/database/SCHEMA.md` içinde **`031`** / promo tablolarının özeti | Şema dokümanı senkronu |
+
+---
+
+<a id="snapshot-remaining-stripe-billing"></a>
+
+## Kalan işler — sonra (Stripe, faturalama)
+
+| Konu | Not |
+|------|-----|
+| **Faz 2 — Stripe** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md); ardından Faz 3 ile tam geo-routing (TR → iyzico, diğer → Stripe). |
+| **Faturalama** | Profil ayarlarındaki “Faturalama” / müşteri portalı, fatura PDF, vergi alanları vb. — **ürün kararı sonrası**; ayrı faz dosyası yok, ihtiyaç halinde eklenebilir. |
 
 ---
 
@@ -11,26 +79,13 @@
 
 | Dalga | Kapsam |
 |-------|--------|
-| **Şimdi** | Faz 0 ✅ · Faz 1 ✅ → **Faz 4** (sipariş UI / admin); Faz 3 geo-routing onayla; Faz 5–6 post-ödeme ve canlı checklist |
-| **Sonra** | [FAZ2_STRIPE.md](FAZ2_STRIPE.md) — Stripe entegrasyonu; ardından Faz 3'te tam geo-routing (TR → iyzico, diğer → Stripe) |
+| **Tamamlanan (iyzico çekirdeği + sipariş + promo kodu)** | Faz 0, 1, 4, 7 *(kod)*; ödeme başarı + üretim UI; sipariş navigasyonu birleşik |
+| **Sıradaki (Stripe / faturalama hariç)** | Faz 6 test & canlı; Faz 5 kapanış; isteğe bağlı Faz 3 |
+| **Sonra** | Stripe, tam geo-routing, faturalama UI |
 
 **iyzico sandbox:** Panelden alınan API / güvenlik anahtarları **yalnızca** yerel `.env` dosyasına yazılır; **asla** git'e commit edilmez ve dokümana gerçek değer olarak eklenmez.
 
 **Günlük / hatırlatma notları:** [ODEME_NOTLARI.md](ODEME_NOTLARI.md)
-
-### Şu an neredeyiz? · Sonraki adım
-
-| Tamamlanan | Açıklama |
-|------------|----------|
-| **Faz 0** | Tablolar (`orders`, `order_items`, `payments`, `payment_events`), indeks/trigger’lar, `lib/payment/*`, fiyat kataloğu, `GET /api/payment/provider`, sepet tipi, i18n anahtarları, **`iyzipay` npm bağımlılığı** (`package.json` + lockfile — sunucuda `npm install` yeterli) |
-
-| Sıradaki | Dosya / iş |
-|----------|------------|
-| **Faz 1** ✅ | [FAZ1_IYZICO.md](FAZ1_IYZICO.md) — Sandbox uçtan uca + DB doğrulaması tamam. İsteğe bağlı canlı öncesi: ayrı 3DS / başarısız kart testi ([FAZ6](FAZ6_TEST_VE_CANLIYA_ALIS.md)). |
-| **Faz 4** ✅ | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) — Kullanıcı sipariş listesi, admin sipariş yönetimi + detay, iyzico iade API, aksiyon bileşeni. **Tamamlandı.** |
-| **Faz 5** ⬜ | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) — **Sıradaki:** Post-ödeme e-posta, e-book teslimi, fulfillment |
-| **Faz 3** ⏸️ | [FAZ3_CHECKOUT.md](FAZ3_CHECKOUT.md) — **Beklemede** (ürün → sepet UX, geo-routing vb.); başlamak için ayrı onay |
-| **Faz 6** | Test + canlıya alış, 3DS / edge-case testleri |
 
 **Deploy notu:** `package.json` ve `package-lock.json` commit edildiyse `deploy:build` / sunucuda `npm install` `iyzipay`’ı kurar. Sunucu `.env` içinde `IYZICO_*` tanımlı olmalı (commit edilmez).
 
@@ -42,7 +97,7 @@
 
 | Katman | Ne kullanılır? |
 |--------|----------------|
-| **Sepet, sipariş satırları, toplam, indirim (ileride)** | Uygulama içi: mevcut sepet + sunucuda `orders` / `order_items` + fiyat doğrulama. **Tam headless commerce suite (Medusa, Saleor vb.) kullanılmayacak** — detay ve gerekçe: [FAZ0_HAZIRLIK.md](FAZ0_HAZIRLIK.md) bölüm **1.1**. |
+| **Sepet, sipariş satırları, toplam, promo indirimi** | Uygulama içi: sepet + sunucuda `orders` / `order_items` + sunucu tarafı fiyat / promo doğrulama (`promo_codes`, Faz 7). **Tam headless commerce suite (Medusa, Saleor vb.) kullanılmayacak** — detay: [FAZ0_HAZIRLIK.md](FAZ0_HAZIRLIK.md) bölüm **1.1**. |
 | **Kart / 3D Secure / tahsilat** | **iyzico:** Checkout Form (API + iframe). **Stripe:** Checkout Session (hosted) veya Payment Element — [FAZ2_STRIPE.md](FAZ2_STRIPE.md). |
 | **Ödeme sonucu** | iyzico callback (+ gerekirse webhook); Stripe webhook → sipariş `paid`. |
 
@@ -91,7 +146,7 @@ Aşağıdaki isimler **Cursor / benzeri araçlarda seçebileceğiniz model takma
 | **Faz 4** | [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md) | Admin sipariş | **Sonnet 4.6** *(veya Auto — tablo/liste rutini)* | ✅ **Tamamlandı** |
 | **Faz 5** | [FAZ5_POST_ODEME.md](FAZ5_POST_ODEME.md) | Post-ödeme, e-posta | **Sonnet 4.6** veya **Auto** | 🔶 Kısmen Tamamlandı *(domain bekliyor)* |
 | **Faz 6** | [FAZ6_TEST_VE_CANLIYA_ALIS.md](FAZ6_TEST_VE_CANLIYA_ALIS.md) · [PAYMENT_MANUAL_TESTS.md](PAYMENT_MANUAL_TESTS.md) | Test, canlıya alış | **Auto** veya **Gemini 3.1 Pro** *(uzun checklist / doküman taraması)* | ⬜ Bekliyor |
-| **Faz 7** | [FAZ7_PROMO_KODLARI.md](FAZ7_PROMO_KODLARI.md) | İndirim / promo kodu sistemi | **Sonnet 4.6** | ⬜ Bekliyor |
+| **Faz 7** | [FAZ7_PROMO_KODLARI.md](FAZ7_PROMO_KODLARI.md) | İndirim / promo kodu sistemi | **Sonnet 4.6** | ✅ **Kod tamamlandı** *(ortamda `031` + QA)* |
 
 ---
 
@@ -142,8 +197,9 @@ Kullanıcı → Sepet → Checkout Sayfası
 | `order_items` | Sipariş satırları (book_id, item_type: ebook/hardcopy/bundle) |
 | `payments` | Ödeme girişimleri (`payment_provider`, `payment_currency`, sağlayıcı ID’leri) |
 | `payment_events` | Webhook/callback log (`payment_provider` + idempotency) |
+| `promo_codes` / `promo_code_usages` | Promo kodu tanımları ve kullanım kaydı; `orders.promo_code_id` (Faz 7) |
 
-> Detay: [FAZ0_HAZIRLIK.md](FAZ0_HAZIRLIK.md) · Sıra: `025` → **`025b`** (indeks) → **`025c`** (trigger) → `026` → `027` → **`027c`** *(yalnızca eski `payments` tablosu 027 şemasından farklıysa)* → **`027b`** → `028` → **`028b`** → **`029`** → **`030`**. DBeaver: [ODEME_NOTLARI.md](ODEME_NOTLARI.md).
+> Detay: [FAZ0_HAZIRLIK.md](FAZ0_HAZIRLIK.md) · Sıra: `025` → **`025b`** (indeks) → **`025c`** (trigger) → `026` → `027` → **`027c`** *(yalnızca eski `payments` tablosu 027 şemasından farklıysa)* → **`027b`** → `028` → **`028b`** → **`029`** → **`030`** → **`031`** *(promo)*. DBeaver: [ODEME_NOTLARI.md](ODEME_NOTLARI.md).
 
 ---
 
@@ -193,6 +249,7 @@ Kullanıcı → Sepet → Checkout Sayfası
 - [x] Migration'lar PostgreSQL'e uygulandı (`025` → `025c` → `026` → `027` → `027b` → `028` → `028b`) — ortam başına doğrula
 - [x] `iyzipay` — `package.json` + lockfile; yerelde `npm install` / sunucuda deploy ile kurulum
 - [x] iyzico callback için public erişilebilir `NEXT_PUBLIC_APP_URL` — Faz 1 sandbox QA’da doğrulandı (staging/production; yerel tünel gerekirse ngrok vb.)
+- [ ] **`031_promo_codes`** hedef veritabanında uygulandı mı? *(Her ortam için doğrula.)*
 
 ---
 
@@ -205,19 +262,22 @@ Kullanıcı → Sepet → Checkout Sayfası
 | Faz 2 | Stripe | 3-5 gün | Opus 4.6 / GPT 5.4 | ⏸️ Ertelendi |
 | Faz 3 | Checkout (önce iyzico-only) | 2-3 gün | Sonnet 4.6 / Composer 2 | ⬜ |
 | Faz 4 | Admin sipariş | 2-3 gün | Sonnet 4.6 / Auto | ✅ **Tamamlandı** |
-| Faz 5 | Post-ödeme | 1-2 gün | Sonnet 4.6 / Auto | 🔶 Kısmen *(domain bekliyor)* |
-| Faz 6 | Test + Canlıya alış | 2-3 gün | Auto / Gemini 3.1 Pro | ⬜ |
-| Faz 7 | İndirim / Promo Kodları | 2-3 gün | Sonnet 4.6 | ⬜ |
+| Faz 5 | Post-ödeme | 1-2 gün | Sonnet 4.6 / Auto | 🔶 Kısmen *(domain / operasyon)* |
+| Faz 6 | Test + Canlıya alış | 2-3 gün | Auto / Gemini 3.1 Pro | ⬜ **Sıradaki ana blok** *(Stripe hariç)* |
+| Faz 7 | İndirim / Promo Kodları | 2-3 gün | Sonnet 4.6 | ✅ **Kod tamam** *(bkz. [Ortam kontrol listesi](#snapshot-env-checklist))* |
 
-**İlk dalga (iyzico):** yaklaşık 10–16 gün (Stripe hariç). Stripe eklendiğinde Faz 2 + Faz 3 tam birleşim.
+**İlk dalga (iyzico):** Stripe hariç çekirdek + sipariş + promo kodu kodlandı; **canlı öncesi** Faz 6 + Faz 5 kapanışı önerilir. Stripe eklendiğinde Faz 2 + Faz 3 tam birleşim.
 
-### Sıradaki adım (implementasyon)
+### Dağıtım / sandbox kontrolü (iyzico — tamamlandı)
 
-**Faz 4 tamam** — özet: [FAZ4_ADMIN_SIPARISLER.md](FAZ4_ADMIN_SIPARISLER.md). **Sıradaki:** **[Faz 5 — Post-ödeme akışları](FAZ5_POST_ODEME.md)** (e-posta bildirimleri, e-book teslimi, fulfillment). Faz 2–3 Stripe / geo-routing ayrı onayla.panış kontrolü (tamamlandı):
-1. [x] Migration zinciri hedef DB’de
+1. [x] Migration zinciri hedef DB’de (`025` … `030`; ayrıca **`031`** prod’da doğrula)
 2. [x] `iyzipay` deploy ortamında kurulu
 3. [x] Sunucu `.env`: `IYZICO_*` + `NEXT_PUBLIC_APP_URL` (commit edilmez)
 4. [x] Callback + başarılı ödeme + DB (`orders` / `payment_events`) doğrulandı
+
+### Sıradaki adım (özet)
+
+**Stripe ve faturalama bilinçli olarak sonra.** Öncesinde: **[Faz 6](FAZ6_TEST_VE_CANLIYA_ALIS.md)** + **[Faz 5](FAZ5_POST_ODEME.md)** kalan maddeler; isteğe bağlı **[Faz 3](FAZ3_CHECKOUT.md)**.
 
 ---
 
@@ -244,7 +304,7 @@ Böylece hem tek sayfada ilerleme hem de faz bazlı detay ayrı dosyada kalır.
 
 Erken fazlarda (Faz 0–1) kural yazmak mümkün ama sık sık revize edilir; **Faz 6 sonrası** oluşturmak “tek seferde doğru” oranı daha yüksek.
 
-**Yapılacak iş:** `.cursor/rules/` altında yeni bir rule dosyası (ör. `payment-system.mdc`) — `alwaysApply: false` + `globs` ile `docs/payment/**`, `lib/payment/**`, `lib/db/orders.ts`, `app/api/payment/**`, `migrations/025*.sql` … `028*.sql` odaklı.
+**Yapılacak iş:** `.cursor/rules/` altında yeni bir rule dosyası (ör. `payment-system.mdc`) — `alwaysApply: false` + `globs` ile `docs/payment/**`, `lib/payment/**`, `lib/db/orders.ts`, `lib/db/promo-codes.ts`, `app/api/payment/**`, `app/api/promo/**`, `migrations/025*.sql` … `031*.sql` odaklı.
 
 ---
 

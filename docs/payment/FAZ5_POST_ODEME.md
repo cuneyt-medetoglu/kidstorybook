@@ -1,7 +1,7 @@
 # 💳 Faz 5 — Ödeme Sonrası Akışlar
 
 **Bağlı Roadmap:** [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md)  
-**Durum:** 🔶 Kısmen Tamamlandı (7 Nisan 2026)  
+**Durum:** 🔶 Kısmen Tamamlandı (7 Nisan 2026) — **11 Nisan 2026:** Genel özet ve “Stripe + faturalama hariç kalan işler” için [PAYMENT_ROADMAP.md](PAYMENT_ROADMAP.md) güncellendi; Faz 5 **kapanışı** (e-posta domain, hardcopy operasyonu) hâlâ beklemede.  
 **Ön koşul:** Faz 1 ✅ (iyzico). Faz 2/3 (Stripe/geo) beklerken de domain-bağımsız kodlar tamamlandı.  
 **Tahmini süre:** Kalan kısım (domain + SMTP/Resend) domain hazır olunca ~1 gün
 
