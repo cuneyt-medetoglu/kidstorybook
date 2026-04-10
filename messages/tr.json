@@ -1098,8 +1098,8 @@
       "hardcopyUnavailableDesc": "Sert kapak baskı şu an yalnızca Türkiye (TRY) için tanımlı. Bölgenize göre para birimi farklıysa bu seçenek kapalıdır."
     },
     "settings": {
-      "title": "Profil Ayarları",
-      "subtitle": "Hesap ayarlarınızı ve tercihlerinizi yönetin",
+      "title": "Hesabım",
+      "subtitle": "Hesap ayarlarınızı ve uygulama tercihlerinizi yönetin",
       "openMenu": "Menüyü Aç",
       "closeMenu": "Menüyü Kapat",
       "nav": {
@@ -1108,6 +1108,7 @@
         "orders": "Siparişlerim",
         "freeCover": "Ücretsiz Kapak Durumu",
         "notifications": "Bildirimler",
+        "appSettings": "Ayarlar",
         "billing": "Faturalama"
       },
       "profile": {
@@ -1200,11 +1201,27 @@
         "cancel": "İptal",
         "confirm": "Hesabı Sil"
       },
+      "appSettings": {
+        "title": "Ayarlar",
+        "subtitle": "Uygulama tercihleri",
+        "saving": "Kaydediliyor...",
+        "savePreferences": "Tercihleri Kaydet",
+        "kidMode": {
+          "title": "Çocuk Modu",
+          "description": "Çocuğunuz cihazı tek başına kullanacaksa arayüzü basitleştirmek için tasarlandı (menü sadeleştirme, daha büyük yazı vb.).",
+          "notImplementedBadge": "Yakında",
+          "notImplementedNote": "Şu an uygulama genelinde etkin değil; tercih yalnızca kaydedilir. Davranış sonradan eklenecek."
+        }
+      },
       "toasts": {
         "profileSavedTitle": "Başarılı",
         "profileSavedDesc": "Profil başarıyla güncellendi",
         "notificationsSavedTitle": "Başarılı",
         "notificationsSavedDesc": "Bildirim tercihleri kaydedildi",
+        "appSettingsSavedTitle": "Başarılı",
+        "appSettingsSavedDesc": "Ayarlar kaydedildi",
+        "appSettingsErrorTitle": "Hata",
+        "appSettingsErrorDesc": "Ayarlar kaydedilemedi. Lütfen tekrar deneyin.",
         "accountDeletedTitle": "Hesap Silindi",
         "accountDeletedDesc": "Hesabınız kalıcı olarak silindi"
       }

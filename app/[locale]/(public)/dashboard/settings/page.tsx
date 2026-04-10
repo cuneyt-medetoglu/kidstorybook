@@ -23,6 +23,7 @@ import {
   Plus,
   Loader2,
   RefreshCw,
+  SlidersHorizontal,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,8 +43,10 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { ToastProvider } from "@/components/providers/ToastProvider"
+import type { UserPreferences } from "@/lib/types/user-preferences"
+import { DEFAULT_PREFERENCES } from "@/lib/types/user-preferences"
 
-type Section = "profile" | "account" | "orders" | "free-cover" | "notifications" | "billing"
+type Section = "profile" | "account" | "orders" | "free-cover" | "notifications" | "app-settings" | "billing"
 
 interface OrderItemData {
   id: string
@@ -112,7 +115,119 @@ const mockBillingHistory = [
   },
 ]
 
-const VALID_SECTIONS: Section[] = ["profile", "account", "orders", "free-cover", "notifications", "billing"]
+const VALID_SECTIONS: Section[] = [
+  "profile",
+  "account",
+  "orders",
+  "free-cover",
+  "notifications",
+  "app-settings",
+  "billing",
+]
+
+// ─── App Settings section ──────────────────────────────────────────────────────
+
+function AppSettingsSection() {
+  const t = useTranslations("dashboard.settings")
+  const { toast } = useToast()
+
+  const [prefs, setPrefs] = useState<UserPreferences>(DEFAULT_PREFERENCES)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch("/api/user/preferences")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled && data.success) setPrefs(data.preferences)
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
+  }, [])
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch("/api/user/preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(prefs),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setPrefs(data.preferences)
+        toast({ title: t("toasts.appSettingsSavedTitle"), description: t("toasts.appSettingsSavedDesc") })
+      } else {
+        throw new Error()
+      }
+    } catch {
+      toast({
+        title: t("toasts.appSettingsErrorTitle"),
+        description: t("toasts.appSettingsErrorDesc"),
+        variant: "destructive",
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="size-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
+  return (
+    <motion.div
+      key="app-settings"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("appSettings.title")}</CardTitle>
+          <CardDescription>{t("appSettings.subtitle")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">{t("appSettings.kidMode.notImplementedBadge")}</Badge>
+            <span className="text-sm text-muted-foreground">{t("appSettings.kidMode.notImplementedNote")}</span>
+          </div>
+          <div className="flex items-start justify-between gap-4 p-4 border rounded-lg bg-muted/30">
+            <div className="space-y-1 flex-1 min-w-0">
+              <Label className="text-base font-semibold">{t("appSettings.kidMode.title")}</Label>
+              <p className="text-sm text-muted-foreground">{t("appSettings.kidMode.description")}</p>
+            </div>
+            <Switch
+              checked={prefs.kidMode}
+              onCheckedChange={(v) => setPrefs((p) => ({ ...p, kidMode: v }))}
+              className="shrink-0"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end">
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-gradient-to-r from-primary to-brand-2 text-white hover:opacity-90"
+        >
+          {saving ? t("appSettings.saving") : t("appSettings.savePreferences")}
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ─── Main page ─────────────────────────────────────────────────────────────────
 
 function ProfilePageContent() {
   const t = useTranslations("dashboard.settings")
@@ -128,6 +243,7 @@ function ProfilePageContent() {
     { id: "orders" as Section, label: t("nav.orders"), icon: ShoppingBag },
     { id: "free-cover" as Section, label: t("nav.freeCover"), icon: Gift },
     { id: "notifications" as Section, label: t("nav.notifications"), icon: Bell },
+    { id: "app-settings" as Section, label: t("nav.appSettings"), icon: SlidersHorizontal },
     { id: "billing" as Section, label: t("nav.billing"), icon: CreditCard },
   ]
 
@@ -591,6 +707,9 @@ function ProfilePageContent() {
             </Card>
           </motion.div>
         )
+
+      case "app-settings":
+        return <AppSettingsSection />
 
       case "billing":
         return (

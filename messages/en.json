@@ -1098,8 +1098,8 @@
       "hardcopyUnavailableDesc": "Hardcover printing is only offered in Turkey (TRY) for now. If your region uses another currency, this option is disabled."
     },
     "settings": {
-      "title": "Profile Settings",
-      "subtitle": "Manage your account settings and preferences",
+      "title": "My Account",
+      "subtitle": "Manage your account settings and app preferences",
       "openMenu": "Open Menu",
       "closeMenu": "Close Menu",
       "nav": {
@@ -1108,6 +1108,7 @@
         "orders": "My Orders",
         "freeCover": "Free Cover Status",
         "notifications": "Notifications",
+        "appSettings": "Settings",
         "billing": "Billing"
       },
       "profile": {
@@ -1200,11 +1201,27 @@
         "cancel": "Cancel",
         "confirm": "Delete Account"
       },
+      "appSettings": {
+        "title": "Settings",
+        "subtitle": "App preferences",
+        "saving": "Saving...",
+        "savePreferences": "Save Preferences",
+        "kidMode": {
+          "title": "Kid Mode",
+          "description": "Designed to simplify the interface when your child uses the device alone (fewer menus, larger text, etc.).",
+          "notImplementedBadge": "Coming soon",
+          "notImplementedNote": "Not active across the app yet; your choice is only saved. Behaviour will be implemented later."
+        }
+      },
       "toasts": {
         "profileSavedTitle": "Success",
         "profileSavedDesc": "Profile updated successfully",
         "notificationsSavedTitle": "Success",
         "notificationsSavedDesc": "Notification preferences saved",
+        "appSettingsSavedTitle": "Success",
+        "appSettingsSavedDesc": "Settings saved",
+        "appSettingsErrorTitle": "Error",
+        "appSettingsErrorDesc": "Could not save settings. Please try again.",
         "accountDeletedTitle": "Account Deleted",
         "accountDeletedDesc": "Your account has been permanently deleted"
       }

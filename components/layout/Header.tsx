@@ -319,7 +319,7 @@ export function Header() {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard/settings" className="flex items-center">
+                      <Link href="/dashboard/settings?section=app-settings" className="flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
                         {t("settings")}
                       </Link>
@@ -441,7 +441,7 @@ export function Header() {
                         <span className="font-medium">{t("myOrders")}</span>
                       </Button>
                     </Link>
-                    <Link href="/dashboard/settings" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link href="/dashboard/settings?section=app-settings" onClick={() => setIsMobileMenuOpen(false)}>
                       <Button
                         variant="ghost"
                         className="w-full justify-start bg-muted/50 hover:bg-muted dark:bg-slate-800 dark:hover:bg-slate-700"
