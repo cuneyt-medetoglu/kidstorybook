@@ -465,7 +465,9 @@
     "legalLinks": {
       "privacyPolicy": "Gizlilik Politikası",
       "termsOfService": "Kullanım Koşulları",
-      "cookiePolicy": "Çerez Politikası"
+      "cookiePolicy": "Çerez Politikası",
+      "distanceSales": "Mesafeli Satış Sözleşmesi",
+      "refundPolicy": "İade Politikası"
     }
   },
   "auth": {
@@ -588,7 +590,7 @@
       "readingAgeLabel": "Dinleme / okuma yaşı",
       "readingAgeHint": "Hikâyenin uzunluğunu ve kelime zenginliğini (sayfa başı kelime) belirler. Kitabı dinleyecek veya okuyacak çocuğa uygun aralığı seçin.",
       "readingAge": {
-        "0-1": "0–1 yaş (karton kitap, çok az metin)",
+        "0-1": "0–1 yaş",
         "1-3": "1–3 yaş",
         "3-5": "3–5 yaş",
         "sixPlus": "6 yaş ve üzeri"
@@ -610,6 +612,13 @@
         "brown": "Kahverengi",
         "black": "Siyah",
         "hazel": "Ela"
+      },
+      "validation": {
+        "nameMin": "İsim en az 2 karakter olmalıdır",
+        "ageRequired": "Lütfen bir yaş aralığı seçin",
+        "genderRequired": "Lütfen cinsiyet seçin",
+        "hairRequired": "Lütfen saç rengi seçin",
+        "eyeRequired": "Lütfen göz rengi seçin"
       }
     },
     "step2": {
@@ -1912,5 +1921,23 @@
     "networkError": "Bağlantı hatası. İnternet bağlantınızı kontrol edin.",
     "timeout": "İşlem çok uzun sürdü. Lütfen tekrar deneyin.",
     "tryAgain": "Bir sorun oluştu. Lütfen tekrar deneyin."
+  },
+  "legalConsents": {
+    "title": "Yasal Onaylar",
+    "preliminaryInfo": {
+      "label": "Ön Bilgilendirme Formu'nu okudum ve anladım.",
+      "link": "Formu Görüntüle"
+    },
+    "contract": {
+      "label": "Mesafeli Satış Sözleşmesi'ni okudum ve kabul ediyorum.",
+      "link": "Sözleşmeyi Görüntüle"
+    },
+    "digitalWaiver": {
+      "label": "Dijital içeriğin (e-kitap) hesabıma anında teslim edilmesine onay veriyorum ve 14 günlük cayma hakkımın ortadan kalkacağını kabul ediyorum."
+    },
+    "requiredNotice": "Ödeme işlemine devam edebilmek için tüm yasal onayları vermeniz gerekmektedir.",
+    "modalTitle": "Ön Bilgilendirme Formu",
+    "close": "Kapat",
+    "viewFull": "Tam Metni Görüntüle"
   }
 }

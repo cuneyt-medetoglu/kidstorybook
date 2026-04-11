@@ -152,4 +152,8 @@ HeroKidStory için **“video gibi kitap”** deneyimi, **generative video** yer
 
 ---
 
-**Revizyon:** İlk sürüm 2026-03-30. Uygulama fazı başladığında `docs/implementation/` altında kısa implementasyon notu ile bağlanabilir.
+**Revizyon:** İlk sürüm 2026-03-30.
+
+---
+
+> **Not (2026-04-11):** Bu analiz fazlandırılarak `docs/read-along-karaoke/` klasörüne taşınmıştır. Güncel yol haritası, faz dokümanları ve detaylı planlar için → [`docs/read-along-karaoke/ROADMAP.md`](../read-along-karaoke/ROADMAP.md)

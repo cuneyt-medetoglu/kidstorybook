@@ -465,7 +465,9 @@
     "legalLinks": {
       "privacyPolicy": "Privacy Policy",
       "termsOfService": "Terms of Service",
-      "cookiePolicy": "Cookie Policy"
+      "cookiePolicy": "Cookie Policy",
+      "distanceSales": "Distance Sales Agreement",
+      "refundPolicy": "Refund Policy"
     }
   },
   "auth": {
@@ -588,7 +590,7 @@
       "readingAgeLabel": "Listening / reading age",
       "readingAgeHint": "Sets story length and vocabulary (words per page). Pick the band that fits who will hear or read the book.",
       "readingAge": {
-        "0-1": "0–1 years (board-book style, very few words)",
+        "0-1": "0–1 years",
         "1-3": "1–3 years",
         "3-5": "3–5 years",
         "sixPlus": "6 years and up"
@@ -610,6 +612,13 @@
         "brown": "Brown",
         "black": "Black",
         "hazel": "Hazel"
+      },
+      "validation": {
+        "nameMin": "Name must be at least 2 characters",
+        "ageRequired": "Please select an age range",
+        "genderRequired": "Please select a gender",
+        "hairRequired": "Please select a hair color",
+        "eyeRequired": "Please select an eye color"
       }
     },
     "step2": {
@@ -1912,5 +1921,23 @@
     "networkError": "Connection error. Please check your internet connection.",
     "timeout": "The operation took too long. Please try again.",
     "tryAgain": "Something went wrong. Please try again."
+  },
+  "legalConsents": {
+    "title": "Legal Agreements",
+    "preliminaryInfo": {
+      "label": "I have read and understood the Pre-information Form.",
+      "link": "View Form"
+    },
+    "contract": {
+      "label": "I have read and accept the Distance Sales Agreement.",
+      "link": "View Agreement"
+    },
+    "digitalWaiver": {
+      "label": "I consent to the immediate delivery of the digital content (e-book) to my account and acknowledge that my 14-day right of withdrawal will be waived."
+    },
+    "requiredNotice": "You must accept all legal agreements to proceed with payment.",
+    "modalTitle": "Pre-information Form",
+    "close": "Close",
+    "viewFull": "View Full Text"
   }
 }

@@ -16,24 +16,33 @@ import {
 } from "@/lib/herokid-wizard-storage"
 import {
   READING_AGE_BRACKET_IDS,
+  READING_AGE_BRACKETS,
   type ReadingAgeBracketId,
   getReadingAgeBracketConfig,
   inferReadingAgeBracketFromNumericAge,
   parseReadingAgeBracket,
 } from "@/lib/config/reading-age-brackets"
 import { useWizardNavigate } from "@/hooks/use-wizard-navigate"
-import { useForm, type Resolver, type SubmitHandler } from "react-hook-form"
+import { useForm, Controller, type Resolver, type SubmitHandler } from "react-hook-form"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-// Form validation schema
+// Form validation schema — error messages are set via i18n inside the component
 const characterSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+  name: z.string().min(2),
   readingAgeBracket: z.enum(READING_AGE_BRACKET_IDS),
-  gender: z.enum(["boy", "girl"], { message: "Please select a gender" }),
-  hairColor: z.string().min(1, "Please select a hair color"),
-  eyeColor: z.string().min(1, "Please select an eye color"),
+  gender: z.enum(["boy", "girl"]),
+  hairColor: z.string().min(1),
+  eyeColor: z.string().min(1),
 })
 
 type CharacterFormData = {
@@ -85,13 +94,11 @@ export default function Step1Page() {
     handleSubmit,
     watch,
     reset,
+    control,
     formState: { errors, isValid },
   } = useForm<CharacterFormData>({
     resolver: zodResolver(characterSchema) as Resolver<CharacterFormData>,
-    mode: "onChange",
-    defaultValues: {
-      readingAgeBracket: "3-5",
-    },
+    mode: "onTouched",
   })
 
   useEffect(() => {
@@ -122,8 +129,7 @@ export default function Step1Page() {
   }, [reset])
 
   const selectedGender = watch("gender")
-  const selectedHairColor = watch("hairColor")
-  const selectedEyeColor = watch("eyeColor")
+  const selectedBracket = watch("readingAgeBracket")
 
   const onSubmit = (data: CharacterFormData) => {
     navigate("/create/step2", () => {
@@ -273,7 +279,7 @@ export default function Step1Page() {
                     id="name-error"
                     className="text-sm text-red-500"
                   >
-                    {errors.name.message}
+                    {t("validation.nameMin")}
                   </motion.p>
                 )}
               </motion.div>
@@ -289,35 +295,52 @@ export default function Step1Page() {
                   {t("ageLabel")}
                 </Label>
                 <div className="relative">
-                  <Heart className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
-                  <select
-                    id="readingAgeBracket"
-                    {...register("readingAgeBracket")}
-                    className={`w-full rounded-md border py-2 pl-10 pr-4 text-sm transition-colors focus:outline-none focus:ring-2 ${
-                      errors.readingAgeBracket
-                        ? "border-red-500 ring-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
-                    }`}
-                    aria-invalid={errors.readingAgeBracket ? "true" : "false"}
-                  >
-                    <option value="">{t("ageSelect")}</option>
-                    {READING_AGE_BRACKET_IDS.map((id) => {
-                      const labelKey = id === "6+" ? "readingAge.sixPlus" : `readingAge.${id}`
-                      return (
-                        <option key={id} value={id}>
-                          {t(labelKey)}
-                        </option>
-                      )
-                    })}
-                  </select>
+                  <Heart className="pointer-events-none absolute left-3 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                  <Controller
+                    control={control}
+                    name="readingAgeBracket"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                        <SelectTrigger
+                          id="readingAgeBracket"
+                          aria-invalid={errors.readingAgeBracket ? "true" : "false"}
+                          className={cn(
+                            "pl-10 text-sm",
+                            errors.readingAgeBracket
+                              ? "border-red-500 ring-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
+                          )}
+                        >
+                          <SelectValue placeholder={t("ageSelect")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {READING_AGE_BRACKET_IDS.map((id) => {
+                            const labelKey = id === "6+" ? "readingAge.sixPlus" : `readingAge.${id}`
+                            return (
+                              <SelectItem key={id} value={id}>
+                                {t(labelKey)}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
+                {selectedBracket && !errors.readingAgeBracket && (
+                  <p className="text-xs text-muted-foreground">
+                    {t("ageWordRangeHint", {
+                      range: `${READING_AGE_BRACKETS[selectedBracket].wordsPerPageMin}–${READING_AGE_BRACKETS[selectedBracket].wordsPerPageMax}`,
+                    })}
+                  </p>
+                )}
                 {errors.readingAgeBracket && (
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="text-sm text-red-500"
                   >
-                    {errors.readingAgeBracket.message}
+                    {t("validation.ageRequired")}
                   </motion.p>
                 )}
               </motion.div>
@@ -363,7 +386,7 @@ export default function Step1Page() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-sm text-red-500"
                   >
-                    {errors.gender.message}
+                    {t("validation.genderRequired")}
                   </motion.p>
                 )}
               </motion.div>
@@ -379,25 +402,35 @@ export default function Step1Page() {
                   {t("hairLabel")}
                 </Label>
                 <div className="relative">
-                  <Scissors className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
-                  <select
-                    id="hairColor"
-                    {...register("hairColor")}
-                    className={`w-full rounded-md border pl-10 pr-4 py-2 text-sm transition-colors focus:outline-none focus:ring-2 ${
-                      errors.hairColor
-                        ? "border-red-500 ring-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
-                    }`}
-                    aria-invalid={errors.hairColor ? "true" : "false"}
-                    aria-describedby={errors.hairColor ? "hairColor-error" : undefined}
-                  >
-                    <option value="">{t("hairSelect")}</option>
-                    {hairColorOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Scissors className="pointer-events-none absolute left-3 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                  <Controller
+                    control={control}
+                    name="hairColor"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                        <SelectTrigger
+                          id="hairColor"
+                          aria-invalid={errors.hairColor ? "true" : "false"}
+                          aria-describedby={errors.hairColor ? "hairColor-error" : undefined}
+                          className={cn(
+                            "pl-10 text-sm",
+                            errors.hairColor
+                              ? "border-red-500 ring-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
+                          )}
+                        >
+                          <SelectValue placeholder={t("hairSelect")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hairColorOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 {errors.hairColor && (
                   <motion.p
@@ -406,7 +439,7 @@ export default function Step1Page() {
                     id="hairColor-error"
                     className="text-sm text-red-500"
                   >
-                    {errors.hairColor.message}
+                    {t("validation.hairRequired")}
                   </motion.p>
                 )}
               </motion.div>
@@ -422,25 +455,35 @@ export default function Step1Page() {
                   {t("eyeLabel")}
                 </Label>
                 <div className="relative">
-                  <Eye className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
-                  <select
-                    id="eyeColor"
-                    {...register("eyeColor")}
-                    className={`w-full rounded-md border pl-10 pr-4 py-2 text-sm transition-colors focus:outline-none focus:ring-2 ${
-                      errors.eyeColor
-                        ? "border-red-500 ring-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
-                    }`}
-                    aria-invalid={errors.eyeColor ? "true" : "false"}
-                    aria-describedby={errors.eyeColor ? "eyeColor-error" : undefined}
-                  >
-                    <option value="">{t("eyeSelect")}</option>
-                    {eyeColorOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  <Eye className="pointer-events-none absolute left-3 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                  <Controller
+                    control={control}
+                    name="eyeColor"
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value || undefined}>
+                        <SelectTrigger
+                          id="eyeColor"
+                          aria-invalid={errors.eyeColor ? "true" : "false"}
+                          aria-describedby={errors.eyeColor ? "eyeColor-error" : undefined}
+                          className={cn(
+                            "pl-10 text-sm",
+                            errors.eyeColor
+                              ? "border-red-500 ring-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-primary dark:border-slate-600 dark:bg-slate-800 dark:text-slate-50"
+                          )}
+                        >
+                          <SelectValue placeholder={t("eyeSelect")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {eyeColorOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 {errors.eyeColor && (
                   <motion.p
@@ -449,7 +492,7 @@ export default function Step1Page() {
                     id="eyeColor-error"
                     className="text-sm text-red-500"
                   >
-                    {errors.eyeColor.message}
+                    {t("validation.eyeRequired")}
                   </motion.p>
                 )}
               </motion.div>

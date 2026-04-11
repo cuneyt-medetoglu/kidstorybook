@@ -15,7 +15,7 @@ import {
   Mail,
   ArrowUp,
 } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { Link } from "@/i18n/navigation"
 import { BrandWordmark } from "@/components/brand/BrandWordmark"
 
@@ -30,7 +30,10 @@ const socialLinks = [
 const SCROLL_TOP_SHOW_WHEN_PX_FROM_BOTTOM = 400
 
 export function Footer() {
-  const t = useTranslations("footer")
+  const t      = useTranslations("footer")
+  const locale = useLocale()
+  const isTr   = locale === "tr"
+
   const [email, setEmail] = useState("")
   const [showScrollTop, setShowScrollTop] = useState(false)
 
@@ -51,6 +54,10 @@ export function Footer() {
     { labelKey: "privacyPolicy" as const, href: "/privacy" },
     { labelKey: "termsOfService" as const, href: "/terms" },
     { labelKey: "cookiePolicy" as const, href: "/cookies" },
+    { labelKey: "refundPolicy" as const, href: isTr ? "/iade-politikasi" : "/refund-policy" },
+    ...(isTr
+      ? [{ labelKey: "distanceSales" as const, href: "/mesafeli-satis" }]
+      : []),
   ]
 
   useEffect(() => {
@@ -260,25 +267,37 @@ export function Footer() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.6 }}
-          className="flex flex-col items-center justify-between gap-4 sm:flex-row"
+          className="space-y-3"
         >
-          {/* Copyright */}
-          <p className="text-center text-sm text-gray-600 dark:text-slate-400">
-            © {new Date().getFullYear()} HeroKidStory. {t("allRightsReserved")}
-          </p>
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            {/* Copyright */}
+            <p className="text-center text-sm text-gray-600 dark:text-slate-400">
+              © {new Date().getFullYear()} HeroKidStory. {t("allRightsReserved")}
+            </p>
 
-          {/* Legal Links */}
-          <div className="flex flex-wrap justify-center gap-4">
-            {legalLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
-              >
-                {t(`legalLinks.${link.labelKey}`)}
-              </Link>
-            ))}
+            {/* Legal Links */}
+            <div className="flex flex-wrap justify-center gap-4">
+              {legalLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-gray-600 transition-colors hover:text-primary dark:text-slate-400"
+                >
+                  {t(`legalLinks.${link.labelKey}`)}
+                </Link>
+              ))}
+            </div>
           </div>
+
+          {/* TR locale — yasal zorunlu satıcı bilgileri */}
+          {isTr && (
+            <p className="text-center text-xs text-gray-400 dark:text-slate-600">
+              Satıcı: Cüneyt Medetoğlu (Şahıs İşletmesi) · Tunceli Vergi Dairesi VKN: 6130979062 ·{" "}
+              <a href="mailto:info@herokidstory.com" className="hover:text-primary">
+                info@herokidstory.com
+              </a>
+            </p>
+          )}
         </motion.div>
       </div>
 

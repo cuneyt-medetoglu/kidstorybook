@@ -71,13 +71,15 @@ function resolveBookId(item: CartItem): string {
 interface IyzicoPaymentFlowProps {
   /** Ödeme başarılı + yönlendirme öncesi çalışır (opsiyonel cleanup) */
   onPaymentInitiated?: (orderId: string) => void
+  /** TR locale'de yasal onaylar kabul edilmeden ödeme bloke edilir */
+  legalConsentsAccepted?: boolean
 }
 
 // ============================================================================
 // Bileşen
 // ============================================================================
 
-export function IyzicoPaymentFlow({ onPaymentInitiated }: IyzicoPaymentFlowProps) {
+export function IyzicoPaymentFlow({ onPaymentInitiated, legalConsentsAccepted = true }: IyzicoPaymentFlowProps) {
   const t      = useTranslations("checkout")
   const tBadge = useTranslations("payment.providerBadge")
   const { items, appliedPromo } = useCart()
@@ -164,11 +166,14 @@ export function IyzicoPaymentFlow({ onPaymentInitiated }: IyzicoPaymentFlowProps
           </span>
         </div>
 
-        <BillingAddressForm
-          onSubmit={handleAddressSubmit}
-          isLoading={false}
-          defaultValues={savedAddress}
-        />
+        {/* Yasal onaylar kabul edilmediyse ödeme formu bloke */}
+        <div className={legalConsentsAccepted ? undefined : "pointer-events-none select-none opacity-40"}>
+          <BillingAddressForm
+            onSubmit={handleAddressSubmit}
+            isLoading={false}
+            defaultValues={savedAddress}
+          />
+        </div>
       </div>
     )
   }
